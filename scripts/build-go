@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "Building Go Apps...."
+
+ROOT=`pwd`
+
+build() {
+    app=$1
+    mkdir -p $ROOT/build/$app
+    cd $ROOT/api/cmd/$app
+    go build -o $ROOT/build/$app/app .
+    cd $ROOT/build/$app
+    cp $ROOT/docker/Dockerfile .
+    cd $ROOT
+}
+
+while IFS= read -r app
+do
+  build "$app"
+done < "$ROOT/scripts/apps"

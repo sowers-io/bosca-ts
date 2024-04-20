@@ -22,10 +22,9 @@ import (
 )
 
 type ServerConfiguration struct {
-	Port                    int
-	Database                string
-	DatabaseDriver          string
-	OathKeeperConfiguration string
+	Port                     int
+	DatabaseConnectionString string
+	OathKeeperConfiguration  string
 }
 
 func NewServerConfiguration() *ServerConfiguration {
@@ -40,9 +39,6 @@ func NewServerConfiguration() *ServerConfiguration {
 	}
 	if configuration.Port == 0 {
 		configuration.Port = 8081
-	}
-	if configuration.DatabaseDriver == "" {
-		configuration.DatabaseDriver = "postgres"
 	}
 
 	return &configuration

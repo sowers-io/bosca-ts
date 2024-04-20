@@ -1,0 +1,24 @@
+#!/bin/sh
+
+echo "Building Docker Images ...."
+
+ROOT=`pwd`
+
+tag="latest"
+
+if [ "$2" != "" ]; then
+  tag = "$2"
+fi
+
+build() {
+    app=$1
+    cd $ROOT/build/$app
+    cp $ROOT/docker/Dockerfile .
+    docker build -t ghcr.io/sowers-io/bosca/$app:$tag .
+    cd $ROOT
+}
+
+while IFS= read -r app
+do
+  build "$app"
+done < "$ROOT/scripts/apps"

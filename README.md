@@ -24,6 +24,7 @@ Key Features:
 * Personalization
     * Profiles
     * Recommendations
+* Client SDKs (GraphQL)
 
 Roadmap:
 
@@ -65,6 +66,7 @@ fit into any organization's architecture well.
 * TypeScript
 * Ollama
 * MinIO
+* GraphQL
 
 For more information, you can look in the /docs folder
 

@@ -23,17 +23,19 @@ import (
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
 	"bosca.io/pkg/server"
+	"context"
+	"github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc"
 	"log"
 )
 
 func main() {
 	cfg := configuration.NewServerConfiguration()
-	db, err := datastore.NewDatabase(cfg)
+	pool, err := datastore.NewDatabasePool(context.Background(), cfg)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
-	ds := profiles.NewDataStore(db)
+	ds := profiles.NewDataStore(stdlib.OpenDBFromPool(pool))
 	svc := profiles.NewService(ds)
 	server.StartServer(cfg, func(svr *grpc.Server) {
 		protoprofiles.RegisterProfilesServiceServer(svr, svc)

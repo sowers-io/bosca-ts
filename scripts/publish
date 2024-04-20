@@ -1,3 +1,24 @@
 #!/bin/sh
 
-echo "Publishing ...."
+echo $DOCKER_PASSWORD | docker login ghcr.io -u $DOCKER_USERNAME --password-stdin
+
+echo "Building Image and Publishing ...."
+
+tag="latest"
+
+if [ "$2" != "" ]; then
+  tag = "$2"
+fi
+
+build() {
+    app=$1
+    mkdir -p $ROOT/build/$app
+    cd $ROOT/api/cmd/$app
+    go build -o $ROOT/build/$app/app .
+    cd $ROOT/build/$app
+    cp $ROOT/docker/Dockerfile .
+    docker build -t ghcr.io/sowers-io/bosca/$app:$tag .
+    cd $ROOT
+}
+
+build profiles

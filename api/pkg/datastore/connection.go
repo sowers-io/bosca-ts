@@ -18,10 +18,11 @@ package datastore
 
 import (
 	cfg "bosca.io/pkg/configuration"
-	"database/sql"
+	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewDatabase(cfg *cfg.ServerConfiguration) (*sql.DB, error) {
-	db, err := sql.Open(cfg.DatabaseDriver, cfg.Database)
-	return db, err
+func NewDatabasePool(ctx context.Context, cfg *cfg.ServerConfiguration) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.New(ctx, cfg.DatabaseConnectionString)
+	return pool, err
 }

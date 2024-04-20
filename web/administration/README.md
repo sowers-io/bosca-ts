@@ -44,16 +44,16 @@ Build the application for production:
 
 ```bash
 # npm
-npm run build
+npm run build-go
 
 # pnpm
-pnpm run build
+pnpm run build-go
 
 # yarn
-yarn build
+yarn build-go
 
 # bun
-bun run build
+bun run build-go
 ```
 
 Locally preview production build:

@@ -57,7 +57,7 @@ enum ProfileVisibility {
 
 message Profile {
   string id = 1;
-  string principal_id = 2;
+  string principal = 2;
   string name = 3;
   repeated ProfileAttribute attributes = 4;
   ProfileVisibility visibility = 5;

@@ -37,7 +37,12 @@ func (ds *DataStore) AddProfile(ctx context.Context, profile *profiles.Profile) 
 	if err != nil {
 		return err
 	}
-	_, err = tx.ExecContext(ctx, "insert into profiles (prinicpal_id, name) values (?, ?)", profile.Name)
+	stmt, err := ds.db.Prepare("insert into profiles (principal, name) values ($1, $2)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(profile.Id, profile.Name)
 	if err != nil {
 		return err
 	}

@@ -12,13 +12,15 @@ create type profile_visibility as enum ('system', 'user', 'friends', 'friends_of
 
 create table profiles
 (
-    id         uuid               not null,
-    principal  varchar            not null,
-    name       varchar            not null,
+    id         uuid               not null default gen_random_uuid(),
+    principal  varchar            not null check (length(principal) > 0),
+    name       varchar            not null check (length(name) > 0),
     visibility profile_visibility not null default 'system'::profile_visibility,
     created    timestamp          not null default now(),
     primary key (id)
 );
+
+comment on column profiles.principal is 'this is the identity provider id';
 
 create table profile_attributes
 (
@@ -34,7 +36,8 @@ create table profile_attributes
     created    timestamp          not null default now(),
     expiration timestamp,
     primary key (id),
-    foreign key (profile_id) references profiles (id) on delete cascade
+    foreign key (profile_id) references profiles (id) on delete cascade,
+    foreign key (type_id) references profile_attribute_types (id) on delete cascade
 );
 -- +goose StatementEnd
 

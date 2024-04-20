@@ -11,8 +11,11 @@ import (
 )
 
 func Up(name string) *sql.DB {
-	cfg := configuration.NewServerConfiguration()
-	cfg.DatabaseConnectionString = "postgresql://bosca:bosca@localhost:5432/boscatest"
+	err := os.Setenv("BOSCA_TESTS_CONNECTION_STRING", "postgresql://bosca:bosca@localhost:5432/boscatest")
+	if err != nil {
+		panic(err)
+	}
+	cfg := configuration.NewServerConfiguration("tests", 6001, 6011)
 	if pool, err := datastore.NewDatabasePool(context.Background(), cfg); err == nil {
 		db := stdlib.OpenDBFromPool(pool)
 		goose.SetBaseFS(os.DirFS("../../../database/" + name))

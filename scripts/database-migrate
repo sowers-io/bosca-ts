@@ -14,6 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cd api
-CGO_ENABLED=1 go test -race -json -v -coverprofile=coverage.txt ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
-gocover-cobertura < coverage.txt > coverage.xml
+set -e
+
+echo "Migrating Database...."
+
+ROOT=`pwd`
+
+migrate() {
+  DIR="$ROOT/database/$1"
+  if [ -d "$DIR" ]; then
+    echo "Migrating $app...\n"
+
+    cd $DIR
+    goose postgres "$2" up
+  fi
+}
+
+while IFS= read -r app
+do
+  VAR_NAME="${app}_CONNECTION_STRING"
+  CONNECTION_STRING=$(eval echo "$"$VAR_NAME)
+
+  migrate "$app" "$CONNECTION_STRING"
+done < "$ROOT/scripts/apps"
+
+echo "...done"

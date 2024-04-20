@@ -1,16 +1,33 @@
 #!/bin/sh
 
+# Copyright 2024 Sowers, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 echo "Building Go Apps...."
 
 ROOT=`pwd`
 
 build() {
     app=$1
+
+    echo "Building $app...\n"
+
     mkdir -p $ROOT/build/$app
     cd $ROOT/api/cmd/$app
     go build -o $ROOT/build/$app/app .
     cd $ROOT/build/$app
-    cp $ROOT/docker/Dockerfile .
+    cp $ROOT/docker/Dockerfile-go .
     cd $ROOT
 }
 
@@ -18,3 +35,5 @@ while IFS= read -r app
 do
   build "$app"
 done < "$ROOT/scripts/apps"
+
+echo "...done"

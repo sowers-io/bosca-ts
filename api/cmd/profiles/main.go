@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-//go:generate protoc -I ../../../protobuf --go_out=../../api/protobuf --go_opt=paths=source_relative --go-grpc_out=../../api/protobuf --go-grpc_opt=paths=source_relative ../../../protobuf/profiles/profiles.proto ../../../protobuf/empty.proto ../../../protobuf/requests.proto
 package main
 
 import (
@@ -24,20 +23,25 @@ import (
 	"bosca.io/pkg/datastore"
 	"bosca.io/pkg/server"
 	"context"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc"
 	"log"
 )
 
 func main() {
-	cfg := configuration.NewServerConfiguration()
+	cfg := configuration.NewServerConfiguration("profiles", 5004, 5014)
 	pool, err := datastore.NewDatabasePool(context.Background(), cfg)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 	ds := profiles.NewDataStore(stdlib.OpenDBFromPool(pool))
 	svc := profiles.NewService(ds)
-	server.StartServer(cfg, func(svr *grpc.Server) {
-		protoprofiles.RegisterProfilesServiceServer(svr, svc)
+	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux) {
+		protoprofiles.RegisterProfilesServiceServer(grpcSvr, svc)
+		err := protoprofiles.RegisterProfilesServiceHandlerServer(ctx, restSvr, svc)
+		if err != nil {
+			log.Fatalf("failed to register profiles: %v", err)
+		}
 	})
 }

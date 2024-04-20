@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo "Building Docker Images...."
+echo $DOCKER_PASSWORD | docker login ghcr.io -u $DOCKER_USERNAME --password-stdin
+
+echo "Publishing Docker Images...."
 
 ROOT=`pwd`
 
@@ -24,35 +26,14 @@ if [ "$IMAGE_TAG" != "" ]; then
   tag="$IMAGE_TAG"
 fi
 
-build_app() {
+build() {
     app=$1
-
-    echo "Building $app...\n"
-
-    cd $ROOT/build/$app
-    cp $ROOT/docker/Dockerfile-go Dockerfile
-    docker build -t ghcr.io/sowers-io/bosca/$app:$tag .
-    cd $ROOT
-}
-
-build_migrations() {
-  mkdir -p $ROOT/build/migrations
-  cd $ROOT/build/migrations
-  mkdir -p scripts
-  cd scripts
-  cp $ROOT/scripts/apps .
-  cp $ROOT/scripts/database-migrate .
-  cd ..
-  cp -Rf $ROOT/database .
-  cp $ROOT/docker/Dockerfile-migration Dockerfile
-  docker build -t ghcr.io/sowers-io/bosca/migrations:$tag .
+    docker image push -t ghcr.io/sowers-io/bosca/$app:$tag .
 }
 
 while IFS= read -r app
 do
-  build_app "$app"
+  build "$app"
 done < "$ROOT/scripts/apps"
-
-build_migrations
 
 echo "...done"

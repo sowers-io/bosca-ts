@@ -40,8 +40,9 @@ func (s *service) AddAccount(ctx context.Context, request *grpc.AddAccountReques
 }
 
 func (s *service) GetAccounts(ctx context.Context, request *protobuf.Empty) (*grpc.Accounts, error) {
-	//TODO implement me
-	panic("implement me")
+	return &grpc.Accounts{
+		Accounts: make([]*grpc.Account, 0),
+	}, nil
 }
 
 func (s *service) GetAccount(ctx context.Context, request *grpc.GetAccountRequest) (*grpc.Account, error) {

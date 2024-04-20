@@ -14,8 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# set -e      ### leaving disabled for now until more things are cleaned up
+set -e
 
-cd api
-CGO_ENABLED=1 go test -race -json -v -coverprofile=coverage.txt ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
-gocover-cobertura < coverage.txt > coverage.xml
+echo "Building Go Apps...."
+
+ROOT=`pwd`
+
+build() {
+    app=$1
+
+    echo "Building $app...\n"
+
+    mkdir -p $ROOT/build/$app
+    cd $ROOT/api/cmd/$app
+    go build -o $ROOT/build/$app/app .
+    cd $ROOT/build/$app
+    cp $ROOT/docker/Dockerfile-go .
+    cd $ROOT
+}
+
+while IFS= read -r app
+do
+  build "$app"
+done < "$ROOT/scripts/apps"
+
+echo "...done"

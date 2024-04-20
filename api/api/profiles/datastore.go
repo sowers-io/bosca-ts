@@ -17,6 +17,8 @@
 package profiles
 
 import (
+	"bosca.io/api/protobuf/profiles"
+	"context"
 	"database/sql"
 )
 
@@ -28,4 +30,21 @@ func NewDataStore(db *sql.DB) *DataStore {
 	return &DataStore{
 		db,
 	}
+}
+
+func (ds *DataStore) AddProfile(ctx context.Context, profile *profiles.Profile) error {
+	tx, err := ds.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+	if err != nil {
+		return err
+	}
+	stmt, err := ds.db.Prepare("insert into profiles (principal, name) values ($1, $2)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(profile.Id, profile.Name)
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
 }

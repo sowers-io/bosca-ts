@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+./scripts/initialize
+
+cd services
+docker-compose up -d
+cd ..
+
+wait 3
+
+./scripts/initialize-database-dev

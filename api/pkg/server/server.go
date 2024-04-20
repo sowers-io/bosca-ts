@@ -20,31 +20,44 @@ import (
 	"bosca.io/pkg/configuration"
 	"context"
 	"fmt"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	oath "github.com/ory/oathkeeper/middleware"
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"net/http"
 )
 
-func StartServer(cfg *configuration.ServerConfiguration, register func(*grpc.Server)) {
-	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", cfg.Port))
+func StartServer(cfg *configuration.ServerConfiguration, register func(context.Context, *grpc.Server, *runtime.ServeMux)) {
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", cfg.GrpcPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	ctx := context.Background()
 
 	oathmw, err := oath.New(ctx, oath.WithConfigFile(cfg.OathKeeperConfiguration))
 	if err != nil {
 		log.Fatalf("failed to create oath middleware: %v", err)
 	}
 
-	opts := []grpc.ServerOption{
+	grpcOpts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(oathmw.UnaryInterceptor()),
 		grpc.StreamInterceptor(oathmw.StreamInterceptor()),
 	}
-	server := grpc.NewServer(opts...)
+	server := grpc.NewServer(grpcOpts...)
+	mux := runtime.NewServeMux()
 
-	register(server)
+	register(ctx, server, mux)
+
+	go func() {
+		err = http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", cfg.RestPort), mux)
+		if err != nil {
+			log.Fatalf("failed to start HTTP server: %v", err)
+		}
+	}()
 
 	err = server.Serve(listen)
 	if err != nil {

@@ -22,15 +22,24 @@ import (
 )
 
 type ServerConfiguration struct {
-	Port                    int
-	Database                string
-	DatabaseDriver          string
-	OathKeeperConfiguration string
+	RestPort                int                    `envconfig:"REST_PORT"`
+	GrpcPort                int                    `envconfig:"GRPC_PORT"`
+	OathKeeperConfiguration string                 `envconfig:"OAUTH_KEEPER_CONFIGURATION"`
+	Database                *DatabaseConfiguration `ignored:"true"`
 }
 
-func NewServerConfiguration() *ServerConfiguration {
+type DatabaseConfiguration struct {
+	ConnectionString string `envconfig:"CONNECTION_STRING" required:"true"`
+}
+
+func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcPort int) *ServerConfiguration {
 	var configuration ServerConfiguration
+	var database DatabaseConfiguration
 	err := envconfig.Process("bosca", &configuration)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = envconfig.Process("bosca_"+databasePrefix, &database)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,12 +47,13 @@ func NewServerConfiguration() *ServerConfiguration {
 	if configuration.OathKeeperConfiguration == "" {
 		configuration.OathKeeperConfiguration = "../conf/accounts/oathkeeper.yaml"
 	}
-	if configuration.Port == 0 {
-		configuration.Port = 8081
+	if configuration.RestPort == 0 {
+		configuration.RestPort = defaultRestPort
 	}
-	if configuration.DatabaseDriver == "" {
-		configuration.DatabaseDriver = "postgres"
+	if configuration.GrpcPort == 0 {
+		configuration.GrpcPort = defaultGrpcPort
 	}
+	configuration.Database = &database
 
 	return &configuration
 }

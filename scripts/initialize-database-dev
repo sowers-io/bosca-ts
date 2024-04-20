@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# Copyright 2024 Sowers, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -e
+
+export PGPASSWORD='bosca'
+
+psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscaprofiles"
+psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscaaccounts"
+psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscacontent"
+psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscatest"
+
+psql -U bosca -h localhost -d bosca -c "CREATE ROLE boscaprofiles WITH SUPERUSER LOGIN PASSWORD 'bosca'"
+psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscaprofiles"
+psql -U bosca -h localhost -d bosca -c "CREATE ROLE boscaaccounts WITH SUPERUSER LOGIN PASSWORD 'bosca'"
+psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscaaccounts"
+psql -U bosca -h localhost -d bosca -c "CREATE ROLE boscacontent WITH SUPERUSER LOGIN PASSWORD 'bosca'"
+psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscacontent"
+
+psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscatest"
+
+export accounts_CONNECTION_STRING="postgresql://boscaaccounts:bosca@localhost:5432/boscaaccounts"
+export profiles_CONNECTION_STRING="postgresql://boscaprofiles:bosca@localhost:5432/boscaprofiles"
+export content_CONNECTION_STRING="postgresql://boscacontent:bosca@localhost:5432/boscacontent"
+
+./scripts/database-migrate

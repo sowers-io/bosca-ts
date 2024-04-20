@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package datastore
+package main
 
-import (
-	cfg "bosca.io/pkg/configuration"
-	"context"
-	"github.com/jackc/pgx/v5/pgxpool"
-)
+func main() {
 
-func NewDatabasePool(ctx context.Context, cfg *cfg.ServerConfiguration) (*pgxpool.Pool, error) {
-	pool, err := pgxpool.New(ctx, cfg.Database.ConnectionString)
-	return pool, err
 }

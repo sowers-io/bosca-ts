@@ -3,3 +3,7 @@
 
 .nuxt
 node_modules
+coverage
+coverage.txt
+coverage.xml
+build

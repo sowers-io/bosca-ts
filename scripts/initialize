@@ -14,8 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# set -e      ### leaving disabled for now until more things are cleaned up
+set -e
 
-cd api
-CGO_ENABLED=1 go test -race -json -v -coverprofile=coverage.txt ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
-gocover-cobertura < coverage.txt > coverage.xml
+go install github.com/pressly/goose/v3/cmd/goose@latest
+go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
+go install github.com/boumenot/gocover-cobertura@latest
+
+go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+cd api; go mod download

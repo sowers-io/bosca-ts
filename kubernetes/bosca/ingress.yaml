@@ -50,3 +50,10 @@ spec:
                 name: profiles
                 port:
                   number: 5004
+          - pathType: Prefix
+            path: "/v1/graphql"
+            backend:
+              service:
+                name: graphql
+                port:
+                  number: 8080

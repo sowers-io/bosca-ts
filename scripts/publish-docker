@@ -14,8 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# set -e      ### leaving disabled for now until more things are cleaned up
+set -e
 
-cd api
-CGO_ENABLED=1 go test -race -json -v -coverprofile=coverage.txt ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
-gocover-cobertura < coverage.txt > coverage.xml
+echo $DOCKER_PASSWORD | docker login ghcr.io -u $DOCKER_USERNAME --password-stdin
+
+echo "Publishing Docker Images...."
+
+ROOT=`pwd`
+
+build() {
+    app=$1
+    docker image push --all-tags ghcr.io/sowers-io/bosca/$app
+}
+
+while IFS= read -r app
+do
+  build "$app"
+done < "$ROOT/scripts/apps"
+
+echo "...done"

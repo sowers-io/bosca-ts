@@ -34,7 +34,7 @@ build_app() {
     cd $ROOT/build/$app
     cp $ROOT/docker/Dockerfile-go Dockerfile
     docker build -t ghcr.io/sowers-io/bosca/$app:latest .
-    docker image tag ghcr.io/sowers-io/bosca/$app:$tag
+    docker image tag ghcr.io/sowers-io/bosca/$app:latest ghcr.io/sowers-io/bosca/$app:$tag
     cd $ROOT
 }
 

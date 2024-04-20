@@ -3,6 +3,8 @@ module bosca.io
 go 1.22.2
 
 require (
+	github.com/graphql-go/handler v0.2.3
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.1
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/ory/oathkeeper v0.40.7
@@ -68,7 +70,7 @@ require (
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.1 // indirect
+	github.com/graphql-go/graphql v0.8.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

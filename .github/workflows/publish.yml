@@ -15,7 +15,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: bosca
           POSTGRES_USER: bosca
-          POSTGRES_DB: bosca
+          POSTGRES_DB: boscatest
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22.2'
+          go-version-file: 'api/go.mod'
       - name: Initialize CI
         run: ./scripts/initialize
       - name: Build Go

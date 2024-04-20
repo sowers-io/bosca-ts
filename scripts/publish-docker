@@ -14,21 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -e
+
 echo $DOCKER_PASSWORD | docker login ghcr.io -u $DOCKER_USERNAME --password-stdin
 
 echo "Publishing Docker Images...."
 
 ROOT=`pwd`
 
-tag="latest"
-
-if [ "$IMAGE_TAG" != "" ]; then
-  tag="$IMAGE_TAG"
-fi
-
 build() {
     app=$1
-    docker image push -t ghcr.io/sowers-io/bosca/$app:$tag .
+    docker image push --all-tags ghcr.io/sowers-io/bosca/$app
 }
 
 while IFS= read -r app

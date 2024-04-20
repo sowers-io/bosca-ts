@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# set -e      ### leaving disabled for now until more things are cleaned up
+
 cd api
 CGO_ENABLED=1 go test -race -json -v -coverprofile=coverage.txt ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
 gocover-cobertura < coverage.txt > coverage.xml

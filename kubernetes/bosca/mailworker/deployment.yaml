@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailworker
+  namespace: bosca
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: mailworker
+  template:
+    metadata:
+      labels:
+        app: mailworker
+    spec:
+      containers:
+      - name: mailworker
+        image: ghcr.io/sowers-io/bosca/mailworker:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: BOSCA_ACCOUNTS_API_SERVICE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: service-credentials
+                key: username
+          - name: BOSCA_ACCOUNTS_API_SERVICE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: service-credentials
+                key: password
+          - name: BOSCA_MAIL_HOSTNAME
+            valueFrom:
+              secretKeyRef:
+                name: mail-credentials
+                key: hostname
+          - name: BOSCA_MAIL_PORT
+            valueFrom:
+              secretKeyRef:
+                name: mail-credentials
+                key: port
+          - name: BOSCA_MAIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mail-credentials
+                key: username
+          - name: BOSCA_MAIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mail-credentials
+                key: credential
+        envFrom:
+        - configMapRef:
+            name: mailworker-env
+      terminationGracePeriodSeconds: 60
+      imagePullSecrets:
+        - name: packages-credentials

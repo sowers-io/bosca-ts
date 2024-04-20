@@ -1,0 +1,14 @@
+resources:
+- deployment.yaml
+- service.yaml
+- jobs-database-secret.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: jobs-env
+  literals:
+  - BOSCA_ACCOUNTS_API_ADDRESS=http://accounts.bosca.svc.cluster.local:5011
+  - BOSCA_MAIL_API_ADDRESS=http://mail.bosca.svc.cluster.local:5012
+  - BOSCA_JOBS_API_ADDRESS=http://jobs.bosca.svc.cluster.local:5015

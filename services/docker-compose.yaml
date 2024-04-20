@@ -1,0 +1,89 @@
+version: '3.9'
+
+x-minio-common: &minio-common
+  image: quay.io/minio/minio:RELEASE.2024-04-06T05-26-02Z
+  command: server --console-address ":9011" http://minio{1...4}/data{1...2}
+  expose:
+    - "9010"
+    - "9011"
+  healthcheck:
+    test: ["CMD", "mc", "ready", "local"]
+    interval: 5s
+    timeout: 5s
+    retries: 5
+  networks:
+    - net1
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=bosca
+      - POSTGRES_USER=bosca
+      - POSTGRES_DB=bosca
+    networks:
+      - net1
+
+  minio1:
+    <<: *minio-common
+    hostname: minio1
+    volumes:
+      - minio-data1-1:/data1
+      - minio-data1-2:/data2
+
+  minio2:
+    <<: *minio-common
+    hostname: minio2
+    volumes:
+      - minio-data2-1:/data1
+      - minio-data2-2:/data2
+
+  minio3:
+    <<: *minio-common
+    hostname: minio3
+    volumes:
+      - minio-data3-1:/data1
+      - minio-data3-2:/data2
+
+  minio4:
+    <<: *minio-common
+    hostname: minio4
+    volumes:
+      - minio-data4-1:/data1
+      - minio-data4-2:/data2
+
+  nginx:
+    image: nginx:1.19.2-alpine
+    hostname: nginx
+    volumes:
+      - ./minio-nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "9010:9010"
+      - "9011:9011"
+    depends_on:
+      - minio1
+      - minio2
+      - minio3
+      - minio4
+    networks:
+      - net1
+
+networks:
+  net1:
+    ipam:
+      driver: default
+
+volumes:
+  postgres:
+  minio-data1-1:
+  minio-data1-2:
+  minio-data2-1:
+  minio-data2-2:
+  minio-data3-1:
+  minio-data3-2:
+  minio-data4-1:
+  minio-data4-2:

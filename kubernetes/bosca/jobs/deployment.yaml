@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobs
+  namespace: bosca
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: jobs
+  template:
+    metadata:
+      labels:
+        app: jobs
+    spec:
+      containers:
+      - name: jobs
+        image: ghcr.io/sowers-io/bosca/jobs:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5005
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /alive
+            port: 5005
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        ports:
+          - containerPort: 5005
+          - containerPort: 5015
+        env:
+          - name: BOSCA_ACCOUNTS_API_SERVICE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: service-credentials
+                key: username
+          - name: BOSCA_ACCOUNTS_API_SERVICE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: service-credentials
+                key: password
+          - name: BOSCA_JOBS_DB_CONNECTION
+            valueFrom:
+              secretKeyRef:
+                name: jobs-database-credentials
+                key: jobs-connection
+        envFrom:
+        - configMapRef:
+            name: jobs-env
+        volumeMounts:
+          - mountPath: /opt/bosca
+            name: service-config
+          - mountPath: /opt/bosca/certificates
+            name: service-certificate
+            readOnly: true
+      terminationGracePeriodSeconds: 180
+      imagePullSecrets:
+        - name: packages-credentials
+      volumes:
+        - name: service-config
+          persistentVolumeClaim:
+            claimName: service-config
+        - name: service-certificate
+          secret:
+            secretName: service-certificate

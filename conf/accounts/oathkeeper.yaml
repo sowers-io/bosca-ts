@@ -1,0 +1,39 @@
+serve:
+  proxy:
+    port: 4455
+  api:
+    port: 4456
+
+access_rules:
+  repositories:
+    - file://../conf/accounts/access-rules.yaml
+
+mutators:
+  header:
+    enabled: true
+    config:
+      headers:
+        X-User: "{{ print .Subject }}"
+  noop:
+    enabled: true
+  id_token:
+    enabled: true
+    config:
+      issuer_url: https://auth.bosca.io/
+      jwks_url: file:///jwks.json
+
+authorizers:
+  allow:
+    enabled: true
+  deny:
+    enabled: true
+
+authenticators:
+  anonymous:
+    enabled: true
+    config:
+      subject: anonymous
+  oauth2_client_credentials:
+    enabled: true
+    config:
+      token_url: https://bosca.io/oauth2/token

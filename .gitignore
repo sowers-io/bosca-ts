@@ -1,0 +1,5 @@
+.idea
+*.iml
+
+.nuxt
+node_modules

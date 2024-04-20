@@ -3,6 +3,8 @@ Bosca
 
 **Current Project Phase:** Pre-Alpha
 
+See [Getting Started](docs/getting-started.md) for development instructions.
+
 This project is fairly new. I've only been working on it for about a week now (though, I've been conceptualizing it in 
 my head for quite some time), and it seems like a perfect opportunity to start developing it in the open.
 

@@ -57,10 +57,11 @@ enum ProfileVisibility {
 
 message Profile {
   string id = 1;
-  string name = 2;
-  repeated ProfileAttribute attributes = 3;
-  ProfileVisibility visibility = 4;
-  google.protobuf.Timestamp created = 5;
+  string principal_id = 2;
+  string name = 3;
+  repeated ProfileAttribute attributes = 4;
+  ProfileVisibility visibility = 5;
+  google.protobuf.Timestamp created = 6;
 }
 
 message ProfileAttributeType {

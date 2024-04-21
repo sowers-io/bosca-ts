@@ -252,7 +252,7 @@ kratos:
 
     serve:
       public:
-        base_url: "https://accounts.bosca.io"
+        base_url: "https://accounts.bosca.io/sessions/whoami"
         port: 4433
         cors:
           enabled: true

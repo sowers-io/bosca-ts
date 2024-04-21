@@ -29,6 +29,16 @@ authorizers:
     enabled: true
 
 authenticators:
+  noop:
+    enabled: true
+  bearer_token:
+    enabled: true
+    config:
+      check_session_url: https://accounts.bosca.io/sessions/whoami
+      preserve_path: true
+      subject_from: "identity.id"
+      token_from:
+        header: Authorization
   anonymous:
     enabled: true
     config:

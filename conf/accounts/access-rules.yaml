@@ -1,29 +1,12 @@
-- id: "allow-anonymous-with-header-mutator"
+- id: "bearer"
   version: "v0.40.7"
   match:
-    url: "http://<127.0.0.1|localhost>:d+/bosca.content.ContentService/AddMetadata"
-    methods:
-      - "GET"
+    authority: "0.0.0.0:5013"
+    full_method: "bosca.content.ContentService/AddMetadata"
   authenticators:
     - handler: "anonymous"
+    - handler: "bearer_token"
   authorizer:
     handler: "allow"
   mutators:
     - handler: "header"
-      config:
-        headers:
-          X-User: "{{ print .Subject }}"
-- id: "allow-anonymous-with-id-token-mutator"
-  version: "v0.40.7"
-  upstream:
-    url: "https://httpbin.org/anything/id_token"
-  match:
-    url: "http://<127.0.0.1|localhost>:4455/anything/id_token"
-    methods:
-      - "GET"
-  authenticators:
-    - handler: "anonymous"
-  authorizer:
-    handler: "allow"
-  mutators:
-    - handler: "id_token"

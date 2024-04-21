@@ -37,9 +37,9 @@ func main() {
 	}
 	ds := accounts.NewDataStore(stdlib.OpenDBFromPool(pool))
 	svc := accounts.NewService(ds)
-	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux) {
+	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
 		protoaccounts.RegisterAccountsServiceServer(grpcSvr, svc)
-		err := protoaccounts.RegisterAccountsServiceHandlerServer(ctx, restSvr, svc)
+		err := protoaccounts.RegisterAccountsServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
 			log.Fatalf("failed to register accounts: %v", err)
 		}

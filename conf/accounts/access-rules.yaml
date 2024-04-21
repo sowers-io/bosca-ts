@@ -1,9 +1,7 @@
 - id: "allow-anonymous-with-header-mutator"
   version: "v0.40.7"
-  upstream:
-    url: "https://httpbin.org/anything/header"
   match:
-    url: "http://<127.0.0.1|localhost>:4455/anything/header"
+    url: "http://<127.0.0.1|localhost>:d+/bosca.content.ContentService/AddMetadata"
     methods:
       - "GET"
   authenticators:

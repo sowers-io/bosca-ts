@@ -16,6 +16,15 @@
 
 set -e
 
+if [ "$OSTYPE" = "darwin23" ]; then
+  brew install minio/stable/mc
+else
+  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $GOPATH/bin/mc
+
+  chmod +x $GOPATH/bin/mc
+  export PATH=$PATH:$GOPATH/bin/mc
+fi
+
 go install github.com/pressly/goose/v3/cmd/goose@latest
 go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
 go install github.com/boumenot/gocover-cobertura@latest

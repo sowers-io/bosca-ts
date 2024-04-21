@@ -20,7 +20,7 @@ mutators:
     enabled: true
     config:
       issuer_url: https://auth.bosca.io/
-      jwks_url: file:///jwks.json
+      jwks_url: https://auth.bosca.io/.well-known/jwks.json
 
 authorizers:
   allow:

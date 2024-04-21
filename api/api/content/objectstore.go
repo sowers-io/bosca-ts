@@ -1,9 +1,12 @@
 package content
 
-import "bosca.io/api/protobuf/content"
+import (
+	"bosca.io/api/protobuf/content"
+	"context"
+)
 
 type ObjectStore interface {
-	CreateUploadUrl(id string, name string, contentType string, attributes map[string]string) (content.SignedUrl, error)
+	CreateUploadUrl(ctx context.Context, id string, name string, contentType string, attributes map[string]string) (*content.SignedUrl, error)
 
-	CreateDownloadUrl(id string) (content.SignedUrl, error)
+	CreateDownloadUrl(ctx context.Context, id string) (*content.SignedUrl, error)
 }

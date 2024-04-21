@@ -11,6 +11,9 @@ x-minio-common: &minio-common
     interval: 5s
     timeout: 5s
     retries: 5
+  environment:
+    - MINIO_ACCESS_KEY=67fO5gFs6BuksBrh6rMp
+    - MINIO_SECRET_KEY=eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
   networks:
     - net1
 

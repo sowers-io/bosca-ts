@@ -17,6 +17,7 @@
 package configuration
 
 import (
+	"errors"
 	"github.com/kelseyhightower/envconfig"
 	"log"
 )
@@ -25,23 +26,54 @@ type ServerConfiguration struct {
 	RestPort                int                    `envconfig:"REST_PORT"`
 	GrpcPort                int                    `envconfig:"GRPC_PORT"`
 	OathKeeperConfiguration string                 `envconfig:"OAUTH_KEEPER_CONFIGURATION"`
+	StorageType             string                 `envconfig:"STORAGE_TYPE"`
 	Database                *DatabaseConfiguration `ignored:"true"`
+	Storage                 *StorageConfiguration  `ignored:"true"`
 }
 
 type DatabaseConfiguration struct {
 	ConnectionString string `envconfig:"CONNECTION_STRING" required:"true"`
 }
 
+const StorageTypeMinio = "minio"
+
+type StorageConfiguration struct {
+	Minio *MinioConfiguration
+}
+
+type MinioConfiguration struct {
+	Endpoint        string `envconfig:"ENDPOINT"`
+	Bucket          string `envconfig:"BUCKET" default:"bosca"`
+	AccessKeyID     string `envconfig:"ACCESS_KEY_ID"`
+	SecretAccessKey string `envconfig:"SECRET_ACCESS_KEY"`
+}
+
 func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcPort int) *ServerConfiguration {
 	var configuration ServerConfiguration
 	var database DatabaseConfiguration
+
 	err := envconfig.Process("bosca", &configuration)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to process configuration: %v", err)
 	}
+
 	err = envconfig.Process("bosca_"+databasePrefix, &database)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to process database configuration: %v", err)
+	}
+
+	switch configuration.StorageType {
+	case StorageTypeMinio:
+		configuration.Storage = &StorageConfiguration{
+			Minio: &MinioConfiguration{},
+		}
+		err = envconfig.Process("bosca_minio", configuration.Storage.Minio)
+		if err != nil {
+			log.Fatalf("failed to process storage configuration: %v", err)
+		}
+		break
+	default:
+		panic(errors.New("unknown storage type: " + configuration.StorageType))
 	}
 
 	if configuration.OathKeeperConfiguration == "" {
@@ -53,6 +85,7 @@ func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcP
 	if configuration.GrpcPort == 0 {
 		configuration.GrpcPort = defaultGrpcPort
 	}
+
 	configuration.Database = &database
 
 	return &configuration

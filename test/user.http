@@ -1,0 +1,68 @@
+### Login Me - Get Login Action
+GET https://accounts.bosca.io/self-service/login/api
+Accept: application/json
+
+> {% client.global.set("login_action", response.body.ui.action); %}
+
+### Login Me - Login with Action
+POST {{login_action}}
+Accept: application/json
+Content-Type: application/json
+
+{"identifier": "test@bosca.dev", "password": "vjr0awg9vdh5bth-JDW", "method": "password"}
+
+> {% client.global.set("session_token", response.body.session_token); %}
+
+###
+GET http://localhost:5002/v1/mail/messages/fastmail/k@brocks.io?offset=0&limit=25
+Authorization: Bearer {{session_token}}
+
+###
+GET http://localhost:5001/v1/accounts/external/login?provider=google
+Authorization: Bearer {{session_token}}
+
+###
+GET http://localhost:5001/v1/accounts/manage/info
+Authorization: Bearer {{session_token}}
+
+###
+GET http://localhost:5001/v1/accounts
+Authorization: Bearer {{session_token}}
+
+###
+POST http://localhost:5001/v1/accounts
+Authorization: Bearer {{session_token}}
+Content-Type: application/json
+
+{
+  "name": "FastMail",
+  "provider": "fastmail",
+  "features": ["mail"],
+  "providerKey": "k@brocks.io",
+  "credential": {
+    "username": "k@brocks.io",
+    "password": "hi"
+  }
+}
+
+###
+POST http://localhost:5003/v1/content/metadata
+Authorization: Bearer {{session_token}}
+Content-Type: application/json
+
+{
+  "name": "test file",
+  "contentType": "text/plain",
+  "attributes": {
+    "asdf": "123"
+  }
+}
+
+> {% client.global.set("upload_url", response.body.url); %}
+
+###
+PUT {{upload_url}}
+Host: localhost:9010
+Content-Type: text/plain
+
+Hello

@@ -1,0 +1,60 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package content
+
+import (
+	"bosca.io/api/protobuf"
+	grpc "bosca.io/api/protobuf/content"
+	"bosca.io/pkg/identity"
+	"context"
+)
+
+type service struct {
+	grpc.UnimplementedContentServiceServer
+
+	ds *DataStore
+	os ObjectStore
+}
+
+func NewService(dataStore *DataStore, objectStore ObjectStore) grpc.ContentServiceServer {
+	return &service{
+		ds: dataStore,
+		os: objectStore,
+	}
+}
+
+func (svc *service) GetRootCollectionItems(context.Context, *protobuf.Empty) (*grpc.CollectionItems, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (svc *service) AddMetadata(ctx context.Context, metadata *grpc.Metadata) (*grpc.SignedUrl, error) {
+	_, err := identity.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := svc.ds.AddMetadata(ctx, metadata)
+	if err != nil {
+		return nil, err
+	}
+	return svc.os.CreateUploadUrl(ctx, id, metadata.Name, metadata.ContentType, metadata.Attributes)
+}
+
+func (svc *service) SetMetadataStatus(context.Context, *grpc.SetMetadataStatusRequest) (*protobuf.Empty, error) {
+	//TODO implement me
+	panic("implement me")
+}

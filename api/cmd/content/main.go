@@ -16,6 +16,43 @@
 
 package main
 
-func main() {
+import (
+	"bosca.io/api/content"
+	"bosca.io/api/content/minio"
+	protocontent "bosca.io/api/protobuf/content"
+	"bosca.io/pkg/configuration"
+	"bosca.io/pkg/datastore"
+	"bosca.io/pkg/server"
+	"context"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/jackc/pgx/v5/stdlib"
+	"google.golang.org/grpc"
+	"log"
+)
 
+func main() {
+	cfg := configuration.NewServerConfiguration("content", 5003, 5013)
+	pool, err := datastore.NewDatabasePool(context.Background(), cfg)
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
+	var os content.ObjectStore
+
+	switch cfg.StorageType {
+	case configuration.StorageTypeMinio:
+		os = minio.NewMinioObjectStore(cfg)
+		break
+	default:
+		log.Fatalf("unknown storage type: %v", cfg.StorageType)
+	}
+
+	svc := content.NewService(ds, os)
+	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
+		protocontent.RegisterContentServiceServer(grpcSvr, svc)
+		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
+		if err != nil {
+			log.Fatalf("failed to register content: %v", err)
+		}
+	})
 }

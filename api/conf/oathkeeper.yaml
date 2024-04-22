@@ -6,7 +6,7 @@ serve:
 
 access_rules:
   repositories:
-    - file://../conf/accounts/access-rules.yaml
+    - file://conf/accounts/access-rules.yaml
 
 mutators:
   header:
@@ -27,6 +27,9 @@ authorizers:
     enabled: true
   deny:
     enabled: true
+  keto_engine_acp_ory:
+    enabled: true
+    base_url: https://permissions.bosca.io/
 
 authenticators:
   noop:

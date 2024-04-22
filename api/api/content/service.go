@@ -43,7 +43,7 @@ func (svc *service) GetRootCollectionItems(context.Context, *protobuf.Empty) (*g
 }
 
 func (svc *service) AddMetadata(ctx context.Context, metadata *grpc.Metadata) (*grpc.SignedUrl, error) {
-	_, err := identity.GetUserId(ctx)
+	_, err := identity.GetAuthenticatedUserId(ctx)
 	if err != nil {
 		return nil, err
 	}

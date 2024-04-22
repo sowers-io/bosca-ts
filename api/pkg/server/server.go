@@ -18,10 +18,10 @@ package server
 
 import (
 	"bosca.io/pkg/configuration"
+	oath "bosca.io/pkg/identity/middleware"
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	oath "github.com/ory/oathkeeper/middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -56,6 +56,7 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 
 	go func() {
 		authentication := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			print(r.Header.Get("Authorization"))
 			mux.ServeHTTP(w, r)
 		})
 		err = http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", cfg.RestPort), authentication)

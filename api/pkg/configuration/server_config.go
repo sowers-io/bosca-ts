@@ -62,22 +62,24 @@ func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcP
 		log.Fatalf("failed to process database configuration: %v", err)
 	}
 
-	switch configuration.StorageType {
-	case StorageTypeMinio:
-		configuration.Storage = &StorageConfiguration{
-			Minio: &MinioConfiguration{},
+	if databasePrefix == "content" {
+		switch configuration.StorageType {
+		case StorageTypeMinio:
+			configuration.Storage = &StorageConfiguration{
+				Minio: &MinioConfiguration{},
+			}
+			err = envconfig.Process("bosca_minio", configuration.Storage.Minio)
+			if err != nil {
+				log.Fatalf("failed to process storage configuration: %v", err)
+			}
+			break
+		default:
+			panic(errors.New("unknown storage type: " + configuration.StorageType))
 		}
-		err = envconfig.Process("bosca_minio", configuration.Storage.Minio)
-		if err != nil {
-			log.Fatalf("failed to process storage configuration: %v", err)
-		}
-		break
-	default:
-		panic(errors.New("unknown storage type: " + configuration.StorageType))
 	}
 
 	if configuration.OathKeeperConfiguration == "" {
-		configuration.OathKeeperConfiguration = "../conf/accounts/oathkeeper.yaml"
+		configuration.OathKeeperConfiguration = "conf/accounts/oathkeeper.yaml"
 	}
 	if configuration.RestPort == 0 {
 		configuration.RestPort = defaultRestPort

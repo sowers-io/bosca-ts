@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-package content
+package common
 
 import (
-	"bosca.io/api/protobuf/content"
 	"github.com/graphql-go/graphql"
 )
 
-var MetadataObjectConfig = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Metadata",
+type KeyValue struct {
+	Key   string
+	Value string
+}
+
+var KeyValueObjectConfig = graphql.NewObject(graphql.ObjectConfig{
+	Name: "KeyValue",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
-			Type: graphql.NewNonNull(graphql.ID),
+		"key": &graphql.Field{
+			Type: graphql.String,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				var metadata = p.Source.(*content.Metadata)
-				return metadata.Id, nil
+				var kv = p.Source.(*KeyValue)
+				return kv.Key, nil
+			},
+		},
+		"value": &graphql.Field{
+			Type: graphql.String,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var kv = p.Source.(*KeyValue)
+				return kv.Value, nil
 			},
 		},
 	},

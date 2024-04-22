@@ -46,6 +46,25 @@ Content-Type: application/json
 }
 
 ###
+GRAPHQL http://localhost:8080/graphql
+Authorization: Bearer {{session_token}}
+
+mutation {
+    addMetadata(name: "hi", contentType: "text/plain", attributes: []) {
+        url
+        headers {
+            key
+            value
+        }
+        attributes {
+            key
+            value
+        }
+    }
+}
+
+
+###
 POST http://localhost:5003/v1/content/metadata
 Authorization: Bearer {{session_token}}
 Content-Type: application/json

@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package content
+package common
 
-import (
-	"bosca.io/api/protobuf/content"
-	"github.com/graphql-go/graphql"
-)
+import "context"
 
-var MetadataObjectConfig = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Metadata",
-	Fields: graphql.Fields{
-		"id": &graphql.Field{
-			Type: graphql.NewNonNull(graphql.ID),
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				var metadata = p.Source.(*content.Metadata)
-				return metadata.Id, nil
-			},
-		},
-	},
-})
+type Authorization struct {
+	HeaderValue string
+}
+
+func (t Authorization) GetRequestMetadata(ctx context.Context, in ...string) (map[string]string, error) {
+	return map[string]string{
+		"authorization": t.HeaderValue,
+	}, nil
+}
+
+func (Authorization) RequireTransportSecurity() bool {
+	// KJB: TODO: I'm leaning towards letting SSL between services within Kubernetes being managed at a different layer
+	//            So, for now I'll leave this as false.  But, it's still open for consideration.
+	return false
+}

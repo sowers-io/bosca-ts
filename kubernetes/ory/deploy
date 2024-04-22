@@ -1,7 +1,13 @@
 #!/bin/sh
 
+kubectl apply -f namespace.yaml
+kubectl apply -f secrets.yaml
+
 helm repo add ory https://k8s.ory.sh/helm/charts
 helm repo update
 
+kubectl -n ory create configmap keto-namespaces --from-file=keto/namespaces.keto.ts
+
 helm install kratos -n ory -f kratos/values.yaml ory/kratos
 helm install hydra -n ory -f hydra/values.yaml ory/hydra
+helm install keto -n ory -f keto/values.yaml ory/keto

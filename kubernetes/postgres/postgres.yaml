@@ -1,0 +1,23 @@
+apiVersion: kubegres.reactive-tech.io/v1
+kind: Kubegres
+metadata:
+  name: postgres
+  namespace: postgres
+spec:
+  database:
+    size: 200Mi
+    storageClassName: do-block-storage
+    volumeMount: /var/lib/postgresql/data
+  env:
+    - name: POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: superUserPassword
+          name: postgres-secret
+    - name: POSTGRES_REPLICATION_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: replicationUserPassword
+          name: postgres-secret
+  image: postgres:16.1
+  replicas: 1

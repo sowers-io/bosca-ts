@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package content
+package main
 
 import (
-	"bosca.io/api/protobuf/content"
-	"github.com/graphql-go/graphql"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"log"
 )
 
-var MetadataObjectConfig = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Metadata",
-	Fields: graphql.Fields{
-		"id": &graphql.Field{
-			Type: graphql.NewNonNull(graphql.ID),
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				var metadata = p.Source.(*content.Metadata)
-				return metadata.Id, nil
-			},
-		},
-	},
-})
+func NewContentClientConnection() *grpc.ClientConn {
+	var opts []grpc.DialOption
+	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("localhost:5013", opts...)
+	if err != nil {
+		log.Fatalf("fail to dial: %v", err)
+	}
+	return conn
+}

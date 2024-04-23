@@ -7,13 +7,14 @@ serve:
 access_rules:
   repositories:
     - file://conf/accounts/access-rules.yaml
+    - file://conf/content/access-rules.yaml
 
 mutators:
   header:
     enabled: true
     config:
       headers:
-        X-User: "{{ print .Subject }}"
+        X-Subject: "{{ print .Subject }}"
   noop:
     enabled: true
   id_token:
@@ -29,7 +30,11 @@ authorizers:
     enabled: true
   keto_engine_acp_ory:
     enabled: true
-    base_url: https://permissions.bosca.io/
+    config:
+      base_url: https://permissions.bosca.io
+      subject: "{{ .MatchContext.Header.Get \"X-Subject\" }}"
+      required_action: "{{ .MatchContext.Header.Get \"X-ResourceType\" }}:{{ .MatchContext.Header.Get \"X-Action\" }}"
+      required_resource: "{{ .MatchContext.Header.Get \"X-ResourceType\" }}:{{ .MatchContext.Header.Get \"X-ResourceId\" }}"
 
 authenticators:
   noop:

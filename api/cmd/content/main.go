@@ -22,6 +22,7 @@ import (
 	protocontent "bosca.io/api/protobuf/content"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
+	"bosca.io/pkg/permissions"
 	"bosca.io/pkg/server"
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -37,8 +38,9 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
-	var os content.ObjectStore
+	oryClient := permissions.NewOryClient(cfg)
 
+	var os content.ObjectStore
 	switch cfg.StorageType {
 	case configuration.StorageTypeMinio:
 		os = minio.NewMinioObjectStore(cfg)
@@ -47,7 +49,7 @@ func main() {
 		log.Fatalf("unknown storage type: %v", cfg.StorageType)
 	}
 
-	svc := content.NewService(ds, os)
+	svc := content.NewService(ds, os, oryClient)
 	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
 		protocontent.RegisterContentServiceServer(grpcSvr, svc)
 		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)

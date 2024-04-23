@@ -2,7 +2,7 @@
   "name": "permissions",
   "version": "1.0.0",
   "description": "",
-  "main": "namespaces.keto.ts",
+  "main": "bosca.keto.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

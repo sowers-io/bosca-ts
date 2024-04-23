@@ -23,12 +23,18 @@ import (
 )
 
 type ServerConfiguration struct {
-	RestPort                int                    `envconfig:"REST_PORT"`
-	GrpcPort                int                    `envconfig:"GRPC_PORT"`
-	OathKeeperConfiguration string                 `envconfig:"OAUTH_KEEPER_CONFIGURATION"`
-	StorageType             string                 `envconfig:"STORAGE_TYPE"`
-	Database                *DatabaseConfiguration `ignored:"true"`
-	Storage                 *StorageConfiguration  `ignored:"true"`
+	RestPort                int                       `envconfig:"REST_PORT"`
+	GrpcPort                int                       `envconfig:"GRPC_PORT"`
+	OathKeeperConfiguration string                    `envconfig:"OAUTH_KEEPER_CONFIGURATION" default:"conf/oathkeeper.yaml"`
+	StorageType             string                    `envconfig:"STORAGE_TYPE"`
+	Database                *DatabaseConfiguration    `ignored:"true"`
+	Permissions             *PermissionsConfiguration `ignored:"true"`
+	Storage                 *StorageConfiguration     `ignored:"true"`
+}
+
+type PermissionsConfiguration struct {
+	ReadEndPoint  string `envconfig:"KETO_READ_ENDPOINT" default:"http://localhost:4466"`
+	WriteEndPoint string `envconfig:"KETO_WRITE_ENDPOINT" default:"http://localhost:4465"`
 }
 
 type DatabaseConfiguration struct {
@@ -48,38 +54,11 @@ type MinioConfiguration struct {
 	SecretAccessKey string `envconfig:"SECRET_ACCESS_KEY"`
 }
 
-func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcPort int) *ServerConfiguration {
-	var configuration ServerConfiguration
-	var database DatabaseConfiguration
-
-	err := envconfig.Process("bosca", &configuration)
+func getBaseConfiguration(defaultRestPort, defaultGrpcPort int) *ServerConfiguration {
+	configuration := &ServerConfiguration{}
+	err := envconfig.Process("bosca", configuration)
 	if err != nil {
-		log.Fatalf("failed to process configuration: %v", err)
-	}
-
-	err = envconfig.Process("bosca_"+databasePrefix, &database)
-	if err != nil {
-		log.Fatalf("failed to process database configuration: %v", err)
-	}
-
-	if databasePrefix == "content" {
-		switch configuration.StorageType {
-		case StorageTypeMinio:
-			configuration.Storage = &StorageConfiguration{
-				Minio: &MinioConfiguration{},
-			}
-			err = envconfig.Process("bosca_minio", configuration.Storage.Minio)
-			if err != nil {
-				log.Fatalf("failed to process storage configuration: %v", err)
-			}
-			break
-		default:
-			panic(errors.New("unknown storage type: " + configuration.StorageType))
-		}
-	}
-
-	if configuration.OathKeeperConfiguration == "" {
-		configuration.OathKeeperConfiguration = "conf/accounts/oathkeeper.yaml"
+		log.Fatalf("failed to process base configuration: %v", err)
 	}
 	if configuration.RestPort == 0 {
 		configuration.RestPort = defaultRestPort
@@ -87,8 +66,50 @@ func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcP
 	if configuration.GrpcPort == 0 {
 		configuration.GrpcPort = defaultGrpcPort
 	}
+	return configuration
+}
 
-	configuration.Database = &database
+func getDatabaseConfiguration(databasePrefix string) *DatabaseConfiguration {
+	database := &DatabaseConfiguration{}
+	err := envconfig.Process("bosca_"+databasePrefix, database)
+	if err != nil {
+		log.Fatalf("failed to process database configuration: %v", err)
+	}
+	return database
+}
 
-	return &configuration
+func getPermissionsConfiguration() *PermissionsConfiguration {
+	permissions := &PermissionsConfiguration{}
+	err := envconfig.Process("bosca", permissions)
+	if err != nil {
+		log.Fatalf("failed to process permissions configuration: %v", err)
+	}
+	return permissions
+}
+
+func getStorageConfiguration(databasePrefix string, storageType string) *StorageConfiguration {
+	if databasePrefix == "content" {
+		switch storageType {
+		case StorageTypeMinio:
+			cfg := &StorageConfiguration{
+				Minio: &MinioConfiguration{},
+			}
+			err := envconfig.Process("bosca_minio", cfg.Minio)
+			if err != nil {
+				log.Fatalf("failed to process storage configuration: %v", err)
+			}
+			return cfg
+		default:
+			panic(errors.New("unknown storage type: " + storageType))
+		}
+	}
+	return nil
+}
+
+func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcPort int) *ServerConfiguration {
+	configuration := getBaseConfiguration(defaultRestPort, defaultGrpcPort)
+	configuration.Database = getDatabaseConfiguration(databasePrefix)
+	configuration.Storage = getStorageConfiguration(databasePrefix, configuration.StorageType)
+	configuration.Permissions = getPermissionsConfiguration()
+	return configuration
 }

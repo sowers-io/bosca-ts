@@ -23,7 +23,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func GetUserId(ctx context.Context) (string, error) {
+func GetSubjectId(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return "", status.Error(codes.Unauthenticated, "failed to get grpc metadata")
@@ -35,13 +35,13 @@ func GetUserId(ctx context.Context) (string, error) {
 	return userID[0], nil
 }
 
-func GetAuthenticatedUserId(ctx context.Context) (string, error) {
-	userId, err := GetUserId(ctx)
+func GetAuthenticatedSubjectId(ctx context.Context) (string, error) {
+	id, err := GetSubjectId(ctx)
 	if err != nil {
 		return "", err
 	}
-	if userId == "anonymous" {
+	if id == "anonymous" {
 		return "", status.Error(codes.Unauthenticated, "user is anonymous")
 	}
-	return userId, nil
+	return id, nil
 }

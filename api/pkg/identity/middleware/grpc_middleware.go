@@ -4,9 +4,12 @@
 // KJB: NOTE: This is a temporary copy of grpc_middleware.go from https://github.com/ory/oathkeeper.
 //            it's not passing the mutated headers to the service.  Not sure if that is intended yet or not
 
+// KJB: NOTE: Also adding code to inject headers for the templating of keto permissions
+
 package middleware
 
 import (
+	"bosca.io/api/protobuf/content"
 	"context"
 	"fmt"
 	"github.com/ory/herodot"
@@ -73,6 +76,23 @@ func (m *middleware) UnaryInterceptor() grpc.UnaryServerInterceptor {
 	return m.unaryInterceptor
 }
 
+func (m *middleware) updateRequest(info *grpc.UnaryServerInfo, req interface{}, httpReq *http.Request) {
+	switch info.FullMethod {
+	case content.ContentService_AddCollection_FullMethodName:
+		request := req.(*content.AddCollectionRequest)
+		httpReq.Header["X-ResourceType"] = []string{"Collection"}
+		httpReq.Header["X-ResourceId"] = []string{request.Parent}
+		httpReq.Header["X-Action"] = []string{"create"}
+		break
+	case content.ContentService_AddMetadata_FullMethodName:
+		request := req.(*content.AddMetadataRequest)
+		httpReq.Header["X-ResourceType"] = []string{"Metadata"}
+		httpReq.Header["X-ResourceId"] = []string{request.Collection}
+		httpReq.Header["X-Action"] = []string{"create"}
+		break
+	}
+}
+
 func (m *middleware) unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	traceCtx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("oathkeeper/middleware").Start(ctx, "middleware.UnaryInterceptor")
 	defer otelx.End(span, &err)
@@ -97,6 +117,8 @@ func (m *middleware) unaryInterceptor(ctx context.Context, req interface{}, info
 		span.SetStatus(codes.Error, err.Error())
 		return nil, ErrDenied
 	}
+
+	m.updateRequest(info, req, httpReq)
 
 	session, err := m.ProxyRequestHandler().HandleRequest(httpReq, r)
 	if err != nil {

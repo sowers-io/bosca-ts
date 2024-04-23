@@ -28,24 +28,97 @@ create table categories
     primary key (id)
 );
 
+create type workflow_state_type as enum ('draft', 'pending', 'pending_approval', 'approved', 'published');
+
+create table workflow_states
+(
+    id          varchar             not null,
+    name        varchar             not null,
+    description varchar             not null,
+    type        workflow_state_type not null,
+    primary key (id)
+);
+
+insert into workflow_states (id, name, description, type)
+values ('draft', 'Draft', 'Draft', 'draft'::workflow_state_type),
+       ('pending', 'Pending', 'Pending', 'pending'::workflow_state_type),
+       ('pending_approval', 'Pending Approval', 'Pending Approval', 'pending_approval'::workflow_state_type),
+       ('approved', 'Approved', 'Approved', 'approved'::workflow_state_type),
+       ('published', 'Published', 'Published', 'published'::workflow_state_type);
+
+create type collection_type as enum ('root', 'standard', 'folder');
+
+create table collections
+(
+    id                uuid      not null default gen_random_uuid(),
+    name              varchar   not null,
+    type              collection_type    default 'standard',
+    attributes        jsonb     not null default '{}',
+    tags              varchar[] not null default '{}',
+    created           timestamp          default now(),
+    modified          timestamp          default now(),
+    enabled           boolean            default true,
+    workflow_state_id varchar   not null default 'draft',
+    primary key (id),
+    foreign key (workflow_state_id) references workflow_states (id)
+);
+
+create table collection_collection_items
+(
+    collection_id uuid,
+    child_id      uuid,
+    primary key (collection_id, child_id),
+    foreign key (collection_id) references collections (id) on delete cascade,
+    foreign key (child_id) references collections (id) on delete cascade
+);
+
+create table collection_traits
+(
+    collection_id uuid,
+    trait_id      uuid,
+    primary key (collection_id, trait_id),
+    foreign key (collection_id) references collections (id) on delete cascade,
+    foreign key (trait_id) references traits (id) on delete cascade
+);
+
+create table collection_categories
+(
+    collection_id uuid,
+    category_id   uuid,
+    primary key (collection_id, category_id),
+    foreign key (collection_id) references collections (id) on delete cascade,
+    foreign key (category_id) references categories (id) on delete cascade
+);
+
 create type metadata_status as enum ('processing', 'ready');
 create type metadata_type as enum ('standard', 'variant');
 
 create table metadata
 (
-    id           uuid      not null default gen_random_uuid(),
-    parent_id    uuid,
-    name         varchar   not null,
-    type         metadata_type      default 'standard',
-    content_type varchar   not null,
-    language_tag varchar   not null default 'en',
-    tags         varchar[] not null,
-    attributes   jsonb     not null,
-    created      timestamp          default now(),
-    modified     timestamp          default now(),
-    status       metadata_status    default 'processing',
+    id                uuid      not null                                  default gen_random_uuid(),
+    parent_id         uuid,
+    name              varchar   not null check (length(name) > 0),
+    type              metadata_type                                       default 'standard',
+    content_type      varchar   not null check (length(content_type) > 0),
+    language_tag      varchar   not null check (length(language_tag) > 0) default 'en',
+    tags              varchar[] not null                                  default '{}',
+    attributes        jsonb     not null                                  default '{}',
+    created           timestamp                                           default now(),
+    modified          timestamp                                           default now(),
+    status            metadata_status                                     default 'processing',
+    workflow_state_id varchar   not null                                  default 'draft',
     primary key (id),
-    foreign key (parent_id) references metadata (id) on delete cascade
+    foreign key (parent_id) references metadata (id) on delete cascade,
+    foreign key (workflow_state_id) references workflow_states (id)
+);
+
+create table collection_metadata_items
+(
+    collection_id uuid,
+    metadata_id   uuid,
+    primary key (collection_id, metadata_id),
+    foreign key (collection_id) references collections (id) on delete cascade,
+    foreign key (metadata_id) references metadata (id) on delete cascade
 );
 
 create table metadata_relationship
@@ -79,10 +152,21 @@ create table metadata_categories
 
 -- +goose Down
 -- +goose StatementBegin
-drop table metadata_relationship cascade;
-drop table metadata_traits cascade;
-drop table metadata_categories cascade;
-drop table metadata cascade;
-drop table traits;
-drop table categories;
+drop table if exists collection_traits cascade;
+drop table if exists collection_categories cascade;
+drop table if exists collections cascade;
+drop table if exists collection_collection_items cascade;
+drop table if exists collection_metadata_items cascade;
+drop type if exists collection_type cascade;
+drop table if exists metadata_relationship cascade;
+drop table if exists metadata_traits cascade;
+drop table if exists metadata_categories cascade;
+drop table if exists metadata cascade;
+drop type if exists metadata_type cascade;
+drop table if exists traits cascade;
+drop table if exists categories cascade;
+drop type if exists metadata_status cascade;
+drop type if exists metadata_status cascade;
+drop table if exists workflow_states cascade;
+drop type if exists workflow_state_type cascade;
 -- +goose StatementEnd

@@ -255,8 +255,9 @@ keto:
       metrics:
         port: 4468
     namespaces:
-      - id: 0
-        name: file:///etc/keto/namespaces/namespaces.keto.ts
+      - name: bosca
+        config:
+          location: file:///etc/keto/namespaces/bosca.keto.ts
 
 ## -- Configure the probes for when the deployment is considered ready and ongoing health check
 deployment:

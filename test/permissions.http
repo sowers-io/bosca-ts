@@ -1,0 +1,10 @@
+POST /engines/acp/ory/regex/allowed HTTP/1.1
+Host: localhost:4466
+Content-Type: application/json
+Accept: application/json
+
+{
+  "object": "Collection:<*>",
+  "action": "owner",
+  "subject_id": "Group:<*>"
+}

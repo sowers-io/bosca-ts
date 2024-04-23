@@ -10,27 +10,3 @@
     handler: "allow"
   mutators:
     - handler: "header"
-
-- id: "bosca.content.ContentService/AddMetadata"
-  version: "v0.40.7"
-  match:
-    authority: "<.*>:5013"
-    full_method: "bosca.content.ContentService/AddMetadata"
-  authenticators:
-    - handler: "bearer_token"
-  authorizer:
-    handler: "allow"
-  mutators:
-    - handler: "header"
-
-- id: "bosca.content.ContentService/SetMetadataStatus"
-  version: "v0.40.7"
-  match:
-    authority: "<.*>:5013"
-    full_method: "bosca.content.ContentService/SetMetadataStatus"
-  authenticators:
-    - handler: "bearer_token"
-  authorizer:
-    handler: "allow"
-  mutators:
-    - handler: "header"

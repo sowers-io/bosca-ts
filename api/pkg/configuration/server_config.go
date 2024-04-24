@@ -33,8 +33,8 @@ type ServerConfiguration struct {
 }
 
 type PermissionsConfiguration struct {
-	ReadEndPoint  string `envconfig:"KETO_READ_ENDPOINT" default:"http://localhost:4466"`
-	WriteEndPoint string `envconfig:"KETO_WRITE_ENDPOINT" default:"http://localhost:4465"`
+	EndPoint    string `envconfig:"PERMISSIONS_ENDPOINT" default:"localhost:50052"`
+	SharedToken string `envconfig:"PERMISSIONS_SHARED_TOKEN" required:"true"`
 }
 
 type DatabaseConfiguration struct {
@@ -82,7 +82,7 @@ func getPermissionsConfiguration() *PermissionsConfiguration {
 	permissions := &PermissionsConfiguration{}
 	err := envconfig.Process("bosca", permissions)
 	if err != nil {
-		log.Fatalf("failed to process permissions configuration: %v", err)
+		log.Fatalf("failed to process security configuration: %v", err)
 	}
 	return permissions
 }

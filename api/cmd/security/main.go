@@ -17,9 +17,8 @@
 package main
 
 import (
-	"bosca.io/api/content"
-	"bosca.io/api/content/minio"
-	protocontent "bosca.io/api/protobuf/content"
+	protosecurity "bosca.io/api/protobuf/security"
+	api "bosca.io/api/security"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
 	"bosca.io/pkg/security"
@@ -32,31 +31,21 @@ import (
 )
 
 func main() {
-	cfg := configuration.NewServerConfiguration("content", 5003, 5013)
+	cfg := configuration.NewServerConfiguration("security", 5006, 5016)
 	pool, err := datastore.NewDatabasePool(context.Background(), cfg)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
-	spiceDbClient := security.NewSpiceDBClient(cfg)
-	securityClient := security.NewManager(spiceDbClient)
-
-	var os content.ObjectStore
-	switch cfg.StorageType {
-	case configuration.StorageTypeMinio:
-		os = minio.NewMinioObjectStore(cfg)
-		break
-	default:
-		log.Fatalf("unknown storage type: %v", cfg.StorageType)
-	}
-
-	svc := content.NewServiceSecurity(securityClient, ds, content.NewService(ds, os, securityClient))
+	ds := api.NewDataStore(stdlib.OpenDBFromPool(pool))
+	permissionsClient := security.NewSpiceDBClient(cfg)
+	mgr := security.NewManager(permissionsClient)
+	svc := api.NewServiceSecurity(mgr, api.NewService(ds))
 	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
-		protocontent.RegisterContentServiceServer(grpcSvr, svc)
-		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
+		protosecurity.RegisterSecurityServiceServer(grpcSvr, svc)
+		err := protosecurity.RegisterSecurityServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
-			log.Fatalf("failed to register content: %v", err)
+			log.Fatalf("failed to register profiles: %v", err)
 		}
 	})
 }

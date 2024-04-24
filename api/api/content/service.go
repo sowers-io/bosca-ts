@@ -20,10 +20,8 @@ import (
 	"bosca.io/api/protobuf"
 	grpc "bosca.io/api/protobuf/content"
 	"bosca.io/pkg/identity"
-	"bosca.io/pkg/permissions"
+	"bosca.io/pkg/security"
 	"context"
-	ory "github.com/ory/client-go"
-	"log"
 )
 
 type service struct {
@@ -32,36 +30,17 @@ type service struct {
 	ds *DataStore
 	os ObjectStore
 
-	oryClient *ory.APIClient
+	security *security.Manager
 }
 
 const RootCollectionId = "00000000-0000-0000-0000-000000000000"
 
-func NewService(dataStore *DataStore, objectStore ObjectStore, oryClient *ory.APIClient) grpc.ContentServiceServer {
-	svc := &service{
-		ds:        dataStore,
-		os:        objectStore,
-		oryClient: oryClient,
+func NewService(dataStore *DataStore, objectStore ObjectStore, security *security.Manager) grpc.ContentServiceServer {
+	return &service{
+		ds:       dataStore,
+		os:       objectStore,
+		security: security,
 	}
-
-	ctx := context.Background()
-	if added, err := svc.ds.AddRootCollection(ctx); added {
-		if err != nil {
-			log.Fatalf("error initializing root collection: %v", err)
-		}
-		_, err = svc.AddCollectionPermission(ctx, &grpc.Permission{
-			Id:       RootCollectionId,
-			Subject:  "administrators",
-			Group:    true,
-			Relation: grpc.PermissionRelation_owners,
-		})
-		if err != nil {
-			_ = svc.ds.DeleteCollection(ctx, RootCollectionId)
-			log.Fatalf("error initializing root collection permission: %v", err)
-		}
-	}
-
-	return svc
 }
 
 func (svc *service) GetRootCollectionItems(context.Context, *protobuf.Empty) (*grpc.CollectionItems, error) {
@@ -83,81 +62,14 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 		Subject:  userId,
 		Relation: grpc.PermissionRelation_owners,
 	})
+	err = svc.ds.AddCollectionMetadataItems(ctx, request.Collection, []string{id})
+	if err != nil {
+		return nil, err
+	}
 	if err != nil {
 		return nil, err
 	}
 	return svc.os.CreateUploadUrl(ctx, id, request.Metadata.Name, request.Metadata.ContentType, request.Metadata.Attributes)
-}
-
-func (svc *service) GetMetadataPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
-	r := svc.oryClient.RelationshipAPI.GetRelationships(ctx)
-	r.Namespace(permissions.PermissionsNamespace)
-	r.Object(request.Id)
-	r.PageSize(100)
-	result, _, err := svc.oryClient.RelationshipAPI.GetRelationshipsExecute(r)
-	if err != nil {
-		return nil, err
-	}
-	mp := &grpc.Permissions{
-		Permissions: make([]*grpc.Permission, 0),
-	}
-	for _, relation := range result.RelationTuples {
-		action := grpc.PermissionRelation_viewers
-		switch relation.Relation {
-		case "viewers":
-			action = grpc.PermissionRelation_viewers
-			break
-		case "editors":
-			action = grpc.PermissionRelation_editors
-			break
-		case "owners":
-			action = grpc.PermissionRelation_owners
-			break
-		}
-		permission := &grpc.Permission{
-			Id:       relation.Object,
-			Relation: action,
-		}
-		if relation.HasSubjectId() {
-			permission.Subject = *relation.SubjectId
-		} else if relation.HasSubjectSet() {
-			// KJB: TODO: I don't think this is right
-			permission.Subject = (*relation.SubjectSet).Object
-		}
-		mp.Permissions = append(mp.Permissions, permission)
-	}
-	// TODO: handle paging
-	return mp, nil
-}
-
-func (svc *service) AddMetadataPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	var subject string
-	if permission.Group {
-		subject = "Group:"
-	} else {
-		subject = "User:"
-	}
-	subject += permission.Subject
-	err := svc.createRelationship(ctx, "Metadata:"+permission.Id, permission.Relation.String(), subject)
-	if err != nil {
-		return nil, err
-	}
-	return &protobuf.Empty{}, nil
-}
-
-func (svc *service) AddCollectionPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	var subject string
-	if permission.Group {
-		subject = "Group:"
-	} else {
-		subject = "User:"
-	}
-	subject += permission.Subject
-	err := svc.createRelationship(ctx, "Collection:"+permission.Id, permission.Relation.String(), subject)
-	if err != nil {
-		return nil, err
-	}
-	return &protobuf.Empty{}, nil
 }
 
 func (svc *service) SetMetadataStatus(ctx context.Context, request *grpc.SetMetadataStatusRequest) (*protobuf.Empty, error) {
@@ -168,16 +80,26 @@ func (svc *service) SetMetadataStatus(ctx context.Context, request *grpc.SetMeta
 	return &protobuf.Empty{}, nil
 }
 
-func (svc *service) createRelationship(ctx context.Context, object string, relation string, subject string) error {
-	r := svc.oryClient.RelationshipAPI.CreateRelationship(ctx)
-	ns := permissions.PermissionsNamespace
-	body := ory.CreateRelationshipBody{
-		Namespace: &ns,
-		Object:    &object,
-		Relation:  &relation,
+func (svc *service) GetMetadataPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
+	return svc.security.GetPermissions(ctx, security.MetadataObject, request.Id)
+}
+
+func (svc *service) AddMetadataPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
+	err := svc.security.CreateRelationship(ctx, security.MetadataObject, permission)
+	if err != nil {
+		return nil, err
 	}
-	body.SubjectId = &subject
-	r = r.CreateRelationshipBody(body)
-	_, _, err := svc.oryClient.RelationshipAPI.CreateRelationshipExecute(r)
-	return err
+	return &protobuf.Empty{}, nil
+}
+
+func (svc *service) GetCollectionPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
+	return svc.security.GetPermissions(ctx, security.CollectionObject, request.Id)
+}
+
+func (svc *service) AddCollectionPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
+	err := svc.security.CreateRelationship(ctx, security.CollectionObject, permission)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.Empty{}, nil
 }

@@ -19,7 +19,7 @@
   authenticators:
     - handler: "bearer_token"
   authorizer:
-    handler: "keto_engine_acp_ory"
+    handler: "allow"
   mutators:
     - handler: "header"
 
@@ -31,7 +31,7 @@
   authenticators:
     - handler: "bearer_token"
   authorizer:
-    handler: "keto_engine_acp_ory"
+    handler: "allow"
   mutators:
     - handler: "header"
 
@@ -43,6 +43,6 @@
   authenticators:
     - handler: "bearer_token"
   authorizer:
-    handler: "keto_engine_acp_ory"
+    handler: "allow"
   mutators:
     - handler: "header"

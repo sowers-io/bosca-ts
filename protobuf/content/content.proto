@@ -60,13 +60,13 @@ service ContentService {
 
   rpc GetMetadataPermissions(bosca.IdRequest) returns (Permissions) {
     option (google.api.http) = {
-      get: "/v1/content/metadata/{id}/permissions"
+      get: "/v1/content/metadata/{id}/security"
     };
   }
 
   rpc AddMetadataPermission(Permission) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/permissions"
+      post: "/v1/content/metadata/{id}/security"
       body: "*"
     };
   }
@@ -81,8 +81,20 @@ service ContentService {
 
 enum PermissionRelation {
   viewers = 0;
-  editors = 1;
-  owners = 2;
+  discoverers = 1;
+  editors = 2;
+  managers = 3;
+  serviceaccounts = 4;
+  owners = 5;
+}
+
+enum PermissionAction {
+  view = 0;
+  list = 2;
+  edit = 3;
+  manage = 4;
+  service = 5;
+  delete = 6;
 }
 
 message Permissions {

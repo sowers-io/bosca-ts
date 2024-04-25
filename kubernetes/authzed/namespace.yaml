@@ -3,5 +3,6 @@ kind: Namespace
 metadata:
   name: spicedb
   annotations:
-    operator.1password.io/auto-restart: "true"
+    config.linkerd.io/default-inbound-policy: all-authenticated
     linkerd.io/inject: enabled
+    operator.1password.io/auto-restart: "true"

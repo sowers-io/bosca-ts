@@ -39,7 +39,7 @@ func main() {
 
 	ds := api.NewDataStore(stdlib.OpenDBFromPool(pool))
 	permissionsClient := security.NewSpiceDBClient(cfg)
-	mgr := security.NewManager(permissionsClient)
+	mgr := security.NewPermissionManager(permissionsClient)
 	svc := api.NewServiceSecurity(mgr, api.NewService(ds))
 	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
 		protosecurity.RegisterSecurityServiceServer(grpcSvr, svc)

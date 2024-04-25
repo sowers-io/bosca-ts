@@ -30,16 +30,16 @@ type service struct {
 	ds *DataStore
 	os ObjectStore
 
-	security *security.Manager
+	permissions *security.PermissionManager
 }
 
 const RootCollectionId = "00000000-0000-0000-0000-000000000000"
 
-func NewService(dataStore *DataStore, objectStore ObjectStore, security *security.Manager) grpc.ContentServiceServer {
+func NewService(dataStore *DataStore, objectStore ObjectStore, permissions *security.PermissionManager) grpc.ContentServiceServer {
 	return &service{
-		ds:       dataStore,
-		os:       objectStore,
-		security: security,
+		ds:          dataStore,
+		os:          objectStore,
+		permissions: permissions,
 	}
 }
 
@@ -81,11 +81,11 @@ func (svc *service) SetMetadataStatus(ctx context.Context, request *grpc.SetMeta
 }
 
 func (svc *service) GetMetadataPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
-	return svc.security.GetPermissions(ctx, security.MetadataObject, request.Id)
+	return svc.permissions.GetPermissions(ctx, security.MetadataObject, request.Id)
 }
 
 func (svc *service) AddMetadataPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	err := svc.security.CreateRelationship(ctx, security.MetadataObject, permission)
+	err := svc.permissions.CreateRelationship(ctx, security.MetadataObject, permission)
 	if err != nil {
 		return nil, err
 	}
@@ -93,11 +93,11 @@ func (svc *service) AddMetadataPermission(ctx context.Context, permission *grpc.
 }
 
 func (svc *service) GetCollectionPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
-	return svc.security.GetPermissions(ctx, security.CollectionObject, request.Id)
+	return svc.permissions.GetPermissions(ctx, security.CollectionObject, request.Id)
 }
 
 func (svc *service) AddCollectionPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	err := svc.security.CreateRelationship(ctx, security.CollectionObject, permission)
+	err := svc.permissions.CreateRelationship(ctx, security.CollectionObject, permission)
 	if err != nil {
 		return nil, err
 	}

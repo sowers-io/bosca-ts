@@ -40,7 +40,7 @@ func main() {
 
 	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
 	spiceDbClient := security.NewSpiceDBClient(cfg)
-	securityClient := security.NewManager(spiceDbClient)
+	permissions := security.NewPermissionManager(spiceDbClient)
 
 	var os content.ObjectStore
 	switch cfg.StorageType {
@@ -51,7 +51,7 @@ func main() {
 		log.Fatalf("unknown storage type: %v", cfg.StorageType)
 	}
 
-	svc := content.NewServiceSecurity(securityClient, ds, content.NewService(ds, os, securityClient))
+	svc := content.NewServiceSecurity(permissions, ds, content.NewService(ds, os, permissions))
 	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
 		protocontent.RegisterContentServiceServer(grpcSvr, svc)
 		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)

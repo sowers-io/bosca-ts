@@ -28,7 +28,7 @@ func GetSubjectId(ctx context.Context) (string, error) {
 	if !ok {
 		return "", status.Error(codes.Unauthenticated, "failed to get grpc metadata")
 	}
-	userID := md.Get("X-User")
+	userID := md.Get("X-Subject")
 	if len(userID) == 0 || userID[0] == "" {
 		return "", status.Error(codes.Unauthenticated, "user is missing in metadata")
 	}

@@ -14,38 +14,6 @@ Content-Type: application/json
 > {% client.global.set("session_token", response.body.session_token); %}
 
 ###
-GET http://localhost:5002/v1/mail/messages/fastmail/k@brocks.io?offset=0&limit=25
-Authorization: Bearer {{session_token}}
-
-###
-GET http://localhost:5001/v1/accounts/external/login?provider=google
-Authorization: Bearer {{session_token}}
-
-###
-GET http://localhost:5001/v1/accounts/manage/info
-Authorization: Bearer {{session_token}}
-
-###
-GET http://localhost:5001/v1/accounts
-Authorization: Bearer {{session_token}}
-
-###
-POST http://localhost:5001/v1/accounts
-Authorization: Bearer {{session_token}}
-Content-Type: application/json
-
-{
-  "name": "FastMail",
-  "provider": "fastmail",
-  "features": ["mail"],
-  "providerKey": "k@brocks.io",
-  "credential": {
-    "username": "k@brocks.io",
-    "password": "hi"
-  }
-}
-
-###
 GRAPHQL http://localhost:8080/graphql
 Authorization: Bearer {{session_token}}
 
@@ -70,10 +38,13 @@ Authorization: Bearer {{session_token}}
 Content-Type: application/json
 
 {
-  "name": "test file",
-  "contentType": "text/plain",
-  "attributes": {
-    "asdf": "123"
+  "collection": "00000000-0000-0000-0000-000000000000",
+  "metadata": {
+    "name": "test file",
+    "contentType": "text/plain",
+    "attributes": {
+      "asdf": "123"
+    }
   }
 }
 

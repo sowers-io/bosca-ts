@@ -164,11 +164,10 @@ func (ds *DataStore) SetCollectionWorkflowStateId(ctx context.Context, id string
 
 func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metadata, error) {
 	var metadata content.Metadata
-	err := ds.db.QueryRowContext(ctx, "SELECT * FROM metadata WHERE id = $1", id).Scan(
+	err := ds.db.QueryRowContext(ctx, "SELECT id, name, content_type, tags, attributes, created, modified, status FROM metadata WHERE id = $1", id).Scan(
 		&metadata.Id,
 		&metadata.Name,
 		&metadata.ContentType,
-		&metadata.TraitIds,
 		&metadata.CategoryIds,
 		&metadata.Tags,
 		&metadata.Attributes,
@@ -179,6 +178,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 	if err != nil {
 		return nil, err
 	}
+	// TODO: traits and categories
 	return &metadata, nil
 }
 

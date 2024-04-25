@@ -21,20 +21,22 @@ import (
 	grpc "bosca.io/api/protobuf/content"
 	"bosca.io/pkg/security"
 	"context"
+	"errors"
 	"log"
+	"strings"
 )
 
 type serviceSecurity struct {
 	grpc.UnimplementedContentServiceServer
 
-	service  grpc.ContentServiceServer
-	security *security.Manager
+	service     grpc.ContentServiceServer
+	permissions *security.PermissionManager
 }
 
-func NewServiceSecurity(security *security.Manager, dataSource *DataStore, service grpc.ContentServiceServer) grpc.ContentServiceServer {
+func NewServiceSecurity(permissions *security.PermissionManager, dataSource *DataStore, service grpc.ContentServiceServer) grpc.ContentServiceServer {
 	svc := &serviceSecurity{
-		service:  service,
-		security: security,
+		service:     service,
+		permissions: permissions,
 	}
 
 	ctx := context.Background()
@@ -42,7 +44,7 @@ func NewServiceSecurity(security *security.Manager, dataSource *DataStore, servi
 		if err != nil {
 			log.Fatalf("error initializing root collection: %v", err)
 		}
-		_, err = svc.AddCollectionPermission(ctx, &grpc.Permission{
+		err = svc.permissions.CreateRelationship(ctx, security.CollectionObject, &grpc.Permission{
 			Id:       RootCollectionId,
 			Subject:  "administrators",
 			Group:    true,
@@ -58,7 +60,7 @@ func NewServiceSecurity(security *security.Manager, dataSource *DataStore, servi
 }
 
 func (svc *serviceSecurity) GetRootCollectionItems(ctx context.Context, request *protobuf.Empty) (*grpc.CollectionItems, error) {
-	err := svc.security.CheckWithError(ctx, security.CollectionObject, RootCollectionId, grpc.PermissionAction_list)
+	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, RootCollectionId, grpc.PermissionAction_list)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +68,13 @@ func (svc *serviceSecurity) GetRootCollectionItems(ctx context.Context, request 
 }
 
 func (svc *serviceSecurity) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*grpc.SignedUrl, error) {
-	err := svc.security.CheckWithError(ctx, security.CollectionObject, request.Collection, grpc.PermissionAction_edit)
+	if request.Metadata == nil {
+		return nil, errors.New("metadata is required")
+	}
+	if len(strings.Trim(request.Collection, " ")) == 0 {
+		return nil, errors.New("collection is required")
+	}
+	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, request.Collection, grpc.PermissionAction_edit)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +82,7 @@ func (svc *serviceSecurity) AddMetadata(ctx context.Context, request *grpc.AddMe
 }
 
 func (svc *serviceSecurity) SetMetadataStatus(ctx context.Context, request *grpc.SetMetadataStatusRequest) (*protobuf.Empty, error) {
-	err := svc.security.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_service)
+	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +90,7 @@ func (svc *serviceSecurity) SetMetadataStatus(ctx context.Context, request *grpc
 }
 
 func (svc *serviceSecurity) GetMetadataPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
-	err := svc.security.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +98,7 @@ func (svc *serviceSecurity) GetMetadataPermissions(ctx context.Context, request 
 }
 
 func (svc *serviceSecurity) AddMetadataPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	err := svc.security.CheckWithError(ctx, security.MetadataObject, permission.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, permission.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +106,7 @@ func (svc *serviceSecurity) AddMetadataPermission(ctx context.Context, permissio
 }
 
 func (svc *serviceSecurity) GetCollectionPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
-	err := svc.security.CheckWithError(ctx, security.CollectionObject, request.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, request.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +114,7 @@ func (svc *serviceSecurity) GetCollectionPermissions(ctx context.Context, reques
 }
 
 func (svc *serviceSecurity) AddCollectionPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	err := svc.security.CheckWithError(ctx, security.CollectionObject, permission.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, permission.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}

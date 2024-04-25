@@ -1,0 +1,12 @@
+apiVersion: authzed.com/v1alpha1
+kind: SpiceDBCluster
+metadata:
+  name: spicedb
+  namespace: spicedb
+spec:
+  config:
+    datastoreEngine: postgres
+    channel: stable
+    version: v1.31.0
+    replicas: 2
+  secretName: spicedb-secrets

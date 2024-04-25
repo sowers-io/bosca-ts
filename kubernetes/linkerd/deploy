@@ -1,0 +1,56 @@
+#!/bin/sh
+
+brew install step
+
+if [ "$OSTYPE" = "darwin23" ]; then
+  brew install step
+else
+  wget https://dl.smallstep.com/cli/docs-cli-install/latest/step-cli_amd64.deb
+  sudo dpkg -i step-cli_amd64.deb
+fi
+
+kubectl create namespace linkerd
+
+step certificate create root.linkerd.cluster.local ca.crt ca.key --profile root-ca --no-password --insecure
+kubectl create secret tls linkerd-trust-anchor --cert=ca.crt --key=ca.key --namespace=linkerd
+
+kubectl apply -f - <<EOF
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: linkerd-trust-anchor
+  namespace: linkerd
+spec:
+  ca:
+    secretName: linkerd-trust-anchor
+EOF
+
+kubectl apply -f - <<EOF
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: linkerd-identity-issuer
+  namespace: linkerd
+spec:
+  secretName: linkerd-identity-issuer
+  duration: 48h
+  renewBefore: 25h
+  issuerRef:
+    name: linkerd-trust-anchor
+    kind: Issuer
+  commonName: identity.linkerd.cluster.local
+  dnsNames:
+  - identity.linkerd.cluster.local
+  isCA: true
+  privateKey:
+    algorithm: ECDSA
+  usages:
+  - cert sign
+  - crl sign
+  - server auth
+  - client auth
+EOF
+
+helm repo add linkerd https://helm.linkerd.io/edge
+helm install linkerd-crds linkerd/linkerd-crds -n linkerd
+helm install linkerd-control-plane -n linkerd --set-file identityTrustAnchorsPEM=ca.crt --set identity.issuer.scheme=kubernetes.io/tls linkerd/linkerd-control-plane

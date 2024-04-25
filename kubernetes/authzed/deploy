@@ -1,0 +1,10 @@
+#!/bin/sh
+
+kubectl apply -f namespace.yaml
+
+kubectl apply -f https://github.com/authzed/spicedb-operator/releases/latest/download/bundle.yaml
+
+kubectl apply -f secrets.yaml
+kubectl apply -f spicedb.yaml
+
+zed schema write --insecure --endpoint localhost:50052 --token $ZED_TOKEN

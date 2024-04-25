@@ -37,9 +37,9 @@ func main() {
 	}
 	ds := profiles.NewDataStore(stdlib.OpenDBFromPool(pool))
 	svc := profiles.NewService(ds)
-	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux) {
+	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
 		protoprofiles.RegisterProfilesServiceServer(grpcSvr, svc)
-		err := protoprofiles.RegisterProfilesServiceHandlerServer(ctx, restSvr, svc)
+		err := protoprofiles.RegisterProfilesServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
 			log.Fatalf("failed to register profiles: %v", err)
 		}

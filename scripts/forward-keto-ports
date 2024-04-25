@@ -1,0 +1,4 @@
+#!/bin/sh
+
+kubectl --namespace ory port-forward service/keto-read 4466:80&
+kubectl --namespace ory port-forward service/keto-write 4465:80&

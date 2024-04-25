@@ -18,22 +18,24 @@ package server
 
 import (
 	"bosca.io/pkg/configuration"
+	oath "bosca.io/pkg/identity/middleware"
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	oath "github.com/ory/oathkeeper/middleware"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net"
 	"net/http"
 )
 
-func StartServer(cfg *configuration.ServerConfiguration, register func(context.Context, *grpc.Server, *runtime.ServeMux)) {
+func StartServer(cfg *configuration.ServerConfiguration, register func(context.Context, *grpc.Server, *runtime.ServeMux, string, []grpc.DialOption)) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", cfg.GrpcPort))
+	endpoint := fmt.Sprintf("0.0.0.0:%d", cfg.GrpcPort)
+	listen, err := net.Listen("tcp", endpoint)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -50,10 +52,14 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 	server := grpc.NewServer(grpcOpts...)
 	mux := runtime.NewServeMux()
 
-	register(ctx, server, mux)
+	register(ctx, server, mux, endpoint, []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())})
 
 	go func() {
-		err = http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", cfg.RestPort), mux)
+		authentication := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			print(r.Header.Get("Authorization"))
+			mux.ServeHTTP(w, r)
+		})
+		err = http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", cfg.RestPort), authentication)
 		if err != nil {
 			log.Fatalf("failed to start HTTP server: %v", err)
 		}

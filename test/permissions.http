@@ -1,0 +1,30 @@
+POST /engines/acp/ory/exact/allowed HTTP/1.1
+Host: localhost:4466
+Content-Type: application/json
+Accept: application/json
+
+{
+  "namespace": "bosca",
+  "object": "Collection:00000000-0000-0000-0000-000000000000",
+  "relation": "delete",
+  "subject_id": "Group:administrators"
+}
+
+###
+POST /relation-tuples/check?max-depth=10 HTTP/1.1
+Host: localhost:4466
+Content-Type: application/json
+Accept: application/json
+
+{
+  "namespace": "bosca",
+  "object": "Collection:00000000-0000-0000-0000-000000000000",
+  "relation": "owners",
+  "subject_id": "Group:administrators"
+}
+
+###
+GET /relation-tuples HTTP/1.1
+Host: localhost:4466
+Content-Type: application/json
+Accept: application/json

@@ -20,6 +20,7 @@ option go_package = "bosca.io/api/protobuf/content";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "empty.proto";
+import "requests.proto";
 
 package bosca.content;
 
@@ -30,9 +31,42 @@ service ContentService {
     };
   }
 
-  rpc AddMetadata (Metadata) returns (SignedUrl) {
+  rpc AddCollection (AddCollectionRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      post: "/v1/content/collections"
+      body: "*"
+    };
+  }
+
+  rpc GetCollectionPermissions(bosca.IdRequest) returns (Permissions) {
+    option (google.api.http) = {
+      get: "/v1/content/collections/{id}/permissions"
+    };
+  }
+
+  rpc AddCollectionPermission(Permission) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/collections/{id}/permissions"
+      body: "*"
+    };
+  }
+
+  rpc AddMetadata (AddMetadataRequest) returns (SignedUrl) {
     option (google.api.http) = {
       post: "/v1/content/metadata"
+      body: "*"
+    };
+  }
+
+  rpc GetMetadataPermissions(bosca.IdRequest) returns (Permissions) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/security"
+    };
+  }
+
+  rpc AddMetadataPermission(Permission) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/security"
       body: "*"
     };
   }
@@ -43,6 +77,35 @@ service ContentService {
       body: "*"
     };
   }
+}
+
+enum PermissionRelation {
+  viewers = 0;
+  discoverers = 1;
+  editors = 2;
+  managers = 3;
+  serviceaccounts = 4;
+  owners = 5;
+}
+
+enum PermissionAction {
+  view = 0;
+  list = 2;
+  edit = 3;
+  manage = 4;
+  service = 5;
+  delete = 6;
+}
+
+message Permissions {
+  repeated Permission permissions = 1;
+}
+
+message Permission {
+  string id = 1;
+  string subject = 2;
+  bool group = 3;
+  PermissionRelation relation = 4;
 }
 
 message SetMetadataStatusRequest {
@@ -73,6 +136,12 @@ message Item {
 enum CollectionType {
   standard = 0;
   folder = 1;
+  root = 2;
+}
+
+message AddCollectionRequest {
+  string parent = 1;
+  Collection collection = 2;
 }
 
 message Collection {
@@ -110,6 +179,11 @@ message SignedUrl {
 enum MetadataStatus {
   processing = 0;
   ready = 1;
+}
+
+message AddMetadataRequest {
+  string collection = 1;
+  Metadata metadata = 2;
 }
 
 message Metadata {

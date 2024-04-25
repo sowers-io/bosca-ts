@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ory
+  annotations:
+    config.linkerd.io/default-inbound-policy: all-authenticated
+    linkerd.io/inject: enabled
+    operator.1password.io/auto-restart: "true"

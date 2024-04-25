@@ -1,5 +1,8 @@
 #!/bin/sh
 
+kubectl apply -f namespace.yaml
+kubectl apply -f secrets.yaml
+
 helm repo add ory https://k8s.ory.sh/helm/charts
 helm repo update
 

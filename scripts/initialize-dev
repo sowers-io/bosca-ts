@@ -11,3 +11,4 @@ cd ..
 wait 3
 
 ./scripts/initialize-database-dev
+./scripts/initialize-minio-dev

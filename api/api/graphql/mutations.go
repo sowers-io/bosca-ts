@@ -29,6 +29,9 @@ func NewMutationFields(client grpc.ContentServiceClient) graphql.Fields {
 		"addMetadata": &graphql.Field{
 			Type: graphql.NewNonNull(content.SignedUrlObjectConfig),
 			Args: graphql.FieldConfigArgument{
+				"collection": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
 				"name": &graphql.ArgumentConfig{
 					Type: graphql.NewNonNull(graphql.String),
 				},
@@ -58,7 +61,10 @@ func NewMutationFields(client grpc.ContentServiceClient) graphql.Fields {
 
 				url, err := client.AddMetadata(
 					p.Context,
-					metadata,
+					&grpc.AddMetadataRequest{
+						Collection: p.Args["collection"].(string),
+						Metadata:   metadata,
+					},
 					opts.PerRPCCredsCallOption{Creds: &common.Authorization{HeaderValue: authorization}},
 				)
 

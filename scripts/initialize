@@ -18,15 +18,12 @@ set -e
 
 if [ "$OSTYPE" = "darwin23" ]; then
   brew install minio/stable/mc
-  brew install ory/tap/keto
 else
-  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $GOPATH/bin/mc
+  mkdir -p $HOME/bin
+  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $HOME/bin/mc
 
-  chmod +x $GOPATH/bin/mc
-  export PATH=$PATH:$GOPATH/bin/mc
-
-  curl https://raw.githubusercontent.com/ory/meta/master/install.sh | sh -d -b . keto v0.13.0-alpha.0
-  mv keto $GOPATH/bin
+  chmod +x $HOME/bin/mc
+  export PATH=$PATH:$HOME/bin/mc
 fi
 
 go install github.com/pressly/goose/v3/cmd/goose@latest

@@ -11,7 +11,6 @@ require (
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/minio/minio-go/v7 v7.0.69
-	github.com/ory/client-go v1.9.0
 	github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88
 	github.com/ory/jsonschema/v3 v3.0.7
 	github.com/ory/oathkeeper v0.40.7

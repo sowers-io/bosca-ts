@@ -7,3 +7,6 @@ coverage
 coverage.txt
 coverage.xml
 build
+
+1password-credentials.json
+token

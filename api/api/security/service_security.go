@@ -12,10 +12,10 @@ type serviceSecurity struct {
 	grpc.UnimplementedSecurityServiceServer
 
 	service grpc.SecurityServiceServer
-	manager *security.PermissionManager
+	manager security.PermissionManager
 }
 
-func NewServiceSecurity(manager *security.PermissionManager, service grpc.SecurityServiceServer) grpc.SecurityServiceServer {
+func NewServiceSecurity(manager security.PermissionManager, service grpc.SecurityServiceServer) grpc.SecurityServiceServer {
 	return &serviceSecurity{
 		manager: manager,
 		service: service,

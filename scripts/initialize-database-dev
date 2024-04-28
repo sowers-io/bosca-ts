@@ -19,15 +19,15 @@ set -e
 export PGPASSWORD='bosca'
 
 psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscaprofiles"
-psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscaaccounts"
+psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscajobs"
 psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscacontent"
 psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscasecurity"
 psql -U bosca -h localhost -d bosca -c "DROP DATABASE IF EXISTS boscatest"
 
 psql -U bosca -h localhost -d bosca -c "CREATE ROLE boscaprofiles WITH SUPERUSER LOGIN PASSWORD 'bosca'" | echo "boscaprofiles already exists"
 psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscaprofiles"
-psql -U bosca -h localhost -d bosca -c "CREATE ROLE boscaaccounts WITH SUPERUSER LOGIN PASSWORD 'bosca'" | echo "boscaaccounts already exists"
-psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscaaccounts"
+psql -U bosca -h localhost -d bosca -c "CREATE ROLE boscajobs WITH SUPERUSER LOGIN PASSWORD 'bosca'" | echo "boscajobs already exists"
+psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscajobs"
 psql -U bosca -h localhost -d bosca -c "CREATE ROLE boscacontent WITH SUPERUSER LOGIN PASSWORD 'bosca'" | echo "boscacontent already exists"
 psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscacontent"
 psql -U bosca -h localhost -d bosca -c "CREATE ROLE boscasecurity WITH SUPERUSER LOGIN PASSWORD 'bosca'" | echo "boscasecurity already exists"
@@ -35,7 +35,7 @@ psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscasecurity"
 
 psql -U bosca -h localhost -d bosca -c "CREATE DATABASE boscatest"
 
-export accounts_CONNECTION_STRING="postgresql://boscaaccounts:bosca@localhost:5432/boscaaccounts"
+export accounts_CONNECTION_STRING="postgresql://boscajobs:bosca@localhost:5432/boscajobs"
 export profiles_CONNECTION_STRING="postgresql://boscaprofiles:bosca@localhost:5432/boscaprofiles"
 export content_CONNECTION_STRING="postgresql://boscacontent:bosca@localhost:5432/boscacontent"
 export security_CONNECTION_STRING="postgresql://boscasecurity:bosca@localhost:5432/boscasecurity"

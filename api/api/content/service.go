@@ -30,12 +30,12 @@ type service struct {
 	ds *DataStore
 	os ObjectStore
 
-	permissions *security.PermissionManager
+	permissions security.PermissionManager
 }
 
 const RootCollectionId = "00000000-0000-0000-0000-000000000000"
 
-func NewService(dataStore *DataStore, objectStore ObjectStore, permissions *security.PermissionManager) grpc.ContentServiceServer {
+func NewService(dataStore *DataStore, objectStore ObjectStore, permissions security.PermissionManager) grpc.ContentServiceServer {
 	return &service{
 		ds:          dataStore,
 		os:          objectStore,

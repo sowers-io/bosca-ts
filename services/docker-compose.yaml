@@ -24,10 +24,40 @@ services:
       - '5432:5432'
     volumes:
       - postgres:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_PASSWORD=bosca
       - POSTGRES_USER=bosca
       - POSTGRES_DB=bosca
+    networks:
+      - net1
+
+  spicedb:
+    image: authzed/spicedb:v1.31.0
+    command: "serve"
+    restart: "always"
+    ports:
+      - "8081:8080"
+      - "9090:9090"
+      - "50052:50051" # something has stolen this port on my computer
+    environment:
+      - "SPICEDB_GRPC_PRESHARED_KEY=bosca-spicedb"
+      - "SPICEDB_DATASTORE_ENGINE=postgres"
+      - "SPICEDB_DATASTORE_CONN_URI=postgres://bosca:bosca@postgres:5432/spicedb?sslmode=disable"
+    depends_on:
+      - "migrate"
+    networks:
+      - net1
+
+  migrate:
+    image: authzed/spicedb:v1.31.0
+    command: "migrate head"
+    restart: "on-failure"
+    environment:
+      - "SPICEDB_DATASTORE_ENGINE=postgres"
+      - "SPICEDB_DATASTORE_CONN_URI=postgres://bosca:bosca@postgres:5432/spicedb?sslmode=disable"
+    depends_on:
+      - "postgres"
     networks:
       - net1
 

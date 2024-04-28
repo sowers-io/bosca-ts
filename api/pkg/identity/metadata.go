@@ -23,12 +23,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const XSubjectId = "X-Subject"
+
 func GetSubjectId(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return "", status.Error(codes.Unauthenticated, "failed to get grpc metadata")
 	}
-	userID := md.Get("X-Subject")
+	userID := md.Get(XSubjectId)
 	if len(userID) == 0 || userID[0] == "" {
 		return "", status.Error(codes.Unauthenticated, "user is missing in metadata")
 	}

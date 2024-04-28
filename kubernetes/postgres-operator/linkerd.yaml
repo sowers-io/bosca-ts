@@ -1,0 +1,95 @@
+---
+apiVersion: policy.linkerd.io/v1beta1
+kind: Server
+metadata:
+  name: postgres-cluster-health
+  namespace: postgres
+spec:
+  podSelector: {}
+  port: 8008
+---
+apiVersion: policy.linkerd.io/v1beta1
+kind: Server
+metadata:
+  name: postgres-backup-health
+  namespace: postgres
+spec:
+  podSelector:
+    matchLabels:
+      postgres-operator.crunchydata.com/pgbackrest-repo: repo1
+  port: 4191
+---
+apiVersion: policy.linkerd.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: postgres-cluster-health-routes
+  namespace: postgres
+spec:
+  parentRefs:
+    - name: postgres-cluster-health
+      kind: Server
+      group: policy.linkerd.io
+  rules:
+    - matches:
+        - path:
+            value: "/liveness"
+            type: "PathPrefix"
+          method: GET
+        - path:
+            value: "/readiness"
+            type: "PathPrefix"
+          method: GET
+---
+apiVersion: policy.linkerd.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: postgres-backup-health-routes
+  namespace: postgres
+spec:
+  parentRefs:
+    - name: postgres-backup-health
+      kind: Server
+      group: policy.linkerd.io
+  rules:
+    - matches:
+        - path:
+            value: "/"
+            type: "PathPrefix"
+          method: GET
+---
+apiVersion: policy.linkerd.io/v1beta1
+kind: ServerAuthorization
+metadata:
+  namespace: postgres
+  name: postgres-cluster-health-authn
+spec:
+  server:
+    name: postgres-cluster-health
+  client:
+    unauthenticated: true
+---
+apiVersion: policy.linkerd.io/v1beta1
+kind: ServerAuthorization
+metadata:
+  namespace: postgres
+  name: postgres-backup-health-authn
+spec:
+  server:
+    name: postgres-backup-health
+  client:
+    unauthenticated: true
+---
+apiVersion: policy.linkerd.io/v1beta1
+kind: ServerAuthorization
+metadata:
+  namespace: postgres
+  name: postgres-cluster-authn
+spec:
+  server:
+    selector:
+      matchLabels:
+        linkerd.io/workload-ns: postgres
+  client:
+    meshTLS:
+      identities:
+        - "*"

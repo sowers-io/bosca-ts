@@ -1,0 +1,18 @@
+#!/bin/sh
+
+kubectl apply -f namespace.yaml
+kubectl apply -f init.yaml
+
+helm -n postgres-operator install pgo oci://registry.developers.crunchydata.com/crunchydata/pgo
+helm -n postgres-operator install monitoring oci://registry.developers.crunchydata.com/crunchydata/crunchy-monitoring
+
+kubectl apply -f cluster.yaml
+#kubectl apply -f linkerd.yaml
+
+sleep 30
+
+kubectl apply -f permissions-job.yaml
+
+sleep 3
+
+kubectl delete -f permissions-job.yaml

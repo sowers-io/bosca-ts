@@ -22,7 +22,7 @@ import (
 	protocontent "bosca.io/api/protobuf/content"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
-	"bosca.io/pkg/security"
+	"bosca.io/pkg/security/spicedb"
 	"bosca.io/pkg/server"
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -39,8 +39,7 @@ func main() {
 	}
 
 	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
-	spiceDbClient := security.NewSpiceDBClient(cfg)
-	permissions := security.NewPermissionManager(spiceDbClient)
+	permissions := spicedb.NewPermissionManager(spicedb.NewSpiceDBClient(cfg))
 
 	var os content.ObjectStore
 	switch cfg.StorageType {
@@ -51,7 +50,7 @@ func main() {
 		log.Fatalf("unknown storage type: %v", cfg.StorageType)
 	}
 
-	svc := content.NewServiceSecurity(permissions, ds, content.NewService(ds, os, permissions))
+	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, os, permissions))
 	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
 		protocontent.RegisterContentServiceServer(grpcSvr, svc)
 		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)

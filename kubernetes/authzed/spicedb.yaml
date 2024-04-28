@@ -9,4 +9,5 @@ spec:
     channel: stable
     version: v1.31.0
     replicas: 2
-  secretName: spicedb-secrets
+    pgbouncer: "true"
+  secretName: spicedb

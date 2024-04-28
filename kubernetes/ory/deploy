@@ -3,6 +3,11 @@
 kubectl apply -f namespace.yaml
 kubectl apply -f secrets.yaml
 
+source ../_util/copy-database-secrets
+
+create_secret kratos-database ory kratos
+create_secret hydra-database ory hydra
+
 helm repo add ory https://k8s.ory.sh/helm/charts
 helm repo update
 

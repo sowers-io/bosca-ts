@@ -774,8 +774,6 @@ github.com/opentracing/opentracing-go v1.2.0 h1:uEJPy/1a5RIPAJ0Ov+OIO8OxWu77jEv+
 github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYrxe9dPLANfrWvHYVTgc=
 github.com/openzipkin/zipkin-go v0.4.2 h1:zjqfqHjUpPmB3c1GlCvvgsM1G4LkvqQbBDueDOCg/jA=
 github.com/openzipkin/zipkin-go v0.4.2/go.mod h1:ZeVkFjuuBiSy13y8vpSDCjMi9GoI3hPpCJSBx/EYFhY=
-github.com/ory/client-go v1.9.0 h1:wimTWH+jPU51N3AU+xNbX7Y39XtaQpgzjWcUpR+xllc=
-github.com/ory/client-go v1.9.0/go.mod h1:2rAuzjcllpLalawioQssX/c/J1w3Idi47s2bWTtWVoA=
 github.com/ory/dockertest/v3 v3.10.0 h1:4K3z2VMe8Woe++invjaTB7VRyQXQy5UY+loujO4aNE4=
 github.com/ory/dockertest/v3 v3.10.0/go.mod h1:nr57ZbRWMqfsdGdFNLHz5jjNdDb7VVFnzAeW1n5N1Lg=
 github.com/ory/fosite v0.44.0 h1:Z3UjyO11/wlIoa3BotOqcTkfm7kUNA8F7dd8mOMfx0o=

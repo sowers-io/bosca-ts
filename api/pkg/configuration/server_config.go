@@ -23,13 +23,14 @@ import (
 )
 
 type ServerConfiguration struct {
-	RestPort                int                       `envconfig:"REST_PORT"`
-	GrpcPort                int                       `envconfig:"GRPC_PORT"`
-	OathKeeperConfiguration string                    `envconfig:"OAUTH_KEEPER_CONFIGURATION" default:"conf/oathkeeper.yaml"`
-	StorageType             string                    `envconfig:"STORAGE_TYPE"`
-	Database                *DatabaseConfiguration    `ignored:"true"`
-	Permissions             *PermissionsConfiguration `ignored:"true"`
-	Storage                 *StorageConfiguration     `ignored:"true"`
+	RestPort            int                       `envconfig:"REST_PORT"`
+	GrpcPort            int                       `envconfig:"GRPC_PORT"`
+	SessionEndpoint     string                    `envconfig:"SESSION_ENDPOINT" required:"true"`
+	SessionEndpointType string                    `envconfig:"SESSION_ENDPOINT_TYPE" default:"ory"`
+	StorageType         string                    `envconfig:"STORAGE_TYPE"`
+	Database            *DatabaseConfiguration    `ignored:"true"`
+	Permissions         *PermissionsConfiguration `ignored:"true"`
+	Storage             *StorageConfiguration     `ignored:"true"`
 }
 
 type PermissionsConfiguration struct {

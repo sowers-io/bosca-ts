@@ -17,8 +17,11 @@
 package server
 
 import (
+	"bosca.io/api/health"
+	protohealth "bosca.io/api/protobuf/health"
 	"bosca.io/pkg/configuration"
-	oath "bosca.io/pkg/identity/middleware"
+	"bosca.io/pkg/security"
+	"bosca.io/pkg/security/ory"
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -28,6 +31,16 @@ import (
 	"net"
 	"net/http"
 )
+
+func NewSessionInterceptor(interceptorType string) security.SessionInterceptor {
+	switch interceptorType {
+	case "ory":
+		return ory.NewSessionInterceptor()
+	default:
+		log.Fatalf("failed to find interceptor type %s", interceptorType)
+		return nil
+	}
+}
 
 func StartServer(cfg *configuration.ServerConfiguration, register func(context.Context, *grpc.Server, *runtime.ServeMux, string, []grpc.DialOption)) {
 	ctx := context.Background()
@@ -40,26 +53,27 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	oathmw, err := oath.New(ctx, oath.WithConfigFile(cfg.OathKeeperConfiguration))
-	if err != nil {
-		log.Fatalf("failed to create oath middleware: %v", err)
-	}
+	interceptor := NewSessionInterceptor(cfg.SessionEndpointType)
+	interceptors := security.NewSecurityInterceptors(cfg.SessionEndpoint, interceptor)
 
 	grpcOpts := []grpc.ServerOption{
-		grpc.UnaryInterceptor(oathmw.UnaryInterceptor()),
-		grpc.StreamInterceptor(oathmw.StreamInterceptor()),
+		grpc.UnaryInterceptor(interceptors.UnaryInterceptor()),
+		grpc.StreamInterceptor(interceptors.StreamInterceptor()),
 	}
 	server := grpc.NewServer(grpcOpts...)
 	mux := runtime.NewServeMux()
 
-	register(ctx, server, mux, endpoint, []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())})
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	register(ctx, server, mux, endpoint, opts)
+
+	protohealth.RegisterHealthServiceServer(server, health.NewHealthService())
+	err = protohealth.RegisterHealthServiceHandlerFromEndpoint(ctx, mux, endpoint, opts)
+	if err != nil {
+		log.Fatalf("failed to register health endpoints: %v", err)
+	}
 
 	go func() {
-		authentication := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			print(r.Header.Get("Authorization"))
-			mux.ServeHTTP(w, r)
-		})
-		err = http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", cfg.RestPort), authentication)
+		err = http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", cfg.RestPort), mux)
 		if err != nil {
 			log.Fatalf("failed to start HTTP server: %v", err)
 		}

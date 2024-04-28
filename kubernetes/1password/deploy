@@ -1,0 +1,10 @@
+#!/bin/sh
+
+source ./token
+
+kubectl apply -f namespace.yaml
+
+helm -n 1password install connect 1password/connect \
+    --set-file connect.credentials=./1password-credentials.json \
+    --set operator.create=true \
+    --set operator.token.value=$TOKEN_VALUE

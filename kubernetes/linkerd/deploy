@@ -54,3 +54,12 @@ EOF
 helm repo add linkerd https://helm.linkerd.io/edge
 helm install linkerd-crds linkerd/linkerd-crds -n linkerd
 helm install linkerd-control-plane -n linkerd --set-file identityTrustAnchorsPEM=ca.crt --set identity.issuer.scheme=kubernetes.io/tls linkerd/linkerd-control-plane
+
+kubectl label namespace cert-manager linkerd.io/inject=enabled
+
+# if running in minikube
+# helm install linkerd-control-plane --set proxyInit.runAsRoot=true -n linkerd --set-file identityTrustAnchorsPEM=ca.crt --set identity.issuer.scheme=kubernetes.io/tls linkerd/linkerd-control-plane
+linkerd viz install | kubectl apply -f -
+
+#kubectl label namespace kube-system config.linkerd.io/admission-webhooks=disabled
+#kubectl label namespace kube-system linkerd.io/inject=enabled

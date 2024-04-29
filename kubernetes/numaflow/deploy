@@ -1,5 +1,0 @@
-#!/bin/sh
-
-kubectl apply -f namespace.yaml
-
-kubectl apply -n numaflow-system -f https://raw.githubusercontent.com/numaproj/numaflow/stable/config/install.yaml

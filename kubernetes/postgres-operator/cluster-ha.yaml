@@ -1,7 +1,8 @@
 apiVersion: postgres-operator.crunchydata.com/v1beta1
 kind: PostgresCluster
 metadata:
-  name: postgres-ha
+  name: postgres
+  namespace: postgres
 spec:
   image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.2-0
   postgresVersion: 16
@@ -28,8 +29,37 @@ spec:
     dynamicConfiguration:
       postgresql:
         pg_hba:
-          - "hostnossl all all 0.0.0.0/0 md5"
-          - "hostnossl all all 0.0.0.0/0 scram-sha-256"
+          - "hostssl all all all md5"
+          - "hostnossl all all all md5"
+  users:
+    - name: postgres
+      databases:
+        - postgres
+      options: 'SUPERUSER'
+    - name: spicedb
+      databases:
+        - spicedb
+      options: 'LOGIN'
+    - name: boscaaccounts
+      databases:
+        - boscaaccounts
+      options: 'LOGIN'
+    - name: boscaprofiles
+      databases:
+        - boscaprofiles
+      options: 'LOGIN'
+    - name: boscacontent
+      databases:
+        - boscacontent
+      options: 'LOGIN'
+    - name: boscasecurity
+      databases:
+        - boscasecurity
+      options: 'LOGIN'
+    - name: kong
+      databases:
+        - kong
+      options: 'LOGIN'
   backups:
     pgbackrest:
       image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.49-0
@@ -46,6 +76,15 @@ spec:
     pgBouncer:
       image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.21-3
       replicas: 2
+      config:
+        global:
+          client_tls_sslmode: allow
+          default_pool_size: "100"
+          max_client_conn: "500"
+          pool_mode: session
+          query_wait_timeout: "240"
+          ignore_startup_parameters: plan_cache_mode,extra_float_digits
+          # server_tls_sslmode: disable
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

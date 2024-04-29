@@ -81,3 +81,15 @@ spec:
               valueFrom: { secretKeyRef: { name: postgres-pguser-postgres, key: host } }
             - name: PASSWORD
               valueFrom: { secretKeyRef: { name: postgres-pguser-postgres, key: password } }
+        - name: psql-kong
+          image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.2-0
+          command:
+            - psql
+            - "host=$(HOST) dbname=kong user=postgres password=$(PASSWORD)"
+            - -c
+            - "alter role _crunchypgbouncer SET search_path TO public, pgbouncer; grant create on schema public to _crunchypgbouncer, kong; grant usage on schema pgbouncer to _crunchypgbouncer, kong; grant execute on function pgbouncer.get_auth(text) to _crunchypgbouncer, kong;"
+          env:
+            - name: HOST
+              valueFrom: { secretKeyRef: { name: postgres-pguser-postgres, key: host } }
+            - name: PASSWORD
+              valueFrom: { secretKeyRef: { name: postgres-pguser-postgres, key: password } }

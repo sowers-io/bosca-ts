@@ -32,6 +32,11 @@ type ServerConfiguration struct {
 	ClientEndPoints *ClientEndpoints       `ignored:"true"`
 }
 
+type WorkerConfiguration struct {
+	Security        *SecurityConfiguration `ignored:"true"`
+	ClientEndPoints *ClientEndpoints       `ignored:"true"`
+}
+
 type SecurityConfiguration struct {
 	SessionEndpoint        string `envconfig:"SESSION_ENDPOINT" required:"true"`
 	SessionEndpointType    string `envconfig:"SESSION_ENDPOINT_TYPE" default:"ory"`
@@ -126,6 +131,17 @@ func getStorageConfiguration(databasePrefix string, storageType string) *Storage
 		}
 	}
 	return nil
+}
+
+func NewWorkerConfiguration() *WorkerConfiguration {
+	configuration := &WorkerConfiguration{}
+	err := envconfig.Process("bosca", configuration)
+	if err != nil {
+		log.Fatalf("Failed to process configuration: %v", err)
+	}
+	configuration.Security = getSecurityConfiguration()
+	configuration.ClientEndPoints = getClientEndpoints()
+	return configuration
 }
 
 func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcPort int) *ServerConfiguration {

@@ -22,6 +22,7 @@
 package jobs
 
 import (
+	protobuf "bosca.io/api/protobuf"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -34,14 +35,18 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	JobsService_AddJobToQueue_FullMethodName = "/bosca.jobs.JobsService/AddJobToQueue"
+	JobsService_Enqueue_FullMethodName = "/bosca.jobs.JobsService/Enqueue"
+	JobsService_Poll_FullMethodName    = "/bosca.jobs.JobsService/Poll"
+	JobsService_Finish_FullMethodName  = "/bosca.jobs.JobsService/Finish"
 )
 
 // JobsServiceClient is the client API for JobsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type JobsServiceClient interface {
-	AddJobToQueue(ctx context.Context, in *JobQueueRequest, opts ...grpc.CallOption) (*JobResponse, error)
+	Enqueue(ctx context.Context, in *QueueRequest, opts ...grpc.CallOption) (*QueueResponse, error)
+	Poll(ctx context.Context, in *PollRequest, opts ...grpc.CallOption) (JobsService_PollClient, error)
+	Finish(ctx context.Context, in *FinishRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
 }
 
 type jobsServiceClient struct {
@@ -52,9 +57,50 @@ func NewJobsServiceClient(cc grpc.ClientConnInterface) JobsServiceClient {
 	return &jobsServiceClient{cc}
 }
 
-func (c *jobsServiceClient) AddJobToQueue(ctx context.Context, in *JobQueueRequest, opts ...grpc.CallOption) (*JobResponse, error) {
-	out := new(JobResponse)
-	err := c.cc.Invoke(ctx, JobsService_AddJobToQueue_FullMethodName, in, out, opts...)
+func (c *jobsServiceClient) Enqueue(ctx context.Context, in *QueueRequest, opts ...grpc.CallOption) (*QueueResponse, error) {
+	out := new(QueueResponse)
+	err := c.cc.Invoke(ctx, JobsService_Enqueue_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *jobsServiceClient) Poll(ctx context.Context, in *PollRequest, opts ...grpc.CallOption) (JobsService_PollClient, error) {
+	stream, err := c.cc.NewStream(ctx, &JobsService_ServiceDesc.Streams[0], JobsService_Poll_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &jobsServicePollClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type JobsService_PollClient interface {
+	Recv() (*Job, error)
+	grpc.ClientStream
+}
+
+type jobsServicePollClient struct {
+	grpc.ClientStream
+}
+
+func (x *jobsServicePollClient) Recv() (*Job, error) {
+	m := new(Job)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *jobsServiceClient) Finish(ctx context.Context, in *FinishRequest, opts ...grpc.CallOption) (*protobuf.Empty, error) {
+	out := new(protobuf.Empty)
+	err := c.cc.Invoke(ctx, JobsService_Finish_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +111,9 @@ func (c *jobsServiceClient) AddJobToQueue(ctx context.Context, in *JobQueueReque
 // All implementations must embed UnimplementedJobsServiceServer
 // for forward compatibility
 type JobsServiceServer interface {
-	AddJobToQueue(context.Context, *JobQueueRequest) (*JobResponse, error)
+	Enqueue(context.Context, *QueueRequest) (*QueueResponse, error)
+	Poll(*PollRequest, JobsService_PollServer) error
+	Finish(context.Context, *FinishRequest) (*protobuf.Empty, error)
 	mustEmbedUnimplementedJobsServiceServer()
 }
 
@@ -73,8 +121,14 @@ type JobsServiceServer interface {
 type UnimplementedJobsServiceServer struct {
 }
 
-func (UnimplementedJobsServiceServer) AddJobToQueue(context.Context, *JobQueueRequest) (*JobResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddJobToQueue not implemented")
+func (UnimplementedJobsServiceServer) Enqueue(context.Context, *QueueRequest) (*QueueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Enqueue not implemented")
+}
+func (UnimplementedJobsServiceServer) Poll(*PollRequest, JobsService_PollServer) error {
+	return status.Errorf(codes.Unimplemented, "method Poll not implemented")
+}
+func (UnimplementedJobsServiceServer) Finish(context.Context, *FinishRequest) (*protobuf.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Finish not implemented")
 }
 func (UnimplementedJobsServiceServer) mustEmbedUnimplementedJobsServiceServer() {}
 
@@ -89,20 +143,59 @@ func RegisterJobsServiceServer(s grpc.ServiceRegistrar, srv JobsServiceServer) {
 	s.RegisterService(&JobsService_ServiceDesc, srv)
 }
 
-func _JobsService_AddJobToQueue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JobQueueRequest)
+func _JobsService_Enqueue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueueRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(JobsServiceServer).AddJobToQueue(ctx, in)
+		return srv.(JobsServiceServer).Enqueue(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: JobsService_AddJobToQueue_FullMethodName,
+		FullMethod: JobsService_Enqueue_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(JobsServiceServer).AddJobToQueue(ctx, req.(*JobQueueRequest))
+		return srv.(JobsServiceServer).Enqueue(ctx, req.(*QueueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _JobsService_Poll_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PollRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(JobsServiceServer).Poll(m, &jobsServicePollServer{stream})
+}
+
+type JobsService_PollServer interface {
+	Send(*Job) error
+	grpc.ServerStream
+}
+
+type jobsServicePollServer struct {
+	grpc.ServerStream
+}
+
+func (x *jobsServicePollServer) Send(m *Job) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _JobsService_Finish_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FinishRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobsServiceServer).Finish(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JobsService_Finish_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobsServiceServer).Finish(ctx, req.(*FinishRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -115,10 +208,20 @@ var JobsService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*JobsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddJobToQueue",
-			Handler:    _JobsService_AddJobToQueue_Handler,
+			MethodName: "Enqueue",
+			Handler:    _JobsService_Enqueue_Handler,
+		},
+		{
+			MethodName: "Finish",
+			Handler:    _JobsService_Finish_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Poll",
+			Handler:       _JobsService_Poll_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "jobs/jobs.proto",
 }

@@ -37,7 +37,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get queue: %v", err)
 	}
-	svc := jobs.NewService(queue)
+	notifier := jobs.NewNotifier(pool)
+	svc := jobs.NewService(notifier, queue)
 	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
 		protojobs.RegisterJobsServiceServer(grpcSvr, svc)
 		err := protojobs.RegisterJobsServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)

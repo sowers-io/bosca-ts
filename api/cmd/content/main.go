@@ -41,7 +41,10 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	jobsConnection := clients.NewClientConnection(cfg.ClientEndPoints.JobsApiAddress)
+	jobsConnection, err := clients.NewClientConnection(cfg.ClientEndPoints.JobsApiAddress)
+	if err != nil {
+		log.Fatalf("failed to connect to jobs: %v", err)
+	}
 	defer jobsConnection.Close()
 
 	jobsClient := jobs.NewJobsServiceClient(jobsConnection)

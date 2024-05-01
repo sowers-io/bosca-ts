@@ -18,26 +18,52 @@ syntax = "proto3";
 option go_package = "bosca.io/api/protobuf/jobs";
 
 import "google/api/annotations.proto";
-import "google/protobuf/any.proto";
-import "google/protobuf/timestamp.proto";
 import "empty.proto";
-import "requests.proto";
 
 package bosca.jobs;
 
 service JobsService {
-  rpc AddJobToQueue(JobQueueRequest) returns (JobResponse) {
+  rpc Enqueue(QueueRequest) returns (QueueResponse) {
     option (google.api.http) = {
       post: "/v1/jobs/queue"
     };
   }
+
+  rpc Poll(PollRequest) returns (stream Job) {
+    option (google.api.http) = {
+      get: "/v1/jobs/queue/{queue}"
+    };
+  }
+
+  rpc Finish(FinishRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      put: "/v1/jobs/queue/{queue}"
+      body: "*"
+    };
+  }
 }
 
-message JobQueueRequest {
+message PollRequest {
+  string queue = 1;
+  int64 timeout = 2;
+}
+
+message QueueRequest {
   string queue = 1;
   bytes json = 2;
 }
 
-message JobResponse {
+message FinishRequest {
+  string queue = 1;
+  string id = 2;
+  bool success = 3;
+}
+
+message Job {
+  string id = 1;
+  bytes json = 2;
+}
+
+message QueueResponse {
   string id = 1;
 }

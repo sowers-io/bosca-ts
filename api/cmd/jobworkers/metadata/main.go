@@ -14,19 +14,28 @@
  * limitations under the License.
  */
 
-package clients
+package main
 
 import (
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	grpc "bosca.io/api/protobuf/jobs"
+	"bosca.io/pkg/configuration"
+	"bosca.io/pkg/jobs"
+	"context"
+	"log"
 )
 
-func NewClientConnection(endpoint string) (*grpc.ClientConn, error) {
-	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	conn, err := grpc.Dial(endpoint, opts...)
+func main() {
+	cfg := configuration.NewWorkerConfiguration()
+	ctx := context.Background()
+	worker, err := jobs.NewWorker(ctx, cfg, "metadata", 0)
 	if err != nil {
-		return nil, err
+		log.Fatalf("failed to create worker: %v", err)
 	}
-	return conn, nil
+	err = worker.Work(ctx, func(job *grpc.Job) error {
+		// TODO
+		return nil
+	})
+	if err != nil {
+		log.Fatalf("failed to process work: %v", err)
+	}
 }

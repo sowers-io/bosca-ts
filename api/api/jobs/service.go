@@ -17,29 +17,76 @@
 package jobs
 
 import (
+	"bosca.io/api/protobuf"
 	grpc "bosca.io/api/protobuf/jobs"
 	"context"
+	"errors"
+	"fmt"
 	"github.com/craigpastro/pgmq-go"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"strconv"
 )
 
 type service struct {
 	grpc.UnimplementedJobsServiceServer
-	queue *pgmq.PGMQ
+	notifier JobNotifier
+	queue    *pgmq.PGMQ
 }
 
-func NewService(queue *pgmq.PGMQ) grpc.JobsServiceServer {
+func NewService(notifier JobNotifier, queue *pgmq.PGMQ) grpc.JobsServiceServer {
 	return &service{
-		queue: queue,
+		notifier: notifier,
+		queue:    queue,
 	}
 }
 
-func (svc *service) AddJobToQueue(ctx context.Context, request *grpc.JobQueueRequest) (*grpc.JobResponse, error) {
+func (svc *service) Enqueue(ctx context.Context, request *grpc.QueueRequest) (*grpc.QueueResponse, error) {
 	id, err := svc.queue.Send(ctx, request.Queue, request.Json)
 	if err != nil {
 		return nil, err
 	}
-	return &grpc.JobResponse{
+	svc.notifier.Notify(ctx, request.Queue)
+	return &grpc.QueueResponse{
 		Id: strconv.FormatInt(id, 10),
 	}, nil
+}
+
+func (svc *service) Poll(request *grpc.PollRequest, server grpc.JobsService_PollServer) error {
+	ctx := context.Background()
+	for {
+		msg, err := svc.queue.Read(ctx, request.GetQueue(), request.Timeout)
+		if err != nil {
+			if errors.Is(err, pgmq.ErrNoRows) {
+				svc.notifier.WaitForNotification(ctx, request.Queue)
+				continue
+			}
+			return status.Errorf(codes.Internal, "failed to poll job: %v", err)
+		}
+		if msg == nil {
+			return status.Errorf(codes.NotFound, "no job available")
+		}
+		err = server.Send(&grpc.Job{
+			Id:   strconv.FormatInt(msg.MsgID, 10),
+			Json: msg.Message,
+		})
+		if err != nil {
+			return status.Errorf(codes.Internal, "failed to send job: %v", err)
+		}
+	}
+}
+
+func (svc *service) Finish(ctx context.Context, request *grpc.FinishRequest) (*protobuf.Empty, error) {
+	id, err := strconv.ParseInt(request.Id, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	success, err := svc.queue.Delete(ctx, request.Queue, id)
+	if err != nil {
+		return nil, err
+	}
+	if !success {
+		return nil, status.Error(codes.Unavailable, fmt.Sprintf("failed to finish job: %s", request.Id))
+	}
+	return &protobuf.Empty{}, nil
 }

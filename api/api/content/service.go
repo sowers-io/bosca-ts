@@ -88,7 +88,7 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 }
 
 func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	_, err := svc.jobs.AddJobToQueue(ctx, &jobs.JobQueueRequest{
+	_, err := svc.jobs.Enqueue(ctx, &jobs.QueueRequest{
 		Queue: "metadata",
 		Json:  json.RawMessage("{\"id\": \"" + request.Id + "\", \"action\": \"uploaded\"}"),
 	})

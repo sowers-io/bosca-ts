@@ -1,4 +1,3 @@
-<!--
 /*
  * Copyright 2024 Sowers, LLC
  *
@@ -14,9 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
--->
-<template>
-  <div>
-    <NuxtWelcome />
-  </div>
-</template>
+
+package jobs
+
+import (
+	grpc "bosca.io/api/protobuf/jobs"
+	"context"
+)
+
+type service struct {
+	grpc.UnimplementedJobsServiceServer
+}
+
+func NewService() grpc.JobsServiceServer {
+	return &service{}
+}
+
+func (svc *service) AddJob(context.Context, *grpc.JobRequest) (*grpc.JobResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}

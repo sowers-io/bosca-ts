@@ -19,6 +19,7 @@ package main
 import (
 	"bosca.io/api/content"
 	"bosca.io/api/content/minio"
+	"bosca.io/api/content/s3"
 	protocontent "bosca.io/api/protobuf/content"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
@@ -45,6 +46,9 @@ func main() {
 	switch cfg.StorageType {
 	case configuration.StorageTypeMinio:
 		os = minio.NewMinioObjectStore(cfg)
+		break
+	case configuration.StorageTypeS3:
+		os = s3.NewS3ObjectStore(cfg)
 		break
 	default:
 		log.Fatalf("unknown storage type: %v", cfg.StorageType)

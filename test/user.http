@@ -1,5 +1,5 @@
 ### Login Me - Get Login Action
-GET https://accounts.bosca.io/self-service/login/api
+GET http://localhost:4433/self-service/login/api
 Accept: application/json
 
 > {% client.global.set("login_action", response.body.ui.action); %}

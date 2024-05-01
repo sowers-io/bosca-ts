@@ -28,8 +28,8 @@ import (
 
 func NewSpiceDBClient(cfg *configuration.ServerConfiguration) *authzed.Client {
 	client, err := authzed.NewClient(
-		cfg.Permissions.EndPoint,
-		grpcutil.WithInsecureBearerToken(cfg.Permissions.SharedToken),
+		cfg.Security.PermissionsEndPoint,
+		grpcutil.WithInsecureBearerToken(cfg.Security.PermissionsSharedToken),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {

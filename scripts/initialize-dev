@@ -8,7 +8,12 @@ cd services
 docker-compose up -d
 cd ..
 
-wait 3
+echo "...... Waiting for docker to settle ......."
+sleep 5
+echo "...... Continuing ......."
 
 ./scripts/initialize-database-dev
 ./scripts/initialize-minio-dev
+
+
+echo "\n########## Development Environment is Running ############"

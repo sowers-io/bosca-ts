@@ -14,32 +14,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
-
-echo "Migrating Databases...."
-
-ROOT=`pwd`
-
-migrate() {
-  DIR="$ROOT/database/$1"
-  if [ -d "$DIR" ]; then
-    echo "    Migrating $1 ($DIR)...($2)\n"
-
-    cd $DIR
-    if [ "$OSTYPE" = "darwin23" ]; then
-    /opt/homebrew/bin/goose postgres "$2" up
-    else
-    goose postgres "$2" up
-    fi
-  fi
-}
-
-while IFS= read -r app
-do
-  VAR_NAME="${app}_CONNECTION_STRING"
-  CONNECTION_STRING=$(eval echo "$"$VAR_NAME)
-
-  migrate "$app" "$CONNECTION_STRING"
-done < "$ROOT/scripts/apps"
-
-echo "...done"
+zed relationship create group:administrators users user:$1 --insecure --token bosca-spicedb --endpoint localhost:50051

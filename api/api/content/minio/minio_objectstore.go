@@ -36,15 +36,15 @@ type store struct {
 }
 
 func NewMinioObjectStore(cfg *configuration.ServerConfiguration) content.ObjectStore {
-	client, err := minio.New(cfg.Storage.Minio.Endpoint, &minio.Options{
-		Creds: credentials.NewStaticV4(cfg.Storage.Minio.AccessKeyID, cfg.Storage.Minio.SecretAccessKey, ""),
+	client, err := minio.New(cfg.Storage.S3.Endpoint, &minio.Options{
+		Creds: credentials.NewStaticV4(cfg.Storage.S3.AccessKeyID, cfg.Storage.S3.SecretAccessKey, ""),
 	})
 	if err != nil {
 		log.Fatalf("failed to create minio store: %v", err)
 	}
 	return &store{
 		client: client,
-		bucket: cfg.Storage.Minio.Bucket,
+		bucket: cfg.Storage.S3.Bucket,
 	}
 }
 

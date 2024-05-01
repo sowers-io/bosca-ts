@@ -23,19 +23,19 @@ import (
 )
 
 type ServerConfiguration struct {
-	RestPort            int                       `envconfig:"REST_PORT"`
-	GrpcPort            int                       `envconfig:"GRPC_PORT"`
-	SessionEndpoint     string                    `envconfig:"SESSION_ENDPOINT" required:"true"`
-	SessionEndpointType string                    `envconfig:"SESSION_ENDPOINT_TYPE" default:"ory"`
-	StorageType         string                    `envconfig:"STORAGE_TYPE"`
-	Database            *DatabaseConfiguration    `ignored:"true"`
-	Permissions         *PermissionsConfiguration `ignored:"true"`
-	Storage             *StorageConfiguration     `ignored:"true"`
+	RestPort    int                    `envconfig:"REST_PORT"`
+	GrpcPort    int                    `envconfig:"GRPC_PORT"`
+	StorageType string                 `envconfig:"STORAGE_TYPE"`
+	Database    *DatabaseConfiguration `ignored:"true"`
+	Security    *SecurityConfiguration `ignored:"true"`
+	Storage     *StorageConfiguration  `ignored:"true"`
 }
 
-type PermissionsConfiguration struct {
-	EndPoint    string `envconfig:"PERMISSIONS_ENDPOINT" default:"localhost:50052"`
-	SharedToken string `envconfig:"PERMISSIONS_SHARED_TOKEN" required:"true"`
+type SecurityConfiguration struct {
+	SessionEndpoint        string `envconfig:"SESSION_ENDPOINT" required:"true"`
+	SessionEndpointType    string `envconfig:"SESSION_ENDPOINT_TYPE" default:"ory"`
+	PermissionsEndPoint    string `envconfig:"PERMISSIONS_ENDPOINT" default:"localhost:50051"`
+	PermissionsSharedToken string `envconfig:"PERMISSIONS_SHARED_TOKEN" required:"true"`
 }
 
 type DatabaseConfiguration struct {
@@ -43,13 +43,15 @@ type DatabaseConfiguration struct {
 }
 
 const StorageTypeMinio = "minio"
+const StorageTypeS3 = "s3"
 
 type StorageConfiguration struct {
-	Minio *MinioConfiguration
+	S3 *S3Configuration
 }
 
-type MinioConfiguration struct {
+type S3Configuration struct {
 	Endpoint        string `envconfig:"ENDPOINT"`
+	Region          string `envconfig:"REGION"`
 	Bucket          string `envconfig:"BUCKET" default:"bosca"`
 	AccessKeyID     string `envconfig:"ACCESS_KEY_ID"`
 	SecretAccessKey string `envconfig:"SECRET_ACCESS_KEY"`
@@ -79,8 +81,8 @@ func getDatabaseConfiguration(databasePrefix string) *DatabaseConfiguration {
 	return database
 }
 
-func getPermissionsConfiguration() *PermissionsConfiguration {
-	permissions := &PermissionsConfiguration{}
+func getSecurityConfiguration() *SecurityConfiguration {
+	permissions := &SecurityConfiguration{}
 	err := envconfig.Process("bosca", permissions)
 	if err != nil {
 		log.Fatalf("failed to process security configuration: %v", err)
@@ -92,10 +94,12 @@ func getStorageConfiguration(databasePrefix string, storageType string) *Storage
 	if databasePrefix == "content" {
 		switch storageType {
 		case StorageTypeMinio:
+			fallthrough
+		case StorageTypeS3:
 			cfg := &StorageConfiguration{
-				Minio: &MinioConfiguration{},
+				S3: &S3Configuration{},
 			}
-			err := envconfig.Process("bosca_minio", cfg.Minio)
+			err := envconfig.Process("bosca_s3", cfg.S3)
 			if err != nil {
 				log.Fatalf("failed to process storage configuration: %v", err)
 			}
@@ -111,6 +115,6 @@ func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcP
 	configuration := getBaseConfiguration(defaultRestPort, defaultGrpcPort)
 	configuration.Database = getDatabaseConfiguration(databasePrefix)
 	configuration.Storage = getStorageConfiguration(databasePrefix, configuration.StorageType)
-	configuration.Permissions = getPermissionsConfiguration()
+	configuration.Security = getSecurityConfiguration()
 	return configuration
 }

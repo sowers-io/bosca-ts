@@ -53,8 +53,8 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	interceptor := NewSessionInterceptor(cfg.SessionEndpointType)
-	interceptors := security.NewSecurityInterceptors(cfg.SessionEndpoint, interceptor)
+	interceptor := NewSessionInterceptor(cfg.Security.SessionEndpointType)
+	interceptors := security.NewSecurityInterceptors(cfg.Security.SessionEndpoint, interceptor)
 
 	grpcOpts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(interceptors.UnaryInterceptor()),

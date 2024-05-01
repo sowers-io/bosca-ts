@@ -87,7 +87,7 @@ func (m *interceptors) injectSubjectId(ctx context.Context) metadata.MD {
 func (m *interceptors) unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	md := m.injectSubjectId(ctx)
 	if md != nil {
-		ctx = metadata.NewOutgoingContext(ctx, md)
+		ctx = metadata.NewIncomingContext(ctx, md)
 	}
 	return handler(ctx, req)
 }

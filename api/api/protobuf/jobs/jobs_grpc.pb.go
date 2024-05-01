@@ -34,14 +34,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	JobsService_AddJob_FullMethodName = "/bosca.jobs.JobsService/AddJob"
+	JobsService_AddJobToQueue_FullMethodName = "/bosca.jobs.JobsService/AddJobToQueue"
 )
 
 // JobsServiceClient is the client API for JobsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type JobsServiceClient interface {
-	AddJob(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*JobResponse, error)
+	AddJobToQueue(ctx context.Context, in *JobQueueRequest, opts ...grpc.CallOption) (*JobResponse, error)
 }
 
 type jobsServiceClient struct {
@@ -52,9 +52,9 @@ func NewJobsServiceClient(cc grpc.ClientConnInterface) JobsServiceClient {
 	return &jobsServiceClient{cc}
 }
 
-func (c *jobsServiceClient) AddJob(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*JobResponse, error) {
+func (c *jobsServiceClient) AddJobToQueue(ctx context.Context, in *JobQueueRequest, opts ...grpc.CallOption) (*JobResponse, error) {
 	out := new(JobResponse)
-	err := c.cc.Invoke(ctx, JobsService_AddJob_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, JobsService_AddJobToQueue_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *jobsServiceClient) AddJob(ctx context.Context, in *JobRequest, opts ...
 // All implementations must embed UnimplementedJobsServiceServer
 // for forward compatibility
 type JobsServiceServer interface {
-	AddJob(context.Context, *JobRequest) (*JobResponse, error)
+	AddJobToQueue(context.Context, *JobQueueRequest) (*JobResponse, error)
 	mustEmbedUnimplementedJobsServiceServer()
 }
 
@@ -73,8 +73,8 @@ type JobsServiceServer interface {
 type UnimplementedJobsServiceServer struct {
 }
 
-func (UnimplementedJobsServiceServer) AddJob(context.Context, *JobRequest) (*JobResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddJob not implemented")
+func (UnimplementedJobsServiceServer) AddJobToQueue(context.Context, *JobQueueRequest) (*JobResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddJobToQueue not implemented")
 }
 func (UnimplementedJobsServiceServer) mustEmbedUnimplementedJobsServiceServer() {}
 
@@ -89,20 +89,20 @@ func RegisterJobsServiceServer(s grpc.ServiceRegistrar, srv JobsServiceServer) {
 	s.RegisterService(&JobsService_ServiceDesc, srv)
 }
 
-func _JobsService_AddJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JobRequest)
+func _JobsService_AddJobToQueue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JobQueueRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(JobsServiceServer).AddJob(ctx, in)
+		return srv.(JobsServiceServer).AddJobToQueue(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: JobsService_AddJob_FullMethodName,
+		FullMethod: JobsService_AddJobToQueue_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(JobsServiceServer).AddJob(ctx, req.(*JobRequest))
+		return srv.(JobsServiceServer).AddJobToQueue(ctx, req.(*JobQueueRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -115,8 +115,8 @@ var JobsService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*JobsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddJob",
-			Handler:    _JobsService_AddJob_Handler,
+			MethodName: "AddJobToQueue",
+			Handler:    _JobsService_AddJobToQueue_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

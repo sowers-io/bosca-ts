@@ -19,17 +19,27 @@ package jobs
 import (
 	grpc "bosca.io/api/protobuf/jobs"
 	"context"
+	"github.com/craigpastro/pgmq-go"
+	"strconv"
 )
 
 type service struct {
 	grpc.UnimplementedJobsServiceServer
+	queue *pgmq.PGMQ
 }
 
-func NewService() grpc.JobsServiceServer {
-	return &service{}
+func NewService(queue *pgmq.PGMQ) grpc.JobsServiceServer {
+	return &service{
+		queue: queue,
+	}
 }
 
-func (svc *service) AddJob(context.Context, *grpc.JobRequest) (*grpc.JobResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (svc *service) AddJobToQueue(ctx context.Context, request *grpc.JobQueueRequest) (*grpc.JobResponse, error) {
+	id, err := svc.queue.Send(ctx, request.Queue, request.Json)
+	if err != nil {
+		return nil, err
+	}
+	return &grpc.JobResponse{
+		Id: strconv.FormatInt(id, 10),
+	}, nil
 }

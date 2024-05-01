@@ -19,6 +19,8 @@ package main
 import (
 	graphqlConfig "bosca.io/api/graphql"
 	"bosca.io/api/protobuf/content"
+	"bosca.io/pkg/clients"
+	"bosca.io/pkg/configuration"
 	"context"
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
@@ -27,7 +29,9 @@ import (
 )
 
 func main() {
-	contentConnection := NewContentClientConnection()
+	cfg := configuration.NewServerConfiguration("", 0, 0)
+
+	contentConnection := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
 	defer contentConnection.Close()
 
 	contentClient := content.NewContentServiceClient(contentConnection)

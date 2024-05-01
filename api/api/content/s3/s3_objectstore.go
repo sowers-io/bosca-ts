@@ -58,7 +58,7 @@ func NewS3ObjectStore(cfg *configuration.ServerConfiguration) content.ObjectStor
 	}
 }
 
-func (m *store) toSignedUrl(request *v4.PresignedHTTPRequest) *model.SignedUrl {
+func (m *store) toSignedUrl(id string, request *v4.PresignedHTTPRequest) *model.SignedUrl {
 	headers := make([]*model.SignedUrlHeader, 0)
 	for key, values := range request.SignedHeader {
 		for _, value := range values {
@@ -69,6 +69,7 @@ func (m *store) toSignedUrl(request *v4.PresignedHTTPRequest) *model.SignedUrl {
 		}
 	}
 	return &model.SignedUrl{
+		Id:      id,
 		Url:     request.URL,
 		Method:  request.Method,
 		Headers: headers,
@@ -86,7 +87,7 @@ func (m *store) CreateUploadUrl(ctx context.Context, id string, _ string, conten
 	if err != nil {
 		return nil, err
 	}
-	return m.toSignedUrl(request), nil
+	return m.toSignedUrl(id, request), nil
 }
 
 func (m *store) CreateDownloadUrl(ctx context.Context, id string) (*model.SignedUrl, error) {
@@ -99,5 +100,5 @@ func (m *store) CreateDownloadUrl(ctx context.Context, id string) (*model.Signed
 	if err != nil {
 		return nil, err
 	}
-	return m.toSignedUrl(request), nil
+	return m.toSignedUrl(id, request), nil
 }

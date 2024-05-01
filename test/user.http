@@ -1,3 +1,24 @@
+### Login Me - Register Action
+GET http://localhost:4433/self-service/registration/api
+Accept: application/json
+
+> {% client.global.set("register_action", response.body.ui.action); %}
+
+### Login Me - Register With Action
+POST {{register_action}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "traits": {
+    "email": "test@bosca.dev",
+    "firstName": "Test",
+    "lastName": "User"
+  },
+  "password": "vjr0awg9vdh5bth-JDW",
+  "method": "password"
+}
+
 ### Login Me - Get Login Action
 GET http://localhost:4433/self-service/login/api
 Accept: application/json
@@ -48,7 +69,7 @@ Content-Type: application/json
   }
 }
 
-> {% client.global.set("upload_url", response.body.url); %}
+> {% client.global.set("upload_url", response.body.url); client.global.set("upload_id", response.body.id); %}
 
 ###
 PUT {{upload_url}}
@@ -56,3 +77,8 @@ Host: localhost:9010
 Content-Type: text/plain
 
 Hello
+
+###
+POST http://localhost:5003/v1/content/metadata/{{upload_id}}/uploaded
+Authorization: Bearer {{session_token}}
+Content-Type: application/json

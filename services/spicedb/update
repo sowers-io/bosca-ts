@@ -1,0 +1,3 @@
+#!/bin/sh
+
+zed schema write schema --insecure --endpoint localhost:50051 --token bosca-spicedb

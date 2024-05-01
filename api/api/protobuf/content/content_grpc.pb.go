@@ -40,7 +40,9 @@ const (
 	ContentService_GetCollectionPermissions_FullMethodName = "/bosca.content.ContentService/GetCollectionPermissions"
 	ContentService_AddCollectionPermission_FullMethodName  = "/bosca.content.ContentService/AddCollectionPermission"
 	ContentService_AddMetadata_FullMethodName              = "/bosca.content.ContentService/AddMetadata"
+	ContentService_SetMetadataUploaded_FullMethodName      = "/bosca.content.ContentService/SetMetadataUploaded"
 	ContentService_GetMetadataPermissions_FullMethodName   = "/bosca.content.ContentService/GetMetadataPermissions"
+	ContentService_AddMetadataPermissions_FullMethodName   = "/bosca.content.ContentService/AddMetadataPermissions"
 	ContentService_AddMetadataPermission_FullMethodName    = "/bosca.content.ContentService/AddMetadataPermission"
 	ContentService_SetMetadataStatus_FullMethodName        = "/bosca.content.ContentService/SetMetadataStatus"
 )
@@ -54,7 +56,9 @@ type ContentServiceClient interface {
 	GetCollectionPermissions(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
 	AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*SignedUrl, error)
+	SetMetadataUploaded(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	GetMetadataPermissions(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
+	AddMetadataPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	AddMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	SetMetadataStatus(ctx context.Context, in *SetMetadataStatusRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
 }
@@ -112,9 +116,27 @@ func (c *contentServiceClient) AddMetadata(ctx context.Context, in *AddMetadataR
 	return out, nil
 }
 
+func (c *contentServiceClient) SetMetadataUploaded(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error) {
+	out := new(protobuf.Empty)
+	err := c.cc.Invoke(ctx, ContentService_SetMetadataUploaded_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) GetMetadataPermissions(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Permissions, error) {
 	out := new(Permissions)
 	err := c.cc.Invoke(ctx, ContentService_GetMetadataPermissions_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) AddMetadataPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*protobuf.Empty, error) {
+	out := new(protobuf.Empty)
+	err := c.cc.Invoke(ctx, ContentService_AddMetadataPermissions_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +170,9 @@ type ContentServiceServer interface {
 	GetCollectionPermissions(context.Context, *protobuf.IdRequest) (*Permissions, error)
 	AddCollectionPermission(context.Context, *Permission) (*protobuf.Empty, error)
 	AddMetadata(context.Context, *AddMetadataRequest) (*SignedUrl, error)
+	SetMetadataUploaded(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error)
 	GetMetadataPermissions(context.Context, *protobuf.IdRequest) (*Permissions, error)
+	AddMetadataPermissions(context.Context, *Permissions) (*protobuf.Empty, error)
 	AddMetadataPermission(context.Context, *Permission) (*protobuf.Empty, error)
 	SetMetadataStatus(context.Context, *SetMetadataStatusRequest) (*protobuf.Empty, error)
 	mustEmbedUnimplementedContentServiceServer()
@@ -173,8 +197,14 @@ func (UnimplementedContentServiceServer) AddCollectionPermission(context.Context
 func (UnimplementedContentServiceServer) AddMetadata(context.Context, *AddMetadataRequest) (*SignedUrl, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadata not implemented")
 }
+func (UnimplementedContentServiceServer) SetMetadataUploaded(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetMetadataUploaded not implemented")
+}
 func (UnimplementedContentServiceServer) GetMetadataPermissions(context.Context, *protobuf.IdRequest) (*Permissions, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataPermissions not implemented")
+}
+func (UnimplementedContentServiceServer) AddMetadataPermissions(context.Context, *Permissions) (*protobuf.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataPermissions not implemented")
 }
 func (UnimplementedContentServiceServer) AddMetadataPermission(context.Context, *Permission) (*protobuf.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataPermission not implemented")
@@ -285,6 +315,24 @@ func _ContentService_AddMetadata_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_SetMetadataUploaded_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(protobuf.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).SetMetadataUploaded(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_SetMetadataUploaded_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).SetMetadataUploaded(ctx, req.(*protobuf.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_GetMetadataPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(protobuf.IdRequest)
 	if err := dec(in); err != nil {
@@ -299,6 +347,24 @@ func _ContentService_GetMetadataPermissions_Handler(srv interface{}, ctx context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).GetMetadataPermissions(ctx, req.(*protobuf.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_AddMetadataPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Permissions)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).AddMetadataPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_AddMetadataPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).AddMetadataPermissions(ctx, req.(*Permissions))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -367,8 +433,16 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_AddMetadata_Handler,
 		},
 		{
+			MethodName: "SetMetadataUploaded",
+			Handler:    _ContentService_SetMetadataUploaded_Handler,
+		},
+		{
 			MethodName: "GetMetadataPermissions",
 			Handler:    _ContentService_GetMetadataPermissions_Handler,
+		},
+		{
+			MethodName: "AddMetadataPermissions",
+			Handler:    _ContentService_AddMetadataPermissions_Handler,
 		},
 		{
 			MethodName: "AddMetadataPermission",

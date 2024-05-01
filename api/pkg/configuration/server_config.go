@@ -23,12 +23,13 @@ import (
 )
 
 type ServerConfiguration struct {
-	RestPort    int                    `envconfig:"REST_PORT"`
-	GrpcPort    int                    `envconfig:"GRPC_PORT"`
-	StorageType string                 `envconfig:"STORAGE_TYPE"`
-	Database    *DatabaseConfiguration `ignored:"true"`
-	Security    *SecurityConfiguration `ignored:"true"`
-	Storage     *StorageConfiguration  `ignored:"true"`
+	RestPort        int                    `envconfig:"REST_PORT"`
+	GrpcPort        int                    `envconfig:"GRPC_PORT"`
+	StorageType     string                 `envconfig:"STORAGE_TYPE"`
+	Database        *DatabaseConfiguration `ignored:"true"`
+	Security        *SecurityConfiguration `ignored:"true"`
+	Storage         *StorageConfiguration  `ignored:"true"`
+	ClientEndPoints *ClientEndpoints       `ignored:"true"`
 }
 
 type SecurityConfiguration struct {
@@ -57,6 +58,13 @@ type S3Configuration struct {
 	SecretAccessKey string `envconfig:"SECRET_ACCESS_KEY"`
 }
 
+type ClientEndpoints struct {
+	JobsApiAddress     string `envconfig:"JOBS_API_ADDRESS"`
+	ContentApiAddress  string `envconfig:"CONTENT_API_ADDRESS"`
+	ProfilesApiAddress string `envconfig:"PROFILES_API_ADDRESS"`
+	SecurityApiAddress string `envconfig:"SECURITY_API_ADDRESS"`
+}
+
 func getBaseConfiguration(defaultRestPort, defaultGrpcPort int) *ServerConfiguration {
 	configuration := &ServerConfiguration{}
 	err := envconfig.Process("bosca", configuration)
@@ -70,6 +78,15 @@ func getBaseConfiguration(defaultRestPort, defaultGrpcPort int) *ServerConfigura
 		configuration.GrpcPort = defaultGrpcPort
 	}
 	return configuration
+}
+
+func getClientEndpoints() *ClientEndpoints {
+	endpoints := &ClientEndpoints{}
+	err := envconfig.Process("bosca", endpoints)
+	if err != nil {
+		log.Fatalf("failed to process endpoints configuration: %v", err)
+	}
+	return endpoints
 }
 
 func getDatabaseConfiguration(databasePrefix string) *DatabaseConfiguration {
@@ -116,5 +133,6 @@ func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcP
 	configuration.Database = getDatabaseConfiguration(databasePrefix)
 	configuration.Storage = getStorageConfiguration(databasePrefix, configuration.StorageType)
 	configuration.Security = getSecurityConfiguration()
+	configuration.ClientEndPoints = getClientEndpoints()
 	return configuration
 }

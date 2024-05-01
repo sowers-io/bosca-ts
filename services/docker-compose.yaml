@@ -24,7 +24,7 @@ services:
       - 8025:8025
 
   postgres:
-    image: postgres:14-alpine
+    image: postgres:16-alpine
     ports:
       - '5432:5432'
     volumes:
@@ -34,6 +34,19 @@ services:
       - POSTGRES_PASSWORD=bosca
       - POSTGRES_USER=bosca
       - POSTGRES_DB=bosca
+    networks:
+      - net1
+
+  postgres-job-queue:
+    image: quay.io/tembo/pgmq-pg:latest
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgresjobqueue:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=bosca
+      - POSTGRES_USER=bosca
+      - POSTGRES_DB=boscajobs
     networks:
       - net1
 
@@ -101,6 +114,7 @@ services:
       - ./kratos:/etc/kratos/config
     environment:
       SECRETS_SYSTEM: J6HsjnqeGHqVai7GVlFbKQi6Je189fMF
+      COURIER_SMTP_CONNECTION_URI: "smtp://mailhog:1025"
       DSN: "postgres://bosca:bosca@postgres:5432/kratos?sslmode=disable"
     networks:
       - net1
@@ -206,6 +220,7 @@ networks:
 
 volumes:
   postgres:
+  postgresjobqueue:
   minio-data1-1:
   minio-data1-2:
   minio-data2-1:

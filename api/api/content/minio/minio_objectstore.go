@@ -58,6 +58,7 @@ func (m *store) CreateUploadUrl(ctx context.Context, id string, _ string, conten
 		return nil, err
 	}
 	return &model.SignedUrl{
+		Id:  id,
 		Url: u.String(),
 	}, nil
 }
@@ -69,6 +70,7 @@ func (m *store) CreateDownloadUrl(ctx context.Context, id string) (*model.Signed
 		return nil, err
 	}
 	return &model.SignedUrl{
+		Id:  id,
 		Url: u.String(),
 	}, nil
 }

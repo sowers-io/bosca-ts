@@ -39,5 +39,6 @@ export profiles_CONNECTION_STRING="postgresql://boscaprofiles:bosca@localhost:54
 export jobs_CONNECTION_STRING="postgresql://boscajobs:bosca@localhost:5432/boscajobs"
 export content_CONNECTION_STRING="postgresql://boscacontent:bosca@localhost:5432/boscacontent"
 export security_CONNECTION_STRING="postgresql://boscasecurity:bosca@localhost:5432/boscasecurity"
+export jobs_CONNECTION_STRING="postgresql://bosca:bosca@localhost:5433/boscajobs"
 
 ./scripts/database-migrate

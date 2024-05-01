@@ -66,6 +66,14 @@ func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.
 	return svc.service.AddMetadata(ctx, request)
 }
 
+func (svc *authorizationService) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_edit)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.SetMetadataUploaded(ctx, request)
+}
+
 func (svc *authorizationService) SetMetadataStatus(ctx context.Context, request *grpc.SetMetadataStatusRequest) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_service)
 	if err != nil {
@@ -80,6 +88,14 @@ func (svc *authorizationService) GetMetadataPermissions(ctx context.Context, req
 		return nil, err
 	}
 	return svc.service.GetMetadataPermissions(ctx, request)
+}
+
+func (svc *authorizationService) AddMetadataPermissions(ctx context.Context, permission *grpc.Permissions) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, permission.Id, grpc.PermissionAction_manage)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.AddMetadataPermissions(ctx, permission)
 }
 
 func (svc *authorizationService) AddMetadataPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {

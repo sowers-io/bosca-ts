@@ -26,15 +26,16 @@ import "requests.proto";
 package bosca.jobs;
 
 service JobsService {
-  rpc AddJob(JobRequest) returns (JobResponse) {
+  rpc AddJobToQueue(JobQueueRequest) returns (JobResponse) {
     option (google.api.http) = {
-      post: "/v1/jobs"
+      post: "/v1/jobs/queue"
     };
   }
 }
 
-message JobRequest {
-  bytes blob = 1;
+message JobQueueRequest {
+  string queue = 1;
+  bytes json = 2;
 }
 
 message JobResponse {

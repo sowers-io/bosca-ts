@@ -21,6 +21,8 @@ import (
 	"bosca.io/api/content/minio"
 	"bosca.io/api/content/s3"
 	protocontent "bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/jobs"
+	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
 	"bosca.io/pkg/security/spicedb"
@@ -39,6 +41,11 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
+	jobsConnection := clients.NewClientConnection(cfg.ClientEndPoints.JobsApiAddress)
+	defer jobsConnection.Close()
+
+	jobsClient := jobs.NewJobsServiceClient(jobsConnection)
+
 	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
 	permissions := spicedb.NewPermissionManager(spicedb.NewSpiceDBClient(cfg))
 
@@ -54,7 +61,7 @@ func main() {
 		log.Fatalf("unknown storage type: %v", cfg.StorageType)
 	}
 
-	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, os, permissions))
+	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, os, permissions, jobsClient))
 	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
 		protocontent.RegisterContentServiceServer(grpcSvr, svc)
 		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)

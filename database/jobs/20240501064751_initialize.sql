@@ -1,9 +1,11 @@
 -- +goose Up
 -- +goose StatementBegin
-SELECT 'up SQL query';
+CREATE EXTENSION pgmq CASCADE;
+SELECT pgmq.create('metadata');
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-SELECT 'down SQL query';
+SELECT pgmq.drop_queue('metadata');
+DROP EXTENSION pgmq;
 -- +goose StatementEnd

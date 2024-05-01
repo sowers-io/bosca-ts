@@ -127,31 +127,35 @@ func (s *permissionManager) getAction(relation grpc.PermissionAction) string {
 	return ""
 }
 
-func (s *permissionManager) CreateRelationship(ctx context.Context, objectType security.ObjectType, permission *grpc.Permission) error {
-	_, err := s.permissionsClient.WriteRelationships(ctx, &pb.WriteRelationshipsRequest{
-		Updates: []*pb.RelationshipUpdate{
-			{
-				Operation: pb.RelationshipUpdate_OPERATION_CREATE,
-				Relationship: &pb.Relationship{
-					Resource: &pb.ObjectReference{
-						ObjectType: s.getObjectType(objectType),
-						ObjectId:   permission.Id,
-					},
-					Relation: s.getRelation(permission.Relation),
-					Subject: &pb.SubjectReference{
-						Object: &pb.ObjectReference{
-							ObjectType: s.getSubjectType(permission.Group),
-							ObjectId:   permission.Subject,
-						},
+func (s *permissionManager) CreateRelationships(ctx context.Context, objectType security.ObjectType, permissions []*grpc.Permission) error {
+	updates := make([]*pb.RelationshipUpdate, 0)
+	for _, permission := range permissions {
+		updates = append(updates, &pb.RelationshipUpdate{
+			Operation: pb.RelationshipUpdate_OPERATION_CREATE,
+			Relationship: &pb.Relationship{
+				Resource: &pb.ObjectReference{
+					ObjectType: s.getObjectType(objectType),
+					ObjectId:   permission.Id,
+				},
+				Relation: s.getRelation(permission.Relation),
+				Subject: &pb.SubjectReference{
+					Object: &pb.ObjectReference{
+						ObjectType: s.getSubjectType(permission.Group),
+						ObjectId:   permission.Subject,
 					},
 				},
 			},
-		},
-	})
+		})
+	}
+	_, err := s.permissionsClient.WriteRelationships(ctx, &pb.WriteRelationshipsRequest{Updates: updates})
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (s *permissionManager) CreateRelationship(ctx context.Context, objectType security.ObjectType, permission *grpc.Permission) error {
+	return s.CreateRelationships(ctx, objectType, []*grpc.Permission{permission})
 }
 
 func (s *permissionManager) GetPermissions(ctx context.Context, objectType security.ObjectType, resourceId string) (*grpc.Permissions, error) {

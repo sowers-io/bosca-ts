@@ -15,12 +15,12 @@ definition group {
 }
 
 definition metadata {
-    relation viewers: group
-    relation discoverers: group
-    relation editors: group
-    relation managers: group
-    relation servicers: group
-    relation owners: group
+    relation viewers: group | user
+    relation discoverers: group | user
+    relation editors: group | user
+    relation managers: group | user
+    relation servicers: group | user
+    relation owners: group | user
 
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list
@@ -31,12 +31,12 @@ definition metadata {
 }
 
 definition collection {
-    relation viewers: group
-    relation discoverers: group
-    relation editors: group
-    relation managers: group
-    relation servicers: group
-    relation owners: group
+    relation viewers: group | user
+    relation discoverers: group | user
+    relation editors: group | user
+    relation managers: group | user
+    relation servicers: group | user
+    relation owners: group | user
 
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list
@@ -47,12 +47,12 @@ definition collection {
 }
 
 definition systemresource {
-    relation viewers: group
-    relation discoverers: group
-    relation editors: group
-    relation managers: group
-    relation servicers: group
-    relation owners: group
+    relation viewers: group | user
+    relation discoverers: group | user
+    relation editors: group | user
+    relation managers: group | user
+    relation servicers: group | user
+    relation owners: group | user
 
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list

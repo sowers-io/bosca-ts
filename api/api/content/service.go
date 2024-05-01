@@ -19,9 +19,11 @@ package content
 import (
 	"bosca.io/api/protobuf"
 	grpc "bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/jobs"
 	"bosca.io/pkg/identity"
 	"bosca.io/pkg/security"
 	"context"
+	"encoding/json"
 )
 
 type service struct {
@@ -31,15 +33,17 @@ type service struct {
 	os ObjectStore
 
 	permissions security.PermissionManager
+	jobs        jobs.JobsServiceClient
 }
 
 const RootCollectionId = "00000000-0000-0000-0000-000000000000"
 
-func NewService(dataStore *DataStore, objectStore ObjectStore, permissions security.PermissionManager) grpc.ContentServiceServer {
+func NewService(dataStore *DataStore, objectStore ObjectStore, permissions security.PermissionManager, jobs jobs.JobsServiceClient) grpc.ContentServiceServer {
 	return &service{
 		ds:          dataStore,
 		os:          objectStore,
 		permissions: permissions,
+		jobs:        jobs,
 	}
 }
 
@@ -57,11 +61,22 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 	if err != nil {
 		return nil, err
 	}
-	_, err = svc.AddMetadataPermission(ctx, &grpc.Permission{
-		Id:       id,
-		Subject:  userId,
-		Relation: grpc.PermissionRelation_owners,
+	err = svc.permissions.CreateRelationships(ctx, security.MetadataObject, []*grpc.Permission{
+		{
+			Id:       id,
+			Subject:  security.AdministratorGroup,
+			Group:    true,
+			Relation: grpc.PermissionRelation_owners,
+		},
+		{
+			Id:       id,
+			Subject:  userId,
+			Relation: grpc.PermissionRelation_owners,
+		},
 	})
+	if err != nil {
+		return nil, err
+	}
 	err = svc.ds.AddCollectionMetadataItems(ctx, request.Collection, []string{id})
 	if err != nil {
 		return nil, err
@@ -70,6 +85,17 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 		return nil, err
 	}
 	return svc.os.CreateUploadUrl(ctx, id, request.Metadata.Name, request.Metadata.ContentType, request.Metadata.Attributes)
+}
+
+func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	_, err := svc.jobs.AddJobToQueue(ctx, &jobs.JobQueueRequest{
+		Queue: "metadata",
+		Json:  json.RawMessage("{\"id\": \"" + request.Id + "\", \"action\": \"uploaded\"}"),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.Empty{}, nil
 }
 
 func (svc *service) SetMetadataStatus(ctx context.Context, request *grpc.SetMetadataStatusRequest) (*protobuf.Empty, error) {
@@ -82,6 +108,19 @@ func (svc *service) SetMetadataStatus(ctx context.Context, request *grpc.SetMeta
 
 func (svc *service) GetMetadataPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
 	return svc.permissions.GetPermissions(ctx, security.MetadataObject, request.Id)
+}
+
+func (svc *service) AddMetadataPermissions(ctx context.Context, permissions *grpc.Permissions) (*protobuf.Empty, error) {
+	for _, permission := range permissions.Permissions {
+		if permission.Id == "" {
+			permission.Id = permissions.Id
+		}
+	}
+	err := svc.permissions.CreateRelationships(ctx, security.MetadataObject, permissions.Permissions)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.Empty{}, nil
 }
 
 func (svc *service) AddMetadataPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {

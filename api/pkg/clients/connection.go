@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package main
+package clients
 
 import (
 	"google.golang.org/grpc"
@@ -22,10 +22,10 @@ import (
 	"log"
 )
 
-func NewContentClientConnection() *grpc.ClientConn {
+func NewClientConnection(endpoint string) *grpc.ClientConn {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	conn, err := grpc.Dial("localhost:5013", opts...)
+	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}

@@ -3,61 +3,61 @@ definition user {}
 definition serviceaccount {}
 
 definition group {
-	relation users: user
-	relation serviceaccounts: serviceaccount
+    relation users: user
+    relation serviceaccounts: serviceaccount
 
-	permission view = users
-	permission list = users
-	permission edit = users
-	permission manage = users
-	permission service = serviceaccounts
-	permission delete = users
+    permission view = users
+    permission list = users
+    permission edit = users
+    permission manage = users
+    permission service = serviceaccounts
+    permission delete = users
 }
 
 definition metadata {
-	relation viewers: group
-	relation discoverers: group
-	relation editors: group
-	relation managers: group
-	relation servicers: group
-	relation owners: group
-
-	permission view = viewers->view + editors->view + owners->view
-	permission list = discoverers->list + editors->list + owners->list
-	permission edit = editors->edit + owners->edit
-	permission manage = managers->manage + owners->manage
-	permission service = servicers->service
-	permission delete = owners->delete
-}
-
-definition collection {
-	relation viewers: group
-	relation discoverers: group
-	relation editors: group
-	relation managers: group
-	relation servicers: group
-	relation owners: group
-
-	permission view = viewers->view + editors->view + owners->view
-	permission list = discoverers->list + editors->list + owners->list
-	permission edit = editors->edit + owners->edit
-	permission manage = managers->manage + owners->manage
-	permission service = servicers->service
-	permission delete = owners->delete
-}
-
-definition systemresource {
     relation viewers: group
-	relation discoverers: group
+    relation discoverers: group
     relation editors: group
-	relation managers: group
-	relation servicers: group
+    relation managers: group
+    relation servicers: group
     relation owners: group
 
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list
     permission edit = editors->edit + owners->edit
-	permission manage = managers->manage + owners->manage
-	permission service = servicers->service
+    permission manage = managers->manage + owners->manage
+    permission service = servicers->service
+    permission delete = owners->delete
+}
+
+definition collection {
+    relation viewers: group
+    relation discoverers: group
+    relation editors: group
+    relation managers: group
+    relation servicers: group
+    relation owners: group
+
+    permission view = viewers->view + editors->view + owners->view
+    permission list = discoverers->list + editors->list + owners->list
+    permission edit = editors->edit + owners->edit
+    permission manage = managers->manage + owners->manage
+    permission service = servicers->service
+    permission delete = owners->delete
+}
+
+definition systemresource {
+    relation viewers: group
+    relation discoverers: group
+    relation editors: group
+    relation managers: group
+    relation servicers: group
+    relation owners: group
+
+    permission view = viewers->view + editors->view + owners->view
+    permission list = discoverers->list + editors->list + owners->list
+    permission edit = editors->edit + owners->edit
+    permission manage = managers->manage + owners->manage
+    permission service = servicers->service
     permission delete = owners->delete
 }

@@ -1,6 +1,0 @@
-### Enqueue Job
-GRPC grpcs://localhost:5005/bosca.jobs.JobsService/Enqueue
-
-{
-  "queue": "test"
-}

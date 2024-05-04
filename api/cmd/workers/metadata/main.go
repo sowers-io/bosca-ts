@@ -17,25 +17,24 @@
 package main
 
 import (
-	grpc "bosca.io/api/protobuf/jobs"
 	"bosca.io/pkg/configuration"
-	"bosca.io/pkg/jobs"
+	"bosca.io/pkg/temporal"
+	"bosca.io/pkg/workers/metadata"
 	"context"
+	"go.temporal.io/sdk/worker"
 	"log"
 )
 
 func main() {
-	cfg := configuration.NewWorkerConfiguration()
 	ctx := context.Background()
-	worker, err := jobs.NewWorker(ctx, cfg, "metadata", 0)
+	cfg := configuration.NewWorkerConfiguration()
+	client, err := temporal.NewClient(ctx, cfg.ClientEndPoints)
 	if err != nil {
-		log.Fatalf("failed to create worker: %v", err)
+		log.Fatalln("Unable to create Temporal client:", err)
 	}
-	err = worker.Work(ctx, func(job *grpc.Job) error {
-		// TODO
-		return nil
-	})
+	defer client.Close()
+	err = metadata.NewWorker(client).Run(worker.InterruptCh())
 	if err != nil {
-		log.Fatalf("failed to process work: %v", err)
+		log.Fatalf("error starting worker: %v", err)
 	}
 }

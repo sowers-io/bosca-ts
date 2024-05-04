@@ -87,6 +87,10 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 	return svc.os.CreateUploadUrl(ctx, id, request.Metadata.Name, request.Metadata.ContentType, request.Metadata.Attributes)
 }
 
+func (svc *service) GetMetadata(ctx context.Context, request *protobuf.IdRequest) (*grpc.Metadata, error) {
+	return svc.ds.GetMetadata(ctx, request.Id)
+}
+
 func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
 	_, err := svc.jobs.Enqueue(ctx, &jobs.QueueRequest{
 		Queue: "metadata",

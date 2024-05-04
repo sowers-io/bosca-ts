@@ -51,7 +51,13 @@ service ContentService {
     };
   }
 
-  rpc AddMetadata (AddMetadataRequest) returns (SignedUrl) {
+  rpc GetMetadata(bosca.IdRequest) returns (Metadata) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}"
+    };
+  }
+
+  rpc AddMetadata(AddMetadataRequest) returns (SignedUrl) {
     option (google.api.http) = {
       post: "/v1/content/metadata"
       body: "*"
@@ -179,7 +185,6 @@ message CollectionItems {
 message CollectionItem {
   oneof Item {
     Metadata metadata = 1;
-    MetadataVariant variant = 2;
     Collection collection = 3;
   }
 }
@@ -208,28 +213,15 @@ message AddMetadataRequest {
 }
 
 message Metadata {
+  string default_id = 1;
+
   string id = 2;
   string name = 3;
   string content_type = 4;
 
+  string language_tag = 5;
+
   repeated string trait_ids = 11;
-  repeated string category_ids = 12;
-  repeated string tags = 13;
-  map<string, string> attributes = 14;
-
-  google.protobuf.Timestamp created = 20;
-  google.protobuf.Timestamp modified = 21;
-
-  MetadataStatus status = 30;
-}
-
-message MetadataVariant {
-  string metadata_id = 1;
-  string id = 2;
-  string name = 3;
-
-  string language_tag = 6;
-
   repeated string category_ids = 12;
   repeated string tags = 13;
   map<string, string> attributes = 14;

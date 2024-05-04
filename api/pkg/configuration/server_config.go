@@ -64,7 +64,7 @@ type S3Configuration struct {
 }
 
 type ClientEndpoints struct {
-	JobsApiAddress     string `envconfig:"JOBS_API_ADDRESS"`
+	TemporalApiAddress string `envconfig:"TEMPORAL_API_ADDRESS"`
 	ContentApiAddress  string `envconfig:"CONTENT_API_ADDRESS"`
 	ProfilesApiAddress string `envconfig:"PROFILES_API_ADDRESS"`
 	SecurityApiAddress string `envconfig:"SECURITY_API_ADDRESS"`

@@ -17,6 +17,7 @@ Key Features:
 * Semantic Search
 * Accounts, Authentication, Authorization, etc.
     * See [Ory](https://www.ory.sh/)
+    * See [Authzed](https://www.authzed.com/)
 * Content Workflows
 * Content Processing
     * Videos
@@ -58,9 +59,9 @@ fit into any organization's architecture well.
 
 * Go
 * GRPC
-* Faktory
+* Temporal
 * Ory
-* Nuxt
+* NextJS
 * PostgreSQL
 * Kubernetes
 * Qdrant
@@ -69,6 +70,7 @@ fit into any organization's architecture well.
 * Ollama
 * MinIO
 * GraphQL
+* Ray
 
 For more information, you can look in the /docs folder
 

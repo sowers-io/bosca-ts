@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package content
+package objectstore
 
 import (
 	"bosca.io/api/protobuf/content"

@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package metadata
+package textextractor
 
 import (
 	"bosca.io/api/protobuf/content"
-	"bosca.io/pkg/workers/common"
-	"bosca.io/pkg/workers/metadata/stringify"
+	"bosca.io/pkg/workers/textextractor/extractor"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
@@ -27,24 +26,23 @@ import (
 	"time"
 )
 
-const TaskQueue = "metadata"
+const TaskQueue = "textextractor"
 
 func NewWorker(client client.Client) worker.Worker {
 	w := worker.New(client, TaskQueue, worker.Options{})
-	w.RegisterWorkflow(Stringify)
-	w.RegisterActivity(common.GetMetadata)
-	w.RegisterActivity(stringify.Stringify)
-	w.RegisterActivity(stringify.SetMetadataStatusReady)
+
+	w.RegisterWorkflow(TextExtractor)
+	w.RegisterActivity(extractor.Extract)
+
 	return w
 }
 
-func Stringify(ctx workflow.Context, id string) error {
+func TextExtractor(ctx workflow.Context, metadata *content.Metadata) error {
 	retryPolicy := &temporal.RetryPolicy{
-		InitialInterval:        time.Second,
-		BackoffCoefficient:     2.0,
-		MaximumInterval:        100 * time.Second,
-		MaximumAttempts:        500, // 0 is unlimited retries
-		NonRetryableErrorTypes: []string{"MissingMetadata"},
+		InitialInterval:    time.Second,
+		BackoffCoefficient: 2.0,
+		MaximumInterval:    100 * time.Second,
+		MaximumAttempts:    500, // 0 is unlimited retries
 	}
 
 	options := workflow.ActivityOptions{
@@ -54,16 +52,9 @@ func Stringify(ctx workflow.Context, id string) error {
 
 	ctx = workflow.WithActivityOptions(ctx, options)
 
-	var metadata *content.Metadata
-	err := workflow.ExecuteActivity(ctx, common.GetMetadata, id).Get(ctx, &metadata)
+	err := workflow.ExecuteActivity(ctx, extractor.Extract, metadata).Get(ctx, &metadata)
 	if err != nil {
 		return err
 	}
-
-	err = workflow.ExecuteActivity(ctx, stringify.Stringify, metadata).Get(ctx, &metadata)
-	if err != nil {
-		return err
-	}
-
-	return workflow.ExecuteActivity(ctx, stringify.SetMetadataStatusReady, metadata).Get(ctx, &metadata)
+	return workflow.ExecuteActivity(ctx, extractor.Cleanup, metadata).Get(ctx, nil)
 }

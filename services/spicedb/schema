@@ -6,12 +6,12 @@ definition group {
     relation users: user
     relation serviceaccounts: serviceaccount
 
-    permission view = users
-    permission list = users
-    permission edit = users
-    permission manage = users
+    permission view = users + serviceaccounts
+    permission list = users + serviceaccounts
+    permission edit = users + serviceaccounts
+    permission manage = users + serviceaccounts
     permission service = serviceaccounts
-    permission delete = users
+    permission delete = users + serviceaccounts
 }
 
 definition metadata {
@@ -19,14 +19,14 @@ definition metadata {
     relation discoverers: group | user
     relation editors: group | user
     relation managers: group | user
-    relation servicers: group | user
+    relation servicers: serviceaccount
     relation owners: group | user
 
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list
     permission edit = editors->edit + owners->edit
     permission manage = managers->manage + owners->manage
-    permission service = servicers->service
+    permission service = owners->service + servicers->service
     permission delete = owners->delete
 }
 
@@ -35,14 +35,14 @@ definition collection {
     relation discoverers: group | user
     relation editors: group | user
     relation managers: group | user
-    relation servicers: group | user
+    relation servicers: serviceaccount
     relation owners: group | user
 
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list
     permission edit = editors->edit + owners->edit
     permission manage = managers->manage + owners->manage
-    permission service = servicers->service
+    permission service = owners->service + servicers->service
     permission delete = owners->delete
 }
 
@@ -58,6 +58,6 @@ definition systemresource {
     permission list = discoverers->list + editors->list + owners->list
     permission edit = editors->edit + owners->edit
     permission manage = managers->manage + owners->manage
-    permission service = servicers->service
+    permission service = owners->service + servicers->service
     permission delete = owners->delete
 }

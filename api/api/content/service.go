@@ -19,31 +19,34 @@ package content
 import (
 	"bosca.io/api/protobuf"
 	grpc "bosca.io/api/protobuf/content"
-	"bosca.io/api/protobuf/jobs"
 	"bosca.io/pkg/identity"
+	"bosca.io/pkg/objectstore"
 	"bosca.io/pkg/security"
+	"bosca.io/pkg/workers/metadata"
 	"context"
-	"encoding/json"
+	"go.temporal.io/sdk/client"
 )
 
 type service struct {
 	grpc.UnimplementedContentServiceServer
 
 	ds *DataStore
-	os ObjectStore
+	os objectstore.ObjectStore
 
-	permissions security.PermissionManager
-	jobs        jobs.JobsServiceClient
+	serviceAccountId string
+	permissions      security.PermissionManager
+	temporalClient   client.Client
 }
 
 const RootCollectionId = "00000000-0000-0000-0000-000000000000"
 
-func NewService(dataStore *DataStore, objectStore ObjectStore, permissions security.PermissionManager, jobs jobs.JobsServiceClient) grpc.ContentServiceServer {
+func NewService(dataStore *DataStore, serviceAccountId string, objectStore objectstore.ObjectStore, permissions security.PermissionManager, temporalClient client.Client) grpc.ContentServiceServer {
 	return &service{
-		ds:          dataStore,
-		os:          objectStore,
-		permissions: permissions,
-		jobs:        jobs,
+		ds:               dataStore,
+		os:               objectStore,
+		serviceAccountId: serviceAccountId,
+		permissions:      permissions,
+		temporalClient:   temporalClient,
 	}
 }
 
@@ -63,15 +66,22 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 	}
 	err = svc.permissions.CreateRelationships(ctx, security.MetadataObject, []*grpc.Permission{
 		{
-			Id:       id,
-			Subject:  security.AdministratorGroup,
-			Group:    true,
-			Relation: grpc.PermissionRelation_owners,
+			Id:          id,
+			Subject:     security.AdministratorGroup,
+			SubjectType: grpc.PermissionSubjectType_group,
+			Relation:    grpc.PermissionRelation_owners,
 		},
 		{
-			Id:       id,
-			Subject:  userId,
-			Relation: grpc.PermissionRelation_owners,
+			Id:          id,
+			Subject:     svc.serviceAccountId,
+			SubjectType: grpc.PermissionSubjectType_service_account,
+			Relation:    grpc.PermissionRelation_serviceaccounts,
+		},
+		{
+			Id:          id,
+			Subject:     userId,
+			SubjectType: grpc.PermissionSubjectType_user,
+			Relation:    grpc.PermissionRelation_owners,
 		},
 	})
 	if err != nil {
@@ -91,11 +101,14 @@ func (svc *service) GetMetadata(ctx context.Context, request *protobuf.IdRequest
 	return svc.ds.GetMetadata(ctx, request.Id)
 }
 
+func (svc *service) GetMetadataDownloadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
+	return svc.os.CreateDownloadUrl(ctx, request.Id)
+}
+
 func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	_, err := svc.jobs.Enqueue(ctx, &jobs.QueueRequest{
-		Queue: "metadata",
-		Json:  json.RawMessage("{\"id\": \"" + request.Id + "\", \"action\": \"uploaded\"}"),
-	})
+	_, err := svc.temporalClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
+		TaskQueue: metadata.TaskQueue,
+	}, metadata.Stringify, request.Id)
 	if err != nil {
 		return nil, err
 	}

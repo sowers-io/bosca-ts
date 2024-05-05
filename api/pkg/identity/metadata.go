@@ -24,6 +24,10 @@ import (
 )
 
 const XSubjectId = "X-Subject"
+const XSubjectType = "X-Subject-Type"
+
+const SubjectTypeUser = "user"
+const SubjectTypeServiceAccount = "sa"
 
 func GetSubjectId(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
@@ -35,6 +39,18 @@ func GetSubjectId(ctx context.Context) (string, error) {
 		return "", status.Error(codes.Unauthenticated, "user is missing in metadata")
 	}
 	return userID[0], nil
+}
+
+func GetSubjectType(ctx context.Context) string {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return ""
+	}
+	subjectType := md.Get(XSubjectType)
+	if len(subjectType) == 0 {
+		return ""
+	}
+	return subjectType[0]
 }
 
 func GetAuthenticatedSubjectId(ctx context.Context) (string, error) {

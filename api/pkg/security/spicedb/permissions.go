@@ -29,6 +29,10 @@ import (
 	"io"
 )
 
+const SubjectTypeGroup = "group"
+const SubjectTypeUser = "user"
+const SubjectTypeServiceAccount = "serviceaccount"
+
 type permissionManager struct {
 	permissionsClient *authzed.Client
 }
@@ -48,6 +52,10 @@ func (s *permissionManager) CheckWithError(ctx context.Context, objectType secur
 }
 
 func (s *permissionManager) CheckWithUserIdError(ctx context.Context, userId string, objectType security.ObjectType, resourceId string, action grpc.PermissionAction) error {
+	subjectType := SubjectTypeUser
+	if identity.GetSubjectType(ctx) == identity.SubjectTypeServiceAccount {
+		subjectType = SubjectTypeServiceAccount
+	}
 	r, err := s.permissionsClient.CheckPermission(ctx, &pb.CheckPermissionRequest{
 		Resource: &pb.ObjectReference{
 			ObjectType: s.getObjectType(objectType),
@@ -56,7 +64,7 @@ func (s *permissionManager) CheckWithUserIdError(ctx context.Context, userId str
 		Permission: s.getAction(action),
 		Subject: &pb.SubjectReference{
 			Object: &pb.ObjectReference{
-				ObjectType: "user",
+				ObjectType: subjectType,
 				ObjectId:   userId,
 			},
 		},
@@ -83,14 +91,6 @@ func (s *permissionManager) getObjectType(objectType security.ObjectType) string
 	return ""
 }
 
-func (s *permissionManager) getSubjectType(group bool) string {
-	if group {
-		return "group"
-	} else {
-		return "user"
-	}
-}
-
 func (s *permissionManager) getRelation(relation grpc.PermissionRelation) string {
 	switch relation {
 	case grpc.PermissionRelation_viewers:
@@ -102,7 +102,7 @@ func (s *permissionManager) getRelation(relation grpc.PermissionRelation) string
 	case grpc.PermissionRelation_managers:
 		return "managers"
 	case grpc.PermissionRelation_serviceaccounts:
-		return "serviceaccounts"
+		return "servicers"
 	case grpc.PermissionRelation_owners:
 		return "owners"
 	}
@@ -130,6 +130,19 @@ func (s *permissionManager) getAction(relation grpc.PermissionAction) string {
 func (s *permissionManager) CreateRelationships(ctx context.Context, objectType security.ObjectType, permissions []*grpc.Permission) error {
 	updates := make([]*pb.RelationshipUpdate, 0)
 	for _, permission := range permissions {
+		subjectType := ""
+		switch permission.SubjectType {
+		case grpc.PermissionSubjectType_user:
+			subjectType = SubjectTypeUser
+			break
+		case grpc.PermissionSubjectType_group:
+			subjectType = SubjectTypeGroup
+			break
+		case grpc.PermissionSubjectType_service_account:
+			subjectType = SubjectTypeServiceAccount
+			break
+		}
+
 		updates = append(updates, &pb.RelationshipUpdate{
 			Operation: pb.RelationshipUpdate_OPERATION_CREATE,
 			Relationship: &pb.Relationship{
@@ -140,7 +153,7 @@ func (s *permissionManager) CreateRelationships(ctx context.Context, objectType 
 				Relation: s.getRelation(permission.Relation),
 				Subject: &pb.SubjectReference{
 					Object: &pb.ObjectReference{
-						ObjectType: s.getSubjectType(permission.Group),
+						ObjectType: subjectType,
 						ObjectId:   permission.Subject,
 					},
 				},
@@ -207,7 +220,17 @@ func (s *permissionManager) GetPermissions(ctx context.Context, objectType secur
 			Relation: action,
 		}
 		permission.Subject = relationship.Subject.Object.ObjectId
-		permission.Group = relationship.Subject.Object.ObjectType == "group"
+		switch relationship.Subject.Object.ObjectType {
+		case SubjectTypeUser:
+			permission.SubjectType = grpc.PermissionSubjectType_user
+			break
+		case SubjectTypeGroup:
+			permission.SubjectType = grpc.PermissionSubjectType_group
+			break
+		case SubjectTypeServiceAccount:
+			permission.SubjectType = grpc.PermissionSubjectType_service_account
+			break
+		}
 		mp.Permissions = append(mp.Permissions, permission)
 	}
 	return mp, nil

@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package clients
+package common
 
 import (
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"bosca.io/api/protobuf"
+	"bosca.io/api/protobuf/content"
+	"context"
 )
 
-func NewClientConnection(endpoint string) (*grpc.ClientConn, error) {
-	var opts []grpc.DialOption
-	// TLS is managed at the service mesh
-	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	conn, err := grpc.Dial(endpoint, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
+func GetMetadata(ctx context.Context, id string) (*content.Metadata, error) {
+	contentService := GetContentService(ctx)
+	return contentService.GetMetadata(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
+		Id: id,
+	})
 }

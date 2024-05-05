@@ -54,7 +54,7 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 	}
 
 	interceptor := NewSessionInterceptor(cfg.Security.SessionEndpointType)
-	interceptors := security.NewSecurityInterceptors(cfg.Security.SessionEndpoint, interceptor)
+	interceptors := security.NewSecurityInterceptors(cfg.Security.SessionEndpoint, cfg.Security.ServiceAccountId, cfg.Security.ServiceAccountToken, interceptor)
 
 	grpcOpts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(interceptors.UnaryInterceptor()),

@@ -31,7 +31,10 @@ import (
 func main() {
 	cfg := configuration.NewServerConfiguration("", 0, 0)
 
-	contentConnection := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
+	contentConnection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
+	if err != nil {
+		log.Fatalf("failed to create content client: %v", err)
+	}
 	defer contentConnection.Close()
 
 	contentClient := content.NewContentServiceClient(contentConnection)

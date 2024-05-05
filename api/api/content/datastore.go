@@ -21,6 +21,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"time"
 )
 
 type DataStore struct {
@@ -164,21 +166,35 @@ func (ds *DataStore) SetCollectionWorkflowStateId(ctx context.Context, id string
 
 func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metadata, error) {
 	var metadata content.Metadata
-	err := ds.db.QueryRowContext(ctx, "SELECT id, name, content_type, tags, attributes, created, modified, status FROM metadata WHERE id = $1", id).Scan(
+
+	var created time.Time
+	var modified time.Time
+	var status string
+
+	err := ds.db.QueryRowContext(ctx, "SELECT id, name, content_type, created, modified, status FROM metadata WHERE id = $1", id).Scan(
 		&metadata.Id,
 		&metadata.Name,
 		&metadata.ContentType,
-		&metadata.CategoryIds,
-		&metadata.Tags,
-		&metadata.Attributes,
-		&metadata.Created,
-		&metadata.Modified,
-		&metadata.Status,
+		&created,
+		&modified,
+		&status,
 	)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: traits and categories
+	metadata.Created = timestamppb.New(created)
+	metadata.Modified = timestamppb.New(modified)
+
+	switch status {
+	case "ready":
+		metadata.Status = content.MetadataStatus_ready
+		break
+	default:
+		metadata.Status = content.MetadataStatus_processing
+		break
+	}
+
+	// TODO: tags, traits and categories
 	return &metadata, nil
 }
 

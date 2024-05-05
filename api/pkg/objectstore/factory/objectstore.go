@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
-package clients
+package factory
 
 import (
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"bosca.io/pkg/configuration"
+	"bosca.io/pkg/objectstore"
+	"bosca.io/pkg/objectstore/minio"
+	"bosca.io/pkg/objectstore/s3"
+	"fmt"
 )
 
-func NewClientConnection(endpoint string) (*grpc.ClientConn, error) {
-	var opts []grpc.DialOption
-	// TLS is managed at the service mesh
-	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	conn, err := grpc.Dial(endpoint, opts...)
-	if err != nil {
-		return nil, err
+func NewObjectStore(storageType string, cfg *configuration.StorageConfiguration) (objectstore.ObjectStore, error) {
+	var os objectstore.ObjectStore
+	switch storageType {
+	case configuration.StorageTypeMinio:
+		os = minio.NewMinioObjectStore(cfg)
+		break
+	case configuration.StorageTypeS3:
+		os = s3.NewS3ObjectStore(cfg)
+		break
+	default:
+		return nil, fmt.Errorf("unknown storage type: %s", storageType)
 	}
-	return conn, nil
+	return os, nil
 }

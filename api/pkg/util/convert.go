@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 
-package stringify
+package util
 
 import (
-	"bosca.io/api/protobuf"
 	"bosca.io/api/protobuf/content"
-	"context"
-	"go.temporal.io/sdk/workflow"
+	"net/http"
 )
 
-func GetMetadata(ctx workflow.Context, id string) (*content.Metadata, error) {
-	return svc.GetMetadata(context.Background(), &protobuf.IdRequest{
-		Id: id,
-	})
-}
-
-func SetMetadataStatusReady(ctx workflow.Context, metadata *content.Metadata) error {
-	_, err := svc.SetMetadataStatus(context.Background(), &content.SetMetadataStatusRequest{
-		Id:     metadata.Id,
-		Status: content.MetadataStatus_ready,
-	})
-	return err
-}
-
-func Stringify(ctx workflow.Context, content *content.Metadata) error {
-	return nil
+func GetSignedUrlHeaders(url *content.SignedUrl) http.Header {
+	header := make(http.Header)
+	if url.Headers != nil {
+		for _, hdr := range url.Headers {
+			vals := header[hdr.Name]
+			if vals == nil {
+				vals = make([]string, 0)
+			}
+			vals = append(vals, hdr.Value)
+			header[hdr.Name] = vals
+		}
+	}
+	return header
 }

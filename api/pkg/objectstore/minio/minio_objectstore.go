@@ -17,9 +17,9 @@
 package minio
 
 import (
-	"bosca.io/api/content"
 	model "bosca.io/api/protobuf/content"
 	"bosca.io/pkg/configuration"
+	"bosca.io/pkg/objectstore"
 	"context"
 	"log"
 	"net/http"
@@ -30,25 +30,25 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-type store struct {
+type objectStore struct {
 	client *minio.Client
 	bucket string
 }
 
-func NewMinioObjectStore(cfg *configuration.ServerConfiguration) content.ObjectStore {
-	client, err := minio.New(cfg.Storage.S3.Endpoint, &minio.Options{
-		Creds: credentials.NewStaticV4(cfg.Storage.S3.AccessKeyID, cfg.Storage.S3.SecretAccessKey, ""),
+func NewMinioObjectStore(cfg *configuration.StorageConfiguration) objectstore.ObjectStore {
+	client, err := minio.New(cfg.S3.Endpoint, &minio.Options{
+		Creds: credentials.NewStaticV4(cfg.S3.AccessKeyID, cfg.S3.SecretAccessKey, ""),
 	})
 	if err != nil {
 		log.Fatalf("failed to create minio store: %v", err)
 	}
-	return &store{
+	return &objectStore{
 		client: client,
-		bucket: cfg.Storage.S3.Bucket,
+		bucket: cfg.S3.Bucket,
 	}
 }
 
-func (m *store) CreateUploadUrl(ctx context.Context, id string, _ string, contentType string, _ map[string]string) (*model.SignedUrl, error) {
+func (m *objectStore) CreateUploadUrl(ctx context.Context, id string, _ string, contentType string, _ map[string]string) (*model.SignedUrl, error) {
 	urlParams := url.Values{}
 	headers := http.Header{
 		"Content-Type": []string{contentType},
@@ -63,7 +63,7 @@ func (m *store) CreateUploadUrl(ctx context.Context, id string, _ string, conten
 	}, nil
 }
 
-func (m *store) CreateDownloadUrl(ctx context.Context, id string) (*model.SignedUrl, error) {
+func (m *objectStore) CreateDownloadUrl(ctx context.Context, id string) (*model.SignedUrl, error) {
 	urlParams := url.Values{}
 	u, err := m.client.PresignedGetObject(ctx, m.bucket, id, 5*time.Minute, urlParams)
 	if err != nil {

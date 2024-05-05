@@ -52,12 +52,20 @@ func (svc *authorizationService) GetRootCollectionItems(ctx context.Context, req
 	return svc.service.GetRootCollectionItems(ctx, request)
 }
 
-func (svc *authorizationService) GetMetadata(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
+func (svc *authorizationService) GetMetadata(ctx context.Context, request *protobuf.IdRequest) (*grpc.Metadata, error) {
 	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_view)
 	if err != nil {
 		return nil, err
 	}
 	return svc.service.GetMetadata(ctx, request)
+}
+
+func (svc *authorizationService) GetMetadataDownloadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
+	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_view)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetMetadataDownloadUrl(ctx, request)
 }
 
 func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*grpc.SignedUrl, error) {

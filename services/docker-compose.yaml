@@ -305,6 +305,30 @@ services:
       timeout: 10s
       retries: 3
 
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    volumes:
+      - ./ollama/ollama:/root/.ollama
+    tty: true
+    restart: always
+    networks:
+      - net1
+
+  ollama-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    depends_on:
+      - ollama
+    ports:
+      - 8086:8080
+    environment:
+      - '/ollama/api=http://ollama:11434/api'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - net1
+
 networks:
   net1:
 

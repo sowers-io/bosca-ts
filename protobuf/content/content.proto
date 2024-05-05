@@ -64,6 +64,12 @@ service ContentService {
     };
   }
 
+  rpc GetMetadataDownloadUrl(bosca.IdRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/url"
+    };
+  }
+
   rpc SetMetadataUploaded(bosca.IdRequest) returns (Empty) {
     option (google.api.http) = {
       post: "/v1/content/metadata/{id}/uploaded"
@@ -121,11 +127,17 @@ message Permissions {
   repeated Permission permissions = 2;
 }
 
+enum PermissionSubjectType {
+  user = 0;
+  group = 1;
+  service_account = 2;
+}
+
 message Permission {
   string id = 1;
   string subject = 2;
-  bool group = 3;
-  PermissionRelation relation = 4;
+  PermissionSubjectType subject_type = 3;
+  PermissionRelation relation = 5;
 }
 
 message SetMetadataStatusRequest {

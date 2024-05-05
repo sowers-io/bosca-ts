@@ -40,6 +40,8 @@ type WorkerConfiguration struct {
 type SecurityConfiguration struct {
 	SessionEndpoint        string `envconfig:"SESSION_ENDPOINT" required:"true"`
 	SessionEndpointType    string `envconfig:"SESSION_ENDPOINT_TYPE" default:"ory"`
+	ServiceAccountId       string `envconfig:"SERVICE_ACCOUNT_ID" required:"true"`    // TODO: something more secure
+	ServiceAccountToken    string `envconfig:"SERVICE_ACCOUNT_TOKEN" required:"true"` // TODO: something more secure
 	PermissionsEndPoint    string `envconfig:"PERMISSIONS_ENDPOINT" default:"localhost:50051"`
 	PermissionsSharedToken string `envconfig:"PERMISSIONS_SHARED_TOKEN" required:"true"`
 }
@@ -64,10 +66,11 @@ type S3Configuration struct {
 }
 
 type ClientEndpoints struct {
-	TemporalApiAddress string `envconfig:"TEMPORAL_API_ADDRESS"`
-	ContentApiAddress  string `envconfig:"CONTENT_API_ADDRESS"`
-	ProfilesApiAddress string `envconfig:"PROFILES_API_ADDRESS"`
-	SecurityApiAddress string `envconfig:"SECURITY_API_ADDRESS"`
+	TemporalApiAddress      string `envconfig:"TEMPORAL_API_ADDRESS"`
+	ContentApiAddress       string `envconfig:"CONTENT_API_ADDRESS"`
+	ProfilesApiAddress      string `envconfig:"PROFILES_API_ADDRESS"`
+	SecurityApiAddress      string `envconfig:"SECURITY_API_ADDRESS"`
+	TextExtractorApiAddress string `envconfig:"TEXT_EXTRACTOR_API_ADDRESS"`
 }
 
 func getBaseConfiguration(defaultRestPort, defaultGrpcPort int) *ServerConfiguration {

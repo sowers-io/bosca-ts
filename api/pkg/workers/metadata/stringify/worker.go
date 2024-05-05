@@ -18,14 +18,19 @@ package stringify
 
 import (
 	"bosca.io/api/protobuf/content"
-	"bosca.io/pkg/clients"
-	"bosca.io/pkg/configuration"
+	"bosca.io/pkg/workers/common"
+	"context"
 )
 
-var svc content.ContentServiceClient
+func SetMetadataStatusReady(ctx context.Context, metadata *content.Metadata) error {
+	contentService := common.GetContentService(ctx)
+	_, err := contentService.SetMetadataStatus(common.GetServiceAuthorizedContext(ctx), &content.SetMetadataStatusRequest{
+		Id:     metadata.Id,
+		Status: content.MetadataStatus_ready,
+	})
+	return err
+}
 
-func init() {
-	cfg := configuration.NewWorkerConfiguration()
-	connection := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
-	svc = content.NewContentServiceClient(connection)
+func Stringify(ctx context.Context, content *content.Metadata) error {
+	return nil
 }

@@ -22,7 +22,7 @@ import (
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/temporal"
 	"bosca.io/pkg/workers/common"
-	"bosca.io/pkg/workers/metadata"
+	"bosca.io/pkg/workers/textextractor"
 	rootContext "context"
 	"go.temporal.io/sdk/worker"
 	"log"
@@ -44,7 +44,7 @@ func main() {
 	}
 	defer client.Close()
 
-	err = metadata.NewWorker(client).Run(worker.InterruptCh())
+	err = textextractor.NewWorker(client).Run(worker.InterruptCh())
 	if err != nil {
 		log.Fatalf("error starting worker: %v", err)
 	}

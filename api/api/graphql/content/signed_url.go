@@ -37,10 +37,10 @@ var SignedUrlObjectConfig = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				var url = p.Source.(*content.SignedUrl)
 				headers := make([]common.KeyValue, 0)
-				for key, val := range url.Headers {
+				for _, hdr := range url.Headers {
 					headers = append(headers, common.KeyValue{
-						Key:   key,
-						Value: val,
+						Key:   hdr.Name,
+						Value: hdr.Value,
 					})
 				}
 				return headers, nil

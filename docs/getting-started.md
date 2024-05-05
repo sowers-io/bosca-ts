@@ -7,6 +7,7 @@ Required Development Software
 * Docker Compose
 * golang 1.22.2
 * protobuf 26.1
+* [Zed Client](https://github.com/authzed/zed) 
 
 Setup Development Environment
 --

@@ -329,6 +329,13 @@ services:
     networks:
       - net1
 
+  text-extractor:
+    image: ghcr.io/sowers-io/bosca/text-extractor:93732fe8eafc7ea35fed329c76a2424c8a04445e
+    ports:
+      - 8083:8080
+    networks:
+      - net1
+
 networks:
   net1:
 

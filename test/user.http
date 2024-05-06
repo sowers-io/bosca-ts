@@ -63,6 +63,7 @@ Content-Type: application/json
   "metadata": {
     "name": "test file",
     "contentType": "text/plain",
+    "contentLength": 5,
     "attributes": {
       "asdf": "123"
     }

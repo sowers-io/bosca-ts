@@ -23,35 +23,42 @@ import (
 	"bosca.io/pkg/workers/common"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 )
 
-func Extract(ctx context.Context, metadata *content.Metadata) (string, error) {
+type ExtractRequest struct {
+	Metadata *content.Metadata
+	Type     string
+	Name     string
+}
+
+func Extract(ctx context.Context, extractRequest ExtractRequest) error {
 	svc := common.GetContentService(ctx)
-	signedUrl, err := svc.GetMetadataDownloadUrl(ctx, &protobuf.IdRequest{
-		Id: metadata.Id,
+	signedUrl, err := svc.GetMetadataDownloadUrl(common.GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
+		Id: extractRequest.Metadata.Id,
 	})
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	downloadUrl, err := url.Parse(signedUrl.Url)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	cfg := common.GetConfiguration(ctx)
 	extractorUrl, err := url.Parse(cfg.ClientEndPoints.TextExtractorApiAddress)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	file, err := os.CreateTemp("/tmp", metadata.Id)
+	file, err := os.CreateTemp("/tmp", extractRequest.Metadata.Id)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer os.Remove(file.Name())
 
@@ -62,32 +69,80 @@ func Extract(ctx context.Context, metadata *content.Metadata) (string, error) {
 	}
 	response, err := client.Do(request)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer response.Body.Close()
 	_, err = io.Copy(file, response.Body)
 	if err != nil {
-		return "", err
+		return err
+	}
+
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		return err
 	}
 
 	request = &http.Request{
 		URL:    extractorUrl,
 		Method: "POST",
-		Body:   file,
+		Header: map[string][]string{
+			"Content-Type": {extractRequest.Metadata.ContentType},
+		},
+		Body: file,
 	}
 	response, err = client.Do(request)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return "", errors.New("text extractor API returned non-OK status code")
+		return errors.New("failed to extract text")
 	}
 
-	return "", nil
+	uploadSignedUrl, err := svc.AddMetadataSupplementary(common.GetServiceAuthorizedContext(ctx), &content.AddSupplementaryRequest{
+		Id:            extractRequest.Metadata.Id,
+		Type:          extractRequest.Type,
+		Name:          extractRequest.Name,
+		ContentType:   extractRequest.Metadata.ContentType,
+		ContentLength: response.ContentLength,
+	})
+	if err != nil {
+		return err
+	}
+
+	uploadUrl, err := url.Parse(uploadSignedUrl.Url)
+	if err != nil {
+		return err
+	}
+
+	request = &http.Request{
+		URL:    uploadUrl,
+		Method: uploadSignedUrl.Method,
+		Header: util.GetSignedUrlHeaders(uploadSignedUrl),
+		Body:   response.Body,
+	}
+
+	response, err = client.Do(request)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to upload extracted text: %d", response.StatusCode)
+	}
+
+	return nil
 }
 
-func Cleanup(ctx context.Context, metadata *content.Metadata) {
+func Cleanup(ctx context.Context, extractRequest ExtractRequest) error {
+	svc := common.GetContentService(ctx)
 
+	_, err := svc.DeleteMetadataSupplementary(common.GetServiceAuthorizedContext(ctx), &content.SupplementaryIdRequest{
+		Id:   extractRequest.Metadata.Id,
+		Type: extractRequest.Type,
+	})
+
+	return err
 }

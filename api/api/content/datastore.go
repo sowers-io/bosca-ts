@@ -171,10 +171,11 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 	var modified time.Time
 	var status string
 
-	err := ds.db.QueryRowContext(ctx, "SELECT id, name, content_type, created, modified, status FROM metadata WHERE id = $1", id).Scan(
+	err := ds.db.QueryRowContext(ctx, "SELECT id, name, content_type, content_length, created, modified, status FROM metadata WHERE id = $1", id).Scan(
 		&metadata.Id,
 		&metadata.Name,
 		&metadata.ContentType,
+		&metadata.ContentLength,
 		&created,
 		&modified,
 		&status,
@@ -199,7 +200,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 }
 
 func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata) (string, error) {
-	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO metadata (name, content_type, tags, attributes) VALUES ($1, $2, $3, ($4)::jsonb) returning id")
+	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO metadata (name, content_type, content_length, tags, attributes) VALUES ($1, $2, $3, $4, ($5)::jsonb) returning id")
 	if err != nil {
 		return "", err
 	}
@@ -217,6 +218,7 @@ func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata
 	result := stmt.QueryRowContext(ctx,
 		metadata.Name,
 		metadata.ContentType,
+		metadata.ContentLength,
 		tags,
 		attributes,
 	)

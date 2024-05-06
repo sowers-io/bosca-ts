@@ -100,6 +100,7 @@ create table metadata
     name              varchar   not null check (length(name) > 0),
     type              metadata_type                                       default 'standard',
     content_type      varchar   not null check (length(content_type) > 0),
+    content_length    bigint    not null check (content_length > 0),
     language_tag      varchar   not null check (length(language_tag) > 0) default 'en',
     tags              varchar[] not null                                  default '{}',
     attributes        jsonb     not null                                  default '{}',

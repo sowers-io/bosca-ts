@@ -24,6 +24,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -48,17 +49,30 @@ func NewMinioObjectStore(cfg *configuration.StorageConfiguration) objectstore.Ob
 	}
 }
 
-func (m *objectStore) CreateUploadUrl(ctx context.Context, id string, _ string, contentType string, _ map[string]string) (*model.SignedUrl, error) {
+func (m *objectStore) CreateUploadUrl(ctx context.Context, id string, _ string, contentType string, contentLength int64, _ map[string]string) (*model.SignedUrl, error) {
 	urlParams := url.Values{}
+	contentLengthStr := strconv.FormatInt(contentLength, 10)
 	headers := http.Header{
-		"Content-Type": []string{contentType},
+		"Content-Type":   []string{contentType},
+		"Content-Length": []string{contentLengthStr},
 	}
 	u, err := m.client.PresignHeader(ctx, "PUT", m.bucket, id, 5*time.Minute, urlParams, headers)
 	if err != nil {
 		return nil, err
 	}
 	return &model.SignedUrl{
-		Id:  id,
+		Id:     id,
+		Method: "PUT",
+		Headers: []*model.SignedUrlHeader{
+			{
+				Name:  "Content-Type",
+				Value: contentType,
+			},
+			{
+				Name:  "Content-Length",
+				Value: contentLengthStr,
+			},
+		},
 		Url: u.String(),
 	}, nil
 }
@@ -70,7 +84,12 @@ func (m *objectStore) CreateDownloadUrl(ctx context.Context, id string) (*model.
 		return nil, err
 	}
 	return &model.SignedUrl{
-		Id:  id,
-		Url: u.String(),
+		Id:     id,
+		Method: "GET",
+		Url:    u.String(),
 	}, nil
+}
+
+func (m *objectStore) Delete(ctx context.Context, id string) error {
+	return m.client.RemoveObject(ctx, m.bucket, id, minio.RemoveObjectOptions{})
 }

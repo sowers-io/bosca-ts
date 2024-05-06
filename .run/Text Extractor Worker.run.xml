@@ -14,6 +14,7 @@
       <env name="BOSCA_S3_SECRET_ACCESS_KEY" value="eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm" />
       <env name="BOSCA_SECURITY_CONNECTION_STRING" value="postgresql://boscasecurity:bosca@localhost:5432/boscasecurity" />
       <env name="BOSCA_SESSION_ENDPOINT" value="http://localhost:4433/sessions/whoami" />
+      <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
       <env name="BOSCA_TEMPORAL_API_ADDRESS" value="localhost:7233" />
     </envs>

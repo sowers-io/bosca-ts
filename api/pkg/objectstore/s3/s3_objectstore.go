@@ -76,11 +76,12 @@ func (m *objectStore) toSignedUrl(id string, request *v4.PresignedHTTPRequest) *
 	}
 }
 
-func (m *objectStore) CreateUploadUrl(ctx context.Context, id string, _ string, contentType string, _ map[string]string) (*model.SignedUrl, error) {
+func (m *objectStore) CreateUploadUrl(ctx context.Context, id string, _ string, contentType string, contentLength int64, _ map[string]string) (*model.SignedUrl, error) {
 	request, err := m.presign.PresignPutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(m.bucket),
-		Key:         aws.String(id),
-		ContentType: &contentType,
+		Bucket:        aws.String(m.bucket),
+		Key:           aws.String(id),
+		ContentType:   &contentType,
+		ContentLength: &contentLength,
 	}, func(opts *s3.PresignOptions) {
 		opts.Expires = 5 * time.Minute
 	})
@@ -101,4 +102,12 @@ func (m *objectStore) CreateDownloadUrl(ctx context.Context, id string) (*model.
 		return nil, err
 	}
 	return m.toSignedUrl(id, request), nil
+}
+
+func (m *objectStore) Delete(ctx context.Context, id string) error {
+	_, err := m.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+		Bucket: aws.String(m.bucket),
+		Key:    aws.String(id),
+	})
+	return err
 }

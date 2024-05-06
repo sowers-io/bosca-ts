@@ -24,6 +24,7 @@ import (
 	"bosca.io/pkg/security"
 	"bosca.io/pkg/workers/metadata"
 	"context"
+	"errors"
 	"go.temporal.io/sdk/client"
 )
 
@@ -60,6 +61,9 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 	if err != nil {
 		return nil, err
 	}
+	if request.Metadata.ContentLength <= 0 {
+		return nil, errors.New("content length must be greather than 0")
+	}
 	id, err := svc.ds.AddMetadata(ctx, request.Metadata)
 	if err != nil {
 		return nil, err
@@ -94,7 +98,7 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 	if err != nil {
 		return nil, err
 	}
-	return svc.os.CreateUploadUrl(ctx, id, request.Metadata.Name, request.Metadata.ContentType, request.Metadata.Attributes)
+	return svc.os.CreateUploadUrl(ctx, id, request.Metadata.Name, request.Metadata.ContentType, request.Metadata.ContentLength, request.Metadata.Attributes)
 }
 
 func (svc *service) GetMetadata(ctx context.Context, request *protobuf.IdRequest) (*grpc.Metadata, error) {
@@ -103,6 +107,25 @@ func (svc *service) GetMetadata(ctx context.Context, request *protobuf.IdRequest
 
 func (svc *service) GetMetadataDownloadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
 	return svc.os.CreateDownloadUrl(ctx, request.Id)
+}
+
+func (svc *service) AddMetadataSupplementary(ctx context.Context, request *grpc.AddSupplementaryRequest) (*grpc.SignedUrl, error) {
+	id := request.Id + "." + request.Type
+	return svc.os.CreateUploadUrl(ctx, id, request.Name, request.ContentType, request.ContentLength, nil)
+}
+
+func (svc *service) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *grpc.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
+	id := request.Id + "." + request.Type
+	return svc.os.CreateDownloadUrl(ctx, id)
+}
+
+func (svc *service) DeleteMetadataSupplementary(ctx context.Context, request *grpc.SupplementaryIdRequest) (*protobuf.Empty, error) {
+	id := request.Id + "." + request.Type
+	err := svc.os.Delete(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.Empty{}, nil
 }
 
 func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {

@@ -32,7 +32,9 @@ func NewWorker(client client.Client) worker.Worker {
 	w := worker.New(client, TaskQueue, worker.Options{})
 
 	w.RegisterWorkflow(TextExtractor)
+	w.RegisterWorkflow(TextExtractorCleanup)
 	w.RegisterActivity(extractor.Extract)
+	w.RegisterActivity(extractor.Cleanup)
 
 	return w
 }
@@ -52,9 +54,35 @@ func TextExtractor(ctx workflow.Context, metadata *content.Metadata) error {
 
 	ctx = workflow.WithActivityOptions(ctx, options)
 
-	err := workflow.ExecuteActivity(ctx, extractor.Extract, metadata).Get(ctx, &metadata)
-	if err != nil {
-		return err
+	extractRequest := &extractor.ExtractRequest{
+		Metadata: metadata,
+		Type:     "text",
+		Name:     "Extracted Text",
 	}
-	return workflow.ExecuteActivity(ctx, extractor.Cleanup, metadata).Get(ctx, nil)
+
+	return workflow.ExecuteActivity(ctx, extractor.Extract, extractRequest).Get(ctx, nil)
+}
+
+func TextExtractorCleanup(ctx workflow.Context, metadata *content.Metadata) error {
+	retryPolicy := &temporal.RetryPolicy{
+		InitialInterval:    time.Second,
+		BackoffCoefficient: 2.0,
+		MaximumInterval:    100 * time.Second,
+		MaximumAttempts:    500, // 0 is unlimited retries
+	}
+
+	options := workflow.ActivityOptions{
+		StartToCloseTimeout: 10 * time.Minute,
+		RetryPolicy:         retryPolicy,
+	}
+
+	ctx = workflow.WithActivityOptions(ctx, options)
+
+	extractRequest := &extractor.ExtractRequest{
+		Metadata: metadata,
+		Type:     "text",
+		Name:     "Extracted Text",
+	}
+
+	return workflow.ExecuteActivity(ctx, extractor.Extract, extractRequest).Get(ctx, nil)
 }

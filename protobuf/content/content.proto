@@ -70,6 +70,24 @@ service ContentService {
     };
   }
 
+  rpc AddMetadataSupplementary(AddSupplementaryRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/url/supplementary/{type}/upload"
+    };
+  }
+
+  rpc GetMetadataSupplementaryDownloadUrl(SupplementaryIdRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/url/supplementary/{type}/download"
+    };
+  }
+
+  rpc DeleteMetadataSupplementary(SupplementaryIdRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/metadata/{id}/url/supplementary/{type}"
+    };
+  }
+
   rpc SetMetadataUploaded(bosca.IdRequest) returns (Empty) {
     option (google.api.http) = {
       post: "/v1/content/metadata/{id}/uploaded"
@@ -120,6 +138,19 @@ enum PermissionAction {
   manage = 4;
   service = 5;
   delete = 6;
+}
+
+message AddSupplementaryRequest {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+  string content_type = 4;
+  int64 content_length = 5;
+}
+
+message SupplementaryIdRequest {
+  string id = 1;
+  string type = 2;
 }
 
 message Permissions {
@@ -232,6 +263,7 @@ message Metadata {
   string content_type = 4;
 
   string language_tag = 5;
+  int64 content_length = 6;
 
   repeated string trait_ids = 11;
   repeated string category_ids = 12;

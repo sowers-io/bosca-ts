@@ -32,5 +32,6 @@ func SetMetadataStatusReady(ctx context.Context, metadata *content.Metadata) err
 }
 
 func Stringify(ctx context.Context, content *content.Metadata) error {
+
 	return nil
 }

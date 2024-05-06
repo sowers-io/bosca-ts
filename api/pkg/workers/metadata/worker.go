@@ -20,6 +20,7 @@ import (
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/workers/common"
 	"bosca.io/pkg/workers/metadata/stringify"
+	"bosca.io/pkg/workers/textextractor"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
@@ -60,7 +61,16 @@ func Stringify(ctx workflow.Context, id string) error {
 		return err
 	}
 
-	err = workflow.ExecuteActivity(ctx, stringify.Stringify, metadata).Get(ctx, &metadata)
+	childCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
+		TaskQueue: textextractor.TaskQueue,
+	})
+
+	err = workflow.ExecuteChildWorkflow(childCtx, textextractor.TextExtractor, metadata).Get(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	err = workflow.ExecuteActivity(ctx, stringify.Stringify, metadata).Get(ctx, nil)
 	if err != nil {
 		return err
 	}

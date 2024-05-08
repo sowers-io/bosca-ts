@@ -66,6 +66,7 @@ func (m *interceptors) UnaryInterceptor() grpc.UnaryServerInterceptor {
 func (m *interceptors) injectSubjectId(ctx context.Context) metadata.MD {
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		request := &http.Request{
+			Method: "GET",
 			Header: map[string][]string{},
 			URL:    m.endpoint,
 		}
@@ -93,6 +94,10 @@ func (m *interceptors) injectSubjectId(ctx context.Context) metadata.MD {
 			return nil
 		}
 		defer r.Body.Close()
+		if r.StatusCode != http.StatusOK {
+			log.Printf("failed to get session: %v", r.Status)
+			return nil
+		}
 		subjectId, err := m.interceptor.GetSubjectId(r)
 		if err != nil {
 			log.Printf("failed to get subject: %v", err)

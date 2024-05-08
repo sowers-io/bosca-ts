@@ -51,9 +51,59 @@ func NewService(dataStore *DataStore, serviceAccountId string, objectStore objec
 	}
 }
 
-func (svc *service) GetRootCollectionItems(context.Context, *protobuf.Empty) (*grpc.CollectionItems, error) {
-	//TODO implement me
-	panic("implement me")
+func (svc *service) GetRootCollectionItems(ctx context.Context, request *protobuf.Empty) (*grpc.CollectionItems, error) {
+	return svc.GetCollectionItems(ctx, &protobuf.IdRequest{Id: RootCollectionId})
+}
+
+func (svc *service) GetCollectionItems(ctx context.Context, request *protobuf.IdRequest) (*grpc.CollectionItems, error) {
+	collectionItemIds, err := svc.ds.GetCollectionCollectionItemIds(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	metadataItemIds, err := svc.ds.GetCollectionMetadataItemIds(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]*grpc.CollectionItem, 0, len(collectionItemIds)+len(metadataItemIds))
+	for _, item := range collectionItemIds {
+		collection, err := svc.ds.GetCollection(ctx, item)
+		if err != nil {
+			return nil, err
+		}
+		err = svc.permissions.CheckWithError(ctx, security.CollectionObject, item, grpc.PermissionAction_view)
+		if err != nil {
+			continue
+		}
+		items = append(items, &grpc.CollectionItem{
+			Item: &grpc.CollectionItem_Collection{
+				Collection: collection,
+			},
+		})
+	}
+	for _, item := range metadataItemIds {
+		meta, err := svc.ds.GetMetadata(ctx, item)
+		if err != nil {
+			return nil, err
+		}
+		err = svc.permissions.CheckWithError(ctx, security.MetadataObject, item, grpc.PermissionAction_view)
+		if err != nil {
+			continue
+		}
+		if meta.Status == grpc.MetadataStatus_processing {
+			err = svc.permissions.CheckWithError(ctx, security.MetadataObject, item, grpc.PermissionAction_edit)
+			if err != nil {
+				continue
+			}
+		}
+		items = append(items, &grpc.CollectionItem{
+			Item: &grpc.CollectionItem_Metadata{
+				Metadata: meta,
+			},
+		})
+	}
+	return &grpc.CollectionItems{
+		Items: items,
+	}, nil
 }
 
 func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*grpc.SignedUrl, error) {

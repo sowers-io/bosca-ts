@@ -50,6 +50,75 @@ func (ds *DataStore) AddRootCollection(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
+func (ds *DataStore) GetCollectionCollectionItemIds(ctx context.Context, collectionId string) ([]string, error) {
+	stmt, err := ds.db.PrepareContext(ctx, "SELECT child_id FROM collection_collection_items WHERE collection_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, collectionId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ids := make([]string, 0)
+	id := ""
+	for rows.Next() {
+		err = rows.Scan(&id)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
+func (ds *DataStore) GetCollectionMetadataItemIds(ctx context.Context, collectionId string) ([]string, error) {
+	stmt, err := ds.db.PrepareContext(ctx, "SELECT metadata_id FROM collection_metadata_items WHERE collection_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, collectionId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ids := make([]string, 0)
+	id := ""
+	for rows.Next() {
+		err = rows.Scan(&id)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
+func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Collection, error) {
+	var collection content.Collection
+
+	var tags []string
+	var attributes map[string]string
+	err := ds.db.QueryRowContext(ctx, "SELECT name, type, tags, attributes FROM collections WHERE id = $1", id).Scan(
+		&collection.Name,
+		&collection.Type,
+		&tags,
+		&attributes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	collection.Tags = tags
+	collection.Attributes = attributes
+	return &collection, nil
+}
+
 func (ds *DataStore) AddCollection(ctx context.Context, collection *content.Collection) (string, error) {
 	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO collections (name, type, tags, attributes) VALUES ($1, $2, $3, ($4)::jsonb) returning id")
 	if err != nil {

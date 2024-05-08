@@ -25,13 +25,19 @@ import "requests.proto";
 package bosca.content;
 
 service ContentService {
-  rpc GetRootCollectionItems (bosca.Empty) returns (CollectionItems) {
+  rpc GetRootCollectionItems(bosca.Empty) returns (CollectionItems) {
     option (google.api.http) = {
       get: "/v1/content/collections"
     };
   }
 
-  rpc AddCollection (AddCollectionRequest) returns (SignedUrl) {
+  rpc GetCollectionItems(bosca.IdRequest) returns (CollectionItems) {
+    option (google.api.http) = {
+      get: "/v1/content/collections/{id}"
+    };
+  }
+
+  rpc AddCollection(AddCollectionRequest) returns (SignedUrl) {
     option (google.api.http) = {
       post: "/v1/content/collections"
       body: "*"
@@ -123,8 +129,7 @@ service ContentService {
 
   rpc ProcessMetadata (bosca.IdRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/process"
-      body: "*"
+      post: "/v1/content/metadata/{id}/process"
     };
   }
 }

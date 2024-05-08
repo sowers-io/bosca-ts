@@ -10,3 +10,6 @@ build
 
 1password-credentials.json
 token
+
+services/meilisearch/meili_data
+services/ollama/ollama

@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Text Extractor Worker" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="bosca" />
-    <working_directory value="$PROJECT_DIR$/api" />
+    <working_directory value="$PROJECT_DIR$/backend" />
     <envs>
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
       <env name="BOSCA_CONTENT_CONNECTION_STRING" value="postgresql://boscacontent:bosca@localhost:5432/boscacontent" />
@@ -17,11 +17,13 @@
       <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
       <env name="BOSCA_TEMPORAL_API_ADDRESS" value="localhost:7233" />
+      <env name="BOSCA_SEARCH_ENDPOINT" value="http://localhost:7700" />
+      <env name="BOSCA_SEARCH_API_KEY" value="p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M" />
     </envs>
     <kind value="PACKAGE" />
     <package value="bosca.io/cmd/workers/textextractor" />
     <directory value="$PROJECT_DIR$" />
-    <filePath value="$PROJECT_DIR$/api/cmd/workers/textextractor/main.go" />
+    <filePath value="$PROJECT_DIR$/backend/cmd/workers/textextractor/main.go" />
     <method v="2" />
   </configuration>
 </component>

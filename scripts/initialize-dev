@@ -14,6 +14,6 @@ echo "...... Continuing ......."
 
 ./scripts/initialize-database-dev
 ./scripts/initialize-minio-dev
-
+./services/meilisearch/initialize
 
 echo "\n########## Development Environment is Running ############"

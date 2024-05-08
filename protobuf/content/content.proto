@@ -120,6 +120,13 @@ service ContentService {
       body: "*"
     };
   }
+
+  rpc ProcessMetadata (bosca.IdRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/process"
+      body: "*"
+    };
+  }
 }
 
 enum PermissionRelation {

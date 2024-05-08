@@ -26,7 +26,7 @@ build() {
     echo "Building $app...\n"
 
     mkdir -p $ROOT/build/$app
-    cd $ROOT/api/cmd/$app
+    cd $ROOT/backend/cmd/$app
     go build -o $ROOT/build/$app/app .
     cd $ROOT/build/$app
     cp $ROOT/docker/Dockerfile-go .

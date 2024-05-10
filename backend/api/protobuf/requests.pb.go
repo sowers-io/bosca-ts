@@ -82,6 +82,53 @@ func (x *IdRequest) GetId() string {
 	return ""
 }
 
+type IdResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *IdResponse) Reset() {
+	*x = IdResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_requests_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IdResponse) ProtoMessage() {}
+
+func (x *IdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_requests_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IdResponse.ProtoReflect.Descriptor instead.
+func (*IdResponse) Descriptor() ([]byte, []int) {
+	return file_requests_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *IdResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 type Url struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -93,7 +140,7 @@ type Url struct {
 func (x *Url) Reset() {
 	*x = Url{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_requests_proto_msgTypes[1]
+		mi := &file_requests_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -106,7 +153,7 @@ func (x *Url) String() string {
 func (*Url) ProtoMessage() {}
 
 func (x *Url) ProtoReflect() protoreflect.Message {
-	mi := &file_requests_proto_msgTypes[1]
+	mi := &file_requests_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -119,7 +166,7 @@ func (x *Url) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Url.ProtoReflect.Descriptor instead.
 func (*Url) Descriptor() ([]byte, []int) {
-	return file_requests_proto_rawDescGZIP(), []int{1}
+	return file_requests_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Url) GetUrl() string {
@@ -140,7 +187,7 @@ type IdsRequest struct {
 func (x *IdsRequest) Reset() {
 	*x = IdsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_requests_proto_msgTypes[2]
+		mi := &file_requests_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -153,7 +200,7 @@ func (x *IdsRequest) String() string {
 func (*IdsRequest) ProtoMessage() {}
 
 func (x *IdsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_requests_proto_msgTypes[2]
+	mi := &file_requests_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -166,7 +213,7 @@ func (x *IdsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IdsRequest.ProtoReflect.Descriptor instead.
 func (*IdsRequest) Descriptor() ([]byte, []int) {
-	return file_requests_proto_rawDescGZIP(), []int{2}
+	return file_requests_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *IdsRequest) GetId() []string {
@@ -182,12 +229,14 @@ var file_requests_proto_rawDesc = []byte{
 	0x0a, 0x0e, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x12, 0x05, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x22, 0x1b, 0x0a, 0x09, 0x49, 0x64, 0x52, 0x65, 0x71,
 	0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x02, 0x69, 0x64, 0x22, 0x17, 0x0a, 0x03, 0x55, 0x72, 0x6c, 0x12, 0x10, 0x0a, 0x03, 0x75,
-	0x72, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x6c, 0x22, 0x1c, 0x0a,
-	0x0a, 0x49, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69,
-	0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x42, 0x17, 0x5a, 0x15, 0x62,
-	0x6f, 0x73, 0x63, 0x61, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x75, 0x66, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x02, 0x69, 0x64, 0x22, 0x1c, 0x0a, 0x0a, 0x49, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
+	0x69, 0x64, 0x22, 0x17, 0x0a, 0x03, 0x55, 0x72, 0x6c, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x72, 0x6c,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x6c, 0x22, 0x1c, 0x0a, 0x0a, 0x49,
+	0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x42, 0x17, 0x5a, 0x15, 0x62, 0x6f, 0x73,
+	0x63, 0x61, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -202,11 +251,12 @@ func file_requests_proto_rawDescGZIP() []byte {
 	return file_requests_proto_rawDescData
 }
 
-var file_requests_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_requests_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_requests_proto_goTypes = []interface{}{
 	(*IdRequest)(nil),  // 0: bosca.IdRequest
-	(*Url)(nil),        // 1: bosca.Url
-	(*IdsRequest)(nil), // 2: bosca.IdsRequest
+	(*IdResponse)(nil), // 1: bosca.IdResponse
+	(*Url)(nil),        // 2: bosca.Url
+	(*IdsRequest)(nil), // 3: bosca.IdsRequest
 }
 var file_requests_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -235,7 +285,7 @@ func file_requests_proto_init() {
 			}
 		}
 		file_requests_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Url); i {
+			switch v := v.(*IdResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -247,6 +297,18 @@ func file_requests_proto_init() {
 			}
 		}
 		file_requests_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Url); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_requests_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*IdsRequest); i {
 			case 0:
 				return &v.state
@@ -265,7 +327,7 @@ func file_requests_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_requests_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

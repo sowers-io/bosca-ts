@@ -23,6 +23,10 @@ message IdRequest {
   string id = 1;
 }
 
+message IdResponse {
+  string id = 1;
+}
+
 message Url {
   string url = 1;
 }

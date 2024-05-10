@@ -39,16 +39,16 @@ type WorkerConfiguration struct {
 }
 
 type SecurityConfiguration struct {
-	SessionEndpoint        string `envconfig:"SESSION_ENDPOINT" required:"true"`
+	SessionEndpoint        string `envconfig:"SESSION_ENDPOINT"`
 	SessionEndpointType    string `envconfig:"SESSION_ENDPOINT_TYPE" default:"ory"`
-	ServiceAccountId       string `envconfig:"SERVICE_ACCOUNT_ID" required:"true"`    // TODO: something more secure
-	ServiceAccountToken    string `envconfig:"SERVICE_ACCOUNT_TOKEN" required:"true"` // TODO: something more secure
+	ServiceAccountId       string `envconfig:"SERVICE_ACCOUNT_ID"`    // TODO: something more secure
+	ServiceAccountToken    string `envconfig:"SERVICE_ACCOUNT_TOKEN"` // TODO: something more secure
 	PermissionsEndPoint    string `envconfig:"PERMISSIONS_ENDPOINT" default:"localhost:50051"`
-	PermissionsSharedToken string `envconfig:"PERMISSIONS_SHARED_TOKEN" required:"true"`
+	PermissionsSharedToken string `envconfig:"PERMISSIONS_SHARED_TOKEN"`
 }
 
 type DatabaseConfiguration struct {
-	ConnectionString string `envconfig:"CONNECTION_STRING" required:"true"`
+	ConnectionString string `envconfig:"CONNECTION_STRING"`
 }
 
 const StorageTypeMinio = "minio"

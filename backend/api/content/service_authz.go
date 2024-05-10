@@ -52,6 +52,28 @@ func (svc *authorizationService) GetRootCollectionItems(ctx context.Context, req
 	return svc.service.GetRootCollectionItems(ctx, request)
 }
 
+func (svc *authorizationService) AddCollection(ctx context.Context, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, error) {
+	if request.Collection == nil {
+		return nil, errors.New("collection is required")
+	}
+	if len(strings.Trim(request.Parent, " ")) == 0 {
+		return nil, errors.New("collection is required")
+	}
+	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, request.Parent, grpc.PermissionAction_edit)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.AddCollection(ctx, request)
+}
+
+func (svc *authorizationService) DeleteCollection(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, request.Id, grpc.PermissionAction_manage)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.DeleteCollection(ctx, request)
+}
+
 func (svc *authorizationService) GetMetadata(ctx context.Context, request *protobuf.IdRequest) (*grpc.Metadata, error) {
 	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_view)
 	if err != nil {
@@ -68,7 +90,7 @@ func (svc *authorizationService) GetMetadataDownloadUrl(ctx context.Context, req
 	return svc.service.GetMetadataDownloadUrl(ctx, request)
 }
 
-func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*grpc.SignedUrl, error) {
+func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*protobuf.IdResponse, error) {
 	if request.Metadata == nil {
 		return nil, errors.New("metadata is required")
 	}
@@ -80,6 +102,14 @@ func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.
 		return nil, err
 	}
 	return svc.service.AddMetadata(ctx, request)
+}
+
+func (svc *authorizationService) DeleteMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_manage)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.DeleteMetadata(ctx, request)
 }
 
 func (svc *authorizationService) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *grpc.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
@@ -107,7 +137,7 @@ func (svc *authorizationService) DeleteMetadataSupplementary(ctx context.Context
 }
 
 func (svc *authorizationService) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_edit)
+	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}

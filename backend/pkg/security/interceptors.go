@@ -26,6 +26,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type interceptors struct {
@@ -72,7 +73,15 @@ func (m *interceptors) injectSubjectId(ctx context.Context) metadata.MD {
 		}
 		authorization := md.Get("Authorization")
 		if authorization != nil && len(authorization) > 0 {
-			request.Header["Authorization"] = authorization
+			if strings.Index(authorization[0], "Cookie ") == 0 {
+				request.Header["Cookie"] = []string{authorization[0][7:]}
+			} else if authorization[0] == m.serviceAccountTokenHeader {
+				md.Set(identity.XSubjectId, m.serviceAccountId)
+				md.Set(identity.XSubjectType, identity.SubjectTypeServiceAccount)
+				return md
+			} else {
+				request.Header["Authorization"] = authorization
+			}
 		} else {
 			serviceAuthorization := md.Get("X-Service-Authorization")
 			if serviceAuthorization != nil && len(serviceAuthorization) > 0 && serviceAuthorization[0] == m.serviceAccountTokenHeader {

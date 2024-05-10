@@ -55,6 +55,53 @@ func (svc *service) GetRootCollectionItems(ctx context.Context, request *protobu
 	return svc.GetCollectionItems(ctx, &protobuf.IdRequest{Id: RootCollectionId})
 }
 
+func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, error) {
+	userId, err := identity.GetAuthenticatedSubjectId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := svc.ds.AddCollection(ctx, request.Collection)
+	if err != nil {
+		return nil, err
+	}
+	err = svc.permissions.CreateRelationships(ctx, security.CollectionObject, []*grpc.Permission{
+		{
+			Id:          id,
+			Subject:     security.AdministratorGroup,
+			SubjectType: grpc.PermissionSubjectType_group,
+			Relation:    grpc.PermissionRelation_owners,
+		},
+		{
+			Id:          id,
+			Subject:     svc.serviceAccountId,
+			SubjectType: grpc.PermissionSubjectType_service_account,
+			Relation:    grpc.PermissionRelation_serviceaccounts,
+		},
+		{
+			Id:          id,
+			Subject:     userId,
+			SubjectType: grpc.PermissionSubjectType_user,
+			Relation:    grpc.PermissionRelation_owners,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	err = svc.ds.AddCollectionCollectionItems(ctx, request.Parent, []string{id})
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.IdResponse{Id: id}, nil
+}
+
+func (svc *service) DeleteCollection(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	err := svc.ds.DeleteCollection(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.Empty{}, nil
+}
+
 func (svc *service) GetCollectionItems(ctx context.Context, request *protobuf.IdRequest) (*grpc.CollectionItems, error) {
 	collectionItemIds, err := svc.ds.GetCollectionCollectionItemIds(ctx, request.Id)
 	if err != nil {
@@ -106,7 +153,7 @@ func (svc *service) GetCollectionItems(ctx context.Context, request *protobuf.Id
 	}, nil
 }
 
-func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*grpc.SignedUrl, error) {
+func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*protobuf.IdResponse, error) {
 	userId, err := identity.GetAuthenticatedSubjectId(ctx)
 	if err != nil {
 		return nil, err
@@ -148,7 +195,21 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 	if err != nil {
 		return nil, err
 	}
-	return svc.os.CreateUploadUrl(ctx, id, request.Metadata.Name, request.Metadata.ContentType, request.Metadata.ContentLength, request.Metadata.Attributes)
+	return &protobuf.IdResponse{
+		Id: id,
+	}, nil
+}
+
+func (svc *service) DeleteMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	err := svc.os.Delete(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	err = svc.ds.DeleteMetadata(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.Empty{}, nil
 }
 
 func (svc *service) GetMetadata(ctx context.Context, request *protobuf.IdRequest) (*grpc.Metadata, error) {

@@ -38,10 +38,13 @@ const (
 	ContentService_GetRootCollectionItems_FullMethodName              = "/bosca.content.ContentService/GetRootCollectionItems"
 	ContentService_GetCollectionItems_FullMethodName                  = "/bosca.content.ContentService/GetCollectionItems"
 	ContentService_AddCollection_FullMethodName                       = "/bosca.content.ContentService/AddCollection"
+	ContentService_DeleteCollection_FullMethodName                    = "/bosca.content.ContentService/DeleteCollection"
 	ContentService_GetCollectionPermissions_FullMethodName            = "/bosca.content.ContentService/GetCollectionPermissions"
 	ContentService_AddCollectionPermission_FullMethodName             = "/bosca.content.ContentService/AddCollectionPermission"
 	ContentService_GetMetadata_FullMethodName                         = "/bosca.content.ContentService/GetMetadata"
 	ContentService_AddMetadata_FullMethodName                         = "/bosca.content.ContentService/AddMetadata"
+	ContentService_DeleteMetadata_FullMethodName                      = "/bosca.content.ContentService/DeleteMetadata"
+	ContentService_GetMetadataUploadUrl_FullMethodName                = "/bosca.content.ContentService/GetMetadataUploadUrl"
 	ContentService_GetMetadataDownloadUrl_FullMethodName              = "/bosca.content.ContentService/GetMetadataDownloadUrl"
 	ContentService_AddMetadataSupplementary_FullMethodName            = "/bosca.content.ContentService/AddMetadataSupplementary"
 	ContentService_GetMetadataSupplementaryDownloadUrl_FullMethodName = "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl"
@@ -60,11 +63,14 @@ const (
 type ContentServiceClient interface {
 	GetRootCollectionItems(ctx context.Context, in *protobuf.Empty, opts ...grpc.CallOption) (*CollectionItems, error)
 	GetCollectionItems(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*CollectionItems, error)
-	AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*SignedUrl, error)
+	AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*protobuf.IdResponse, error)
+	DeleteCollection(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	GetCollectionPermissions(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
 	AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	GetMetadata(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Metadata, error)
-	AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*SignedUrl, error)
+	AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*protobuf.IdResponse, error)
+	DeleteMetadata(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
+	GetMetadataUploadUrl(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
 	GetMetadataDownloadUrl(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
 	AddMetadataSupplementary(ctx context.Context, in *AddSupplementaryRequest, opts ...grpc.CallOption) (*SignedUrl, error)
 	GetMetadataSupplementaryDownloadUrl(ctx context.Context, in *SupplementaryIdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
@@ -103,9 +109,18 @@ func (c *contentServiceClient) GetCollectionItems(ctx context.Context, in *proto
 	return out, nil
 }
 
-func (c *contentServiceClient) AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*SignedUrl, error) {
-	out := new(SignedUrl)
+func (c *contentServiceClient) AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*protobuf.IdResponse, error) {
+	out := new(protobuf.IdResponse)
 	err := c.cc.Invoke(ctx, ContentService_AddCollection_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) DeleteCollection(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error) {
+	out := new(protobuf.Empty)
+	err := c.cc.Invoke(ctx, ContentService_DeleteCollection_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -139,9 +154,27 @@ func (c *contentServiceClient) GetMetadata(ctx context.Context, in *protobuf.IdR
 	return out, nil
 }
 
-func (c *contentServiceClient) AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*SignedUrl, error) {
-	out := new(SignedUrl)
+func (c *contentServiceClient) AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*protobuf.IdResponse, error) {
+	out := new(protobuf.IdResponse)
 	err := c.cc.Invoke(ctx, ContentService_AddMetadata_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) DeleteMetadata(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error) {
+	out := new(protobuf.Empty)
+	err := c.cc.Invoke(ctx, ContentService_DeleteMetadata_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetMetadataUploadUrl(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*SignedUrl, error) {
+	out := new(SignedUrl)
+	err := c.cc.Invoke(ctx, ContentService_GetMetadataUploadUrl_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -244,11 +277,14 @@ func (c *contentServiceClient) ProcessMetadata(ctx context.Context, in *protobuf
 type ContentServiceServer interface {
 	GetRootCollectionItems(context.Context, *protobuf.Empty) (*CollectionItems, error)
 	GetCollectionItems(context.Context, *protobuf.IdRequest) (*CollectionItems, error)
-	AddCollection(context.Context, *AddCollectionRequest) (*SignedUrl, error)
+	AddCollection(context.Context, *AddCollectionRequest) (*protobuf.IdResponse, error)
+	DeleteCollection(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error)
 	GetCollectionPermissions(context.Context, *protobuf.IdRequest) (*Permissions, error)
 	AddCollectionPermission(context.Context, *Permission) (*protobuf.Empty, error)
 	GetMetadata(context.Context, *protobuf.IdRequest) (*Metadata, error)
-	AddMetadata(context.Context, *AddMetadataRequest) (*SignedUrl, error)
+	AddMetadata(context.Context, *AddMetadataRequest) (*protobuf.IdResponse, error)
+	DeleteMetadata(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error)
+	GetMetadataUploadUrl(context.Context, *protobuf.IdRequest) (*SignedUrl, error)
 	GetMetadataDownloadUrl(context.Context, *protobuf.IdRequest) (*SignedUrl, error)
 	AddMetadataSupplementary(context.Context, *AddSupplementaryRequest) (*SignedUrl, error)
 	GetMetadataSupplementaryDownloadUrl(context.Context, *SupplementaryIdRequest) (*SignedUrl, error)
@@ -272,8 +308,11 @@ func (UnimplementedContentServiceServer) GetRootCollectionItems(context.Context,
 func (UnimplementedContentServiceServer) GetCollectionItems(context.Context, *protobuf.IdRequest) (*CollectionItems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollectionItems not implemented")
 }
-func (UnimplementedContentServiceServer) AddCollection(context.Context, *AddCollectionRequest) (*SignedUrl, error) {
+func (UnimplementedContentServiceServer) AddCollection(context.Context, *AddCollectionRequest) (*protobuf.IdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollection not implemented")
+}
+func (UnimplementedContentServiceServer) DeleteCollection(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollection not implemented")
 }
 func (UnimplementedContentServiceServer) GetCollectionPermissions(context.Context, *protobuf.IdRequest) (*Permissions, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollectionPermissions not implemented")
@@ -284,8 +323,14 @@ func (UnimplementedContentServiceServer) AddCollectionPermission(context.Context
 func (UnimplementedContentServiceServer) GetMetadata(context.Context, *protobuf.IdRequest) (*Metadata, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMetadata not implemented")
 }
-func (UnimplementedContentServiceServer) AddMetadata(context.Context, *AddMetadataRequest) (*SignedUrl, error) {
+func (UnimplementedContentServiceServer) AddMetadata(context.Context, *AddMetadataRequest) (*protobuf.IdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadata not implemented")
+}
+func (UnimplementedContentServiceServer) DeleteMetadata(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteMetadata not implemented")
+}
+func (UnimplementedContentServiceServer) GetMetadataUploadUrl(context.Context, *protobuf.IdRequest) (*SignedUrl, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataUploadUrl not implemented")
 }
 func (UnimplementedContentServiceServer) GetMetadataDownloadUrl(context.Context, *protobuf.IdRequest) (*SignedUrl, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataDownloadUrl not implemented")
@@ -384,6 +429,24 @@ func _ContentService_AddCollection_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_DeleteCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(protobuf.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).DeleteCollection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_DeleteCollection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).DeleteCollection(ctx, req.(*protobuf.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_GetCollectionPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(protobuf.IdRequest)
 	if err := dec(in); err != nil {
@@ -452,6 +515,42 @@ func _ContentService_AddMetadata_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).AddMetadata(ctx, req.(*AddMetadataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_DeleteMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(protobuf.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).DeleteMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_DeleteMetadata_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).DeleteMetadata(ctx, req.(*protobuf.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetMetadataUploadUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(protobuf.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetMetadataUploadUrl(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetMetadataUploadUrl_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetMetadataUploadUrl(ctx, req.(*protobuf.IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -656,6 +755,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_AddCollection_Handler,
 		},
 		{
+			MethodName: "DeleteCollection",
+			Handler:    _ContentService_DeleteCollection_Handler,
+		},
+		{
 			MethodName: "GetCollectionPermissions",
 			Handler:    _ContentService_GetCollectionPermissions_Handler,
 		},
@@ -670,6 +773,14 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddMetadata",
 			Handler:    _ContentService_AddMetadata_Handler,
+		},
+		{
+			MethodName: "DeleteMetadata",
+			Handler:    _ContentService_DeleteMetadata_Handler,
+		},
+		{
+			MethodName: "GetMetadataUploadUrl",
+			Handler:    _ContentService_GetMetadataUploadUrl_Handler,
 		},
 		{
 			MethodName: "GetMetadataDownloadUrl",

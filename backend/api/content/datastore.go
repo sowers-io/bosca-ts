@@ -21,6 +21,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/jackc/pgx/v5/pgtype"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
@@ -103,19 +104,33 @@ func (ds *DataStore) GetCollectionMetadataItemIds(ctx context.Context, collectio
 func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Collection, error) {
 	var collection content.Collection
 
+	m := pgtype.NewMap()
+
+	var collectionType string
 	var tags []string
-	var attributes map[string]string
+	var attributes string
 	err := ds.db.QueryRowContext(ctx, "SELECT name, type, tags, attributes FROM collections WHERE id = $1", id).Scan(
 		&collection.Name,
-		&collection.Type,
-		&tags,
+		&collectionType,
+		m.SQLScanner(&tags),
 		&attributes,
 	)
 	if err != nil {
 		return nil, err
 	}
+
+	switch collectionType {
+	case "root":
+		collection.Type = content.CollectionType_root
+	case "folder":
+		collection.Type = content.CollectionType_folder
+	case "standard":
+		collection.Type = content.CollectionType_standard
+	}
+
+	collection.Id = id
 	collection.Tags = tags
-	collection.Attributes = attributes
+	//collection.Attributes = attributes
 	return &collection, nil
 }
 
@@ -236,13 +251,17 @@ func (ds *DataStore) SetCollectionWorkflowStateId(ctx context.Context, id string
 func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metadata, error) {
 	var metadata content.Metadata
 
+	m := pgtype.NewMap()
+
 	var created time.Time
 	var modified time.Time
 	var status string
+	var tags []string
 
-	err := ds.db.QueryRowContext(ctx, "SELECT id, name, content_type, content_length, created, modified, status FROM metadata WHERE id = $1", id).Scan(
+	err := ds.db.QueryRowContext(ctx, "SELECT id, name, tags, content_type, content_length, created, modified, status FROM metadata WHERE id = $1", id).Scan(
 		&metadata.Id,
 		&metadata.Name,
+		m.SQLScanner(&tags),
 		&metadata.ContentType,
 		&metadata.ContentLength,
 		&created,
@@ -254,6 +273,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 	}
 	metadata.Created = timestamppb.New(created)
 	metadata.Modified = timestamppb.New(modified)
+	metadata.Tags = tags
 
 	switch status {
 	case "ready":

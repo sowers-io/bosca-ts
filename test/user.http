@@ -52,6 +52,20 @@ mutation {
     }
 }
 
+###
+POST http://localhost:5003/v1/content/collections
+Authorization: Bearer {{session_token}}
+Content-Type: application/json
+
+{
+  "parent": "00000000-0000-0000-0000-000000000000",
+  "collection": {
+    "name": "test file",
+    "attributes": {
+      "asdf": "123"
+    }
+  }
+}
 
 ###
 POST http://localhost:5003/v1/content/metadata

@@ -56,7 +56,7 @@ func (s *permissionManager) CheckWithUserIdError(ctx context.Context, userId str
 	if identity.GetSubjectType(ctx) == identity.SubjectTypeServiceAccount {
 		subjectType = SubjectTypeServiceAccount
 	}
-	r, err := s.permissionsClient.CheckPermission(ctx, &pb.CheckPermissionRequest{
+	check := &pb.CheckPermissionRequest{
 		Resource: &pb.ObjectReference{
 			ObjectType: s.getObjectType(objectType),
 			ObjectId:   resourceId,
@@ -68,7 +68,8 @@ func (s *permissionManager) CheckWithUserIdError(ctx context.Context, userId str
 				ObjectId:   userId,
 			},
 		},
-	})
+	}
+	r, err := s.permissionsClient.CheckPermission(ctx, check)
 	if err != nil {
 		return err
 	}

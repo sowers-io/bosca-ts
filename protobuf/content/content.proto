@@ -37,10 +37,16 @@ service ContentService {
     };
   }
 
-  rpc AddCollection(AddCollectionRequest) returns (SignedUrl) {
+  rpc AddCollection(AddCollectionRequest) returns (bosca.IdResponse) {
     option (google.api.http) = {
       post: "/v1/content/collections"
       body: "*"
+    };
+  }
+
+  rpc DeleteCollection(bosca.IdRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/collections/{id}"
     };
   }
 
@@ -63,10 +69,22 @@ service ContentService {
     };
   }
 
-  rpc AddMetadata(AddMetadataRequest) returns (SignedUrl) {
+  rpc AddMetadata(AddMetadataRequest) returns (IdResponse) {
     option (google.api.http) = {
       post: "/v1/content/metadata"
       body: "*"
+    };
+  }
+
+  rpc DeleteMetadata(bosca.IdRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/metadata/{id}"
+    };
+  }
+
+  rpc GetMetadataUploadUrl(bosca.IdRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/url"
     };
   }
 

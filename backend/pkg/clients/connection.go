@@ -17,11 +17,15 @@
 package clients
 
 import (
+	"errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func NewClientConnection(endpoint string) (*grpc.ClientConn, error) {
+	if endpoint == "" {
+		return nil, errors.New("endpoint is required")
+	}
 	var opts []grpc.DialOption
 	// TLS is managed at the service mesh
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))

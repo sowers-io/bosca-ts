@@ -19,9 +19,9 @@ package content
 import (
 	"bosca.io/api/protobuf"
 	grpc "bosca.io/api/protobuf/content"
-	"bosca.io/pkg/identity"
 	"bosca.io/pkg/objectstore"
 	"bosca.io/pkg/security"
+	"bosca.io/pkg/security/identity"
 	"bosca.io/pkg/workers/metadata"
 	"context"
 	"errors"
@@ -51,6 +51,14 @@ func NewService(dataStore *DataStore, serviceAccountId string, objectStore objec
 	}
 }
 
+func (svc *service) CheckPermissions(ctx context.Context, request *grpc.PermissionCheckRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithSubjectIdError(ctx, request.SubjectType, request.Subject, request.ObjectType, request.Object, request.Action)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.Empty{}, nil
+}
+
 func (svc *service) GetRootCollectionItems(ctx context.Context, request *protobuf.Empty) (*grpc.CollectionItems, error) {
 	return svc.GetCollectionItems(ctx, &protobuf.IdRequest{Id: RootCollectionId})
 }
@@ -64,7 +72,7 @@ func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollecti
 	if err != nil {
 		return nil, err
 	}
-	err = svc.permissions.CreateRelationships(ctx, security.CollectionObject, []*grpc.Permission{
+	err = svc.permissions.CreateRelationships(ctx, grpc.PermissionObjectType_collection_type, []*grpc.Permission{
 		{
 			Id:          id,
 			Subject:     security.AdministratorGroup,
@@ -117,7 +125,7 @@ func (svc *service) GetCollectionItems(ctx context.Context, request *protobuf.Id
 		if err != nil {
 			return nil, err
 		}
-		err = svc.permissions.CheckWithError(ctx, security.CollectionObject, item, grpc.PermissionAction_view)
+		err = svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, item, grpc.PermissionAction_view)
 		if err != nil {
 			continue
 		}
@@ -132,12 +140,12 @@ func (svc *service) GetCollectionItems(ctx context.Context, request *protobuf.Id
 		if err != nil {
 			return nil, err
 		}
-		err = svc.permissions.CheckWithError(ctx, security.MetadataObject, item, grpc.PermissionAction_view)
+		err = svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, item, grpc.PermissionAction_view)
 		if err != nil {
 			continue
 		}
 		if meta.Status == grpc.MetadataStatus_processing {
-			err = svc.permissions.CheckWithError(ctx, security.MetadataObject, item, grpc.PermissionAction_edit)
+			err = svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, item, grpc.PermissionAction_edit)
 			if err != nil {
 				continue
 			}
@@ -165,7 +173,7 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 	if err != nil {
 		return nil, err
 	}
-	err = svc.permissions.CreateRelationships(ctx, security.MetadataObject, []*grpc.Permission{
+	err = svc.permissions.CreateRelationships(ctx, grpc.PermissionObjectType_metadata_type, []*grpc.Permission{
 		{
 			Id:          id,
 			Subject:     security.AdministratorGroup,
@@ -262,7 +270,7 @@ func (svc *service) SetMetadataStatus(ctx context.Context, request *grpc.SetMeta
 }
 
 func (svc *service) GetMetadataPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
-	return svc.permissions.GetPermissions(ctx, security.MetadataObject, request.Id)
+	return svc.permissions.GetPermissions(ctx, grpc.PermissionObjectType_metadata_type, request.Id)
 }
 
 func (svc *service) AddMetadataPermissions(ctx context.Context, permissions *grpc.Permissions) (*protobuf.Empty, error) {
@@ -271,7 +279,7 @@ func (svc *service) AddMetadataPermissions(ctx context.Context, permissions *grp
 			permission.Id = permissions.Id
 		}
 	}
-	err := svc.permissions.CreateRelationships(ctx, security.MetadataObject, permissions.Permissions)
+	err := svc.permissions.CreateRelationships(ctx, grpc.PermissionObjectType_metadata_type, permissions.Permissions)
 	if err != nil {
 		return nil, err
 	}
@@ -279,7 +287,7 @@ func (svc *service) AddMetadataPermissions(ctx context.Context, permissions *grp
 }
 
 func (svc *service) AddMetadataPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	err := svc.permissions.CreateRelationship(ctx, security.MetadataObject, permission)
+	err := svc.permissions.CreateRelationship(ctx, grpc.PermissionObjectType_metadata_type, permission)
 	if err != nil {
 		return nil, err
 	}
@@ -287,11 +295,11 @@ func (svc *service) AddMetadataPermission(ctx context.Context, permission *grpc.
 }
 
 func (svc *service) GetCollectionPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
-	return svc.permissions.GetPermissions(ctx, security.CollectionObject, request.Id)
+	return svc.permissions.GetPermissions(ctx, grpc.PermissionObjectType_collection_type, request.Id)
 }
 
 func (svc *service) AddCollectionPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	err := svc.permissions.CreateRelationship(ctx, security.CollectionObject, permission)
+	err := svc.permissions.CreateRelationship(ctx, grpc.PermissionObjectType_collection_type, permission)
 	if err != nil {
 		return nil, err
 	}

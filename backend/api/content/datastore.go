@@ -258,7 +258,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 	var status string
 	var tags []string
 
-	err := ds.db.QueryRowContext(ctx, "SELECT id, name, tags, content_type, content_length, created, modified, status FROM metadata WHERE id = $1", id).Scan(
+	err := ds.db.QueryRowContext(ctx, "SELECT id, name, tags, content_type, content_length, created, modified, status, source FROM metadata WHERE id = $1", id).Scan(
 		&metadata.Id,
 		&metadata.Name,
 		m.SQLScanner(&tags),
@@ -267,6 +267,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 		&created,
 		&modified,
 		&status,
+		&metadata.Source,
 	)
 	if err != nil {
 		return nil, err
@@ -289,7 +290,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 }
 
 func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata) (string, error) {
-	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO metadata (name, content_type, content_length, tags, attributes) VALUES ($1, $2, $3, $4, ($5)::jsonb) returning id")
+	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO metadata (name, content_type, content_length, tags, attributes, source) VALUES ($1, $2, $3, $4, ($5)::jsonb, $6) returning id")
 	if err != nil {
 		return "", err
 	}
@@ -310,6 +311,7 @@ func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata
 		metadata.ContentLength,
 		tags,
 		attributes,
+		metadata.Source,
 	)
 	if result.Err() != nil {
 		return "", result.Err()

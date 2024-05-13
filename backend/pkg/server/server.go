@@ -21,7 +21,7 @@ import (
 	protohealth "bosca.io/api/protobuf/health"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/security"
-	"bosca.io/pkg/security/ory"
+	securityFactory "bosca.io/pkg/security/factory"
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -31,16 +31,6 @@ import (
 	"net"
 	"net/http"
 )
-
-func NewSessionInterceptor(interceptorType string) security.SessionInterceptor {
-	switch interceptorType {
-	case "ory":
-		return ory.NewSessionInterceptor()
-	default:
-		log.Fatalf("failed to find interceptor type %s", interceptorType)
-		return nil
-	}
-}
 
 func StartServer(cfg *configuration.ServerConfiguration, register func(context.Context, *grpc.Server, *runtime.ServeMux, string, []grpc.DialOption)) {
 	ctx := context.Background()
@@ -53,8 +43,9 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	interceptor := NewSessionInterceptor(cfg.Security.SessionEndpointType)
-	interceptors := security.NewSecurityInterceptors(cfg.Security.SessionEndpoint, cfg.Security.ServiceAccountId, cfg.Security.ServiceAccountToken, interceptor)
+	sessionInterceptor := securityFactory.NewSessionInterceptor(cfg.Security.SessionEndpointType)
+	subjectFinder := security.NewSubjectFinder(cfg.Security.SessionEndpoint, cfg.Security.ServiceAccountId, cfg.Security.ServiceAccountToken, sessionInterceptor)
+	interceptors := security.NewSecurityInterceptors(subjectFinder)
 
 	grpcOpts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(interceptors.UnaryInterceptor()),

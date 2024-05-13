@@ -18,8 +18,8 @@ package spicedb
 
 import (
 	grpc "bosca.io/api/protobuf/content"
-	"bosca.io/pkg/identity"
 	"bosca.io/pkg/security"
+	"bosca.io/pkg/security/identity"
 	"context"
 
 	pb "github.com/authzed/authzed-go/proto/authzed/api/v1"
@@ -43,29 +43,29 @@ func NewPermissionManager(permissionsClient *authzed.Client) security.Permission
 	}
 }
 
-func (s *permissionManager) CheckWithError(ctx context.Context, objectType security.ObjectType, resourceId string, action grpc.PermissionAction) error {
-	userId, err := identity.GetAuthenticatedSubjectId(ctx)
+func (s *permissionManager) CheckWithError(ctx context.Context, objectType grpc.PermissionObjectType, resourceId string, action grpc.PermissionAction) error {
+	subjectId, err := identity.GetAuthenticatedSubjectId(ctx)
 	if err != nil {
 		return err
 	}
-	return s.CheckWithUserIdError(ctx, userId, objectType, resourceId, action)
+	subjectType := grpc.PermissionSubjectType_user
+	if identity.GetSubjectType(ctx) == identity.SubjectTypeServiceAccount {
+		subjectType = grpc.PermissionSubjectType_service_account
+	}
+	return s.CheckWithSubjectIdError(ctx, subjectType, subjectId, objectType, resourceId, action)
 }
 
-func (s *permissionManager) CheckWithUserIdError(ctx context.Context, userId string, objectType security.ObjectType, resourceId string, action grpc.PermissionAction) error {
-	subjectType := SubjectTypeUser
-	if identity.GetSubjectType(ctx) == identity.SubjectTypeServiceAccount {
-		subjectType = SubjectTypeServiceAccount
-	}
+func (s *permissionManager) CheckWithSubjectIdError(ctx context.Context, subjectType grpc.PermissionSubjectType, subjectId string, objectType grpc.PermissionObjectType, objectId string, action grpc.PermissionAction) error {
 	check := &pb.CheckPermissionRequest{
 		Resource: &pb.ObjectReference{
 			ObjectType: s.getObjectType(objectType),
-			ObjectId:   resourceId,
+			ObjectId:   objectId,
 		},
 		Permission: s.getAction(action),
 		Subject: &pb.SubjectReference{
 			Object: &pb.ObjectReference{
-				ObjectType: subjectType,
-				ObjectId:   userId,
+				ObjectType: s.getSubjectType(subjectType),
+				ObjectId:   subjectId,
 			},
 		},
 	}
@@ -80,14 +80,26 @@ func (s *permissionManager) CheckWithUserIdError(ctx context.Context, userId str
 	return nil
 }
 
-func (s *permissionManager) getObjectType(objectType security.ObjectType) string {
+func (s *permissionManager) getObjectType(objectType grpc.PermissionObjectType) string {
 	switch objectType {
-	case security.MetadataObject:
+	case grpc.PermissionObjectType_metadata_type:
 		return "metadata"
-	case security.CollectionObject:
+	case grpc.PermissionObjectType_collection_type:
 		return "collection"
-	case security.SystemResourceObject:
+	case grpc.PermissionObjectType_system_resource_type:
 		return "systemresource"
+	}
+	return ""
+}
+
+func (s *permissionManager) getSubjectType(objectType grpc.PermissionSubjectType) string {
+	switch objectType {
+	case grpc.PermissionSubjectType_user:
+		return "user"
+	case grpc.PermissionSubjectType_group:
+		return "group"
+	case grpc.PermissionSubjectType_service_account:
+		return "serviceaccount"
 	}
 	return ""
 }
@@ -128,7 +140,7 @@ func (s *permissionManager) getAction(relation grpc.PermissionAction) string {
 	return ""
 }
 
-func (s *permissionManager) CreateRelationships(ctx context.Context, objectType security.ObjectType, permissions []*grpc.Permission) error {
+func (s *permissionManager) CreateRelationships(ctx context.Context, objectType grpc.PermissionObjectType, permissions []*grpc.Permission) error {
 	updates := make([]*pb.RelationshipUpdate, 0)
 	for _, permission := range permissions {
 		subjectType := ""
@@ -168,11 +180,11 @@ func (s *permissionManager) CreateRelationships(ctx context.Context, objectType 
 	return nil
 }
 
-func (s *permissionManager) CreateRelationship(ctx context.Context, objectType security.ObjectType, permission *grpc.Permission) error {
+func (s *permissionManager) CreateRelationship(ctx context.Context, objectType grpc.PermissionObjectType, permission *grpc.Permission) error {
 	return s.CreateRelationships(ctx, objectType, []*grpc.Permission{permission})
 }
 
-func (s *permissionManager) GetPermissions(ctx context.Context, objectType security.ObjectType, resourceId string) (*grpc.Permissions, error) {
+func (s *permissionManager) GetPermissions(ctx context.Context, objectType grpc.PermissionObjectType, resourceId string) (*grpc.Permissions, error) {
 	client, err := s.permissionsClient.ReadRelationships(ctx, &pb.ReadRelationshipsRequest{
 		RelationshipFilter: &pb.RelationshipFilter{
 			ResourceType:       s.getObjectType(objectType),

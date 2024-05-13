@@ -41,6 +41,7 @@ const (
 	ContentService_DeleteCollection_FullMethodName                    = "/bosca.content.ContentService/DeleteCollection"
 	ContentService_GetCollectionPermissions_FullMethodName            = "/bosca.content.ContentService/GetCollectionPermissions"
 	ContentService_AddCollectionPermission_FullMethodName             = "/bosca.content.ContentService/AddCollectionPermission"
+	ContentService_CheckPermission_FullMethodName                     = "/bosca.content.ContentService/CheckPermission"
 	ContentService_GetMetadata_FullMethodName                         = "/bosca.content.ContentService/GetMetadata"
 	ContentService_AddMetadata_FullMethodName                         = "/bosca.content.ContentService/AddMetadata"
 	ContentService_DeleteMetadata_FullMethodName                      = "/bosca.content.ContentService/DeleteMetadata"
@@ -67,6 +68,7 @@ type ContentServiceClient interface {
 	DeleteCollection(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	GetCollectionPermissions(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
 	AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*protobuf.Empty, error)
+	CheckPermission(ctx context.Context, in *PermissionCheckRequest, opts ...grpc.CallOption) (*PermissionCheckResponse, error)
 	GetMetadata(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Metadata, error)
 	AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*protobuf.IdResponse, error)
 	DeleteMetadata(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
@@ -139,6 +141,15 @@ func (c *contentServiceClient) GetCollectionPermissions(ctx context.Context, in 
 func (c *contentServiceClient) AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*protobuf.Empty, error) {
 	out := new(protobuf.Empty)
 	err := c.cc.Invoke(ctx, ContentService_AddCollectionPermission_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) CheckPermission(ctx context.Context, in *PermissionCheckRequest, opts ...grpc.CallOption) (*PermissionCheckResponse, error) {
+	out := new(PermissionCheckResponse)
+	err := c.cc.Invoke(ctx, ContentService_CheckPermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -281,6 +292,7 @@ type ContentServiceServer interface {
 	DeleteCollection(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error)
 	GetCollectionPermissions(context.Context, *protobuf.IdRequest) (*Permissions, error)
 	AddCollectionPermission(context.Context, *Permission) (*protobuf.Empty, error)
+	CheckPermission(context.Context, *PermissionCheckRequest) (*PermissionCheckResponse, error)
 	GetMetadata(context.Context, *protobuf.IdRequest) (*Metadata, error)
 	AddMetadata(context.Context, *AddMetadataRequest) (*protobuf.IdResponse, error)
 	DeleteMetadata(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error)
@@ -319,6 +331,9 @@ func (UnimplementedContentServiceServer) GetCollectionPermissions(context.Contex
 }
 func (UnimplementedContentServiceServer) AddCollectionPermission(context.Context, *Permission) (*protobuf.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollectionPermission not implemented")
+}
+func (UnimplementedContentServiceServer) CheckPermission(context.Context, *PermissionCheckRequest) (*PermissionCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckPermission not implemented")
 }
 func (UnimplementedContentServiceServer) GetMetadata(context.Context, *protobuf.IdRequest) (*Metadata, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMetadata not implemented")
@@ -479,6 +494,24 @@ func _ContentService_AddCollectionPermission_Handler(srv interface{}, ctx contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).AddCollectionPermission(ctx, req.(*Permission))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_CheckPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PermissionCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).CheckPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_CheckPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).CheckPermission(ctx, req.(*PermissionCheckRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -765,6 +798,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddCollectionPermission",
 			Handler:    _ContentService_AddCollectionPermission_Handler,
+		},
+		{
+			MethodName: "CheckPermission",
+			Handler:    _ContentService_CheckPermission_Handler,
 		},
 		{
 			MethodName: "GetMetadata",

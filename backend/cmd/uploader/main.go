@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package main
 
 import (
@@ -6,7 +22,11 @@ import (
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
+	"bosca.io/pkg/security"
+	securityFactory "bosca.io/pkg/security/factory"
+	"bosca.io/pkg/security/identity"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -20,6 +40,58 @@ import (
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 	"github.com/tus/tusd/v2/pkg/s3store"
 )
+
+func verify(cfg *configuration.ServerConfiguration, contentClient content.ContentServiceClient, subjectFinder security.SubjectFinder, hook tusd.HookEvent) error {
+	var subjectId string
+	var subjectType string
+	var err error
+	cookies := hook.HTTPRequest.Header["Cookie"]
+	if cookies != nil && len(cookies) > 0 {
+		subjectId, subjectType, err = subjectFinder.FindSubjectId(context.Background(), true, cookies[0])
+		if err != nil {
+			authorization := hook.HTTPRequest.Header["Authorization"]
+			if authorization != nil && len(authorization) > 0 {
+				subjectId, subjectType, err = subjectFinder.FindSubjectId(context.Background(), false, authorization[0])
+				if err != nil {
+					return err
+				}
+			} else {
+				return errors.New("missing authorization header")
+			}
+		}
+	} else {
+		return errors.New("missing authorization header")
+	}
+
+	var subjectPermissionType content.PermissionSubjectType
+	if subjectType == identity.SubjectTypeServiceAccount {
+		subjectPermissionType = content.PermissionSubjectType_service_account
+	} else {
+		subjectPermissionType = content.PermissionSubjectType_user
+	}
+
+	collection := hook.Upload.MetaData["collection"]
+	if collection == "" {
+		collection = "00000000-0000-0000-0000-000000000000"
+	}
+
+	permission := &content.PermissionCheckRequest{
+		Object:      collection,
+		ObjectType:  content.PermissionObjectType_collection_type,
+		Subject:     subjectId,
+		SubjectType: subjectPermissionType,
+		Action:      content.PermissionAction_edit,
+	}
+
+	result, err := contentClient.CheckPermission(context.Background(), permission, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+		HeaderValue: "Token " + cfg.Security.ServiceAccountToken,
+	}})
+
+	if err != nil || result == nil || !result.Allowed {
+		return errors.New("unauthorized")
+	}
+	return nil
+}
 
 func main() {
 	cfg := configuration.NewServerConfiguration("", 8099, 0)
@@ -65,6 +137,9 @@ func main() {
 		ExposeHeaders:    "Cookie, Upload-Offset, Location, Upload-Length, Tus-Version, Tus-Resumable, Tus-Max-Size, Tus-Extension, Upload-Metadata, Upload-Defer-Length, Upload-Concat, Upload-Incomplete, Upload-Complete, Upload-Draft-Interop-Version",
 	}
 
+	sessionInterceptor := securityFactory.NewSessionInterceptor(cfg.Security.SessionEndpointType)
+	subjectFinder := security.NewSubjectFinder(cfg.Security.SessionEndpoint, cfg.Security.ServiceAccountId, cfg.Security.ServiceAccountToken, sessionInterceptor)
+
 	handler, err := tusd.NewHandler(tusd.Config{
 		BasePath:              "/uploads/",
 		StoreComposer:         composer,
@@ -72,27 +147,10 @@ func main() {
 		DisableDownload:       true,
 		Cors:                  cors,
 		PreUploadCreateCallback: func(hook tusd.HookEvent) (response tusd.HTTPResponse, changes tusd.FileInfoChanges, error error) {
-			if hook.Upload.ID == "" {
-				var id *protobuf.IdResponse
-				collection := hook.Upload.MetaData["collection"]
-				if collection == "" {
-					collection = "00000000-0000-0000-0000-000000000000"
-				}
-				metadata := &content.Metadata{
-					Name:          hook.Upload.MetaData["name"],
-					ContentType:   hook.Upload.MetaData["filetype"],
-					ContentLength: hook.Upload.Size,
-				}
-				id, error = contentClient.AddMetadata(context.Background(), &content.AddMetadataRequest{
-					Collection: collection,
-					Metadata:   metadata,
-				}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{HeaderValue: "Cookie " + hook.HTTPRequest.Header.Get("Cookie")}})
-				if error != nil {
-					response.StatusCode = 500
-					error = fmt.Errorf("unable to add metadata: %s", error)
-					return
-				}
-				changes.ID = id.Id
+			if err := verify(cfg, contentClient, subjectFinder, hook); err != nil {
+				response.StatusCode = 401
+				error = err
+				return
 			}
 			response.StatusCode = 200
 			error = nil
@@ -107,9 +165,40 @@ func main() {
 	go func() {
 		for {
 			event := <-handler.CompleteUploads
-			_, err := contentClient.SetMetadataUploaded(context.Background(), &protobuf.IdRequest{
-				Id: event.Upload.Storage["Key"],
+
+			if err := verify(cfg, contentClient, subjectFinder, event); err != nil {
+				log.Printf("cannot complete upload: %v", err)
+				return
+			}
+
+			collection := event.Upload.MetaData["collection"]
+			if collection == "" {
+				collection = "00000000-0000-0000-0000-000000000000"
+			}
+
+			metadata := &content.Metadata{
+				Name:          event.Upload.MetaData["name"],
+				ContentType:   event.Upload.MetaData["filetype"],
+				ContentLength: event.Upload.Size,
+				Source:        &event.Upload.ID,
+			}
+
+			id, err := contentClient.AddMetadata(context.Background(), &content.AddMetadataRequest{
+				Collection: collection,
+				Metadata:   metadata,
+			}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+				HeaderValue: "Token " + cfg.Security.ServiceAccountToken,
+			}})
+
+			if err != nil {
+				log.Printf("ERROR: unable to set metadata uploaded: %v", err)
+				return
+			}
+
+			_, err = contentClient.SetMetadataUploaded(context.Background(), &protobuf.IdRequest{
+				Id: id.Id,
 			}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{HeaderValue: "Token " + cfg.Security.ServiceAccountToken}})
+
 			if err != nil {
 				log.Printf("ERROR: unable to set metadata uploaded: %v", err)
 			}

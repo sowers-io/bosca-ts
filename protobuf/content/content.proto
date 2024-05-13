@@ -63,6 +63,12 @@ service ContentService {
     };
   }
 
+  rpc CheckPermission(PermissionCheckRequest) returns (PermissionCheckResponse) {
+    option (google.api.http) = {
+      get: "/v1/content/permission/check"
+    };
+  }
+
   rpc GetMetadata(bosca.IdRequest) returns (Metadata) {
     option (google.api.http) = {
       get: "/v1/content/metadata/{id}"
@@ -183,15 +189,35 @@ message SupplementaryIdRequest {
   string type = 2;
 }
 
+message PermissionCheckRequest {
+  string object = 1;
+  PermissionObjectType object_type = 2;
+  string subject = 3;
+  PermissionSubjectType subject_type = 4;
+  PermissionAction action = 5;
+}
+
+message PermissionCheckResponse {
+  bool allowed = 1;
+}
+
 message Permissions {
   string id = 1;
   repeated Permission permissions = 2;
 }
 
+enum PermissionObjectType {
+  unknown_object_type = 0;
+  collection_type = 1;
+  metadata_type = 2;
+  system_resource_type = 3;
+}
+
 enum PermissionSubjectType {
-  user = 0;
-  group = 1;
-  service_account = 2;
+  unknown_subject_type = 0;
+  user = 1;
+  group = 2;
+  service_account = 3;
 }
 
 message Permission {
@@ -292,8 +318,10 @@ message Metadata {
   string name = 3;
   string content_type = 4;
 
-  string language_tag = 5;
-  int64 content_length = 6;
+  optional string source = 5;
+
+  string language_tag = 6;
+  int64 content_length = 7;
 
   repeated string trait_ids = 11;
   repeated string category_ids = 12;

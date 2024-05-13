@@ -5,12 +5,12 @@ Bosca
 
 See [Getting Started](docs/getting-started.md) for development instructions.
 
-This project is fairly new. I've only been working on it for about a week now (though, I've been conceptualizing it in 
-my head for quite some time), and it seems like a perfect opportunity to start developing it in the open.
+This project is fairly new (though, I've been conceptualizing it in  my head for quite some time), and it seems like a 
+perfect opportunity to start developing it in the open.
 
 Bosca is an Open Source (Apache 2.0) AI powered content management system.
 
-Key Features:
+Key Features (not an exhaustive list):
 
 * Content Management
 * Collections
@@ -31,8 +31,9 @@ Key Features:
 
 Roadmap:
 
-* Convert C# prototype to Go (there have been a few prototypes: Java and a smaller one in Node)
-* Stabilize Kubernetes environment
+* Stabilize Service Interfaces
+* Build Administration Interfaces
+* Stabilize Kubernetes Environment
 * ...
 
 This system leverages a monorepo containing all the components for Bosca. However, the build pipeline will deploy 
@@ -40,9 +41,13 @@ Bosca in a microservice style architecture.  There are some exceptions to this r
 of the Bosca Core.  For example, administrative interfaces that will be part of a commercial offering (or, at least that
 is the current thinking, open to other thoughts about how to make Bosca sustainable).
 
-* **/api** - Contains backend API components
+* **/docs** - Documentation for Bosca
+* **/backend** - Contains backend API components
+* **/docker** - Dockerfiles for running Bosca commands within a container
 * **/protobuf** - Contains protobuf definitions for the API and Clients
-* **/conf** - Contains various configuration files
+* **/database** - Contains various database scripts and definitions
+* **/services** - Contains a development environment for the services Bosca leverages and integrates
+* **/.run** - Contains scripts for running Bosca Commands in IntelliJ (using the GoLand plugin)
 
 Technologies:
 

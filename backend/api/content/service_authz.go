@@ -44,8 +44,16 @@ func NewAuthorizationService(permissions security.PermissionManager, dataSource 
 	return svc
 }
 
+func (svc *authorizationService) CheckPermission(ctx context.Context, request *grpc.PermissionCheckRequest) (*grpc.PermissionCheckResponse, error) {
+	err := svc.permissions.CheckWithSubjectIdError(ctx, request.SubjectType, request.Subject, request.ObjectType, request.Object, request.Action)
+	if err != nil {
+		return &grpc.PermissionCheckResponse{Allowed: false}, nil
+	}
+	return &grpc.PermissionCheckResponse{Allowed: true}, nil
+}
+
 func (svc *authorizationService) GetRootCollectionItems(ctx context.Context, request *protobuf.Empty) (*grpc.CollectionItems, error) {
-	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, RootCollectionId, grpc.PermissionAction_list)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, RootCollectionId, grpc.PermissionAction_list)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +67,7 @@ func (svc *authorizationService) AddCollection(ctx context.Context, request *grp
 	if len(strings.Trim(request.Parent, " ")) == 0 {
 		return nil, errors.New("collection is required")
 	}
-	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, request.Parent, grpc.PermissionAction_edit)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Parent, grpc.PermissionAction_edit)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +75,7 @@ func (svc *authorizationService) AddCollection(ctx context.Context, request *grp
 }
 
 func (svc *authorizationService) DeleteCollection(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, request.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +83,7 @@ func (svc *authorizationService) DeleteCollection(ctx context.Context, request *
 }
 
 func (svc *authorizationService) GetMetadata(ctx context.Context, request *protobuf.IdRequest) (*grpc.Metadata, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_view)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_view)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +91,7 @@ func (svc *authorizationService) GetMetadata(ctx context.Context, request *proto
 }
 
 func (svc *authorizationService) GetMetadataDownloadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_view)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_view)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +105,7 @@ func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.
 	if len(strings.Trim(request.Collection, " ")) == 0 {
 		return nil, errors.New("collection is required")
 	}
-	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, request.Collection, grpc.PermissionAction_edit)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Collection, grpc.PermissionAction_edit)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +113,7 @@ func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.
 }
 
 func (svc *authorizationService) DeleteMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +121,7 @@ func (svc *authorizationService) DeleteMetadata(ctx context.Context, request *pr
 }
 
 func (svc *authorizationService) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *grpc.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_service)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +129,7 @@ func (svc *authorizationService) GetMetadataSupplementaryDownloadUrl(ctx context
 }
 
 func (svc *authorizationService) AddMetadataSupplementary(ctx context.Context, request *grpc.AddSupplementaryRequest) (*grpc.SignedUrl, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_service)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +137,7 @@ func (svc *authorizationService) AddMetadataSupplementary(ctx context.Context, r
 }
 
 func (svc *authorizationService) DeleteMetadataSupplementary(ctx context.Context, request *grpc.SupplementaryIdRequest) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_service)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +145,7 @@ func (svc *authorizationService) DeleteMetadataSupplementary(ctx context.Context
 }
 
 func (svc *authorizationService) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_service)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +153,7 @@ func (svc *authorizationService) SetMetadataUploaded(ctx context.Context, reques
 }
 
 func (svc *authorizationService) ProcessMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_edit)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_edit)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +161,7 @@ func (svc *authorizationService) ProcessMetadata(ctx context.Context, request *p
 }
 
 func (svc *authorizationService) SetMetadataStatus(ctx context.Context, request *grpc.SetMetadataStatusRequest) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_service)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +169,7 @@ func (svc *authorizationService) SetMetadataStatus(ctx context.Context, request 
 }
 
 func (svc *authorizationService) GetMetadataPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, request.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +177,7 @@ func (svc *authorizationService) GetMetadataPermissions(ctx context.Context, req
 }
 
 func (svc *authorizationService) AddMetadataPermissions(ctx context.Context, permission *grpc.Permissions) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, permission.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, permission.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +185,7 @@ func (svc *authorizationService) AddMetadataPermissions(ctx context.Context, per
 }
 
 func (svc *authorizationService) AddMetadataPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.MetadataObject, permission.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, permission.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +193,7 @@ func (svc *authorizationService) AddMetadataPermission(ctx context.Context, perm
 }
 
 func (svc *authorizationService) GetCollectionPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
-	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, request.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +201,7 @@ func (svc *authorizationService) GetCollectionPermissions(ctx context.Context, r
 }
 
 func (svc *authorizationService) AddCollectionPermission(ctx context.Context, permission *grpc.Permission) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, security.CollectionObject, permission.Id, grpc.PermissionAction_manage)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, permission.Id, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}

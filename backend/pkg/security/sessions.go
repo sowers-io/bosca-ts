@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package util
+package security
 
-import (
-	"net/http"
-	"time"
-)
+import "net/http"
 
-func NewDefaultHttpClient() *http.Client {
-	return &http.Client{
-		Transport: &http.Transport{
-			MaxIdleConns:    100,
-			MaxConnsPerHost: 1000,
-			IdleConnTimeout: 10 * time.Second,
-		},
-	}
+type SessionInterceptor interface {
+	GetSubjectId(response *http.Response) (string, error)
 }

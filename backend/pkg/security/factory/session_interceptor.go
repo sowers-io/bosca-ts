@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package util
+package factory
 
 import (
-	"net/http"
-	"time"
+	"bosca.io/pkg/security"
+	"bosca.io/pkg/security/ory"
+	"log"
 )
 
-func NewDefaultHttpClient() *http.Client {
-	return &http.Client{
-		Transport: &http.Transport{
-			MaxIdleConns:    100,
-			MaxConnsPerHost: 1000,
-			IdleConnTimeout: 10 * time.Second,
-		},
+func NewSessionInterceptor(interceptorType string) security.SessionInterceptor {
+	switch interceptorType {
+	case "ory":
+		return ory.NewSessionInterceptor()
+	default:
+		log.Fatalf("failed to find interceptor type %s", interceptorType)
+		return nil
 	}
 }

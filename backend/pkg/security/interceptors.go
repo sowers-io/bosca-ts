@@ -17,24 +17,15 @@
 package security
 
 import (
-	"bosca.io/pkg/identity"
-	"bosca.io/pkg/util"
+	"bosca.io/pkg/security/identity"
 	"context"
 	middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"log"
-	"net/http"
-	"net/url"
-	"strings"
 )
 
 type interceptors struct {
-	endpoint                  *url.URL
-	client                    *http.Client
-	serviceAccountId          string
-	serviceAccountTokenHeader string
-	interceptor               SessionInterceptor
+	subjectFinder SubjectFinder
 }
 
 type Interceptors interface {
@@ -42,21 +33,9 @@ type Interceptors interface {
 	StreamInterceptor() grpc.StreamServerInterceptor
 }
 
-type SessionInterceptor interface {
-	GetSubjectId(response *http.Response) (string, error)
-}
-
-func NewSecurityInterceptors(endpoint string, serviceAccountId string, serviceAccountToken string, interceptor SessionInterceptor) Interceptors {
-	endpointUrl, err := url.Parse(endpoint)
-	if err != nil {
-		log.Fatalf("failed to parse endpoint %s: %v", endpoint, err)
-	}
+func NewSecurityInterceptors(subjectFinder SubjectFinder) Interceptors {
 	return &interceptors{
-		endpoint:                  endpointUrl,
-		interceptor:               interceptor,
-		serviceAccountId:          serviceAccountId,
-		serviceAccountTokenHeader: "Token " + serviceAccountToken,
-		client:                    util.NewDefaultHttpClient(),
+		subjectFinder: subjectFinder,
 	}
 }
 
@@ -66,55 +45,27 @@ func (m *interceptors) UnaryInterceptor() grpc.UnaryServerInterceptor {
 
 func (m *interceptors) injectSubjectId(ctx context.Context) metadata.MD {
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		request := &http.Request{
-			Method: "GET",
-			Header: map[string][]string{},
-			URL:    m.endpoint,
-		}
 		authorization := md.Get("Authorization")
 		if authorization != nil && len(authorization) > 0 {
-			if strings.Index(authorization[0], "Cookie ") == 0 {
-				request.Header["Cookie"] = []string{authorization[0][7:]}
-			} else if authorization[0] == m.serviceAccountTokenHeader {
-				md.Set(identity.XSubjectId, m.serviceAccountId)
-				md.Set(identity.XSubjectType, identity.SubjectTypeServiceAccount)
-				return md
-			} else {
-				request.Header["Authorization"] = authorization
+			subjectId, subjectType, err := m.subjectFinder.FindSubjectId(ctx, false, authorization[0])
+			if err != nil {
+				return nil
 			}
+			md.Set(identity.XSubjectId, subjectId)
+			md.Set(identity.XSubjectType, subjectType)
+			return md
 		} else {
-			serviceAuthorization := md.Get("X-Service-Authorization")
-			if serviceAuthorization != nil && len(serviceAuthorization) > 0 && serviceAuthorization[0] == m.serviceAccountTokenHeader {
-				md.Set(identity.XSubjectId, m.serviceAccountId)
-				md.Set(identity.XSubjectType, identity.SubjectTypeServiceAccount)
-				return md
-			}
 			cookies := md.Get("Cookie")
 			if cookies != nil && len(cookies) > 0 {
-				request.Header["Cookie"] = cookies
+				subjectId, subjectType, err := m.subjectFinder.FindSubjectId(ctx, true, cookies[0])
+				if err != nil {
+					return nil
+				}
+				md.Set(identity.XSubjectId, subjectId)
+				md.Set(identity.XSubjectType, subjectType)
+				return md
 			}
 		}
-		if len(request.Header) == 0 {
-			return nil
-		}
-		r, err := m.client.Do(request)
-		if err != nil {
-			log.Printf("failed to get session: %v", err)
-			return nil
-		}
-		defer r.Body.Close()
-		if r.StatusCode != http.StatusOK {
-			log.Printf("failed to get session: %v", r.Status)
-			return nil
-		}
-		subjectId, err := m.interceptor.GetSubjectId(r)
-		if err != nil {
-			log.Printf("failed to get subject: %v", err)
-			return nil
-		}
-		md.Set(identity.XSubjectId, subjectId)
-		md.Set(identity.XSubjectType, identity.SubjectTypeUser)
-		return md
 	}
 	return nil
 }

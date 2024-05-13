@@ -27,7 +27,7 @@ const XSubjectId = "X-Subject"
 const XSubjectType = "X-Subject-Type"
 
 const SubjectTypeUser = "user"
-const SubjectTypeServiceAccount = "sa"
+const SubjectTypeServiceAccount = "serviceaccount"
 
 func GetSubjectId(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)

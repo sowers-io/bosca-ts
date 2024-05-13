@@ -29,7 +29,7 @@ func initializeService(permissions security.PermissionManager, dataSource *DataS
 		if err != nil {
 			log.Fatalf("error initializing root collection: %v", err)
 		}
-		err = permissions.CreateRelationship(ctx, security.CollectionObject, &grpc.Permission{
+		err = permissions.CreateRelationship(ctx, grpc.PermissionObjectType_collection_type, &grpc.Permission{
 			Id:          RootCollectionId,
 			Subject:     security.AdministratorGroup,
 			SubjectType: grpc.PermissionSubjectType_group,

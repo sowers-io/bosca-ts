@@ -21,20 +21,12 @@ import (
 	"context"
 )
 
-type ObjectType int
-
 const AdministratorGroup = "administrators"
 
-const (
-	MetadataObject ObjectType = iota
-	CollectionObject
-	SystemResourceObject
-)
-
 type PermissionManager interface {
-	CheckWithError(ctx context.Context, objectType ObjectType, resourceId string, action content.PermissionAction) error
-	CheckWithUserIdError(ctx context.Context, userId string, objectType ObjectType, resourceId string, action content.PermissionAction) error
-	CreateRelationships(ctx context.Context, objectType ObjectType, permissions []*content.Permission) error
-	CreateRelationship(ctx context.Context, objectType ObjectType, permission *content.Permission) error
-	GetPermissions(ctx context.Context, objectType ObjectType, resourceId string) (*content.Permissions, error)
+	CheckWithError(ctx context.Context, objectType content.PermissionObjectType, resourceId string, action content.PermissionAction) error
+	CheckWithSubjectIdError(ctx context.Context, subjectType content.PermissionSubjectType, subjectId string, objectType content.PermissionObjectType, objectId string, action content.PermissionAction) error
+	CreateRelationships(ctx context.Context, objectType content.PermissionObjectType, permissions []*content.Permission) error
+	CreateRelationship(ctx context.Context, objectType content.PermissionObjectType, permission *content.Permission) error
+	GetPermissions(ctx context.Context, objectType content.PermissionObjectType, resourceId string) (*content.Permissions, error)
 }

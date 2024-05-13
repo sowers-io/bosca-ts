@@ -108,6 +108,7 @@ create table metadata
     modified          timestamp                                           default now(),
     status            metadata_status                                     default 'processing',
     workflow_state_id varchar   not null                                  default 'draft',
+    source            varchar,
     primary key (id),
     foreign key (parent_id) references metadata (id) on delete cascade,
     foreign key (workflow_state_id) references workflow_states (id)

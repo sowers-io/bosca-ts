@@ -332,4 +332,6 @@ message Metadata {
   google.protobuf.Timestamp modified = 21;
 
   MetadataStatus status = 30;
+
+  string workflow_state_id = 31;
 }

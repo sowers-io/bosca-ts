@@ -22,6 +22,7 @@ import (
 	"bosca.io/pkg/objectstore"
 	"context"
 	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -91,5 +92,14 @@ func (m *objectStore) CreateDownloadUrl(ctx context.Context, id string) (*model.
 }
 
 func (m *objectStore) Delete(ctx context.Context, id string) error {
-	return m.client.RemoveObject(ctx, m.bucket, id, minio.RemoveObjectOptions{})
+	for object := range m.client.ListObjects(ctx, m.bucket, minio.ListObjectsOptions{
+		Prefix: id,
+	}) {
+		err := m.client.RemoveObject(ctx, m.bucket, object.Key, minio.RemoveObjectOptions{})
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to delete file", slog.String("file", object.Key), slog.Any("error", err))
+			return err
+		}
+	}
+	return nil
 }

@@ -116,6 +116,9 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 		&attributes,
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -258,7 +261,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 	var status string
 	var tags []string
 
-	err := ds.db.QueryRowContext(ctx, "SELECT id, name, tags, content_type, content_length, created, modified, status, source, language_tag FROM metadata WHERE id = $1", id).Scan(
+	err := ds.db.QueryRowContext(ctx, "SELECT id, name, tags, content_type, content_length, created, modified, status, source, language_tag, workflow_state_id FROM metadata WHERE id = $1", id).Scan(
 		&metadata.Id,
 		&metadata.Name,
 		m.SQLScanner(&tags),
@@ -269,8 +272,12 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 		&status,
 		&metadata.Source,
 		&metadata.LanguageTag,
+		&metadata.WorkflowStateId,
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	metadata.Created = timestamppb.New(created)
@@ -288,6 +295,52 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 
 	// TODO: tags, traits and categories
 	return &metadata, nil
+}
+
+func (ds *DataStore) GetCollectionCollectionItemNames(ctx context.Context, collectionId string) ([]string, error) {
+	stmt, err := ds.db.PrepareContext(ctx, "SELECT name FROM collections WHERE id in (SELECT child_id FROM collection_collection_items WHERE collection_id = $1)")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+	rows, err := stmt.QueryContext(ctx, collectionId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	names := make([]string, 0)
+	var name string
+	for rows.Next() {
+		err = rows.Scan(&name)
+		if err != nil {
+			return nil, err
+		}
+		names = append(names, name)
+	}
+	return names, nil
+}
+
+func (ds *DataStore) GetCollectionMetadataItemNames(ctx context.Context, collectionId string) ([]string, error) {
+	stmt, err := ds.db.PrepareContext(ctx, "SELECT name FROM metadata WHERE id in (SELECT metadata_id FROM collection_metadata_items WHERE collection_id = $1)")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+	rows, err := stmt.QueryContext(ctx, collectionId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	names := make([]string, 0)
+	var name string
+	for rows.Next() {
+		err = rows.Scan(&name)
+		if err != nil {
+			return nil, err
+		}
+		names = append(names, name)
+	}
+	return names, nil
 }
 
 func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata) (string, error) {

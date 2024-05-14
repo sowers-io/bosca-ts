@@ -65,7 +65,7 @@ func (svc *authorizationService) AddCollection(ctx context.Context, request *grp
 		return nil, errors.New("collection is required")
 	}
 	if len(strings.Trim(request.Parent, " ")) == 0 {
-		return nil, errors.New("collection is required")
+		request.Parent = RootCollectionId
 	}
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Parent, grpc.PermissionAction_edit)
 	if err != nil {
@@ -103,7 +103,7 @@ func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.
 		return nil, errors.New("metadata is required")
 	}
 	if len(strings.Trim(request.Collection, " ")) == 0 {
-		return nil, errors.New("collection is required")
+		request.Collection = RootCollectionId
 	}
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Collection, grpc.PermissionAction_edit)
 	if err != nil {

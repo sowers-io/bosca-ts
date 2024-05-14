@@ -21,12 +21,13 @@ import (
 	"bosca.io/pkg/security"
 	"bosca.io/pkg/security/identity"
 	"context"
-
 	pb "github.com/authzed/authzed-go/proto/authzed/api/v1"
 	"github.com/authzed/authzed-go/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
+	"log/slog"
+	"time"
 )
 
 const SubjectTypeGroup = "group"
@@ -155,7 +156,6 @@ func (s *permissionManager) CreateRelationships(ctx context.Context, objectType 
 			subjectType = SubjectTypeServiceAccount
 			break
 		}
-
 		updates = append(updates, &pb.RelationshipUpdate{
 			Operation: pb.RelationshipUpdate_OPERATION_CREATE,
 			Relationship: &pb.Relationship{
@@ -174,10 +174,36 @@ func (s *permissionManager) CreateRelationships(ctx context.Context, objectType 
 		})
 	}
 	_, err := s.permissionsClient.WriteRelationships(ctx, &pb.WriteRelationshipsRequest{Updates: updates})
+
 	if err != nil {
 		return err
 	}
-	return nil
+
+	for _, permission := range permissions {
+		for {
+			current, err := s.GetPermissions(ctx, objectType, permission.Id)
+			if err != nil {
+				return err
+			}
+			if current != nil {
+				match := false
+				for _, p := range current.Permissions {
+					if permission.Id == p.Id && permission.SubjectType == p.SubjectType && permission.Subject == p.Subject && permission.Relation == p.Relation {
+						match = true
+						break
+					}
+				}
+				if match {
+					break
+				} else {
+					slog.Debug("permission not found, trying again")
+					time.Sleep(100 * time.Millisecond)
+				}
+			}
+		}
+	}
+
+	return err
 }
 
 func (s *permissionManager) CreateRelationship(ctx context.Context, objectType grpc.PermissionObjectType, permission *grpc.Permission) error {
@@ -221,7 +247,7 @@ func (s *permissionManager) GetPermissions(ctx context.Context, objectType grpc.
 		case "managers":
 			action = grpc.PermissionRelation_managers
 			break
-		case "serviceaccounts":
+		case "servicers":
 			action = grpc.PermissionRelation_serviceaccounts
 			break
 		case "owners":

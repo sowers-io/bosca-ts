@@ -23,6 +23,8 @@ import (
 	"bosca.io/pkg/workers/common"
 	"context"
 	"fmt"
+	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -41,11 +43,13 @@ func ExtractText(ctx context.Context, contentType string, metadataFile *os.File)
 		return nil, err
 	}
 	client := common.GetHttpClient(ctx)
+	file, _ := metadataFile.Stat()
 	request := &http.Request{
 		URL:    extractorUrl,
 		Method: "POST",
 		Header: map[string][]string{
-			"Content-Type": {contentType},
+			"Content-Type":   {contentType},
+			"Content-Length": {fmt.Sprintf("%d", file.Size())},
 		},
 		Body: metadataFile,
 	}
@@ -54,20 +58,20 @@ func ExtractText(ctx context.Context, contentType string, metadataFile *os.File)
 		return nil, err
 	}
 	if response.StatusCode != http.StatusOK {
-		response.Body.Close()
-		return nil, fmt.Errorf("failed to upload extracted text: %d", response.StatusCode)
+		return nil, fmt.Errorf("failed to extract text: %d", response.StatusCode)
 	}
 	return response, nil
 }
 
-func AddSupplementaryText(ctx context.Context, extractRequest *ExtractRequest, response *http.Response) error {
+func AddSupplementaryText(ctx context.Context, extractRequest *ExtractRequest, file *os.File) error {
+	info, _ := file.Stat()
 	svc := common.GetContentService(ctx)
 	uploadSignedUrl, err := svc.AddMetadataSupplementary(common.GetServiceAuthorizedContext(ctx), &content.AddSupplementaryRequest{
 		Id:            extractRequest.Metadata.Id,
 		Type:          extractRequest.Type,
 		Name:          extractRequest.Name,
 		ContentType:   extractRequest.Metadata.ContentType,
-		ContentLength: response.ContentLength,
+		ContentLength: info.Size(),
 	})
 	if err != nil {
 		return err
@@ -80,9 +84,9 @@ func AddSupplementaryText(ctx context.Context, extractRequest *ExtractRequest, r
 		URL:    uploadUrl,
 		Method: uploadSignedUrl.Method,
 		Header: util.GetSignedUrlHeaders(uploadSignedUrl),
-		Body:   response.Body,
+		Body:   file,
 	}
-	response, err = common.GetHttpClient(ctx).Do(request)
+	response, err := common.GetHttpClient(ctx).Do(request)
 	if err != nil {
 		return err
 	}
@@ -100,6 +104,10 @@ func Extract(ctx context.Context, extractRequest *ExtractRequest) error {
 	if err != nil {
 		return err
 	}
+	if metadataDownloadUrl == nil {
+		slog.WarnContext(ctx, "metadata download url is nil, nothing to do", slog.String("metadata_id", extractRequest.Metadata.Id))
+		return nil
+	}
 	metadataFile, err := common.DownloadTemporaryFile(ctx, metadataDownloadUrl)
 	if err != nil {
 		return err
@@ -110,7 +118,15 @@ func Extract(ctx context.Context, extractRequest *ExtractRequest) error {
 		return err
 	}
 	defer response.Body.Close()
-	return AddSupplementaryText(ctx, extractRequest, response)
+
+	file, err := os.CreateTemp("/tmp", "extracted-text")
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(file, response.Body)
+	_, _ = file.Seek(0, 0)
+	defer os.Remove(file.Name())
+	return AddSupplementaryText(ctx, extractRequest, file)
 }
 
 func Cleanup(ctx context.Context, extractRequest ExtractRequest) error {

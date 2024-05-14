@@ -170,32 +170,27 @@ func main() {
 				error = err
 				return
 			}
-
 			collection := hook.Upload.MetaData["collection"]
 			if collection == "" {
 				collection = "00000000-0000-0000-0000-000000000000"
 			}
-
 			metadata := &content.Metadata{
 				Name:          hook.Upload.MetaData["name"],
 				ContentType:   hook.Upload.MetaData["filetype"],
 				ContentLength: hook.Upload.Size,
 				Source:        &hook.Upload.ID,
 			}
-
 			_, err := contentClient.AddMetadata(context.Background(), &content.AddMetadataRequest{
 				Collection: collection,
 				Metadata:   metadata,
 			}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
 				HeaderValue: "Token " + cfg.Security.ServiceAccountToken,
 			}})
-
 			if err != nil {
 				logger.Error("unable to set metadata uploaded: ", slog.Any("error", err))
 				response.StatusCode = 500
 				return response, err
 			}
-
 			return
 		},
 	})

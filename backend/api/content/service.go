@@ -27,6 +27,7 @@ import (
 	"errors"
 	"go.temporal.io/sdk/client"
 	"log/slog"
+	"slices"
 	"strings"
 )
 
@@ -66,10 +67,39 @@ func (svc *service) GetRootCollectionItems(ctx context.Context, request *protobu
 	return svc.GetCollectionItems(ctx, &protobuf.IdRequest{Id: RootCollectionId})
 }
 
+func (svc *service) verifyUniqueName(ctx context.Context, collectionId string, name string) (bool, error) {
+	collectionNames, err := svc.ds.GetCollectionCollectionItemNames(ctx, collectionId)
+	if err != nil {
+		return false, err
+	}
+	if slices.Contains(collectionNames, name) {
+		return false, nil
+	}
+	metadataNames, err := svc.ds.GetCollectionMetadataItemNames(ctx, collectionId)
+	if err != nil {
+		return false, err
+	}
+	if slices.Contains(metadataNames, name) {
+		return false, nil
+	}
+	return true, nil
+}
+
 func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, error) {
 	userId, err := identity.GetAuthenticatedSubjectId(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to get subject", slog.Any("request", request), slog.Any("error", err))
+		return nil, err
+	}
+	if strings.Trim(request.Collection.Name, " ") == "" {
+		err := errors.New("name must not be empty")
+		slog.ErrorContext(ctx, "name requirement failed", slog.Any("request", request), slog.Any("error", err))
+		return nil, err
+	}
+	if unique, err := svc.verifyUniqueName(ctx, request.Parent, request.Collection.Name); !unique || err != nil {
+		if err == nil {
+			return nil, errors.New("name must be unique")
+		}
 		return nil, err
 	}
 	id, err := svc.ds.AddCollection(ctx, request.Collection)
@@ -187,6 +217,17 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 		slog.ErrorContext(ctx, "content length requirement failed", slog.Any("request", request), slog.Any("error", err))
 		return nil, err
 	}
+	if strings.Trim(request.Metadata.Name, " ") == "" {
+		err := errors.New("name must not be empty")
+		slog.ErrorContext(ctx, "name requirement failed", slog.Any("request", request), slog.Any("error", err))
+		return nil, err
+	}
+	if unique, err := svc.verifyUniqueName(ctx, request.Collection, request.Metadata.Name); !unique || err != nil {
+		if err == nil {
+			return nil, errors.New("name must be unique")
+		}
+		return nil, err
+	}
 	id, err := svc.ds.AddMetadata(ctx, request.Metadata)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to add metadata", slog.Any("request", request), slog.Any("error", err))
@@ -234,7 +275,22 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 }
 
 func (svc *service) DeleteMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	err := svc.os.Delete(ctx, request.Id)
+	md, err := svc.ds.GetMetadata(ctx, request.Id)
+	if md == nil {
+		return &protobuf.Empty{}, nil
+	}
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get metadata to delete", slog.String("id", request.Id), slog.Any("error", err))
+		return nil, err
+	}
+	if md.Source != nil && *md.Source != "" {
+		err = svc.os.Delete(ctx, strings.Split(*md.Source, "+")[0])
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to delete file", slog.String("id", request.Id), slog.Any("error", err))
+			return nil, err
+		}
+	}
+	err = svc.os.Delete(ctx, request.Id)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to delete file", slog.String("id", request.Id), slog.Any("error", err))
 		return nil, err
@@ -255,6 +311,9 @@ func (svc *service) GetMetadataDownloadUrl(ctx context.Context, request *protobu
 	md, err := svc.ds.GetMetadata(ctx, request.Id)
 	if err != nil {
 		return nil, err
+	}
+	if md == nil {
+		return nil, nil
 	}
 	id := request.Id
 	if md.Source != nil && *md.Source != "" {

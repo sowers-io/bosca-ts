@@ -27,6 +27,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"log"
+	"log/slog"
 	"time"
 )
 
@@ -105,9 +106,23 @@ func (m *objectStore) CreateDownloadUrl(ctx context.Context, id string) (*model.
 }
 
 func (m *objectStore) Delete(ctx context.Context, id string) error {
-	_, err := m.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+	objects, err := m.client.ListObjects(ctx, &s3.ListObjectsInput{
 		Bucket: aws.String(m.bucket),
-		Key:    aws.String(id),
+		Prefix: aws.String(id),
 	})
-	return err
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get files to delete", slog.String("prefix", id), slog.Any("error", err))
+		return err
+	}
+	for _, content := range objects.Contents {
+		_, err := m.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+			Bucket: aws.String(m.bucket),
+			Key:    content.Key,
+		})
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to delete file", slog.String("file", *content.Key), slog.Any("error", err))
+			return err
+		}
+	}
+	return nil
 }

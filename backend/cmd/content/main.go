@@ -30,6 +30,8 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc"
 	"log"
+	"log/slog"
+	"os"
 )
 
 func main() {
@@ -39,7 +41,10 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	os, err := factory.NewObjectStore(cfg.Storage)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
+	objectStore, err := factory.NewObjectStore(cfg.Storage)
 	if err != nil {
 		log.Fatalf("failed to create object store: %v", err)
 	}
@@ -52,7 +57,7 @@ func main() {
 		log.Fatalf("failed to create temporal client: %v", err)
 	}
 
-	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, cfg.Security.ServiceAccountId, os, permissions, temporalClient))
+	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, cfg.Security.ServiceAccountId, objectStore, permissions, temporalClient))
 	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
 		protocontent.RegisterContentServiceServer(grpcSvr, svc)
 		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)

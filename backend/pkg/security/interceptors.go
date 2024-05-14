@@ -54,17 +54,26 @@ func (m *interceptors) injectSubjectId(ctx context.Context) metadata.MD {
 			md.Set(identity.XSubjectId, subjectId)
 			md.Set(identity.XSubjectType, subjectType)
 			return md
-		} else {
-			cookies := md.Get("Cookie")
-			if cookies != nil && len(cookies) > 0 {
-				subjectId, subjectType, err := m.subjectFinder.FindSubjectId(ctx, true, cookies[0])
-				if err != nil {
-					return nil
-				}
-				md.Set(identity.XSubjectId, subjectId)
-				md.Set(identity.XSubjectType, subjectType)
-				return md
+		}
+		authorization = md.Get("X-Service-Authorization")
+		if authorization != nil && len(authorization) > 0 {
+			subjectId, subjectType, err := m.subjectFinder.FindSubjectId(ctx, false, authorization[0])
+			if err != nil {
+				return nil
 			}
+			md.Set(identity.XSubjectId, subjectId)
+			md.Set(identity.XSubjectType, subjectType)
+			return md
+		}
+		cookies := md.Get("Cookie")
+		if cookies != nil && len(cookies) > 0 {
+			subjectId, subjectType, err := m.subjectFinder.FindSubjectId(ctx, true, cookies[0])
+			if err != nil {
+				return nil
+			}
+			md.Set(identity.XSubjectId, subjectId)
+			md.Set(identity.XSubjectType, subjectType)
+			return md
 		}
 	}
 	return nil

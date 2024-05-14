@@ -18,7 +18,6 @@ package main
 
 import (
 	"bosca.io/api/graphql/common"
-	"bosca.io/api/protobuf"
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
@@ -33,8 +32,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	opts "google.golang.org/grpc"
-	"log"
+	"log/slog"
+
 	"net/http"
+	"os"
 	"regexp"
 
 	tusd "github.com/tus/tusd/v2/pkg/handler"
@@ -96,9 +97,13 @@ func verify(cfg *configuration.ServerConfiguration, contentClient content.Conten
 func main() {
 	cfg := configuration.NewServerConfiguration("", 8099, 0)
 
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	contentConnection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
 	if err != nil {
-		log.Fatalf("failed to create content client: %v", err)
+		logger.Error("failed to create content client: ", slog.Any("error", err))
+		os.Exit(1)
 	}
 	defer contentConnection.Close()
 
@@ -117,7 +122,8 @@ func main() {
 	)
 
 	if err != nil {
-		log.Fatalf("failed to create config: %v", err)
+		logger.Error("failed to create content client: ", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	s3client := s3.NewFromConfig(s3config)
@@ -141,13 +147,14 @@ func main() {
 	subjectFinder := security.NewSubjectFinder(cfg.Security.SessionEndpoint, cfg.Security.ServiceAccountId, cfg.Security.ServiceAccountToken, sessionInterceptor)
 
 	handler, err := tusd.NewHandler(tusd.Config{
-		BasePath:              "/uploads/",
-		StoreComposer:         composer,
-		NotifyCompleteUploads: true,
-		DisableDownload:       true,
-		Cors:                  cors,
+		BasePath:                "/uploads/",
+		StoreComposer:           composer,
+		DisableDownload:         true,
+		RespectForwardedHeaders: true,
+		Cors:                    cors,
 		PreUploadCreateCallback: func(hook tusd.HookEvent) (response tusd.HTTPResponse, changes tusd.FileInfoChanges, error error) {
 			if err := verify(cfg, contentClient, subjectFinder, hook); err != nil {
+				logger.Error("verify failed", slog.Any("error", err))
 				response.StatusCode = 401
 				error = err
 				return
@@ -156,34 +163,27 @@ func main() {
 			error = nil
 			return
 		},
-	})
-
-	if err != nil {
-		log.Fatalf("unable to create handler: %s", err)
-	}
-
-	go func() {
-		for {
-			event := <-handler.CompleteUploads
-
-			if err := verify(cfg, contentClient, subjectFinder, event); err != nil {
-				log.Printf("cannot complete upload: %v", err)
+		PreFinishResponseCallback: func(hook tusd.HookEvent) (response tusd.HTTPResponse, error error) {
+			if err := verify(cfg, contentClient, subjectFinder, hook); err != nil {
+				logger.Error("verify failed", slog.Any("error", err))
+				response.StatusCode = 401
+				error = err
 				return
 			}
 
-			collection := event.Upload.MetaData["collection"]
+			collection := hook.Upload.MetaData["collection"]
 			if collection == "" {
 				collection = "00000000-0000-0000-0000-000000000000"
 			}
 
 			metadata := &content.Metadata{
-				Name:          event.Upload.MetaData["name"],
-				ContentType:   event.Upload.MetaData["filetype"],
-				ContentLength: event.Upload.Size,
-				Source:        &event.Upload.ID,
+				Name:          hook.Upload.MetaData["name"],
+				ContentType:   hook.Upload.MetaData["filetype"],
+				ContentLength: hook.Upload.Size,
+				Source:        &hook.Upload.ID,
 			}
 
-			id, err := contentClient.AddMetadata(context.Background(), &content.AddMetadataRequest{
+			_, err := contentClient.AddMetadata(context.Background(), &content.AddMetadataRequest{
 				Collection: collection,
 				Metadata:   metadata,
 			}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
@@ -191,24 +191,25 @@ func main() {
 			}})
 
 			if err != nil {
-				log.Printf("ERROR: unable to set metadata uploaded: %v", err)
-				return
+				logger.Error("unable to set metadata uploaded: ", slog.Any("error", err))
+				response.StatusCode = 500
+				return response, err
 			}
 
-			_, err = contentClient.SetMetadataUploaded(context.Background(), &protobuf.IdRequest{
-				Id: id.Id,
-			}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{HeaderValue: "Token " + cfg.Security.ServiceAccountToken}})
+			return
+		},
+	})
 
-			if err != nil {
-				log.Printf("ERROR: unable to set metadata uploaded: %v", err)
-			}
-		}
-	}()
+	if err != nil {
+		logger.Error("unable to create handler: ", slog.Any("error", err))
+		os.Exit(1)
+	}
 
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", handler))
 	http.Handle("/uploads", http.StripPrefix("/uploads", handler))
 	err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.RestPort), nil)
 	if err != nil {
-		log.Fatalf("unable to listen: %s", err)
+		logger.Error("unable to listen", slog.Int("port", cfg.RestPort), slog.Any("error", err))
+		os.Exit(1)
 	}
 }

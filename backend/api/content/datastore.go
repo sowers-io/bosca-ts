@@ -258,7 +258,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 	var status string
 	var tags []string
 
-	err := ds.db.QueryRowContext(ctx, "SELECT id, name, tags, content_type, content_length, created, modified, status, source FROM metadata WHERE id = $1", id).Scan(
+	err := ds.db.QueryRowContext(ctx, "SELECT id, name, tags, content_type, content_length, created, modified, status, source, language_tag FROM metadata WHERE id = $1", id).Scan(
 		&metadata.Id,
 		&metadata.Name,
 		m.SQLScanner(&tags),
@@ -268,6 +268,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 		&modified,
 		&status,
 		&metadata.Source,
+		&metadata.LanguageTag,
 	)
 	if err != nil {
 		return nil, err
@@ -290,7 +291,7 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 }
 
 func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata) (string, error) {
-	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO metadata (name, content_type, content_length, tags, attributes, source) VALUES ($1, $2, $3, $4, ($5)::jsonb, $6) returning id")
+	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO metadata (name, content_type, content_length, tags, attributes, source, language_tag) VALUES ($1, $2, $3, $4, ($5)::jsonb, $6, $7) returning id")
 	if err != nil {
 		return "", err
 	}
@@ -305,6 +306,10 @@ func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata
 		attributes = make(map[string]string)
 	}
 
+	if metadata.LanguageTag == "" {
+		metadata.LanguageTag = "en"
+	}
+
 	result := stmt.QueryRowContext(ctx,
 		metadata.Name,
 		metadata.ContentType,
@@ -312,6 +317,7 @@ func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata
 		tags,
 		attributes,
 		metadata.Source,
+		metadata.LanguageTag,
 	)
 	if result.Err() != nil {
 		return "", result.Err()

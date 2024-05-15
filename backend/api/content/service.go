@@ -85,6 +85,10 @@ func (svc *service) verifyUniqueName(ctx context.Context, collectionId string, n
 	return true, nil
 }
 
+func (svc *service) GetCollection(ctx context.Context, request *protobuf.IdRequest) (*grpc.Collection, error) {
+	return svc.ds.GetCollection(ctx, request.Id)
+}
+
 func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, error) {
 	userId, err := identity.GetAuthenticatedSubjectId(ctx)
 	if err != nil {
@@ -352,6 +356,11 @@ func (svc *service) ProcessMetadata(ctx context.Context, request *protobuf.IdReq
 	}, metadata.ProcessMetadata, request.Id)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to execute process workflow", slog.String("id", request.Id), slog.Any("error", err))
+		return nil, err
+	}
+	err = svc.ds.SetMetadataStatus(ctx, request.Id, grpc.MetadataStatus_processing)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to execute update status", slog.String("id", request.Id), slog.Any("error", err))
 		return nil, err
 	}
 	return &protobuf.Empty{}, nil

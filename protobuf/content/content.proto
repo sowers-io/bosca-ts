@@ -33,7 +33,7 @@ service ContentService {
 
   rpc GetCollectionItems(bosca.IdRequest) returns (CollectionItems) {
     option (google.api.http) = {
-      get: "/v1/content/collections/{id}"
+      get: "/v1/content/collections/{id}/items"
     };
   }
 
@@ -41,6 +41,12 @@ service ContentService {
     option (google.api.http) = {
       post: "/v1/content/collections"
       body: "*"
+    };
+  }
+
+  rpc GetCollection(IdRequest) returns (Collection) {
+    option (google.api.http) = {
+      get: "/v1/content/collections/{id}"
     };
   }
 

@@ -60,6 +60,22 @@ func (svc *authorizationService) GetRootCollectionItems(ctx context.Context, req
 	return svc.service.GetRootCollectionItems(ctx, request)
 }
 
+func (svc *authorizationService) GetCollection(ctx context.Context, request *protobuf.IdRequest) (*grpc.Collection, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Id, grpc.PermissionAction_view)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetCollection(ctx, request)
+}
+
+func (svc *authorizationService) GetCollectionItems(ctx context.Context, request *protobuf.IdRequest) (*grpc.CollectionItems, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Id, grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetCollectionItems(ctx, request)
+}
+
 func (svc *authorizationService) AddCollection(ctx context.Context, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, error) {
 	if request.Collection == nil {
 		return nil, errors.New("collection is required")

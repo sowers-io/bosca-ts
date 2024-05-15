@@ -106,14 +106,18 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 
 	m := pgtype.NewMap()
 
+	var created time.Time
+	var modified time.Time
 	var collectionType string
 	var tags []string
 	var attributes string
-	err := ds.db.QueryRowContext(ctx, "SELECT name, type, tags, attributes FROM collections WHERE id = $1", id).Scan(
+	err := ds.db.QueryRowContext(ctx, "SELECT name, type, tags, attributes, created, modified FROM collections WHERE id = $1", id).Scan(
 		&collection.Name,
 		&collectionType,
 		m.SQLScanner(&tags),
 		&attributes,
+		&created,
+		&modified,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -133,6 +137,8 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 
 	collection.Id = id
 	collection.Tags = tags
+	collection.Created = timestamppb.New(created)
+	collection.Modified = timestamppb.New(modified)
 	//collection.Attributes = attributes
 	return &collection, nil
 }
@@ -360,6 +366,7 @@ func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata
 	}
 
 	if metadata.LanguageTag == "" {
+		// TODO: pull from some default setting
 		metadata.LanguageTag = "en"
 	}
 

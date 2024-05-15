@@ -38,6 +38,7 @@ const (
 	ContentService_GetRootCollectionItems_FullMethodName              = "/bosca.content.ContentService/GetRootCollectionItems"
 	ContentService_GetCollectionItems_FullMethodName                  = "/bosca.content.ContentService/GetCollectionItems"
 	ContentService_AddCollection_FullMethodName                       = "/bosca.content.ContentService/AddCollection"
+	ContentService_GetCollection_FullMethodName                       = "/bosca.content.ContentService/GetCollection"
 	ContentService_DeleteCollection_FullMethodName                    = "/bosca.content.ContentService/DeleteCollection"
 	ContentService_GetCollectionPermissions_FullMethodName            = "/bosca.content.ContentService/GetCollectionPermissions"
 	ContentService_AddCollectionPermission_FullMethodName             = "/bosca.content.ContentService/AddCollectionPermission"
@@ -65,6 +66,7 @@ type ContentServiceClient interface {
 	GetRootCollectionItems(ctx context.Context, in *protobuf.Empty, opts ...grpc.CallOption) (*CollectionItems, error)
 	GetCollectionItems(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*CollectionItems, error)
 	AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*protobuf.IdResponse, error)
+	GetCollection(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Collection, error)
 	DeleteCollection(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	GetCollectionPermissions(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
 	AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*protobuf.Empty, error)
@@ -114,6 +116,15 @@ func (c *contentServiceClient) GetCollectionItems(ctx context.Context, in *proto
 func (c *contentServiceClient) AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*protobuf.IdResponse, error) {
 	out := new(protobuf.IdResponse)
 	err := c.cc.Invoke(ctx, ContentService_AddCollection_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetCollection(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Collection, error) {
+	out := new(Collection)
+	err := c.cc.Invoke(ctx, ContentService_GetCollection_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -289,6 +300,7 @@ type ContentServiceServer interface {
 	GetRootCollectionItems(context.Context, *protobuf.Empty) (*CollectionItems, error)
 	GetCollectionItems(context.Context, *protobuf.IdRequest) (*CollectionItems, error)
 	AddCollection(context.Context, *AddCollectionRequest) (*protobuf.IdResponse, error)
+	GetCollection(context.Context, *protobuf.IdRequest) (*Collection, error)
 	DeleteCollection(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error)
 	GetCollectionPermissions(context.Context, *protobuf.IdRequest) (*Permissions, error)
 	AddCollectionPermission(context.Context, *Permission) (*protobuf.Empty, error)
@@ -322,6 +334,9 @@ func (UnimplementedContentServiceServer) GetCollectionItems(context.Context, *pr
 }
 func (UnimplementedContentServiceServer) AddCollection(context.Context, *AddCollectionRequest) (*protobuf.IdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollection not implemented")
+}
+func (UnimplementedContentServiceServer) GetCollection(context.Context, *protobuf.IdRequest) (*Collection, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCollection not implemented")
 }
 func (UnimplementedContentServiceServer) DeleteCollection(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollection not implemented")
@@ -440,6 +455,24 @@ func _ContentService_AddCollection_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).AddCollection(ctx, req.(*AddCollectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(protobuf.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetCollection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetCollection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetCollection(ctx, req.(*protobuf.IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -786,6 +819,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddCollection",
 			Handler:    _ContentService_AddCollection_Handler,
+		},
+		{
+			MethodName: "GetCollection",
+			Handler:    _ContentService_GetCollection_Handler,
 		},
 		{
 			MethodName: "DeleteCollection",

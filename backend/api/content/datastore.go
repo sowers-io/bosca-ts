@@ -37,14 +37,14 @@ func NewDataStore(db *sql.DB) *DataStore {
 }
 
 func (ds *DataStore) AddRootCollection(ctx context.Context) (bool, error) {
-	root, err := ds.GetMetadata(ctx, "00000000-0000-0000-0000-000000000000")
+	root, err := ds.GetMetadata(ctx, RootCollectionId)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return false, err
 	}
 	if root != nil {
 		return false, nil
 	}
-	_, err = ds.db.ExecContext(ctx, "insert into collections (id, name, type, workflow_state_id) values ('00000000-0000-0000-0000-000000000000', 'Root', 'root', 'published')")
+	_, err = ds.db.ExecContext(ctx, "insert into collections (id, name, type, workflow_state_id) values (?, 'Root', 'root', 'published')", RootCollectionId)
 	if err != nil {
 		return false, err
 	}

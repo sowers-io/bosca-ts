@@ -17,6 +17,7 @@
 package main
 
 import (
+	content2 "bosca.io/api/content"
 	"bosca.io/api/graphql/common"
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/clients"
@@ -73,7 +74,7 @@ func verify(cfg *configuration.ServerConfiguration, contentClient content.Conten
 
 	collection := hook.Upload.MetaData["collection"]
 	if collection == "" {
-		collection = "00000000-0000-0000-0000-000000000000"
+		collection = content2.RootCollectionId
 	}
 
 	permission := &content.PermissionCheckRequest{
@@ -172,7 +173,7 @@ func main() {
 			}
 			collection := hook.Upload.MetaData["collection"]
 			if collection == "" {
-				collection = "00000000-0000-0000-0000-000000000000"
+				collection = content2.RootCollectionId
 			}
 			metadata := &content.Metadata{
 				Name:          hook.Upload.MetaData["name"],

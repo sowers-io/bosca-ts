@@ -27,7 +27,7 @@ func NewSearch(cfg *configuration.SearchConfiguration) (search.Client, error) {
 	switch cfg.Type {
 	case configuration.SearchTypeMeilisearch:
 		client := meilisearch.NewMeilisearchClient(cfg.Endpoint, cfg.ApiKey)
-		return meilisearch.NewSearchClient(client), nil
+		return meilisearch.NewSearchClient(client)
 	default:
 		return nil, fmt.Errorf("unknown storage type: %s", cfg.Type)
 	}

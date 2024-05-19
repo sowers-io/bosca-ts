@@ -58,8 +58,8 @@ func AddToSearchIndex(ctx context.Context, metadata *content.Metadata) error {
 
 	client := common.GetSearchClient(ctx)
 	return client.Index(client.GetMetadataIndex(), &search.Document{
-		Id:    metadata.Id,
-		Title: metadata.Name,
-		Body:  string(body),
+		Id:   metadata.Id,
+		Name: metadata.Name,
+		Body: string(body),
 	})
 }

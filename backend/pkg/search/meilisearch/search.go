@@ -16,7 +16,10 @@
 
 package meilisearch
 
-import "github.com/meilisearch/meilisearch-go"
+import (
+	"errors"
+	"github.com/meilisearch/meilisearch-go"
+)
 import "bosca.io/pkg/search"
 
 type meilisearchSearch struct {
@@ -25,20 +28,32 @@ type meilisearchSearch struct {
 }
 
 type meilisearchIndex struct {
-	name string
+	index *meilisearch.Index
 }
 
 func (m *meilisearchIndex) Name() string {
-	return m.name
+	return m.index.UID
 }
 
-func NewSearchClient(client *meilisearch.Client) search.Client {
-	return &meilisearchSearch{
-		client: client,
-		metadataIndex: &meilisearchIndex{
-			name: MetadataIndex,
-		},
+func NewSearchClient(client *meilisearch.Client) (search.Client, error) {
+	ix, err := client.GetIndex(MetadataIndex)
+	if err != nil {
+		return nil, err
 	}
+	if ix == nil {
+		_, err = client.CreateIndex(&meilisearch.IndexConfig{
+			Uid:        MetadataIndex,
+			PrimaryKey: "id",
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	s := &meilisearchSearch{
+		client:        client,
+		metadataIndex: &meilisearchIndex{index: ix},
+	}
+	return s, nil
 }
 
 func (m *meilisearchSearch) GetMetadataIndex() search.Index {
@@ -46,10 +61,17 @@ func (m *meilisearchSearch) GetMetadataIndex() search.Index {
 }
 
 func (m *meilisearchSearch) Index(index search.Index, doc *search.Document) error {
-	ix := m.client.Index(index.Name())
-	_, err := ix.AddDocuments([]*search.Document{doc})
+	ix := index.(*meilisearchIndex).index
+	taskInfo, err := ix.AddDocuments([]*search.Document{doc})
 	if err != nil {
 		return err
+	}
+	task, err := ix.WaitForTask(taskInfo.TaskUID)
+	if err != nil {
+		return err
+	}
+	if task.Status != meilisearch.TaskStatusSucceeded {
+		return errors.New(task.Error.Message)
 	}
 	return nil
 }

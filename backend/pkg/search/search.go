@@ -17,9 +17,9 @@
 package search
 
 type Document struct {
-	Id    string `json:"id"`
-	Title string `json:"title"`
-	Body  string `json:"body"`
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Body string `json:"body"`
 }
 
 type Index interface {

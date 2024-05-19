@@ -70,7 +70,7 @@ func AddSupplementaryText(ctx context.Context, extractRequest *ExtractRequest, f
 		Id:            extractRequest.Metadata.Id,
 		Type:          extractRequest.Type,
 		Name:          extractRequest.Name,
-		ContentType:   extractRequest.Metadata.ContentType,
+		ContentType:   "text/plain",
 		ContentLength: info.Size(),
 	})
 	if err != nil {
@@ -81,10 +81,11 @@ func AddSupplementaryText(ctx context.Context, extractRequest *ExtractRequest, f
 		return err
 	}
 	request := &http.Request{
-		URL:    uploadUrl,
-		Method: uploadSignedUrl.Method,
-		Header: util.GetSignedUrlHeaders(uploadSignedUrl),
-		Body:   file,
+		URL:           uploadUrl,
+		Method:        uploadSignedUrl.Method,
+		Header:        util.GetSignedUrlHeaders(uploadSignedUrl),
+		ContentLength: info.Size(),
+		Body:          file,
 	}
 	response, err := common.GetHttpClient(ctx).Do(request)
 	if err != nil {

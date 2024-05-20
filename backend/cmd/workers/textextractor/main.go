@@ -21,6 +21,7 @@ import (
 	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/search/factory"
+	"bosca.io/pkg/search/qdrant"
 	"bosca.io/pkg/temporal"
 	"bosca.io/pkg/util"
 	"bosca.io/pkg/workers/common"
@@ -44,8 +45,13 @@ func main() {
 		log.Fatalf("failed to get search client: %v", err)
 	}
 
+	qdrantClient, err := qdrant.NewQdrantClient(cfg.ClientEndPoints.QdrantApiAddress)
+	if err != nil {
+		log.Fatalf("failed to get qdrant client: %v", err)
+	}
+
 	httpClient := util.NewDefaultHttpClient()
-	propagator := common.NewContextPropagator(cfg, httpClient, content.NewContentServiceClient(connection), searchClient)
+	propagator := common.NewContextPropagator(cfg, httpClient, content.NewContentServiceClient(connection), searchClient, qdrantClient)
 	client, err := temporal.NewClientWithPropagator(ctx, cfg.ClientEndPoints, propagator)
 	if err != nil {
 		log.Fatalln("Unable to create Temporal client:", err)

@@ -106,6 +106,10 @@ func (svc *authorizationService) GetMetadata(ctx context.Context, request *proto
 	return svc.service.GetMetadata(ctx, request)
 }
 
+func (svc *authorizationService) GetMetadatas(ctx context.Context, request *protobuf.IdsRequest) (*grpc.Metadatas, error) {
+	return svc.service.GetMetadatas(ctx, request)
+}
+
 func (svc *authorizationService) GetMetadataDownloadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_view)
 	if err != nil {

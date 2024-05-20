@@ -44,8 +44,51 @@ func NewPermissionManager(permissionsClient *authzed.Client) security.Permission
 	}
 }
 
+func (s *permissionManager) BulkCheck(ctx context.Context, objectType grpc.PermissionObjectType, resourceId []string, action grpc.PermissionAction) ([]string, error) {
+	subjectId, err := identity.GetSubjectId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	subjectType := grpc.PermissionSubjectType_user
+	if identity.GetSubjectType(ctx) == identity.SubjectTypeServiceAccount {
+		subjectType = grpc.PermissionSubjectType_service_account
+	}
+	items := make([]*pb.CheckBulkPermissionsRequestItem, 0, len(resourceId))
+	for _, id := range resourceId {
+		items = append(items, &pb.CheckBulkPermissionsRequestItem{
+			Subject: &pb.SubjectReference{
+				Object: &pb.ObjectReference{
+					ObjectType: s.getSubjectType(subjectType),
+					ObjectId:   subjectId,
+				},
+			},
+			Resource: &pb.ObjectReference{
+				ObjectType: s.getObjectType(objectType),
+				ObjectId:   id,
+			},
+			Permission: s.getAction(action),
+		})
+	}
+
+	r, err := s.permissionsClient.CheckBulkPermissions(ctx, &pb.CheckBulkPermissionsRequest{
+		Items: items,
+	})
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]string, 0, len(resourceId))
+	for i, item := range r.Pairs {
+		pair := item.GetItem()
+		if pair.Permissionship == pb.CheckPermissionResponse_PERMISSIONSHIP_HAS_PERMISSION ||
+			pair.Permissionship == pb.CheckPermissionResponse_PERMISSIONSHIP_CONDITIONAL_PERMISSION {
+			ids = append(ids, resourceId[i])
+		}
+	}
+	return ids, nil
+}
+
 func (s *permissionManager) CheckWithError(ctx context.Context, objectType grpc.PermissionObjectType, resourceId string, action grpc.PermissionAction) error {
-	subjectId, err := identity.GetAuthenticatedSubjectId(ctx)
+	subjectId, err := identity.GetSubjectId(ctx)
 	if err != nil {
 		return err
 	}

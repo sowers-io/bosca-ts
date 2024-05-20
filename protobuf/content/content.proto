@@ -19,6 +19,7 @@ option go_package = "bosca.io/api/protobuf/content";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "content/metadata.proto";
 import "empty.proto";
 import "requests.proto";
 
@@ -78,6 +79,12 @@ service ContentService {
   rpc GetMetadata(bosca.IdRequest) returns (Metadata) {
     option (google.api.http) = {
       get: "/v1/content/metadata/{id}"
+    };
+  }
+
+  rpc GetMetadatas(bosca.IdsRequest) returns (Metadatas) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata"
     };
   }
 
@@ -307,37 +314,11 @@ message SignedUrl {
   map<string, string> attributes = 5;
 }
 
-enum MetadataStatus {
-  processing = 0;
-  ready = 1;
-}
-
 message AddMetadataRequest {
   string collection = 1;
   Metadata metadata = 2;
 }
 
-message Metadata {
-  string default_id = 1;
-
-  string id = 2;
-  string name = 3;
-  string content_type = 4;
-
-  optional string source = 5;
-
-  string language_tag = 6;
-  int64 content_length = 7;
-
-  repeated string trait_ids = 11;
-  repeated string category_ids = 12;
-  repeated string tags = 13;
-  map<string, string> attributes = 14;
-
-  google.protobuf.Timestamp created = 20;
-  google.protobuf.Timestamp modified = 21;
-
-  MetadataStatus status = 30;
-
-  string workflow_state_id = 31;
+message Metadatas {
+  repeated Metadata metadata = 1;
 }

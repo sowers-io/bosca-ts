@@ -21,12 +21,16 @@ import (
 	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/search/factory"
+	"bosca.io/pkg/search/qdrant"
 	"bosca.io/pkg/temporal"
 	"bosca.io/pkg/util"
 	"bosca.io/pkg/workers/common"
 	"bosca.io/pkg/workers/metadata"
 	rootContext "context"
+	"github.com/qdrant/go-client/qdrant"
 	"go.temporal.io/sdk/worker"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 )
 
@@ -38,14 +42,50 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get content service connection: %v", err)
 	}
+	contentService := content.NewContentServiceClient(connection)
 
 	searchClient, err := factory.NewSearch(cfg.Search)
 	if err != nil {
 		log.Fatalf("failed to get search client: %v", err)
 	}
 
+	qdrantClient, err := qdrant.NewQdrantClient(cfg.ClientEndPoints.QdrantApiAddress)
+	if err != nil {
+		log.Fatalf("failed to get qdrant client: %v", err)
+	}
+
+	_, err = qdrantClient.CollectionsClient.Get(ctx, &go_client.GetCollectionInfoRequest{
+		CollectionName: "metadata",
+	})
+	if err != nil {
+		if s, ok := status.FromError(err); ok {
+			if s.Code() == codes.NotFound {
+				collection := &go_client.CreateCollection{
+					CollectionName: "metadata",
+					VectorsConfig: &go_client.VectorsConfig{
+						Config: &go_client.VectorsConfig_Params{
+							Params: &go_client.VectorParams{
+								Size:     4096,
+								Distance: go_client.Distance_Cosine,
+							},
+						},
+					},
+				}
+				result, err := qdrantClient.CollectionsClient.Create(ctx, collection)
+				if err != nil {
+					log.Fatalf("failed to create collection: %v", err)
+				}
+				if !result.Result {
+					log.Fatalf("failed to create collection")
+				}
+			}
+		} else {
+			log.Fatalf("failed to get collection: %v", err)
+		}
+	}
+
 	httpClient := util.NewDefaultHttpClient()
-	propagator := common.NewContextPropagator(cfg, httpClient, content.NewContentServiceClient(connection), searchClient)
+	propagator := common.NewContextPropagator(cfg, httpClient, contentService, searchClient, qdrantClient)
 	client, err := temporal.NewClientWithPropagator(ctx, cfg.ClientEndPoints, propagator)
 	if err != nil {
 		log.Fatalln("Unable to create Temporal client:", err)

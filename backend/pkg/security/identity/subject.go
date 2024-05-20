@@ -36,7 +36,7 @@ func GetSubjectId(ctx context.Context) (string, error) {
 	}
 	userID := md.Get(XSubjectId)
 	if len(userID) == 0 || userID[0] == "" {
-		return "", status.Error(codes.Unauthenticated, "user is missing in metadata")
+		return "anonymous", nil
 	}
 	return userID[0], nil
 }

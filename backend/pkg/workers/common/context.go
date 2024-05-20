@@ -20,6 +20,7 @@ import (
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/search"
+	"bosca.io/pkg/search/qdrant"
 	"context"
 	"go.temporal.io/sdk/workflow"
 	"google.golang.org/grpc/metadata"
@@ -30,20 +31,23 @@ const configurationKey = "configuration"
 const httpKey = "http"
 const contentServiceKey = "contentService"
 const searchClientKey = "searchClient"
+const qdrantClientKey = "qdrantClient"
 
 type contextPropagator struct {
 	cfg            *configuration.WorkerConfiguration
 	contentService content.ContentServiceClient
 	httpClient     *http.Client
-	searchClient   search.Client
+	searchClient   search.StandardClient
+	qdrantClient   *qdrant.Client
 }
 
-func NewContextPropagator(cfg *configuration.WorkerConfiguration, httpClient *http.Client, contentService content.ContentServiceClient, searchClient search.Client) workflow.ContextPropagator {
+func NewContextPropagator(cfg *configuration.WorkerConfiguration, httpClient *http.Client, contentService content.ContentServiceClient, searchClient search.StandardClient, qdrantClient *qdrant.Client) workflow.ContextPropagator {
 	return &contextPropagator{
 		cfg:            cfg,
 		contentService: contentService,
 		httpClient:     httpClient,
 		searchClient:   searchClient,
+		qdrantClient:   qdrantClient,
 	}
 }
 
@@ -56,6 +60,7 @@ func (c *contextPropagator) Extract(ctx context.Context, _ workflow.HeaderReader
 	ctx = context.WithValue(ctx, httpKey, c.httpClient)
 	ctx = context.WithValue(ctx, contentServiceKey, c.contentService)
 	ctx = context.WithValue(ctx, searchClientKey, c.searchClient)
+	ctx = context.WithValue(ctx, qdrantClientKey, c.qdrantClient)
 	return ctx, nil
 }
 
@@ -68,6 +73,7 @@ func (c *contextPropagator) ExtractToWorkflow(ctx workflow.Context, writer workf
 	ctx = workflow.WithValue(ctx, httpKey, c.httpClient)
 	ctx = workflow.WithValue(ctx, contentServiceKey, c.contentService)
 	ctx = workflow.WithValue(ctx, searchClientKey, c.searchClient)
+	ctx = workflow.WithValue(ctx, qdrantClientKey, c.qdrantClient)
 	return ctx, nil
 }
 
@@ -93,6 +99,10 @@ func GetContentService(context context.Context) content.ContentServiceClient {
 	return context.Value(contentServiceKey).(content.ContentServiceClient)
 }
 
-func GetSearchClient(context context.Context) search.Client {
-	return context.Value(searchClientKey).(search.Client)
+func GetSearchClient(context context.Context) search.StandardClient {
+	return context.Value(searchClientKey).(search.StandardClient)
+}
+
+func GetQdrantClient(context context.Context) *qdrant.Client {
+	return context.Value(qdrantClientKey).(*qdrant.Client)
 }

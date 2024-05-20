@@ -339,14 +339,10 @@ services:
 
   ollama-webui:
     image: ghcr.io/open-webui/open-webui:main
-    depends_on:
-      - ollama
     ports:
       - 8086:8080
     environment:
-      - '/ollama/api=http://ollama:11434/api'
-    extra_hosts:
-      - host.docker.internal:host-gateway
+      OLLAMA_BASE_URL: http://ollama:11434
     networks:
       - net1
 

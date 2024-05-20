@@ -23,7 +23,7 @@ import (
 	"fmt"
 )
 
-func NewSearch(cfg *configuration.SearchConfiguration) (search.Client, error) {
+func NewSearch(cfg *configuration.SearchConfiguration) (search.StandardClient, error) {
 	switch cfg.Type {
 	case configuration.SearchTypeMeilisearch:
 		client := meilisearch.NewMeilisearchClient(cfg.Endpoint, cfg.ApiKey)

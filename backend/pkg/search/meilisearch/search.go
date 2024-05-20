@@ -22,6 +22,8 @@ import (
 )
 import "bosca.io/pkg/search"
 
+const MetadataIndex = "metadata"
+
 type meilisearchSearch struct {
 	client        *meilisearch.Client
 	metadataIndex search.Index
@@ -35,7 +37,7 @@ func (m *meilisearchIndex) Name() string {
 	return m.index.UID
 }
 
-func NewSearchClient(client *meilisearch.Client) (search.Client, error) {
+func NewSearchClient(client *meilisearch.Client) (search.StandardClient, error) {
 	ix, err := client.GetIndex(MetadataIndex)
 	if err != nil {
 		return nil, err

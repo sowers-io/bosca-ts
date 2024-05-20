@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-package search
+package qdrant
 
-type Document struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-	Body string `json:"body"`
+import (
+	"bosca.io/pkg/clients"
+	"github.com/qdrant/go-client/qdrant"
+)
+
+type Client struct {
+	go_client.PointsClient
+	go_client.CollectionsClient
 }
 
-type Index interface {
-	Name() string
-}
-
-type Client interface {
-	GetMetadataIndex() Index
-	Index(index Index, doc *Document) error
+func NewQdrantClient(endpoint string) (*Client, error) {
+	qdrantConnection, err := clients.NewClientConnection(endpoint)
+	if err != nil {
+		return nil, err
+	}
+	qdrantPointsClient := go_client.NewPointsClient(qdrantConnection)
+	qdrantCollectionsClient := go_client.NewCollectionsClient(qdrantConnection)
+	return &Client{
+		qdrantPointsClient,
+		qdrantCollectionsClient,
+	}, nil
 }

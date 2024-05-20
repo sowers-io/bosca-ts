@@ -23,6 +23,7 @@ import (
 	"errors"
 	"github.com/jackc/pgx/v5/pgtype"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"strings"
 	"time"
 )
 
@@ -258,49 +259,95 @@ func (ds *DataStore) SetCollectionWorkflowStateId(ctx context.Context, id string
 }
 
 func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metadata, error) {
-	var metadata content.Metadata
+	metadatas, err := ds.GetMetadatas(ctx, []string{id})
+	if err != nil {
+		return nil, err
+	}
+	if len(metadatas) == 0 {
+		return nil, nil
+	}
+	return metadatas[0], nil
+}
+
+func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.Metadata, error) {
+	if len(id) == 0 {
+		return nil, nil
+	}
 
 	m := pgtype.NewMap()
 
-	var created time.Time
-	var modified time.Time
-	var status string
-	var tags []string
-
-	err := ds.db.QueryRowContext(ctx, "SELECT id, name, tags, content_type, content_length, created, modified, status, source, language_tag, workflow_state_id FROM metadata WHERE id = $1", id).Scan(
-		&metadata.Id,
-		&metadata.Name,
-		m.SQLScanner(&tags),
-		&metadata.ContentType,
-		&metadata.ContentLength,
-		&created,
-		&modified,
-		&status,
-		&metadata.Source,
-		&metadata.LanguageTag,
-		&metadata.WorkflowStateId,
-	)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
+	queryString := &strings.Builder{}
+	queryString.WriteString("SELECT id, name, tags, content_type, content_length, created, modified, status, source, language_tag, workflow_state_id FROM metadata WHERE id = ?")
+	if len(id) > 1 {
+		for i := 1; i < len(id); i++ {
+			queryString.WriteString(" OR id = ?")
 		}
+	}
+	query, err := ds.db.PrepareContext(ctx, queryString.String())
+	if err != nil {
 		return nil, err
 	}
-	metadata.Created = timestamppb.New(created)
-	metadata.Modified = timestamppb.New(modified)
-	metadata.Tags = tags
+	defer query.Close()
 
-	switch status {
-	case "ready":
-		metadata.Status = content.MetadataStatus_ready
-		break
-	default:
-		metadata.Status = content.MetadataStatus_processing
-		break
+	args := make([]any, len(id))
+	for i, v := range id {
+		args[i] = v
 	}
 
-	// TODO: tags, traits and categories
-	return &metadata, nil
+	result, err := query.QueryContext(ctx, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	metadatas := make([]*content.Metadata, 0)
+
+	for result.Next() {
+		var metadata content.Metadata
+		var created time.Time
+		var modified time.Time
+		var status string
+		var tags []string
+
+		err = result.Scan(
+			&metadata.Id,
+			&metadata.Name,
+			m.SQLScanner(&tags),
+			&metadata.ContentType,
+			&metadata.ContentLength,
+			&created,
+			&modified,
+			&status,
+			&metadata.Source,
+			&metadata.LanguageTag,
+			&metadata.WorkflowStateId,
+		)
+
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, nil
+			}
+			return nil, err
+		}
+
+		metadata.Created = timestamppb.New(created)
+		metadata.Modified = timestamppb.New(modified)
+		metadata.Tags = tags
+
+		switch status {
+		case "ready":
+			metadata.Status = content.MetadataStatus_ready
+			break
+		default:
+			metadata.Status = content.MetadataStatus_processing
+			break
+		}
+
+		// TODO: tags, traits and categories
+
+		metadatas = append(metadatas, &metadata)
+	}
+
+	return metadatas, nil
 }
 
 func (ds *DataStore) GetCollectionCollectionItemNames(ctx context.Context, collectionId string) ([]string, error) {

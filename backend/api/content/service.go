@@ -311,6 +311,18 @@ func (svc *service) GetMetadata(ctx context.Context, request *protobuf.IdRequest
 	return svc.ds.GetMetadata(ctx, request.Id)
 }
 
+func (svc *service) GetMetadatas(ctx context.Context, request *protobuf.IdsRequest) (*grpc.Metadatas, error) {
+	ids, err := svc.permissions.BulkCheck(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_view)
+	if err != nil {
+		return nil, err
+	}
+	m, err := svc.ds.GetMetadatas(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	return &grpc.Metadatas{Metadata: m}, nil
+}
+
 func (svc *service) GetMetadataDownloadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
 	md, err := svc.ds.GetMetadata(ctx, request.Id)
 	if err != nil {

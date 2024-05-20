@@ -21,6 +21,7 @@ import (
 	"bosca.io/pkg/workers/common"
 	"bosca.io/pkg/workers/metadata/processor"
 	"bosca.io/pkg/workers/textextractor"
+	"bosca.io/pkg/workers/vectors/vectorizer"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
@@ -36,6 +37,7 @@ func NewWorker(client client.Client) worker.Worker {
 	w.RegisterWorkflow(ProcessMetadata)
 	w.RegisterActivity(common.GetMetadata)
 	w.RegisterActivity(processor.AddToSearchIndex)
+	w.RegisterActivity(vectorizer.Vectorize)
 	w.RegisterActivity(processor.SetMetadataStatusReady)
 	return w
 }
@@ -72,6 +74,11 @@ func ProcessMetadata(ctx workflow.Context, id string) error {
 	}
 
 	err = workflow.ExecuteActivity(ctx, processor.AddToSearchIndex, metadata).Get(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	err = workflow.ExecuteActivity(ctx, vectorizer.Vectorize, metadata).Get(ctx, &metadata)
 	if err != nil {
 		return err
 	}

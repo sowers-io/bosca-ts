@@ -24,8 +24,9 @@ import (
 const AdministratorGroup = "administrators"
 
 type PermissionManager interface {
+	BulkCheck(ctx context.Context, objectType content.PermissionObjectType, resourceId []string, action content.PermissionAction) ([]string, error)
 	CheckWithError(ctx context.Context, objectType content.PermissionObjectType, resourceId string, action content.PermissionAction) error
-	CheckWithSubjectIdError(ctx context.Context, subjectType content.PermissionSubjectType, subjectId string, objectType content.PermissionObjectType, objectId string, action content.PermissionAction) error
+	CheckWithSubjectIdError(ctx context.Context, subjectType content.PermissionSubjectType, subjectId string, objectType content.PermissionObjectType, resourceId string, action content.PermissionAction) error
 	CreateRelationships(ctx context.Context, objectType content.PermissionObjectType, permissions []*content.Permission) error
 	CreateRelationship(ctx context.Context, objectType content.PermissionObjectType, permission *content.Permission) error
 	GetPermissions(ctx context.Context, objectType content.PermissionObjectType, resourceId string) (*content.Permissions, error)

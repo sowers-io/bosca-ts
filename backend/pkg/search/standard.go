@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package meilisearch
+package search
 
-import "github.com/meilisearch/meilisearch-go"
+type Document struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Body string `json:"body"`
+}
 
-func NewMeilisearchClient(endpoint string, apiKey string) *meilisearch.Client {
-	return meilisearch.NewClient(meilisearch.ClientConfig{
-		Host:   endpoint,
-		APIKey: apiKey,
-	})
+type StandardClient interface {
+	GetMetadataIndex() Index
+	Index(index Index, doc *Document) error
 }

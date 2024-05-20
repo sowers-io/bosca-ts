@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package meilisearch
+package search
 
-import "github.com/meilisearch/meilisearch-go"
+import "context"
 
-func NewMeilisearchClient(endpoint string, apiKey string) *meilisearch.Client {
-	return meilisearch.NewClient(meilisearch.ClientConfig{
-		Host:   endpoint,
-		APIKey: apiKey,
-	})
+type SemanticQuery struct {
+	Query string
+
+	Offset uint64
+	Limit  uint64
+}
+
+type SemanticResult struct {
+	MetadataIds []string
+}
+
+type SemanticClient interface {
+	GetMetadataIndex() Index
+	Search(ctx context.Context, index Index, query *SemanticQuery) (*SemanticResult, error)
 }

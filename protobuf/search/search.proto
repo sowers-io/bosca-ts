@@ -13,14 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+syntax = "proto3";
 
-package meilisearch
+option go_package = "bosca.io/api/protobuf/search";
 
-import "github.com/meilisearch/meilisearch-go"
+import "google/api/annotations.proto";
+import "content/metadata.proto";
 
-func NewMeilisearchClient(endpoint string, apiKey string) *meilisearch.Client {
-	return meilisearch.NewClient(meilisearch.ClientConfig{
-		Host:   endpoint,
-		APIKey: apiKey,
-	})
+package bosca.search;
+
+service SearchService {
+  rpc Search(SearchRequest) returns (SearchResponse) {
+    option (google.api.http) = {
+      post: "/v1/search"
+      body: "*"
+    };
+  }
+}
+
+message SearchRequest {
+  string query = 1;
+
+  uint64 offset = 2;
+  uint64 limit = 3;
+}
+
+message SearchResponse {
+  repeated bosca.content.Metadata metadata = 1;
 }

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Uploader" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="Uploader Service" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="backend" />
     <working_directory value="$PROJECT_DIR$/backend" />
     <envs>

@@ -30,12 +30,18 @@ type ServerConfiguration struct {
 	Storage         *StorageConfiguration  `ignored:"true"`
 	Search          *SearchConfiguration   `ignored:"true"`
 	ClientEndPoints *ClientEndpoints       `ignored:"true"`
+	AIConfiguration *AIConfiguration       `ignored:"true"`
+}
+
+type AIConfiguration struct {
+	DefaultLlmModel string `envconfig:"DEFAULT_LLM_MODEL" default:"llama3:latest"`
 }
 
 type WorkerConfiguration struct {
 	Security        *SecurityConfiguration `ignored:"true"`
 	Search          *SearchConfiguration   `ignored:"true"`
 	ClientEndPoints *ClientEndpoints       `ignored:"true"`
+	AIConfiguration *AIConfiguration       `ignored:"true"`
 }
 
 type SecurityConfiguration struct {
@@ -81,6 +87,8 @@ type ClientEndpoints struct {
 	ProfilesApiAddress      string `envconfig:"PROFILES_API_ADDRESS"`
 	SecurityApiAddress      string `envconfig:"SECURITY_API_ADDRESS"`
 	TextExtractorApiAddress string `envconfig:"TEXT_EXTRACTOR_API_ADDRESS"`
+	QdrantApiAddress        string `envconfig:"QDRANT_API_ADDRESS"`
+	OllamaApiAddress        string `envconfig:"OLLAMA_API_ADDRESS"`
 }
 
 func getBaseConfiguration(defaultRestPort, defaultGrpcPort int) *ServerConfiguration {
@@ -103,6 +111,15 @@ func getClientEndpoints() *ClientEndpoints {
 	err := envconfig.Process("bosca", endpoints)
 	if err != nil {
 		log.Fatalf("failed to process endpoints configuration: %v", err)
+	}
+	return endpoints
+}
+
+func getAIConfiguration() *AIConfiguration {
+	endpoints := &AIConfiguration{}
+	err := envconfig.Process("bosca", endpoints)
+	if err != nil {
+		log.Fatalf("failed to process ai configuration: %v", err)
 	}
 	return endpoints
 }
@@ -167,6 +184,7 @@ func NewWorkerConfiguration() *WorkerConfiguration {
 	configuration.Security = getSecurityConfiguration()
 	configuration.Search = getSearchConfiguration()
 	configuration.ClientEndPoints = getClientEndpoints()
+	configuration.AIConfiguration = getAIConfiguration()
 	return configuration
 }
 
@@ -175,6 +193,8 @@ func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcP
 	configuration.Database = getDatabaseConfiguration(databasePrefix)
 	configuration.Storage = getStorageConfiguration()
 	configuration.Security = getSecurityConfiguration()
+	configuration.Search = getSearchConfiguration()
 	configuration.ClientEndPoints = getClientEndpoints()
+	configuration.AIConfiguration = getAIConfiguration()
 	return configuration
 }

@@ -13,3 +13,4 @@ token
 
 services/meilisearch/meili_data
 services/ollama/ollama
+services/qdrant

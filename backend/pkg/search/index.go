@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-package meilisearch
+package search
 
-import "github.com/meilisearch/meilisearch-go"
-
-func NewMeilisearchClient(endpoint string, apiKey string) *meilisearch.Client {
-	return meilisearch.NewClient(meilisearch.ClientConfig{
-		Host:   endpoint,
-		APIKey: apiKey,
-	})
+type Index interface {
+	Name() string
 }

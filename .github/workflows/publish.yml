@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: 'api/go.mod'
+          go-version-file: 'backend/go.mod'
       - name: Initialize CI
         run: ./scripts/initialize
       - name: Build Go

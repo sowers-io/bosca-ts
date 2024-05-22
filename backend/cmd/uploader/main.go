@@ -62,7 +62,15 @@ func verify(cfg *configuration.ServerConfiguration, contentClient content.Conten
 			}
 		}
 	} else {
-		return errors.New("missing authorization header")
+		authorization := hook.HTTPRequest.Header["Authorization"]
+		if authorization != nil && len(authorization) > 0 {
+			subjectId, subjectType, err = subjectFinder.FindSubjectId(context.Background(), false, authorization[0])
+			if err != nil {
+				return err
+			}
+		} else {
+			return errors.New("missing authorization header")
+		}
 	}
 
 	var subjectPermissionType content.PermissionSubjectType
@@ -160,7 +168,6 @@ func main() {
 				error = err
 				return
 			}
-			response.StatusCode = 200
 			error = nil
 			return
 		},

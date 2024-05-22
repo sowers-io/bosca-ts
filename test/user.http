@@ -30,7 +30,7 @@ POST {{login_action}}
 Accept: application/json
 Content-Type: application/json
 
-{"identifier": "test@bosca.dev", "password": "vjr0awg9vdh5bth-JDW", "method": "password"}
+{"identifier": "admin@bosca.dev", "password": "password", "method": "password"}
 
 > {% client.global.set("session_token", response.body.session_token); %}
 
@@ -95,6 +95,11 @@ Hello
 
 ###
 POST http://localhost:5003/v1/content/metadata/{{upload_id}}/uploaded
+Authorization: Bearer {{session_token}}
+Content-Type: application/json
+
+###
+GET http://localhost:8036/v1/content/metadata?id=53579709-ef96-49e4-9041-37fff9e3bcd2&id=b1c01a83-f1d0-43cf-8967-4db7ef515d35
 Authorization: Bearer {{session_token}}
 Content-Type: application/json
 

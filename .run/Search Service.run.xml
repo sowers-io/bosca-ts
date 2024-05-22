@@ -3,7 +3,7 @@
     <module name="backend" />
     <working_directory value="$PROJECT_DIR$/backend" />
     <envs>
-      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
+      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:8035" />
       <env name="BOSCA_CONTENT_CONNECTION_STRING" value="postgresql://boscacontent:bosca@localhost:5432/boscacontent" />
       <env name="BOSCA_OLLAMA_API_ADDRESS" value="http://localhost:11434" />
       <env name="BOSCA_PERMISSIONS_SHARED_TOKEN" value="bosca-spicedb" />
@@ -21,6 +21,8 @@
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
       <env name="BOSCA_TEMPORAL_API_ADDRESS" value="localhost:7233" />
       <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
+      <env name="GRPC_PORT" value="9090" />
+      <env name="REST_PORT" value="9091" />
     </envs>
     <kind value="PACKAGE" />
     <package value="bosca.io/cmd/search" />

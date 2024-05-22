@@ -1,0 +1,35 @@
+FROM golang:1.22.3-alpine3.19 AS build
+
+ARG BACKEND
+ARG GRPC_PORT
+ARG REST_PORT
+
+WORKDIR /app
+
+COPY backend .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o ${BACKEND} cmd/${BACKEND}/main.go
+
+FROM build-stage AS tests
+
+RUN go test -v ./...
+
+FROM alpine:3.19.1 AS release
+
+ARG BACKEND
+ARG GRPC_PORT
+ARG REST_PORT
+
+WORKDIR /app
+
+COPY --from=build /app/${BACKEND} /app/${BACKEND}
+
+EXPOSE $GRPC_PORT
+EXPOSE $REST_PORT
+
+RUN adduser -s /bin/false -D -u 1000 user user
+RUN echo "echo 'Starting ${BACKEND} server...' && /app/${BACKEND}" > /app/entrypoint
+
+USER user
+
+ENTRYPOINT ["sh", "/app/entrypoint"]

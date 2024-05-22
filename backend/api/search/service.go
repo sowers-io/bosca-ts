@@ -21,6 +21,7 @@ import (
 	grpcContent "bosca.io/api/protobuf/content"
 	grpc "bosca.io/api/protobuf/search"
 	"bosca.io/pkg/search"
+	"bosca.io/pkg/security/identity"
 	"context"
 )
 
@@ -53,7 +54,7 @@ func (s *service) Search(ctx context.Context, request *grpc.SearchRequest) (*grp
 	if err != nil {
 		return nil, err
 	}
-	metadata, err := s.contentClient.GetMetadatas(ctx, &grpcRequests.IdsRequest{Id: results.MetadataIds})
+	metadata, err := s.contentClient.GetMetadatas(identity.GetAuthenticatedContext(ctx), &grpcRequests.IdsRequest{Id: results.MetadataIds})
 	if err != nil {
 		return nil, err
 	}

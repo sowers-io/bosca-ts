@@ -39,7 +39,7 @@ func NewAuthorizationService(manager security.PermissionManager, service grpc.Se
 }
 
 func (svc *authorizationService) GetGroups(ctx context.Context, request *protobuf.Empty) (*grpc.GetGroupsResponse, error) {
-	err := svc.manager.CheckWithError(ctx, security.SystemResourceObject, "groups", content.PermissionAction_list)
+	err := svc.manager.CheckWithError(ctx, content.PermissionObjectType_system_resource_type, "groups", content.PermissionAction_list)
 	if err != nil {
 		return nil, err
 	}

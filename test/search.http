@@ -1,7 +1,23 @@
+### Login Me - Get Login Action
+GET http://localhost:4433/self-service/login/api
+Accept: application/json
+
+> {% client.global.set("login_action", response.body.ui.action); %}
+
+### Login Me - Login with Action
+POST {{login_action}}
+Accept: application/json
+Content-Type: application/json
+
+{"identifier": "admin@bosca.dev", "password": "password", "method": "password"}
+
+> {% client.global.set("session_token", response.body.session_token); %}
+
 ### Search
-POST http://localhost:5005/v1/search
+POST http://localhost:9091/v1/search
+Authorization: Bearer {{session_token}}
 Content-Type: application/json
 
 {
-  "query": "Kyle"
+  "query": "Features"
 }

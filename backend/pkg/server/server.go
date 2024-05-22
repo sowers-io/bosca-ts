@@ -28,6 +28,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	"log/slog"
 	"net"
 	"net/http"
 )
@@ -69,6 +70,8 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 			log.Fatalf("failed to start HTTP server: %v", err)
 		}
 	}()
+
+	slog.Info("starting server", slog.Int("grpc_port", cfg.GrpcPort), slog.Int("rest_port", cfg.RestPort))
 
 	err = server.Serve(listen)
 	if err != nil {

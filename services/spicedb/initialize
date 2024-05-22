@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "Initializing SpiceDB..."
+
+zed schema write /app/schema --insecure --endpoint spicedb:50051 --token bosca-spicedb
+zed relationship create collection:00000000-0000-0000-0000-000000000000 owners group:administrators --insecure --token bosca-spicedb --endpoint spicedb:50051
+zed relationship create collection:00000000-0000-0000-0000-000000000000 viewers group:users --insecure --token bosca-spicedb --endpoint spicedb:50051
+zed relationship create collection:00000000-0000-0000-0000-000000000000 discoverers group:users --insecure --token bosca-spicedb --endpoint spicedb:50051
+zed relationship create group:administrators serviceaccounts serviceaccount:sa --insecure --token bosca-spicedb --endpoint spicedb:50051
+
+cat /app/administrator.json | kratos import identities
+
+UID=$(kratos list identities --format json | jq -r '.identities[0].id')
+
+echo "Admin UID: $UID"
+
+zed relationship create group:administrators users user:$UID --insecure --token bosca-spicedb --endpoint spicedb:50051
+zed relationship create group:users users user:$UID --insecure --token bosca-spicedb --endpoint spicedb:50051
+
+echo "...Complete"

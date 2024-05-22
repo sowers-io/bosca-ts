@@ -1,0 +1,231 @@
+include:
+  - services/docker-compose.yaml
+
+services:
+
+  # Content DB Migration
+  content-db-migration:
+    image: ghcr.io/sowers-io/bosca/content-db-migration:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-migration
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=content
+    environment:
+      GOOSE_DBSTRING: "user=bosca password=bosca host=postgres dbname=boscacontent"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - net1
+
+  # Profiles DB Migration
+  profiles-db-migration:
+    image: ghcr.io/sowers-io/bosca/profiles-db-migration:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-migration
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=profiles
+    environment:
+      GOOSE_DBSTRING: "user=bosca password=bosca host=postgres dbname=boscaprofiles"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - net1
+
+  # Security DB Migration
+  security-db-migration:
+    image: ghcr.io/sowers-io/bosca/security-db-migration:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-migration
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=security
+    environment:
+      GOOSE_DBSTRING: "user=bosca password=bosca host=postgres dbname=boscasecurity"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - net1
+
+  # Profiles gRPC Service
+  profiles:
+    image: ghcr.io/sowers-io/bosca/profiles:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=profiles
+        - GRPC_PORT=5004
+        - REST_PORT=5014
+    env_file:
+      - .env-dev
+    ports:
+      - "5004:5004"
+      - "5014:5014"
+    depends_on:
+      - profiles-db-migration
+      - spicedb
+    networks:
+      - net1
+
+  # Content gRPC Service
+  content:
+    image: ghcr.io/sowers-io/bosca/content:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=content
+        - GRPC_PORT=5003
+        - REST_PORT=5013
+    env_file:
+      - .env-dev
+    ports:
+      - "5003:5003"
+      - "5013:5013"
+    depends_on:
+      content-db-migration:
+        condition: service_completed_successfully
+      temporal:
+        condition: service_healthy
+      minio-nginx:
+        condition: service_healthy
+      spicedb:
+        condition: service_healthy
+    networks:
+      - net1
+
+  # Search gRPC Service
+  search:
+    image: ghcr.io/sowers-io/bosca/search:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=search
+        - GRPC_PORT=5005
+        - REST_PORT=5015
+    env_file:
+      - .env-dev
+    ports:
+      - "5005:5005"
+      - "5015:5015"
+    depends_on:
+      - meilisearch
+      - qdrant
+      - ollama
+      - spicedb
+    networks:
+      - net1
+
+  # Security gRPC Service
+  security:
+    image: ghcr.io/sowers-io/bosca/security:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=security
+        - GRPC_PORT=5006
+        - REST_PORT=5016
+    env_file:
+      - .env-dev
+    ports:
+      - "5006:5006"
+      - "5016:5016"
+    depends_on:
+      - security-db-migration
+      - spicedb
+    networks:
+      - net1
+
+  # Uploader HTTP Server
+  uploader:
+    image: ghcr.io/sowers-io/bosca/uploader:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=uploader
+        - REST_PORT=8099
+    env_file:
+      - .env-dev
+      - .env-uploader-dev
+    ports:
+      - "8099:8099"
+    depends_on:
+      - content
+      - minio-nginx
+    networks:
+      - net1
+
+  # Metadata Worker
+  metadata-worker:
+    image: ghcr.io/sowers-io/bosca/workers/metadata:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=workers/metadata
+    env_file:
+      - .env-dev
+    depends_on:
+      - temporal
+      - meilisearch
+      - qdrant
+      - ollama
+      - spicedb
+    networks:
+      - net1
+
+  # Text Extractor Worker
+  textextractor-worker:
+    image: ghcr.io/sowers-io/bosca/workers/textextractor:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=workers/textextractor
+    env_file:
+      - .env-dev
+    depends_on:
+      temporal:
+        condition: service_healthy
+      textextractor:
+        condition: service_healthy
+    networks:
+      - net1

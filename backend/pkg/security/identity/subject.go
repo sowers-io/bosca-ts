@@ -29,6 +29,18 @@ const XSubjectType = "X-Subject-Type"
 const SubjectTypeUser = "user"
 const SubjectTypeServiceAccount = "serviceaccount"
 
+func GetAuthenticatedContext(ctx context.Context) context.Context {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return ctx
+	}
+	authorization := md.Get("authorization")
+	if authorization == nil || len(authorization) == 0 {
+		return ctx
+	}
+	return metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", authorization[0]))
+}
+
 func GetSubjectId(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

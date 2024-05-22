@@ -1,0 +1,23 @@
+{
+  "schema_id": "default",
+  "traits": {
+    "email": "admin@bosca.dev",
+    "firstName": "Administrator",
+    "lastName": "User"
+  },
+  "credentials": {
+    "password": {
+      "config": {
+        "password": "password"
+      }
+    }
+  },
+  "verifiable_addresses": [
+    {
+      "value": "admin@bosca.dev",
+      "verified": true,
+      "via": "email",
+      "status": "completed"
+    }
+  ]
+}

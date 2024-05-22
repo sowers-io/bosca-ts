@@ -21,8 +21,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"log/slog"
 	"strings"
 	"time"
 )
@@ -40,6 +43,7 @@ func NewDataStore(db *sql.DB) *DataStore {
 func (ds *DataStore) AddRootCollection(ctx context.Context) (bool, error) {
 	root, err := ds.GetMetadata(ctx, RootCollectionId)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		slog.Error("failed to get metadata for root collection", slog.Any("error", err))
 		return false, err
 	}
 	if root != nil {
@@ -277,10 +281,10 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 	m := pgtype.NewMap()
 
 	queryString := &strings.Builder{}
-	queryString.WriteString("SELECT id, name, tags, content_type, content_length, created, modified, status, source, language_tag, workflow_state_id FROM metadata WHERE id = ?")
+	queryString.WriteString("SELECT id, name, tags, content_type, content_length, created, modified, status, source, language_tag, workflow_state_id FROM metadata WHERE id = $1")
 	if len(id) > 1 {
 		for i := 1; i < len(id); i++ {
-			queryString.WriteString(" OR id = ?")
+			queryString.WriteString(fmt.Sprintf(" OR id = $%d", i+1))
 		}
 	}
 	query, err := ds.db.PrepareContext(ctx, queryString.String())
@@ -291,7 +295,11 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 
 	args := make([]any, len(id))
 	for i, v := range id {
-		args[i] = v
+		u, err := uuid.Parse(v)
+		if err != nil {
+			return nil, err
+		}
+		args[i] = u
 	}
 
 	result, err := query.QueryContext(ctx, args...)

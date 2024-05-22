@@ -9,7 +9,7 @@ import (
 )
 
 var Command = &cobra.Command{
-	Use:   "metadata [name]",
+	Use:   "metadata [id]",
 	Short: "Delete metadata",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := cli.NewContentClient(cmd)

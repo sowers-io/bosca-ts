@@ -10,7 +10,7 @@ import (
 )
 
 var Command = &cobra.Command{
-	Use:   "upload",
+	Use:   "upload [file]",
 	Short: "Upload a file",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {

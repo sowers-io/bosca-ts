@@ -25,6 +25,7 @@ import (
 )
 
 const MetadataIndex = "metadata"
+const ContentPayload = "content"
 
 type qdrantSearch struct {
 	index    search.Index

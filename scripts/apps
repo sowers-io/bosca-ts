@@ -1,3 +1,7 @@
 profiles
 content
 security
+search
+uploader
+workers/metadata
+workers/textextractor

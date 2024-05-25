@@ -21,3 +21,12 @@ Content-Type: application/json
 {
   "query": "Features"
 }
+
+### AI
+POST http://localhost:9096/v1/ai/chat
+Authorization: Bearer {{session_token}}
+Content-Type: application/json
+
+{
+  "query": "Who is Kyle?"
+}

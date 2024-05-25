@@ -140,6 +140,32 @@ services:
     networks:
       - net1
 
+  # AI gRPC Service
+  ai:
+    image: ghcr.io/sowers-io/bosca/ai:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=ai
+        - GRPC_PORT=5007
+        - REST_PORT=5017
+    env_file:
+      - .env-dev
+    ports:
+      - "5007:5007"
+      - "5017:5017"
+    depends_on:
+      - meilisearch
+      - qdrant
+      - ollama
+      - spicedb
+    networks:
+      - net1
+
   # Security gRPC Service
   security:
     image: ghcr.io/sowers-io/bosca/security:latest

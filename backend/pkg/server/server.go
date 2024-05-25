@@ -71,7 +71,7 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 		}
 	}()
 
-	slog.Info("starting server", slog.Int("grpc_port", cfg.GrpcPort), slog.Int("rest_port", cfg.RestPort))
+	slog.Info("running server", slog.Int("grpc_port", cfg.GrpcPort), slog.Int("rest_port", cfg.RestPort))
 
 	err = server.Serve(listen)
 	if err != nil {

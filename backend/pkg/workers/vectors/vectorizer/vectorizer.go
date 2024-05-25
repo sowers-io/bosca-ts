@@ -18,6 +18,7 @@ package vectorizer
 
 import (
 	"bosca.io/api/protobuf/content"
+	"bosca.io/pkg/search/qdrant"
 	"bosca.io/pkg/workers/common"
 	"bosca.io/pkg/workers/textextractor"
 	"context"
@@ -85,11 +86,18 @@ func Vectorize(ctx context.Context, metadata *content.Metadata) error {
 	client := common.GetQdrantClient(ctx)
 	wait := true
 	points := &pb.UpsertPoints{
-		CollectionName: "metadata",
+		CollectionName: qdrant.MetadataIndex,
 		Points: []*pb.PointStruct{
 			{
 				Id: &pb.PointId{
 					PointIdOptions: &pb.PointId_Uuid{Uuid: metadata.Id},
+				},
+				Payload: map[string]*pb.Value{
+					qdrant.ContentPayload: {
+						Kind: &pb.Value_StringValue{
+							StringValue: texts[0],
+						},
+					},
 				},
 				Vectors: &pb.Vectors{
 					VectorsOptions: &pb.Vectors_Vector{

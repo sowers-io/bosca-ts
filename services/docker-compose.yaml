@@ -1,6 +1,7 @@
 x-minio-common: &minio-common
   image: quay.io/minio/minio:RELEASE.2024-04-06T05-26-02Z
   command: server --console-address ":9011" http://minio{1...4}/data{1...2}
+  restart: always
   expose:
     - "9010"
     - "9011"
@@ -26,6 +27,7 @@ services:
 
   qdrant:
     image: qdrant/qdrant:v1.9.2
+    restart: always
     ports:
       - 6333:6333
       - 6334:6334
@@ -36,6 +38,7 @@ services:
 
   meilisearch:
     image: getmeili/meilisearch:v1.7
+    restart: always
     ports:
       - 7700:7700
     environment:
@@ -52,6 +55,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    restart: always
     ports:
       - '5432:5432'
     volumes:
@@ -103,6 +107,7 @@ services:
 
   hydra:
     image: oryd/hydra:v2.2.0
+    restart: always
     command:
       - serve
       - all
@@ -124,6 +129,7 @@ services:
 
   kratos:
     image: oryd/kratos:v1.1.0
+    restart: always
     command:
       - serve
       - all
@@ -230,6 +236,7 @@ services:
 
   minio-nginx:
     image: nginx:1.19.2-alpine
+    restart: always
     hostname: nginx
     volumes:
       - ./minio/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -246,6 +253,18 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - net1
+
+  storage-init:
+    build:
+      dockerfile: Dockerfile-storage
+    restart: on-failure:100000
+    depends_on:
+      minio-nginx:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
     networks:
       - net1
 
@@ -283,6 +302,7 @@ services:
 
   temporal-admin-tools:
     container_name: temporal-admin-tools
+    restart: always
     depends_on:
       - temporal
     environment:
@@ -296,6 +316,7 @@ services:
 
   temporal-ui:
     container_name: temporal-ui
+    restart: always
     depends_on:
       - temporal
     environment:
@@ -309,6 +330,7 @@ services:
 
   temporal:
     image: temporalio/auto-setup:1.23.1
+    restart: always
     environment:
       - DB=postgres
       - DB_PORT=5432
@@ -367,9 +389,17 @@ services:
     restart: always
     networks:
       - net1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   ollama-webui:
     image: ghcr.io/open-webui/open-webui:main
+    restart: always
     ports:
       - 8086:8080
     environment:
@@ -379,6 +409,7 @@ services:
 
   textextractor:
     image: ghcr.io/sowers-io/bosca/text-extractor:a35bff0b7cf9d7584f3d58269f9719a7d5778d02
+    restart: always
     ports:
       - 8083:8080
     environment:

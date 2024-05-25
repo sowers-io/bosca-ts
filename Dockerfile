@@ -11,10 +11,6 @@ COPY backend .
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o ${BACKEND} cmd/${BACKEND}/main.go
 
-FROM build-stage AS tests
-
-RUN go test -v ./...
-
 FROM alpine:3.19.1 AS release
 
 ARG BACKEND

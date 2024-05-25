@@ -43,7 +43,6 @@ is the current thinking, open to other thoughts about how to make Bosca sustaina
 
 * **/docs** - Documentation for Bosca
 * **/backend** - Contains backend API components
-* **/docker** - Dockerfiles for running Bosca commands within a container
 * **/protobuf** - Contains protobuf definitions for the API and Clients
 * **/database** - Contains various database scripts and definitions
 * **/services** - Contains a development environment for the services Bosca leverages and integrates

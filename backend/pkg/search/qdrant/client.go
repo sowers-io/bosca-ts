@@ -151,9 +151,6 @@ func (v *vectorStore) SimilaritySearch(ctx context.Context, query string, numDoc
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
 	documents := make([]schema.Document, len(searchResults.Result))
 
 	for i, result := range searchResults.Result {

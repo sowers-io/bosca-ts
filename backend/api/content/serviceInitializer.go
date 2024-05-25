@@ -17,27 +17,19 @@
 package content
 
 import (
-	grpc "bosca.io/api/protobuf/content"
-	"bosca.io/pkg/security"
 	"context"
 	"log"
 )
 
-func initializeService(permissions security.PermissionManager, dataSource *DataStore) {
+func initializeService(dataStore *DataStore) {
 	ctx := context.Background()
-	if added, err := dataSource.AddRootCollection(ctx); added {
+	if added, err := dataStore.AddRootCollection(ctx); added {
 		if err != nil {
 			log.Fatalf("error initializing root collection: %v", err)
 		}
-		err = permissions.CreateRelationship(ctx, grpc.PermissionObjectType_collection_type, &grpc.Permission{
-			Id:          RootCollectionId,
-			Subject:     security.AdministratorGroup,
-			SubjectType: grpc.PermissionSubjectType_group,
-			Relation:    grpc.PermissionRelation_owners,
-		})
-		if err != nil {
-			_ = dataSource.DeleteCollection(ctx, RootCollectionId)
-			log.Fatalf("error initializing root collection permission: %v", err)
-		}
+	} else if err != nil {
+		log.Fatalf("failed to initialize root collection permission: %v", err)
+	} else {
+		println("root collection initialized")
 	}
 }

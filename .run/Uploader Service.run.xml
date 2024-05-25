@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Uploader Service" type="GoApplicationRunConfiguration" factoryName="Go Application">
-    <module name="backend" />
+    <module name="bosca" />
     <working_directory value="$PROJECT_DIR$/backend" />
     <envs>
       <env name="BOSCA_SESSION_ENDPOINT" value="http://localhost:4433/sessions/whoami" />

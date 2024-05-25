@@ -1,5 +1,0 @@
-#!/bin/sh
-
-zed permission lookup-resources 00000000-0000-0000-0000-000000000000 --insecure --token bosca-spicedb --endpoint localhost:50051
-
-zed permission lookup-subjects collection:00000000-0000-0000-0000-000000000000 viewers group --insecure --explain --endpoint localhost:50051 --token bosca-spicedb

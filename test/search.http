@@ -14,7 +14,7 @@ Content-Type: application/json
 > {% client.global.set("session_token", response.body.session_token); %}
 
 ### Search
-POST http://localhost:9091/v1/search
+POST http://localhost:9998/v1/search
 Authorization: Bearer {{session_token}}
 Content-Type: application/json
 

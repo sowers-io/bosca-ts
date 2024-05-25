@@ -40,7 +40,6 @@ func NewAuthorizationService(permissions security.PermissionManager, dataSource 
 		service:     service,
 		permissions: permissions,
 	}
-	go initializeService(permissions, dataSource)
 	return svc
 }
 

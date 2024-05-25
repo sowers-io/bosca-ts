@@ -5,7 +5,7 @@ services:
 
   # Content DB Migration
   content-db-migration:
-    image: ghcr.io/sowers-io/bosca/content-db-migration:latest
+    image: ghcr.io/sowers-io/bosca/content-db-migration:dev
     build:
       context: .
       dockerfile: Dockerfile-migration
@@ -24,7 +24,7 @@ services:
 
   # Profiles DB Migration
   profiles-db-migration:
-    image: ghcr.io/sowers-io/bosca/profiles-db-migration:latest
+    image: ghcr.io/sowers-io/bosca/profiles-db-migration:dev
     build:
       context: .
       dockerfile: Dockerfile-migration
@@ -43,7 +43,7 @@ services:
 
   # Security DB Migration
   security-db-migration:
-    image: ghcr.io/sowers-io/bosca/security-db-migration:latest
+    image: ghcr.io/sowers-io/bosca/security-db-migration:dev
     build:
       context: .
       dockerfile: Dockerfile-migration
@@ -62,7 +62,8 @@ services:
 
   # Profiles gRPC Service
   profiles:
-    image: ghcr.io/sowers-io/bosca/profiles:latest
+    image: ghcr.io/sowers-io/bosca/profiles:dev
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -86,7 +87,8 @@ services:
 
   # Content gRPC Service
   content:
-    image: ghcr.io/sowers-io/bosca/content:latest
+    image: ghcr.io/sowers-io/bosca/content:dev
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -116,7 +118,8 @@ services:
 
   # Search gRPC Service
   search:
-    image: ghcr.io/sowers-io/bosca/search:latest
+    image: ghcr.io/sowers-io/bosca/search:dev
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -142,7 +145,8 @@ services:
 
   # AI gRPC Service
   ai:
-    image: ghcr.io/sowers-io/bosca/ai:latest
+    image: ghcr.io/sowers-io/bosca/ai:dev
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -168,7 +172,8 @@ services:
 
   # Security gRPC Service
   security:
-    image: ghcr.io/sowers-io/bosca/security:latest
+    image: ghcr.io/sowers-io/bosca/security:dev
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -192,7 +197,8 @@ services:
 
   # Uploader HTTP Server
   uploader:
-    image: ghcr.io/sowers-io/bosca/uploader:latest
+    image: ghcr.io/sowers-io/bosca/uploader:dev
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -215,7 +221,8 @@ services:
 
   # Metadata Worker
   metadata-worker:
-    image: ghcr.io/sowers-io/bosca/workers/metadata:latest
+    image: ghcr.io/sowers-io/bosca/workers/metadata:dev
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -237,7 +244,8 @@ services:
 
   # Text Extractor Worker
   textextractor-worker:
-    image: ghcr.io/sowers-io/bosca/workers/textextractor:latest
+    image: ghcr.io/sowers-io/bosca/workers/textextractor:dev
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile

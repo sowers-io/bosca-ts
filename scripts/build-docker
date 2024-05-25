@@ -31,24 +31,12 @@ build_app() {
 
     echo "Building $app...\n"
 
-    cd $ROOT/build/$app
-    cp $ROOT/docker/Dockerfile-go Dockerfile
-    docker build -t ghcr.io/sowers-io/bosca/$app:latest .
+    docker build --build-arg="BACKEND=$app" -t ghcr.io/sowers-io/bosca/$app:latest .
     docker image tag ghcr.io/sowers-io/bosca/$app:latest ghcr.io/sowers-io/bosca/$app:$tag
-    cd $ROOT
 }
 
 build_migrations() {
-  mkdir -p $ROOT/build/migrations
-  cd $ROOT/build/migrations
-  mkdir -p scripts
-  cd scripts
-  cp $ROOT/scripts/apps .
-  cp $ROOT/scripts/database-migrate .
-  cd ..
-  cp -Rf $ROOT/database .
-  cp $ROOT/docker/Dockerfile-migration Dockerfile
-  docker build -t ghcr.io/sowers-io/bosca/migrations:$tag .
+  docker build --build-arg="BACKEND=$app" -t ghcr.io/sowers-io/bosca/$app-migrations:$tag .
 }
 
 while IFS= read -r app

@@ -34,11 +34,9 @@ jobs:
           go-version-file: 'backend/go.mod'
       - name: Initialize CI
         run: ./scripts/initialize
-      - name: Build Go
-        run: ./scripts/build-go
       - name: Test
         run: ./scripts/test
-      - name: Build Docker
-        run: ./scripts/build-docker
+      - name: Build
+        run: ./scripts/build
       - name: Publish
         run: ./scripts/publish-docker

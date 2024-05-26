@@ -38,17 +38,21 @@ build_app() {
 build_migrations() {
   app=$1
 
-  echo "Building $app migration...\n"
+  if [ -d "$ROOT/database/$app" ]; then
+    echo "Building $app migration...\n"
 
-  docker build --build-arg="BACKEND=$app" -f Dockerfile-migration -t ghcr.io/sowers-io/bosca/$app-migrations:latest .
-  docker image tag ghcr.io/sowers-io/bosca/$app-migrations:latest ghcr.io/sowers-io/bosca/$app-migrations:$tag
+    docker build --build-arg="BACKEND=$app" -f Dockerfile-migration -t ghcr.io/sowers-io/bosca/$app-migrations:latest .
+    docker image tag ghcr.io/sowers-io/bosca/$app-migrations:latest ghcr.io/sowers-io/bosca/$app-migrations:$tag
+  else
+    echo "No migrations found for $ROOT/database/$app"
+  fi
 }
 
 while IFS= read -r app
 do
   build_app "$app"
+  build_migrations "$app"
 done < "$ROOT/scripts/apps"
 
-build_migrations
 
 echo "...done"

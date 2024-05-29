@@ -14,22 +14,40 @@
  * limitations under the License.
  */
 
-package main
+package usx
 
-import (
-	"bosca.io/pkg/workers/metadata"
-	"bosca.io/pkg/workers/util"
-	"go.temporal.io/sdk/worker"
-	"log"
+import "encoding/xml"
+
+type PeripheralBookIdentification int
+
+const (
+	PBIUnknown PeripheralBookIdentification = iota
+	// PBICNC Concordance
+	PBICNC
+	// PBIGLO PBIEXO Glossary
+	PBIGLO
+	// PBITDX Topical Index
+	PBITDX
+	// PBINDX Topical Index
+	PBINDX
 )
 
-func main() {
-	client, err := util.NewAITemporalClient()
-	if err != nil {
-		log.Fatalf("error creating temporal client: %v", err)
+type PBIEnumContainer struct {
+	Value PeripheralBookIdentification
+}
+
+func (e *PBIEnumContainer) UnmarshalXMLAttr(attr xml.Attr) error {
+	switch attr.Value {
+	case "CNC":
+		e.Value = PBICNC
+	case "GLO":
+		e.Value = PBIGLO
+	case "TDX":
+		e.Value = PBITDX
+	case "NDX":
+		e.Value = PBINDX
+	default:
+		e.Value = PBIUnknown
 	}
-	err = metadata.NewWorker(client).Run(worker.InterruptCh())
-	if err != nil {
-		log.Fatalf("error starting worker: %v", err)
-	}
+	return nil
 }

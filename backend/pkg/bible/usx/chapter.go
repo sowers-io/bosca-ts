@@ -14,22 +14,32 @@
  * limitations under the License.
  */
 
-package main
+package usx
 
-import (
-	"bosca.io/pkg/workers/metadata"
-	"bosca.io/pkg/workers/util"
-	"go.temporal.io/sdk/worker"
-	"log"
-)
+import "errors"
 
-func main() {
-	client, err := util.NewAITemporalClient()
-	if err != nil {
-		log.Fatalf("error creating temporal client: %v", err)
-	}
-	err = metadata.NewWorker(client).Run(worker.InterruptCh())
-	if err != nil {
-		log.Fatalf("error starting worker: %v", err)
-	}
+type Chapter struct {
+	Number    string
+	AltNumber string
+	PubNumber string
+	Sid       string
+	Children  []Node
+}
+
+func (c *Chapter) AddText(text string) error {
+	return errors.New("unexpected text in chapter")
+}
+
+func (c *Chapter) AddNode(node Node) {
+	c.Children = append(c.Children, node)
+}
+
+func (c *Chapter) GetChildren() []Node {
+	return c.Children
+}
+
+type ChapterStart struct {
+}
+
+type ChapterContent struct {
 }

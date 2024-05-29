@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package main
+package usx
 
-import (
-	"bosca.io/pkg/workers/metadata"
-	"bosca.io/pkg/workers/util"
-	"go.temporal.io/sdk/worker"
-	"log"
-)
+type Node interface {
+	AddText(text string) error
+}
 
-func main() {
-	client, err := util.NewAITemporalClient()
-	if err != nil {
-		log.Fatalf("error creating temporal client: %v", err)
-	}
-	err = metadata.NewWorker(client).Run(worker.InterruptCh())
-	if err != nil {
-		log.Fatalf("error starting worker: %v", err)
-	}
+type NodeContainer interface {
+	AddText(text string) error
+	AddNode(node Node)
+
+	GetChildren() []Node
 }

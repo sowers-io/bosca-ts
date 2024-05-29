@@ -17,7 +17,7 @@
 package main
 
 import (
-	"bosca.io/pkg/workers/metadata"
+	"bosca.io/pkg/workers/bible"
 	"bosca.io/pkg/workers/util"
 	"go.temporal.io/sdk/worker"
 	"log"
@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error creating temporal client: %v", err)
 	}
-	err = metadata.NewWorker(client).Run(worker.InterruptCh())
+	err = bible.NewWorker(client).Run(worker.InterruptCh())
 	if err != nil {
 		log.Fatalf("error starting worker: %v", err)
 	}

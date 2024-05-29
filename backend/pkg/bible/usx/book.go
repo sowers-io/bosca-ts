@@ -14,22 +14,32 @@
  * limitations under the License.
  */
 
-package main
+package usx
 
-import (
-	"bosca.io/pkg/workers/metadata"
-	"bosca.io/pkg/workers/util"
-	"go.temporal.io/sdk/worker"
-	"log"
-)
+type BookIdentification struct {
+	Style string
+	Code  BookCode
+	Text  string
+}
 
-func main() {
-	client, err := util.NewAITemporalClient()
-	if err != nil {
-		log.Fatalf("error creating temporal client: %v", err)
-	}
-	err = metadata.NewWorker(client).Run(worker.InterruptCh())
-	if err != nil {
-		log.Fatalf("error starting worker: %v", err)
-	}
+type BookHeader struct {
+	Style BookHeaderType
+	Text  string
+}
+
+type BookTitle struct {
+	Style BookTitleType
+	Text  string
+}
+
+type BookIntroduction struct {
+	Style BookIntroductionType
+}
+
+type BookIntroductionEndTitle struct {
+	Style BookIntroductionEndTitleType
+}
+
+type BookChapterLabel struct {
+	Text string
 }

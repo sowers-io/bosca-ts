@@ -14,12 +14,33 @@
 
 -- +goose Up
 -- +goose StatementBegin
-create table traits
+create table workflows
 (
-    id   uuid    not null default gen_random_uuid(),
-    name varchar not null,
+    id            varchar not null, -- This is the identifier of the temporal workflow
+    name          varchar not null,
+    description   varchar not null,
+    queue         varchar not null,
+    configuration jsonb   not null default '{}',
     primary key (id)
 );
+
+insert into workflows (id, name, description, queue)
+values ('metadata.ProcessMetadata', 'Process Metadata', 'Process Metadata', 'metadata');
+
+insert into workflows (id, name, description, queue)
+values ('bible.ProcessBible', 'Process Bible', 'Process Bible', 'bible');
+
+create table traits
+(
+    id          uuid    not null default gen_random_uuid(),
+    name        varchar not null,
+    workflow_id varchar not null,
+    primary key (id),
+    foreign key (workflow_id) references workflows (id)
+);
+
+insert into traits (name, workflow_id)
+values ('USX', 'bible.ProcessBible');
 
 create table categories
 (
@@ -28,7 +49,7 @@ create table categories
     primary key (id)
 );
 
-create type workflow_state_type as enum ('draft', 'pending', 'pending_approval', 'approved', 'published');
+create type workflow_state_type as enum ('processing', 'draft', 'pending', 'approval', 'approved', 'published', 'failure');
 
 create table workflow_states
 (
@@ -36,17 +57,43 @@ create table workflow_states
     name        varchar             not null,
     description varchar             not null,
     type        workflow_state_type not null,
-    primary key (id)
+    workflow_id varchar,
+    primary key (id),
+    foreign key (workflow_id) references workflows (id)
 );
+
+create table workflow_state_transitions
+(
+    from_state_id        varchar not null,
+    to_state_id          varchar not null,
+    validate_workflow_id varchar, -- This is the workflow that validates the transition
+    configuration        jsonb   not null default '{}',
+    primary key (from_state_id, to_state_id),
+    foreign key (from_state_id) references workflow_states (id),
+    foreign key (to_state_id) references workflow_states (id),
+    foreign key (validate_workflow_id) references workflows (id)
+);
+
+insert into workflow_states (id, name, description, type, workflow_id)
+values ('processing', 'Processing', 'Initial Processing after Creation', 'processing'::workflow_state_type,
+        'metadata.ProcessMetadata');
 
 insert into workflow_states (id, name, description, type)
 values ('draft', 'Draft', 'Draft', 'draft'::workflow_state_type),
        ('pending', 'Pending', 'Pending', 'pending'::workflow_state_type),
        ('pending_approval', 'Pending Approval', 'Pending Approval', 'pending_approval'::workflow_state_type),
        ('approved', 'Approved', 'Approved', 'approved'::workflow_state_type),
-       ('published', 'Published', 'Published', 'published'::workflow_state_type);
+       ('published', 'Published', 'Published', 'published'::workflow_state_type),
+       ('failure', 'Failure', 'Failure', 'failure'::workflow_state_type);
 
-create type collection_type as enum ('root', 'standard', 'folder');
+insert into workflow_state_transitions (from_state_id, to_state_id, validate_workflow_id)
+values ('pending', 'processing', null),
+       ('processing', 'draft', null),
+       ('processing', 'failure', null),
+       ('failure', 'processing', null),
+       ('draft', 'published', null);
+
+create type collection_type as enum ('root', 'standard', 'folder', 'queue');
 
 create table collections
 (
@@ -58,9 +105,25 @@ create table collections
     created           timestamp          default now(),
     modified          timestamp          default now(),
     enabled           boolean            default true,
-    workflow_state_id varchar   not null default 'draft',
+    workflow_state_id varchar   not null default 'pending',
     primary key (id),
     foreign key (workflow_state_id) references workflow_states (id)
+);
+
+create table collection_workflow_transition_history
+(
+    id            bigserial not null,
+    metadata_id   uuid      not null,
+    to_state_id   varchar   not null,
+    from_state_id varchar   not null,
+    principal     varchar   not null,
+    status        varchar,
+    success       boolean   not null default false,
+    created       timestamp          default now(),
+    primary key (id),
+    foreign key (metadata_id) references metadata (id) on delete cascade,
+    foreign key (to_state_id) references workflow_states (id),
+    foreign key (from_state_id) references workflow_states (id)
 );
 
 create table collection_collection_items
@@ -90,7 +153,6 @@ create table collection_categories
     foreign key (category_id) references categories (id) on delete cascade
 );
 
-create type metadata_status as enum ('processing', 'ready');
 create type metadata_type as enum ('standard', 'variant');
 
 create table metadata
@@ -106,12 +168,27 @@ create table metadata
     attributes        jsonb     not null                                  default '{}',
     created           timestamp                                           default now(),
     modified          timestamp                                           default now(),
-    status            metadata_status                                     default 'processing',
-    workflow_state_id varchar   not null                                  default 'draft',
+    workflow_state_id varchar   not null                                  default 'processing',
     source            varchar,
     primary key (id),
     foreign key (parent_id) references metadata (id) on delete cascade,
     foreign key (workflow_state_id) references workflow_states (id)
+);
+
+create table metadata_workflow_transition_history
+(
+    id            bigserial not null,
+    metadata_id   uuid      not null,
+    to_state_id   varchar   not null,
+    from_state_id varchar   not null,
+    principal     uuid      not null,
+    status        varchar,
+    success       boolean   not null default false,
+    created       timestamp          default now(),
+    primary key (id),
+    foreign key (metadata_id) references metadata (id) on delete cascade,
+    foreign key (to_state_id) references workflow_states (id),
+    foreign key (from_state_id) references workflow_states (id)
 );
 
 create table collection_metadata_items
@@ -154,15 +231,19 @@ create table metadata_categories
 
 -- +goose Down
 -- +goose StatementBegin
+drop table if exists workflows cascade;
+drop table if exists workflow_state_transitions cascade;
 drop table if exists collection_traits cascade;
 drop table if exists collection_categories cascade;
 drop table if exists collections cascade;
 drop table if exists collection_collection_items cascade;
+drop table if exists collection_workflow_transition_history cascade;
 drop table if exists collection_metadata_items cascade;
 drop type if exists collection_type cascade;
 drop table if exists metadata_relationship cascade;
 drop table if exists metadata_traits cascade;
 drop table if exists metadata_categories cascade;
+drop table if exists metadata_workflow_transition_history cascade;
 drop table if exists metadata cascade;
 drop type if exists metadata_type cascade;
 drop table if exists traits cascade;

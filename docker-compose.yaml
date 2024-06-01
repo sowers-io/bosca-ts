@@ -263,3 +263,25 @@ services:
         condition: service_healthy
     networks:
       - net1
+
+  # Bible Worker
+  bible-worker:
+    image: ghcr.io/sowers-io/bosca/workers/bible:dev
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=workers/bible
+    env_file:
+      - .env-dev
+    depends_on:
+      temporal:
+        condition: service_healthy
+      textextractor:
+        condition: service_healthy
+    networks:
+      - net1

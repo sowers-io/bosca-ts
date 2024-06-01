@@ -131,7 +131,7 @@ func main() {
 	)
 
 	if err != nil {
-		logger.Error("failed to create content client: ", slog.Any("error", err))
+		logger.Error("failed to create content client", slog.Any("error", err))
 		os.Exit(1)
 	}
 

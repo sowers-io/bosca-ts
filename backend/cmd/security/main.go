@@ -27,25 +27,33 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc"
-	"log"
+	"log/slog"
+	"os"
 )
 
 func main() {
 	cfg := configuration.NewServerConfiguration("security", 5006, 5016)
 	pool, err := datastore.NewDatabasePool(context.Background(), cfg)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		slog.Error("failed to connect to database", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	ds := api.NewDataStore(stdlib.OpenDBFromPool(pool))
 	permissionsClient := spicedb.NewSpiceDBClient(cfg)
 	mgr := spicedb.NewPermissionManager(permissionsClient)
 	svc := api.NewAuthorizationService(mgr, api.NewService(ds))
-	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
+	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
 		protosecurity.RegisterSecurityServiceServer(grpcSvr, svc)
 		err := protosecurity.RegisterSecurityServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
-			log.Fatalf("failed to register profiles: %v", err)
+			slog.Error("failed to register profiles", slog.Any("error", err))
+			return err
 		}
+		return nil
 	})
+	if err != nil {
+		slog.Error("failed to start server", slog.Any("error", err))
+		os.Exit(1)
+	}
 }

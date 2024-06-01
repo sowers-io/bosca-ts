@@ -26,6 +26,42 @@ import "requests.proto";
 package bosca.content;
 
 service ContentService {
+  rpc GetWorkflowById(bosca.IdRequest) returns (Workflow) {
+    option (google.api.http) = {
+      get: "/v1/content/workflows/{id}"
+    };
+  }
+
+  rpc GetWorkflows(bosca.Empty) returns (Workflows) {
+    option (google.api.http) = {
+      get: "/v1/content/workflows"
+    };
+  }
+
+  rpc GetWorkflowStateById(bosca.IdRequest) returns (WorkflowState) {
+    option (google.api.http) = {
+      get: "/v1/content/workflowstates/{id}"
+    };
+  }
+
+  rpc GetWorkflowStates(bosca.Empty) returns (WorkflowStates) {
+    option (google.api.http) = {
+      get: "/v1/content/workflowstates"
+    };
+  }
+
+  rpc GetTraitById(bosca.IdRequest) returns (Trait) {
+    option (google.api.http) = {
+      get: "/v1/content/traits/{id}"
+    };
+  }
+
+  rpc GetTraits(bosca.Empty) returns (Traits) {
+    option (google.api.http) = {
+      get: "/v1/content/traits"
+    };
+  }
+
   rpc GetRootCollectionItems(bosca.Empty) returns (CollectionItems) {
     option (google.api.http) = {
       get: "/v1/content/collections"
@@ -157,16 +193,17 @@ service ContentService {
     };
   }
 
-  rpc SetMetadataStatus (SetMetadataStatusRequest) returns (bosca.Empty) {
+  rpc TransitionWorkflow (TransitionWorkflowRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/status"
+      post: "/v1/content/metadata/{metadata_id}/workflow/{state_id}"
       body: "*"
     };
   }
 
-  rpc ProcessMetadata (bosca.IdRequest) returns (bosca.Empty) {
+  rpc AddMetadataRelationship(AddMetadataRelationshipRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/process"
+      post: "/v1/content/metadata/{metadata_id1}/relationship/{metadata_id2}"
+      body: "*"
     };
   }
 }
@@ -187,6 +224,17 @@ enum PermissionAction {
   manage = 4;
   service = 5;
   delete = 6;
+}
+
+message TransitionWorkflowRequest {
+  string metadata_id = 1;
+  string state_id = 2;
+}
+
+message AddMetadataRelationshipRequest {
+  string metadata_id1 = 1;
+  string metadata_id2 = 2;
+  string relationship = 3;
 }
 
 message AddSupplementaryRequest {
@@ -240,12 +288,6 @@ message Permission {
   PermissionRelation relation = 5;
 }
 
-message SetMetadataStatusRequest {
-  string id = 1;
-  string variant_id = 2;
-  MetadataStatus status = 3;
-}
-
 enum ItemType {
   unknown = 0;
   collection = 1;
@@ -274,6 +316,63 @@ enum CollectionType {
 message AddCollectionRequest {
   string parent = 1;
   Collection collection = 2;
+}
+
+message Workflows {
+  repeated Workflow workflows = 1;
+}
+
+message Workflow {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string queue = 4;
+  map<string, string> configuration = 5;
+}
+
+message WorkflowStates {
+  repeated WorkflowState states = 1;
+}
+
+enum WorkflowStateType {
+  unknown_workflow_type = 0;
+  processing = 1;
+  draft = 2;
+  pending = 3;
+  approval = 4;
+  approved = 5;
+  published = 6;
+  failure = 7;
+}
+
+message WorkflowState {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  WorkflowStateType type = 4;
+  string enter_workflow_id = 5;
+  string workflow_id = 6;
+}
+
+message WorkflowStateTransitions {
+  repeated WorkflowStateTransition transitions = 1;
+}
+
+message WorkflowStateTransition {
+  string from_state_id = 1;
+  string to_state_id = 2;
+  optional string validate_workflow_id = 3;
+  map<string, string> configuration = 4;
+}
+
+message Traits {
+  repeated Trait traits = 1;
+}
+
+message Trait {
+  string id = 1;
+  string name = 2;
+  string workflow_id = 3;
 }
 
 message Collection {

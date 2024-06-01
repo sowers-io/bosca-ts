@@ -29,7 +29,6 @@ import (
 	"github.com/tmc/langchaingo/embeddings"
 	"github.com/tmc/langchaingo/llms/ollama"
 	"google.golang.org/grpc"
-	"log"
 	"log/slog"
 	"os"
 )
@@ -44,7 +43,8 @@ func main() {
 
 	qdrantClient, err := qdrant.NewQdrantClient(cfg.ClientEndPoints.QdrantApiAddress)
 	if err != nil {
-		log.Fatalf("failed to create qdrant client: %v", err)
+		slog.Error("failed to create qdrant client", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	httpClient := util.NewDefaultHttpClient()
@@ -55,22 +55,30 @@ func main() {
 		ollama.WithModel(cfg.AIConfiguration.DefaultLlmModel),
 	)
 	if err != nil {
-		log.Fatalf("failed to create model: %v", err)
+		slog.Error("failed to create model", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	embedder, err := embeddings.NewEmbedder(llm)
 	if err != nil {
-		log.Fatalf("failed to create embedder: %v", err)
+		slog.Error("failed to create embedder", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	store := qdrant.NewVectorStore(qdrantClient, embedder)
 
 	svc := ai.NewAuthorizationService(permissions, ai.NewService(cfg.Security.ServiceAccountId, permissions, store, llm))
-	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
+	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
 		protoai.RegisterAIServiceServer(grpcSvr, svc)
 		err := protoai.RegisterAIServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
-			log.Fatalf("failed to register ai: %v", err)
+			slog.Error("failed to register ai endpoint", slog.Any("error", err))
+			return err
 		}
+		return nil
 	})
+	if err != nil {
+		slog.Error("failed to start server", slog.Any("error", err))
+		os.Exit(1)
+	}
 }

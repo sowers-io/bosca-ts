@@ -33,7 +33,7 @@ import (
 	"net/http"
 )
 
-func StartServer(cfg *configuration.ServerConfiguration, register func(context.Context, *grpc.Server, *runtime.ServeMux, string, []grpc.DialOption)) {
+func StartServer(cfg *configuration.ServerConfiguration, register func(context.Context, *grpc.Server, *runtime.ServeMux, string, []grpc.DialOption) error) error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -41,7 +41,8 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 	endpoint := fmt.Sprintf("0.0.0.0:%d", cfg.GrpcPort)
 	listen, err := net.Listen("tcp", endpoint)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		slog.Error("failed to listen", slog.Int("grpc_port", cfg.GrpcPort), slog.Any("error", err))
+		return nil
 	}
 
 	sessionInterceptor := securityFactory.NewSessionInterceptor(cfg.Security.SessionEndpointType)
@@ -61,7 +62,8 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 	protohealth.RegisterHealthServiceServer(server, health.NewHealthService())
 	err = protohealth.RegisterHealthServiceHandlerFromEndpoint(ctx, mux, endpoint, opts)
 	if err != nil {
-		log.Fatalf("failed to register health endpoints: %v", err)
+		slog.Error("failed to register health endpoints", slog.Any("error", err))
+		return nil
 	}
 
 	go func() {
@@ -75,6 +77,8 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 
 	err = server.Serve(listen)
 	if err != nil {
-		log.Fatalf("failed to start serving: %v", err)
+		slog.Error("failed to start serving", slog.Any("error", err))
+		return err
 	}
+	return nil
 }

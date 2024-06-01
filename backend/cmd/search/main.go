@@ -44,7 +44,8 @@ func main() {
 
 	connection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
 	if err != nil {
-		log.Fatalf("failed to create content client connection: %v", err)
+		slog.Error("failed to create content client connection", slog.Any("error", err))
+		os.Exit(1)
 	}
 	contentClient := content.NewContentServiceClient(connection)
 
@@ -52,7 +53,8 @@ func main() {
 
 	qdrantClient, err := qdrant.NewQdrantClient(cfg.ClientEndPoints.QdrantApiAddress)
 	if err != nil {
-		log.Fatalf("failed to create qdrant client: %v", err)
+		slog.Error("failed to create qdrant client", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	httpClient := util.NewDefaultHttpClient()
@@ -68,20 +70,28 @@ func main() {
 
 	semanticClient, err := qdrant.NewSearchClient(qdrantClient, llm)
 	if err != nil {
-		log.Fatalf("failed to create semantic search client: %v", err)
+		slog.Error("failed to create semantic search client", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	standardClient, err := factory.NewSearch(cfg.Search)
 	if err != nil {
-		log.Fatalf("failed to create standard search client: %v", err)
+		slog.Error("failed to create standard search client", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	svc := search.NewAuthorizationService(permissions, search.NewService(contentClient, semanticClient, standardClient))
-	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
+	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
 		protosearch.RegisterSearchServiceServer(grpcSvr, svc)
 		err := protosearch.RegisterSearchServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
-			log.Fatalf("failed to register search: %v", err)
+			slog.Error("failed to register search", slog.Any("error", err))
+			return err
 		}
+		return nil
 	})
+	if err != nil {
+		slog.Error("failed to start server", slog.Any("error", err))
+		os.Exit(1)
+	}
 }

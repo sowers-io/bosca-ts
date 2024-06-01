@@ -22,10 +22,13 @@ import (
 	"bosca.io/pkg/objectstore"
 	"bosca.io/pkg/security"
 	"bosca.io/pkg/security/identity"
+	"bosca.io/pkg/workers/common"
 	"bosca.io/pkg/workers/metadata"
 	"context"
 	"errors"
 	"go.temporal.io/sdk/client"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log/slog"
 	"slices"
 	"strings"
@@ -188,15 +191,16 @@ func (svc *service) GetCollectionItems(ctx context.Context, request *protobuf.Id
 			slog.ErrorContext(ctx, "failed to get metadata", slog.String("id", request.Id), slog.String("item", item), slog.Any("error", err))
 			return nil, err
 		}
-		err = svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, item, grpc.PermissionAction_view)
-		if err != nil {
-			slog.InfoContext(ctx, "view permission check failed", slog.String("id", request.Id), slog.String("item", item), slog.Any("error", err))
-			continue
-		}
-		if meta.Status == grpc.MetadataStatus_processing {
+		if meta.WorkflowStateId != WorkflowStatePublished {
 			err = svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, item, grpc.PermissionAction_edit)
 			if err != nil {
-				slog.InfoContext(ctx, "edit permission check failed", slog.String("id", request.Id), slog.String("item", item), slog.Any("error", err))
+				slog.InfoContext(ctx, "edit permission check failed, not returning metadata", slog.String("id", request.Id), slog.String("item", item), slog.Any("error", err))
+				continue
+			}
+		} else {
+			err = svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, item, grpc.PermissionAction_view)
+			if err != nil {
+				slog.InfoContext(ctx, "view permission check failed", slog.String("id", request.Id), slog.String("item", item), slog.Any("error", err))
 				continue
 			}
 		}
@@ -268,7 +272,7 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 		return nil, err
 	}
 	if request.Metadata.Source != nil && *request.Metadata.Source != "" {
-		_, err := svc.ProcessMetadata(ctx, &protobuf.IdRequest{Id: id})
+		_, err := svc.TransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: id, StateId: WorkflowStateProcessing})
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to process metadata", slog.String("id", id), slog.Any("error", err))
 			return nil, err
@@ -360,10 +364,60 @@ func (svc *service) DeleteMetadataSupplementary(ctx context.Context, request *gr
 }
 
 func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	return svc.ProcessMetadata(ctx, request)
+	return svc.TransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: request.Id, StateId: WorkflowStateProcessing})
 }
 
-func (svc *service) ProcessMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+func (svc *service) TransitionWorkflow(ctx context.Context, request *grpc.TransitionWorkflowRequest) (*protobuf.Empty, error) {
+	md, err := svc.ds.GetMetadata(ctx, request.MetadataId)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get metadata", slog.String("id", request.MetadataId), slog.Any("error", err))
+		return nil, err
+	}
+	if md == nil {
+		slog.ErrorContext(ctx, "metadata not found", slog.String("id", request.MetadataId), slog.Any("error", err))
+		return nil, status.Error(codes.NotFound, "metadata not found")
+	}
+	if md.WorkflowStateId == request.StateId {
+		slog.WarnContext(ctx, "metadata already in state", slog.String("id", request.MetadataId), slog.String("state", request.StateId))
+		return &protobuf.Empty{}, nil
+	}
+	transition, err := svc.ds.GetWorkflowTransition(ctx, md.WorkflowStateId, request.StateId)
+	if err != nil {
+		return nil, err
+	}
+	if transition == nil {
+		slog.WarnContext(ctx, "transition not found", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId))
+		return nil, status.Error(codes.InvalidArgument, "invalid transition")
+	}
+	if transition.ValidateWorkflowId != nil {
+		workflow, err := svc.ds.GetWorkflow(ctx, *transition.ValidateWorkflowId)
+		if err != nil {
+			return nil, err
+		}
+		if workflow == nil {
+			slog.ErrorContext(ctx, "workflow not found", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId), slog.String("workflowId", *transition.ValidateWorkflowId))
+			return nil, status.Error(codes.Internal, "workflow not found")
+		}
+		transition = &common.WorkflowTransition{
+			MetadataId:    request.MetadataId,
+			Configuration: workflow.Configuration,
+		}
+		run, err := svc.temporalClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
+			TaskQueue: workflow.Queue,
+		}, workflow.Name, transition)
+		if err != nil {
+			return nil, err
+		}
+		var result bool
+		err = run.Get(ctx, &result)
+		if err != nil {
+			return nil, err
+		}
+		if !result {
+			return nil, status.Error(codes.InvalidArgument, "transition validation failed")
+		}
+	}
+
 	_, err := svc.temporalClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
 		TaskQueue: metadata.TaskQueue,
 	}, metadata.ProcessMetadata, request.Id)

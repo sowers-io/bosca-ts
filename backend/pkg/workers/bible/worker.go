@@ -20,7 +20,6 @@ import (
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/workers/bible/processor"
 	"bosca.io/pkg/workers/common"
-	"bosca.io/pkg/workers/vectors/vectorizer"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
@@ -34,8 +33,7 @@ const TaskQueue = "bible"
 func NewWorker(client client.Client) worker.Worker {
 	w := worker.New(client, TaskQueue, worker.Options{})
 	w.RegisterWorkflow(ProcessBible)
-	w.RegisterActivity(processor.AddToSearchIndex)
-	w.RegisterActivity(processor.VectorizeBible)
+	w.RegisterActivity(processor.ProcessUSX)
 	return w
 }
 
@@ -61,12 +59,7 @@ func ProcessBible(ctx workflow.Context, id string) error {
 		return err
 	}
 
-	err = workflow.ExecuteActivity(ctx, processor.AddToSearchIndex, metadata).Get(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	err = workflow.ExecuteActivity(ctx, vectorizer.Vectorize, metadata).Get(ctx, &metadata)
+	err = workflow.ExecuteActivity(ctx, processor.ProcessUSX, metadata).Get(ctx, nil)
 	if err != nil {
 		return err
 	}

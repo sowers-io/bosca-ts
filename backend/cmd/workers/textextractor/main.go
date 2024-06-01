@@ -28,38 +28,47 @@ import (
 	"bosca.io/pkg/workers/textextractor"
 	rootContext "context"
 	"go.temporal.io/sdk/worker"
-	"log"
+	"log/slog"
+	"os"
 )
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	ctx := rootContext.Background()
 
 	cfg := configuration.NewWorkerConfiguration()
 	connection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
 	if err != nil {
-		log.Fatalf("failed to get content service connection: %v", err)
+		logger.Error("failed to get content service connection", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	searchClient, err := factory.NewSearch(cfg.Search)
 	if err != nil {
-		log.Fatalf("failed to get search client: %v", err)
+		logger.Error("failed to get search client", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	qdrantClient, err := qdrant.NewQdrantClient(cfg.ClientEndPoints.QdrantApiAddress)
 	if err != nil {
-		log.Fatalf("failed to get qdrant client: %v", err)
+		logger.Error("failed to get qdrant client", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	httpClient := util.NewDefaultHttpClient()
 	propagator := common.NewContextPropagator(cfg, httpClient, content.NewContentServiceClient(connection), searchClient, qdrantClient)
 	client, err := temporal.NewClientWithPropagator(ctx, cfg.ClientEndPoints, propagator)
 	if err != nil {
-		log.Fatalln("Unable to create Temporal client:", err)
+		logger.Error("Unable to create temporal client", slog.Any("error", err))
+		os.Exit(1)
 	}
 	defer client.Close()
 
 	err = textextractor.NewWorker(client).Run(worker.InterruptCh())
 	if err != nil {
-		log.Fatalf("error starting worker: %v", err)
+		logger.Error("error starting worker", slog.Any("error", err))
+		os.Exit(1)
 	}
 }

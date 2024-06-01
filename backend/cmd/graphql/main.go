@@ -24,8 +24,9 @@ import (
 	"context"
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -33,7 +34,8 @@ func main() {
 
 	contentConnection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
 	if err != nil {
-		log.Fatalf("failed to create content client: %v", err)
+		slog.Error("failed to create content client", slog.Any("error", err))
+		os.Exit(1)
 	}
 	defer contentConnection.Close()
 
@@ -57,7 +59,8 @@ func main() {
 	)
 
 	if err != nil {
-		log.Fatalf("failed to create graphql schema: %v", err)
+		slog.Error("failed to create graphql schema", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	h := handler.New(&handler.Config{
@@ -75,6 +78,7 @@ func main() {
 
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
-		log.Fatalf("failed to start graphql server: %v", err)
+		slog.Error("failed to start graphql server", slog.Any("error", err))
+		os.Exit(1)
 	}
 }

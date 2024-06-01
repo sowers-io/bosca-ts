@@ -17,21 +17,27 @@
 package processor
 
 import (
+	"bosca.io/api/protobuf"
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/search"
 	"bosca.io/pkg/workers/common"
 	"bosca.io/pkg/workers/textextractor"
 	"context"
+	"log/slog"
 	"os"
 )
 
-func SetMetadataStatusReady(ctx context.Context, metadata *content.Metadata) error {
+func TransitionToDraft(ctx context.Context, metadata *content.Metadata) error {
 	contentService := common.GetContentService(ctx)
-	_, err := contentService.SetMetadataStatus(common.GetServiceAuthorizedContext(ctx), &content.SetMetadataStatusRequest{
-		Id:     metadata.Id,
-		Status: content.MetadataStatus_ready,
-	})
-	return err
+	if metadata.WorkflowStateId == "processing" {
+		_, err := contentService.TransitionWorkflow(common.GetServiceAuthorizedContext(ctx), &content.TransitionWorkflowRequest{
+			MetadataId: metadata.Id,
+			StateId:    "draft",
+		})
+		return err
+	}
+	slog.Warn("Metadata is not in processing state", slog.String("metadataId", metadata.Id), slog.String("stateId", metadata.WorkflowStateId))
+	return nil
 }
 
 func AddToSearchIndex(ctx context.Context, metadata *content.Metadata) error {
@@ -62,4 +68,51 @@ func AddToSearchIndex(ctx context.Context, metadata *content.Metadata) error {
 		Name: metadata.Name,
 		Body: string(body),
 	})
+}
+
+type TraitWorkflow struct {
+	Id    string
+	Queue string
+}
+
+func GetTraitWorkflows(ctx context.Context, metadata *content.Metadata) ([]*TraitWorkflow, error) {
+	if metadata.TraitIds == nil || len(metadata.TraitIds) == 0 {
+		return nil, nil
+	}
+
+	svc := common.GetContentService(ctx)
+
+	workflows, err := svc.GetWorkflows(common.GetServiceAuthorizedContext(ctx), &protobuf.Empty{})
+	if err != nil {
+		return nil, err
+	}
+
+	traits, err := svc.GetTraits(common.GetServiceAuthorizedContext(ctx), &protobuf.Empty{})
+	if err != nil {
+		return nil, err
+	}
+
+	traitsById := make(map[string]*content.Trait)
+	for _, trait := range traits.Traits {
+		traitsById[trait.Id] = trait
+	}
+
+	workflowsById := make(map[string]*content.Workflow)
+	for _, workflow := range workflows.Workflows {
+		workflowsById[workflow.Id] = workflow
+	}
+
+	traitWorkflows := make([]*TraitWorkflow, 0, len(metadata.TraitIds))
+	for _, id := range metadata.TraitIds {
+		if trait, ok := traitsById[id]; ok {
+			if workflow, ok := workflowsById[trait.WorkflowId]; ok {
+				traitWorkflows = append(traitWorkflows, &TraitWorkflow{
+					Id:    workflow.Id,
+					Queue: workflow.Queue,
+				})
+			}
+		}
+	}
+
+	return traitWorkflows, nil
 }

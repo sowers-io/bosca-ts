@@ -16,7 +16,10 @@
 
 package usx
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 type Chapter struct {
 	Number    string
@@ -24,6 +27,10 @@ type Chapter struct {
 	PubNumber string
 	Sid       string
 	Children  []Node
+}
+
+func (v *Chapter) GetUsfm() string {
+	return strings.Replace(strings.Replace(v.Sid, " ", ".", -1), ":", ".", -1)
 }
 
 func (c *Chapter) AddText(text string) error {

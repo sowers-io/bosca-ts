@@ -20,6 +20,7 @@ import (
 	"bosca.io/api/protobuf/content"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -256,6 +257,48 @@ func (ds *DataStore) RemoveCollectionMetadataItem(ctx context.Context, collectio
 	return nil
 }
 
+func (ds *DataStore) GetWorkflow(ctx context.Context, id string) (*content.Workflow, error) {
+	row := ds.db.QueryRowContext(ctx, "SELECT id, name, description, queue, configuration FROM workflows WHERE id = $1", id)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+	var workflow content.Workflow
+	var configuration json.RawMessage
+	err := row.Scan(&workflow.Id, &workflow.Name, &workflow.Description, &workflow.Queue, &configuration)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	err = json.Unmarshal(configuration, &workflow.Configuration)
+	if err != nil {
+		return nil, err
+	}
+	return &workflow, nil
+}
+
+func (ds *DataStore) GetWorkflowTransition(ctx context.Context, fromStateId string, toStateId string) (*content.WorkflowStateTransition, error) {
+	row := ds.db.QueryRowContext(ctx, "SELECT from_state_id, to_state_id, validate_workflow_id, configuration FROM workflow_state_transitions WHERE from_state_id = $1 AND to_state_id = $2", fromStateId, toStateId)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+	var transition content.WorkflowStateTransition
+	var configuration json.RawMessage
+	err := row.Scan(&transition.FromStateId, &transition.ToStateId, &transition.ValidateWorkflowId, &configuration)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	err = json.Unmarshal(configuration, &transition.Configuration)
+	if err != nil {
+		return nil, err
+	}
+	return &transition, nil
+}
+
 func (ds *DataStore) SetCollectionWorkflowStateId(ctx context.Context, id string, stateId string) error {
 	stmt, err := ds.db.PrepareContext(ctx, "UPDATE collections set workflow_state_id = $1 WHERE id = $2")
 	if err != nil {
@@ -285,17 +328,29 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 	m := pgtype.NewMap()
 
 	queryString := &strings.Builder{}
-	queryString.WriteString("SELECT id, name, tags, content_type, content_length, created, modified, status, source, language_tag, workflow_state_id FROM metadata WHERE id = $1")
+	queryString.WriteString("SELECT id, name, tags, attributes, content_type, content_length, created, modified, source, language_tag, workflow_state_id FROM metadata WHERE id = $1")
 	if len(id) > 1 {
 		for i := 1; i < len(id); i++ {
 			queryString.WriteString(fmt.Sprintf(" OR id = $%d", i+1))
 		}
 	}
-	query, err := ds.db.PrepareContext(ctx, queryString.String())
+	metadataQuery, err := ds.db.PrepareContext(ctx, queryString.String())
 	if err != nil {
 		return nil, err
 	}
-	defer query.Close()
+	defer metadataQuery.Close()
+
+	traitsQuery, err := ds.db.PrepareContext(ctx, "select trait_id from metadata_traits where metadata_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer traitsQuery.Close()
+
+	categoriesQuery, err := ds.db.PrepareContext(ctx, "select category_id from metadata_categories where metadata_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer categoriesQuery.Close()
 
 	args := make([]any, len(id))
 	for i, v := range id {
@@ -306,7 +361,7 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 		args[i] = u
 	}
 
-	result, err := query.QueryContext(ctx, args...)
+	result, err := metadataQuery.QueryContext(ctx, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -317,18 +372,18 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 		var metadata content.Metadata
 		var created time.Time
 		var modified time.Time
-		var status string
 		var tags []string
+		var attributesJson json.RawMessage
 
 		err = result.Scan(
 			&metadata.Id,
 			&metadata.Name,
 			m.SQLScanner(&tags),
+			&attributesJson,
 			&metadata.ContentType,
 			&metadata.ContentLength,
 			&created,
 			&modified,
-			&status,
 			&metadata.Source,
 			&metadata.LanguageTag,
 			&metadata.WorkflowStateId,
@@ -341,20 +396,48 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 			return nil, err
 		}
 
+		err = json.Unmarshal(attributesJson, &metadata.Attributes)
+		if err != nil {
+			return nil, err
+		}
+
 		metadata.Created = timestamppb.New(created)
 		metadata.Modified = timestamppb.New(modified)
 		metadata.Tags = tags
 
-		switch status {
-		case "ready":
-			metadata.Status = content.MetadataStatus_ready
-			break
-		default:
-			metadata.Status = content.MetadataStatus_processing
-			break
+		result, err := traitsQuery.QueryContext(ctx, metadata.Id)
+		if err != nil {
+			return nil, err
 		}
+		traits := make([]string, 0)
+		for result.Next() {
+			var trait string
+			err = result.Scan(&trait)
+			if err != nil {
+				result.Close()
+				return nil, err
+			}
+			traits = append(traits, trait)
+		}
+		metadata.TraitIds = traits
+		result.Close()
 
-		// TODO: tags, traits and categories
+		result, err = categoriesQuery.QueryContext(ctx, metadata.Id)
+		if err != nil {
+			return nil, err
+		}
+		categories := make([]string, 0)
+		for result.Next() {
+			var category string
+			err = result.Scan(&category)
+			if err != nil {
+				result.Close()
+				return nil, err
+			}
+			categories = append(categories, category)
+		}
+		metadata.CategoryIds = categories
+		result.Close()
 
 		metadatas = append(metadatas, &metadata)
 	}
@@ -460,22 +543,29 @@ func (ds *DataStore) DeleteMetadata(ctx context.Context, id string) error {
 	return err
 }
 
-func (ds *DataStore) SetMetadataWorkflowStateId(ctx context.Context, id string, stateId string) error {
-	stmt, err := ds.db.PrepareContext(ctx, "UPDATE metadata set workflow_state_id = $1 WHERE id = $2::uuid")
+func (ds *DataStore) TransitionMetadataWorkflowStateId(ctx context.Context, id string, stateId string, principal string, status string, success bool) error {
+	row := ds.db.QueryRowContext(ctx, "select workflow_state_id from metadata where id = $1", id)
+	if row.Err() != nil {
+		return row.Err()
+	}
+	var fromStateId string
+	err := row.Scan(&fromStateId)
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	_, err = stmt.ExecContext(ctx, stateId, id)
-	return err
-}
-
-func (ds *DataStore) SetMetadataStatus(ctx context.Context, id string, status content.MetadataStatus) error {
-	stmt, err := ds.db.PrepareContext(ctx, "UPDATE metadata set status = ($1)::metadata_status WHERE id = $2")
+	txn, err := ds.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	_, err = stmt.ExecContext(ctx, status.String(), id)
-	return err
+	_, err = txn.ExecContext(ctx, "insert into metadata_workflow_state_history (metadata_id, from_state_id, to_state_id, principal, status, success) values ($1::uuid, $2, $3, $4, $5)", id, fromStateId, stateId, principal, status, success)
+	if err != nil {
+		txn.Rollback()
+		return err
+	}
+	_, err = txn.ExecContext(ctx, "update metadata set workflow_state_id = $1 where id = $2::uuid", stateId, id)
+	if err != nil {
+		txn.Rollback()
+		return err
+	}
+	return txn.Commit()
 }

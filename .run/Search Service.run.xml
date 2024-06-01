@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Search Service" type="GoApplicationRunConfiguration" factoryName="Go Application">
-    <module name="bosca" />
+    <module name="backend" />
     <working_directory value="$PROJECT_DIR$/backend" />
     <envs>
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />

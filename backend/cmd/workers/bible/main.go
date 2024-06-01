@@ -20,16 +20,22 @@ import (
 	"bosca.io/pkg/workers/bible"
 	"bosca.io/pkg/workers/util"
 	"go.temporal.io/sdk/worker"
-	"log"
+	"log/slog"
+	"os"
 )
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	client, err := util.NewAITemporalClient()
 	if err != nil {
-		log.Fatalf("error creating temporal client: %v", err)
+		logger.Error("error creating temporal client", slog.Any("error", err))
+		os.Exit(1)
 	}
 	err = bible.NewWorker(client).Run(worker.InterruptCh())
 	if err != nil {
-		log.Fatalf("error starting worker: %v", err)
+		logger.Error("error starting worker", slog.Any("error", err))
+		os.Exit(1)
 	}
 }

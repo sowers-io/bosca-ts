@@ -26,7 +26,6 @@ import (
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
 	"go.temporal.io/sdk/workflow"
-
 	"time"
 )
 
@@ -38,7 +37,7 @@ func NewWorker(client client.Client) worker.Worker {
 	w.RegisterActivity(common.GetMetadata)
 	w.RegisterActivity(processor.AddToSearchIndex)
 	w.RegisterActivity(vectorizer.Vectorize)
-	w.RegisterActivity(processor.SetMetadataStatusReady)
+	w.RegisterActivity(processor.TransitionToDraft)
 	return w
 }
 
@@ -64,11 +63,28 @@ func ProcessMetadata(ctx workflow.Context, id string) error {
 		return err
 	}
 
-	childCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
+	var workflows []*processor.TraitWorkflow
+	err = workflow.ExecuteActivity(ctx, processor.GetTraitWorkflows, metadata).Get(ctx, &workflows)
+	if err != nil {
+		return err
+	}
+
+	if workflows != nil {
+		for _, trait := range workflows {
+			traitWorkflowCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
+				TaskQueue: trait.Queue,
+			})
+			err = workflow.ExecuteChildWorkflow(traitWorkflowCtx, trait.Id, metadata).Get(ctx, nil)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	textExtractorCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
 		TaskQueue: textextractor.TaskQueue,
 	})
-
-	err = workflow.ExecuteChildWorkflow(childCtx, textextractor.TextExtractor, metadata).Get(ctx, nil)
+	err = workflow.ExecuteChildWorkflow(textExtractorCtx, textextractor.TextExtractor, metadata).Get(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -83,5 +99,5 @@ func ProcessMetadata(ctx workflow.Context, id string) error {
 		return err
 	}
 
-	return workflow.ExecuteActivity(ctx, processor.SetMetadataStatusReady, metadata).Get(ctx, &metadata)
+	return workflow.ExecuteActivity(ctx, processor.TransitionToDraft, metadata).Get(ctx, &metadata)
 }

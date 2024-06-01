@@ -21,11 +21,6 @@ import "google/protobuf/timestamp.proto";
 
 package bosca.content;
 
-enum MetadataStatus {
-  processing = 0;
-  ready = 1;
-}
-
 message Metadata {
   string default_id = 1;
 
@@ -45,8 +40,6 @@ message Metadata {
 
   google.protobuf.Timestamp created = 20;
   google.protobuf.Timestamp modified = 21;
-
-  MetadataStatus status = 30;
 
   string workflow_state_id = 31;
 }

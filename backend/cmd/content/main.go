@@ -29,7 +29,6 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc"
-	"log"
 	"log/slog"
 	"os"
 )
@@ -38,7 +37,8 @@ func main() {
 	cfg := configuration.NewServerConfiguration("content", 5003, 5013)
 	pool, err := datastore.NewDatabasePool(context.Background(), cfg)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		slog.Error("failed to connect to database", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -46,7 +46,8 @@ func main() {
 
 	objectStore, err := factory.NewObjectStore(cfg.Storage)
 	if err != nil {
-		log.Fatalf("failed to create object store: %v", err)
+		slog.Error("failed to create object store", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
@@ -54,15 +55,22 @@ func main() {
 
 	temporalClient, err := temporal.NewClient(context.Background(), cfg.ClientEndPoints)
 	if err != nil {
-		log.Fatalf("failed to create temporal client: %v", err)
+		slog.Error("failed to create temporal client", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, cfg.Security.ServiceAccountId, objectStore, permissions, temporalClient))
-	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
+	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
 		protocontent.RegisterContentServiceServer(grpcSvr, svc)
 		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
-			log.Fatalf("failed to register content: %v", err)
+			slog.Error("failed to register content", slog.Any("error", err))
+			return err
 		}
+		return err
 	})
+	if err != nil {
+		slog.Error("failed start server", slog.Any("error", err))
+		os.Exit(1)
+	}
 }

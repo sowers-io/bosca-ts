@@ -26,22 +26,30 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc"
-	"log"
+	"log/slog"
+	"os"
 )
 
 func main() {
 	cfg := configuration.NewServerConfiguration("profiles", 5004, 5014)
 	pool, err := datastore.NewDatabasePool(context.Background(), cfg)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		slog.Error("failed to connect to database", slog.Any("error", err))
+		os.Exit(1)
 	}
 	ds := profiles.NewDataStore(stdlib.OpenDBFromPool(pool))
 	svc := profiles.NewService(ds)
-	server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) {
+	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
 		protoprofiles.RegisterProfilesServiceServer(grpcSvr, svc)
 		err := protoprofiles.RegisterProfilesServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
-			log.Fatalf("failed to register profiles: %v", err)
+			slog.Error("failed to register profiles", slog.Any("error", err))
+			return err
 		}
+		return nil
 	})
+	if err != nil {
+		slog.Error("failed to start server", slog.Any("error", err))
+		os.Exit(1)
+	}
 }

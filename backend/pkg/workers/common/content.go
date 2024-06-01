@@ -21,10 +21,12 @@ import (
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/util"
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 func GetMetadata(ctx context.Context, id string) (*content.Metadata, error) {
@@ -59,4 +61,35 @@ func DownloadTemporaryFile(ctx context.Context, signedUrl *content.SignedUrl) (*
 	}
 	_, err = file.Seek(0, 0)
 	return file, err
+}
+
+func SetTextContent(ctx context.Context, id string, text string) error {
+	contentService := GetContentService(ctx)
+	signedUrl, err := contentService.GetMetadataUploadUrl(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
+		Id: id,
+	})
+	if err != nil {
+		return err
+	}
+	uploadUrl, err := url.Parse(signedUrl.Url)
+	if err != nil {
+		return err
+	}
+	client := GetHttpClient(ctx)
+	request := &http.Request{
+		Method:        signedUrl.Method,
+		URL:           uploadUrl,
+		Header:        util.GetSignedUrlHeaders(signedUrl),
+		Body:          io.NopCloser(strings.NewReader(text)),
+		ContentLength: int64(len(text)),
+	}
+	response, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK && response.StatusCode != http.StatusCreated && response.StatusCode != http.StatusAccepted && response.StatusCode != http.StatusNoContent {
+		return errors.New("failed to upload")
+	}
+	return nil
 }

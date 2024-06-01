@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package search
+package ls
 
 import (
-	grpc "bosca.io/api/protobuf/search"
+	grpcRequests "bosca.io/api/protobuf"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
 	"context"
@@ -27,13 +27,12 @@ import (
 )
 
 var Command = &cobra.Command{
-	Use:   "search [query]",
-	Short: "Search across all workflow",
-	Args:  cobra.ExactArgs(1),
+	Use:   "ls",
+	Short: "List all the workflow states.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var err error
 
-		client, err := cli.NewSearchClient(cmd)
+		client, err := cli.NewContentClient(cmd)
 		if err != nil {
 			return err
 		}
@@ -43,26 +42,34 @@ var Command = &cobra.Command{
 			return err
 		}
 
-		cmd.Printf("Searching for %s\n", args[0])
-
-		response, err := client.Search(ctx, &grpc.SearchRequest{
-			Query: args[0],
-		})
-
+		states, err := client.GetWorkflowStates(ctx, &grpcRequests.Empty{})
 		if err != nil {
 			return err
 		}
 
 		tbl := table.NewWriter()
-		tbl.AppendHeader(table.Row{"ID", "Name", "Type", "State", "Language"})
+		tbl.AppendHeader(table.Row{"ID", "Name", "Description", "Entry Workflow", "Workflow", "Exit Workflow"})
 
-		for _, metadata := range response.Metadata {
+		for _, state := range states.States {
+			workflowId := ""
+			if state.WorkflowId != nil {
+				workflowId = *state.WorkflowId
+			}
+			entryWorkflowId := ""
+			if state.EntryWorkflowId != nil {
+				entryWorkflowId = *state.EntryWorkflowId
+			}
+			exitWorkflowId := ""
+			if state.ExitWorkflowId != nil {
+				exitWorkflowId = *state.ExitWorkflowId
+			}
 			tbl.AppendRow(table.Row{
-				metadata.Id,
-				metadata.Name,
-				metadata.ContentType,
-				metadata.WorkflowStateId,
-				metadata.LanguageTag,
+				state.Id,
+				state.Name,
+				state.Description,
+				entryWorkflowId,
+				workflowId,
+				exitWorkflowId,
 			})
 		}
 
@@ -73,5 +80,5 @@ var Command = &cobra.Command{
 }
 
 func init() {
-	Command.Flags().String(flags.EndpointFlag, "localhost:5015", "The endpoint to use.")
+	Command.Flags().String(flags.EndpointFlag, "localhost:5013", "The endpoint to use.")
 }

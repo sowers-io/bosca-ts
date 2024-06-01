@@ -25,7 +25,7 @@ create table workflows
 );
 
 insert into workflows (id, name, description, queue)
-values ('metadata.ProcessMetadata', 'Process Metadata', 'Process Metadata', 'metadata');
+values ('workflow.ProcessMetadata', 'Process Metadata', 'Process Metadata', 'workflow');
 
 insert into workflows (id, name, description, queue)
 values ('bible.ProcessBible', 'Process Bible', 'Process Bible', 'bible');
@@ -78,12 +78,12 @@ create table workflow_state_transitions
 
 insert into workflow_states (id, name, description, type, workflow_id)
 values ('processing', 'Processing', 'Initial Processing after Creation', 'processing'::workflow_state_type,
-        'metadata.ProcessMetadata');
+        'workflow.ProcessMetadata');
 
 insert into workflow_states (id, name, description, type)
 values ('pending', 'Pending', 'Pending', 'pending'::workflow_state_type),
        ('draft', 'Draft', 'Draft', 'draft'::workflow_state_type),
-       ('pending_approval', 'Pending Approval', 'Pending Approval', 'pending_approval'::workflow_state_type),
+       ('pending_approval', 'Pending Approval', 'Pending Approval', 'approval'::workflow_state_type),
        ('approved', 'Approved', 'Approved', 'approved'::workflow_state_type),
        ('published', 'Published', 'Published', 'published'::workflow_state_type),
        ('failure', 'Failure', 'Failure', 'failure'::workflow_state_type);
@@ -113,23 +113,6 @@ create table collections
     primary key (id),
     foreign key (workflow_state_id) references workflow_states (id),
     foreign key (workflow_state_pending_id) references workflow_states (id)
-);
-
-create table collection_workflow_transition_history
-(
-    id            bigserial not null,
-    metadata_id   uuid      not null,
-    to_state_id   varchar   not null,
-    from_state_id varchar   not null,
-    subject       varchar   not null,
-    status        varchar,
-    success       boolean   not null default false,
-    complete      boolean   not null default false,
-    created       timestamp          default now(),
-    primary key (id),
-    foreign key (metadata_id) references metadata (id) on delete cascade,
-    foreign key (to_state_id) references workflow_states (id),
-    foreign key (from_state_id) references workflow_states (id)
 );
 
 create table collection_collection_items
@@ -175,7 +158,7 @@ create table metadata
     attributes                jsonb     not null                                  default '{}',
     created                   timestamp                                           default now(),
     modified                  timestamp                                           default now(),
-    workflow_state_id         varchar   not null                                  default 'processing',
+    workflow_state_id         varchar   not null                                  default 'pending',
     workflow_state_pending_id varchar,
     source                    varchar,
     primary key (id),
@@ -185,6 +168,23 @@ create table metadata
 );
 
 create table metadata_workflow_transition_history
+(
+    id            bigserial not null,
+    metadata_id   uuid      not null,
+    to_state_id   varchar   not null,
+    from_state_id varchar   not null,
+    subject       varchar   not null,
+    status        varchar,
+    success       boolean   not null default false,
+    complete      boolean   not null default false,
+    created       timestamp          default now(),
+    primary key (id),
+    foreign key (metadata_id) references metadata (id) on delete cascade,
+    foreign key (to_state_id) references workflow_states (id),
+    foreign key (from_state_id) references workflow_states (id)
+);
+
+create table collection_workflow_transition_history
 (
     id            bigserial not null,
     metadata_id   uuid      not null,

@@ -5,9 +5,10 @@ services:
 
   # Content DB Migration
   content-db-migration:
-    image: ghcr.io/sowers-io/bosca/content-db-migration:dev
     build:
       context: .
+      labels:
+        - ghcr.io/sowers-io/bosca/content-db-migration:dev
       dockerfile: Dockerfile-migration
       platforms:
         - linux/arm64
@@ -24,10 +25,11 @@ services:
 
   # Profiles DB Migration
   profiles-db-migration:
-    image: ghcr.io/sowers-io/bosca/profiles-db-migration:dev
     build:
       context: .
       dockerfile: Dockerfile-migration
+      labels:
+        - ghcr.io/sowers-io/bosca/profiles-db-migration:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -43,10 +45,11 @@ services:
 
   # Security DB Migration
   security-db-migration:
-    image: ghcr.io/sowers-io/bosca/security-db-migration:dev
     build:
       context: .
       dockerfile: Dockerfile-migration
+      labels:
+        - ghcr.io/sowers-io/bosca/security-db-migration:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -62,11 +65,12 @@ services:
 
   # Profiles gRPC Service
   profiles:
-    image: ghcr.io/sowers-io/bosca/profiles:dev
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
+      labels:
+        - ghcr.io/sowers-io/bosca/profiles:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -87,11 +91,12 @@ services:
 
   # Content gRPC Service
   content:
-    image: ghcr.io/sowers-io/bosca/content:dev
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
+      labels:
+        - ghcr.io/sowers-io/bosca/content:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -118,11 +123,12 @@ services:
 
   # Search gRPC Service
   search:
-    image: ghcr.io/sowers-io/bosca/search:dev
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
+      labels:
+        - ghcr.io/sowers-io/bosca/search:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -145,11 +151,12 @@ services:
 
   # AI gRPC Service
   ai:
-    image: ghcr.io/sowers-io/bosca/ai:dev
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
+      labels:
+        - ghcr.io/sowers-io/bosca/ai:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -172,11 +179,12 @@ services:
 
   # Security gRPC Service
   security:
-    image: ghcr.io/sowers-io/bosca/security:dev
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
+      labels:
+        - ghcr.io/sowers-io/bosca/security:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -197,11 +205,12 @@ services:
 
   # Uploader HTTP Server
   uploader:
-    image: ghcr.io/sowers-io/bosca/uploader:dev
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
+      labels:
+        - ghcr.io/sowers-io/bosca/uploader:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -221,16 +230,17 @@ services:
 
   # Metadata Worker
   metadata-worker:
-    image: ghcr.io/sowers-io/bosca/workers/metadata:dev
     restart: always
     build:
       context: .
+      labels:
+        - ghcr.io/sowers-io/bosca/workers/workflow:dev
       dockerfile: Dockerfile
       platforms:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=workers/metadata
+        - BACKEND=workers/workflow
     env_file:
       - .env-dev
     depends_on:
@@ -244,11 +254,12 @@ services:
 
   # Text Extractor Worker
   textextractor-worker:
-    image: ghcr.io/sowers-io/bosca/workers/textextractor:dev
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
+      labels:
+        - ghcr.io/sowers-io/bosca/workers/textextractor:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -266,11 +277,12 @@ services:
 
   # Bible Worker
   bible-worker:
-    image: ghcr.io/sowers-io/bosca/workers/bible:dev
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
+      labels:
+        - ghcr.io/sowers-io/bosca/workers/bible:dev
       platforms:
         - linux/arm64
         - linux/amd64

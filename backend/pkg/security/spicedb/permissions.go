@@ -132,6 +132,10 @@ func (s *permissionManager) getObjectType(objectType grpc.PermissionObjectType) 
 		return "collection"
 	case grpc.PermissionObjectType_system_resource_type:
 		return "systemresource"
+	case grpc.PermissionObjectType_workflow_type:
+		return "workflow"
+	case grpc.PermissionObjectType_workflow_state_type:
+		return "workflowstate"
 	}
 	return ""
 }

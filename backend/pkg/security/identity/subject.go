@@ -44,7 +44,7 @@ func GetAuthenticatedContext(ctx context.Context) context.Context {
 func GetSubjectId(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", status.Error(codes.Unauthenticated, "failed to get grpc metadata")
+		return "", status.Error(codes.Unauthenticated, "failed to get grpc workflow")
 	}
 	userID := md.Get(XSubjectId)
 	if len(userID) == 0 || userID[0] == "" {

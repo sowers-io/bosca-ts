@@ -119,7 +119,7 @@ func (svc *authorizationService) GetMetadataDownloadUrl(ctx context.Context, req
 
 func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*protobuf.IdResponse, error) {
 	if request.Metadata == nil {
-		return nil, errors.New("metadata is required")
+		return nil, errors.New("workflow is required")
 	}
 	if len(strings.Trim(request.Collection, " ")) == 0 {
 		request.Collection = RootCollectionId
@@ -179,14 +179,6 @@ func (svc *authorizationService) ProcessMetadata(ctx context.Context, request *p
 	return svc.service.SetMetadataUploaded(ctx, request)
 }
 
-func (svc *authorizationService) SetMetadataStatus(ctx context.Context, request *grpc.SetMetadataStatusRequest) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.SetMetadataStatus(ctx, request)
-}
-
 func (svc *authorizationService) GetMetadataPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_manage)
 	if err != nil {
@@ -225,4 +217,12 @@ func (svc *authorizationService) AddCollectionPermission(ctx context.Context, pe
 		return nil, err
 	}
 	return svc.service.AddCollectionPermission(ctx, permission)
+}
+
+func (svc *authorizationService) GetWorkflowStates(ctx context.Context, request *protobuf.Empty) (*grpc.WorkflowStates, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_state_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetWorkflowStates(ctx, request)
 }

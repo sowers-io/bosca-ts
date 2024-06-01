@@ -195,7 +195,7 @@ func main() {
 				HeaderValue: "Token " + cfg.Security.ServiceAccountToken,
 			}})
 			if err != nil {
-				logger.Error("unable to set metadata uploaded: ", slog.Any("error", err))
+				logger.Error("unable to set workflow uploaded: ", slog.Any("error", err))
 				response.StatusCode = 500
 				return response, err
 			}

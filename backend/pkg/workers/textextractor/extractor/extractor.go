@@ -106,7 +106,7 @@ func Extract(ctx context.Context, extractRequest *ExtractRequest) error {
 		return err
 	}
 	if metadataDownloadUrl == nil {
-		slog.WarnContext(ctx, "metadata download url is nil, nothing to do", slog.String("metadata_id", extractRequest.Metadata.Id))
+		slog.WarnContext(ctx, "workflow download url is nil, nothing to do", slog.String("metadata_id", extractRequest.Metadata.Id))
 		return nil
 	}
 	metadataFile, err := common.DownloadTemporaryFile(ctx, metadataDownloadUrl)

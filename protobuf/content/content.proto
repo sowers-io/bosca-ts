@@ -114,95 +114,95 @@ service ContentService {
 
   rpc GetMetadata(bosca.IdRequest) returns (Metadata) {
     option (google.api.http) = {
-      get: "/v1/content/metadata/{id}"
+      get: "/v1/content/workflow/{id}"
     };
   }
 
   rpc GetMetadatas(bosca.IdsRequest) returns (Metadatas) {
     option (google.api.http) = {
-      get: "/v1/content/metadata"
+      get: "/v1/content/workflow"
     };
   }
 
   rpc AddMetadata(AddMetadataRequest) returns (IdResponse) {
     option (google.api.http) = {
-      post: "/v1/content/metadata"
+      post: "/v1/content/workflow"
       body: "*"
     };
   }
 
   rpc DeleteMetadata(bosca.IdRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      delete: "/v1/content/metadata/{id}"
+      delete: "/v1/content/workflow/{id}"
     };
   }
 
   rpc GetMetadataUploadUrl(bosca.IdRequest) returns (SignedUrl) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/url"
+      post: "/v1/content/workflow/{id}/url"
     };
   }
 
   rpc GetMetadataDownloadUrl(bosca.IdRequest) returns (SignedUrl) {
     option (google.api.http) = {
-      get: "/v1/content/metadata/{id}/url"
+      get: "/v1/content/workflow/{id}/url"
     };
   }
 
   rpc AddMetadataSupplementary(AddSupplementaryRequest) returns (SignedUrl) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/url/supplementary/{type}/upload"
+      post: "/v1/content/workflow/{id}/url/supplementary/{type}/upload"
     };
   }
 
   rpc GetMetadataSupplementaryDownloadUrl(SupplementaryIdRequest) returns (SignedUrl) {
     option (google.api.http) = {
-      get: "/v1/content/metadata/{id}/url/supplementary/{type}/download"
+      get: "/v1/content/workflow/{id}/url/supplementary/{type}/download"
     };
   }
 
   rpc DeleteMetadataSupplementary(SupplementaryIdRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      delete: "/v1/content/metadata/{id}/url/supplementary/{type}"
+      delete: "/v1/content/workflow/{id}/url/supplementary/{type}"
     };
   }
 
   rpc SetMetadataUploaded(bosca.IdRequest) returns (Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/uploaded"
+      post: "/v1/content/workflow/{id}/uploaded"
     };
   }
 
   rpc GetMetadataPermissions(bosca.IdRequest) returns (Permissions) {
     option (google.api.http) = {
-      get: "/v1/content/metadata/{id}/permissions"
+      get: "/v1/content/workflow/{id}/permissions"
     };
   }
 
   rpc AddMetadataPermissions(Permissions) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/permissions"
+      post: "/v1/content/workflow/{id}/permissions"
       body: "*"
     };
   }
 
   rpc AddMetadataPermission(Permission) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/permission"
+      post: "/v1/content/workflow/{id}/permission"
       body: "*"
     };
   }
 
   rpc TransitionWorkflow (TransitionWorkflowRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{metadata_id}/workflow/{state_id}"
+      post: "/v1/content/workflow/{metadata_id}/workflow/{state_id}"
       body: "*"
     };
   }
 
   rpc AddMetadataRelationship(AddMetadataRelationshipRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{metadata_id1}/relationship/{metadata_id2}"
+      post: "/v1/content/workflow/{metadata_id1}/relationship/{metadata_id2}"
       body: "*"
     };
   }
@@ -230,6 +230,7 @@ message TransitionWorkflowRequest {
   string metadata_id = 1;
   string state_id = 2;
   string status = 3;
+  bool retry = 4;
 }
 
 message AddMetadataRelationshipRequest {
@@ -273,6 +274,8 @@ enum PermissionObjectType {
   collection_type = 1;
   metadata_type = 2;
   system_resource_type = 3;
+  workflow_type = 4;
+  workflow_state_type = 5;
 }
 
 enum PermissionSubjectType {

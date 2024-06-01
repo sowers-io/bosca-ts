@@ -50,7 +50,7 @@ func OpenBundle(file *os.File) (*Bundle, error) {
 
 	contents := make(map[string]*zip.File)
 	for _, file := range zipReader.File {
-		if file.Name == "metadata.xml" {
+		if file.Name == "workflow.xml" {
 			metadataFile = file
 		} else {
 			contents[file.Name] = file

@@ -59,15 +59,15 @@ func newMetadata(t *testing.T, ctx context.Context, ds *DataStore) string {
 		t.Error("Expected id to not be empty")
 	}
 
-	err = ds.SetMetadataStatus(ctx, id, content.MetadataStatus_ready)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ds.SetMetadataWorkflowStateId(ctx, id, "published")
-	if err != nil {
-		panic(err)
-	}
+	//err = ds.SetMetadataStatus(ctx, id, content.MetadataStatus_ready)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//err = ds.SetMetadataWorkflowStateId(ctx, id, "published")
+	//if err != nil {
+	//	panic(err)
+	//}
 	return id
 }
 

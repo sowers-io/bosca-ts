@@ -1842,7 +1842,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadata", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadata", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1867,7 +1867,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadatas", runtime.WithHTTPPathPattern("/v1/content/metadata"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadatas", runtime.WithHTTPPathPattern("/v1/content/workflow"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1892,7 +1892,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadata", runtime.WithHTTPPathPattern("/v1/content/metadata"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadata", runtime.WithHTTPPathPattern("/v1/content/workflow"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1917,7 +1917,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadata", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadata", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1942,7 +1942,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataUploadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataUploadUrl", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1967,7 +1967,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1992,7 +1992,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}/upload"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url/supplementary/{type}/upload"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2017,7 +2017,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}/download"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url/supplementary/{type}/download"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2042,7 +2042,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url/supplementary/{type}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2067,7 +2067,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/SetMetadataUploaded", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/uploaded"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/SetMetadataUploaded", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/uploaded"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2092,7 +2092,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataPermissions", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/permissions"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataPermissions", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/permissions"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2117,7 +2117,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataPermissions", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/permissions"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataPermissions", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/permissions"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2142,7 +2142,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataPermission", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/permission"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataPermission", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/permission"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2167,7 +2167,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/TransitionWorkflow", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/{state_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/TransitionWorkflow", runtime.WithHTTPPathPattern("/v1/content/workflow/{metadata_id}/workflow/{state_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2192,7 +2192,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataRelationship", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id1}/relationship/{metadata_id2}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataRelationship", runtime.WithHTTPPathPattern("/v1/content/workflow/{metadata_id1}/relationship/{metadata_id2}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2564,7 +2564,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadata", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadata", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2586,7 +2586,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadatas", runtime.WithHTTPPathPattern("/v1/content/metadata"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadatas", runtime.WithHTTPPathPattern("/v1/content/workflow"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2608,7 +2608,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadata", runtime.WithHTTPPathPattern("/v1/content/metadata"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadata", runtime.WithHTTPPathPattern("/v1/content/workflow"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2630,7 +2630,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadata", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadata", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2652,7 +2652,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataUploadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataUploadUrl", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2674,7 +2674,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2696,7 +2696,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}/upload"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url/supplementary/{type}/upload"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2718,7 +2718,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}/download"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url/supplementary/{type}/download"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2740,7 +2740,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/url/supplementary/{type}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2762,7 +2762,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/SetMetadataUploaded", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/uploaded"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/SetMetadataUploaded", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/uploaded"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2784,7 +2784,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataPermissions", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/permissions"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataPermissions", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/permissions"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2806,7 +2806,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataPermissions", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/permissions"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataPermissions", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/permissions"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2828,7 +2828,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataPermission", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/permission"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataPermission", runtime.WithHTTPPathPattern("/v1/content/workflow/{id}/permission"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2850,7 +2850,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/TransitionWorkflow", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/{state_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/TransitionWorkflow", runtime.WithHTTPPathPattern("/v1/content/workflow/{metadata_id}/workflow/{state_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2872,7 +2872,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataRelationship", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id1}/relationship/{metadata_id2}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataRelationship", runtime.WithHTTPPathPattern("/v1/content/workflow/{metadata_id1}/relationship/{metadata_id2}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2920,35 +2920,35 @@ var (
 
 	pattern_ContentService_CheckPermission_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "content", "permission", "check"}, ""))
 
-	pattern_ContentService_GetMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "content", "metadata", "id"}, ""))
+	pattern_ContentService_GetMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "content", "workflow", "id"}, ""))
 
-	pattern_ContentService_GetMetadatas_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "content", "metadata"}, ""))
+	pattern_ContentService_GetMetadatas_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "content", "workflow"}, ""))
 
-	pattern_ContentService_AddMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "content", "metadata"}, ""))
+	pattern_ContentService_AddMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "content", "workflow"}, ""))
 
-	pattern_ContentService_DeleteMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "content", "metadata", "id"}, ""))
+	pattern_ContentService_DeleteMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "content", "workflow", "id"}, ""))
 
-	pattern_ContentService_GetMetadataUploadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "url"}, ""))
+	pattern_ContentService_GetMetadataUploadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "workflow", "id", "url"}, ""))
 
-	pattern_ContentService_GetMetadataDownloadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "url"}, ""))
+	pattern_ContentService_GetMetadataDownloadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "workflow", "id", "url"}, ""))
 
-	pattern_ContentService_AddMetadataSupplementary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"v1", "content", "metadata", "id", "url", "supplementary", "type", "upload"}, ""))
+	pattern_ContentService_AddMetadataSupplementary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"v1", "content", "workflow", "id", "url", "supplementary", "type", "upload"}, ""))
 
-	pattern_ContentService_GetMetadataSupplementaryDownloadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"v1", "content", "metadata", "id", "url", "supplementary", "type", "download"}, ""))
+	pattern_ContentService_GetMetadataSupplementaryDownloadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"v1", "content", "workflow", "id", "url", "supplementary", "type", "download"}, ""))
 
-	pattern_ContentService_DeleteMetadataSupplementary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"v1", "content", "metadata", "id", "url", "supplementary", "type"}, ""))
+	pattern_ContentService_DeleteMetadataSupplementary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"v1", "content", "workflow", "id", "url", "supplementary", "type"}, ""))
 
-	pattern_ContentService_SetMetadataUploaded_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "uploaded"}, ""))
+	pattern_ContentService_SetMetadataUploaded_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "workflow", "id", "uploaded"}, ""))
 
-	pattern_ContentService_GetMetadataPermissions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "permissions"}, ""))
+	pattern_ContentService_GetMetadataPermissions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "workflow", "id", "permissions"}, ""))
 
-	pattern_ContentService_AddMetadataPermissions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "permissions"}, ""))
+	pattern_ContentService_AddMetadataPermissions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "workflow", "id", "permissions"}, ""))
 
-	pattern_ContentService_AddMetadataPermission_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "permission"}, ""))
+	pattern_ContentService_AddMetadataPermission_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "workflow", "id", "permission"}, ""))
 
-	pattern_ContentService_TransitionWorkflow_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "metadata", "metadata_id", "workflow", "state_id"}, ""))
+	pattern_ContentService_TransitionWorkflow_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 2, 1, 0, 4, 1, 5, 4}, []string{"v1", "content", "workflow", "metadata_id", "state_id"}, ""))
 
-	pattern_ContentService_AddMetadataRelationship_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "metadata", "metadata_id1", "relationship", "metadata_id2"}, ""))
+	pattern_ContentService_AddMetadataRelationship_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "workflow", "metadata_id1", "relationship", "metadata_id2"}, ""))
 )
 
 var (

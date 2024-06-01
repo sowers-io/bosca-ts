@@ -39,7 +39,7 @@ func ProcessUSX(ctx context.Context, metadata *content.Metadata) error {
 	}
 
 	if metadataDownloadUrl == nil {
-		slog.WarnContext(ctx, "metadata download url is nil, nothing to do", slog.String("metadata_id", metadata.Id))
+		slog.WarnContext(ctx, "workflow download url is nil, nothing to do", slog.String("metadata_id", metadata.Id))
 		return nil
 	}
 
@@ -64,7 +64,7 @@ func ProcessUSX(ctx context.Context, metadata *content.Metadata) error {
 							"translation.abbreviation.local": bundle.Metadata().Identification.AbbreviationLocal,
 							"translation.chapter.usfm":       chapter.Chapter.GetUsfm(),
 							"translation.verse.usfm":         verse.GetUsfm(),
-							"translation.metadata.id":        metadata.Id,
+							"translation.workflow.id":        metadata.Id,
 						},
 						LanguageTag:   bundle.Metadata().Language.Iso,
 						ContentLength: int64(len(text)),
@@ -89,7 +89,7 @@ func ProcessUSX(ctx context.Context, metadata *content.Metadata) error {
 						StateId:    content2.WorkflowStateFailed,
 					})
 					if err2 != nil {
-						slog.ErrorContext(ctx, "failed to update metadata status to failed", slog.Any("error", err2))
+						slog.ErrorContext(ctx, "failed to update workflow status to failed", slog.Any("error", err2))
 					}
 					return err
 				}

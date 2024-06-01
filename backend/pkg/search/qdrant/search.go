@@ -24,7 +24,7 @@ import (
 	"github.com/tmc/langchaingo/llms"
 )
 
-const MetadataIndex = "metadata"
+const MetadataIndex = "workflow"
 const ContentPayload = "content"
 
 type qdrantSearch struct {

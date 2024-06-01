@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package cli
+package workflow
 
 import (
-	grpc "bosca.io/api/protobuf/content"
-	"bosca.io/cmd/cli/commands/flags"
-	"bosca.io/pkg/clients"
+	"bosca.io/cmd/cli/commands/workflow/states"
+	"bosca.io/cmd/cli/commands/workflow/transition"
 	"github.com/spf13/cobra"
 )
 
-func NewContentClient(cmd *cobra.Command) (grpc.ContentServiceClient, error) {
-	connection, err := clients.NewClientConnection(cmd.Flag(flags.EndpointFlag).Value.String())
-	if err != nil {
-		return nil, err
-	}
-	return grpc.NewContentServiceClient(connection), nil
+var Command = &cobra.Command{
+	Use:   "workflow",
+	Short: "Manage workflow",
+}
+
+func init() {
+	Command.AddCommand(transition.Command, states.Command)
 }

@@ -61,3 +61,36 @@ definition systemresource {
     permission service = owners->service + servicers->service
     permission delete = owners->delete
 }
+
+definition workflow {
+    relation viewers: group | user
+    relation discoverers: group | user
+    relation editors: group | user
+    relation managers: group | user
+    relation servicers: group | user
+    relation owners: group | user
+
+    permission view = viewers->view + editors->view + owners->view
+    permission list = discoverers->list + editors->list + owners->list
+    permission edit = editors->edit + owners->edit
+    permission manage = managers->manage + owners->manage
+    permission service = owners->service + servicers->service
+    permission delete = owners->delete
+}
+
+definition workflowstate {
+    relation viewers: group | user
+    relation discoverers: group | user
+    relation editors: group | user
+    relation managers: group | user
+    relation servicers: group | user
+    relation owners: group | user
+
+    permission view = viewers->view + editors->view + owners->view
+    permission list = discoverers->list + editors->list + owners->list
+    permission edit = editors->edit + owners->edit
+    permission manage = managers->manage + owners->manage
+    permission service = owners->service + servicers->service
+    permission delete = owners->delete
+}
+

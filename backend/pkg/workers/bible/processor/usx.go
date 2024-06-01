@@ -17,6 +17,7 @@
 package processor
 
 import (
+	content2 "bosca.io/api/content"
 	"bosca.io/api/protobuf"
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/bible/usx"
@@ -83,12 +84,12 @@ func ProcessUSX(ctx context.Context, metadata *content.Metadata) error {
 				}
 				err = common.SetTextContent(ctx, response.Id, text)
 				if err != nil {
-					_, err2 := svc.SetMetadataStatus(ctx, &content.SetMetadataStatusRequest{
-						Id:     response.Id,
-						Status: content.MetadataStatus_failed,
+					_, err2 := svc.TransitionWorkflow(ctx, &content.TransitionWorkflowRequest{
+						MetadataId: response.Id,
+						StateId:    content2.WorkflowStateFailed,
 					})
 					if err2 != nil {
-						slog.ErrorContext(ctx, "failed to update metadata status to failed", err2)
+						slog.ErrorContext(ctx, "failed to update metadata status to failed", slog.Any("error", err2))
 					}
 					return err
 				}

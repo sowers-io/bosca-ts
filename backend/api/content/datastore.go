@@ -18,6 +18,7 @@ package content
 
 import (
 	"bosca.io/api/protobuf/content"
+	"bosca.io/pkg/security/identity"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -279,24 +280,40 @@ func (ds *DataStore) GetWorkflow(ctx context.Context, id string) (*content.Workf
 }
 
 func (ds *DataStore) GetWorkflowTransition(ctx context.Context, fromStateId string, toStateId string) (*content.WorkflowStateTransition, error) {
-	row := ds.db.QueryRowContext(ctx, "SELECT from_state_id, to_state_id, validate_workflow_id, configuration FROM workflow_state_transitions WHERE from_state_id = $1 AND to_state_id = $2", fromStateId, toStateId)
+	row := ds.db.QueryRowContext(ctx, "SELECT from_state_id, to_state_id FROM workflow_state_transitions WHERE from_state_id = $1 AND to_state_id = $2", fromStateId, toStateId)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 	var transition content.WorkflowStateTransition
-	var configuration json.RawMessage
-	err := row.Scan(&transition.FromStateId, &transition.ToStateId, &transition.ValidateWorkflowId, &configuration)
+	err := row.Scan(&transition.FromStateId, &transition.ToStateId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	err = json.Unmarshal(configuration, &transition.Configuration)
+	return &transition, nil
+}
+
+func (ds *DataStore) GetWorkflowState(ctx context.Context, id string) (*content.WorkflowState, error) {
+	row := ds.db.QueryRowContext(ctx, "SELECT id, name, description, type, configuration, workflow_id, exist_workflow_id, entry_workflow_id FROM workflow_states WHERE id = $1", id)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+	var state content.WorkflowState
+	var configuration json.RawMessage
+	err := row.Scan(&state.Id, &state.Name, &state.Description, &state.Type, &configuration, &state.WorkflowId, &state.ExitWorkflowId, &state.EntryWorkflowId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	err = json.Unmarshal(configuration, &state.Configuration)
 	if err != nil {
 		return nil, err
 	}
-	return &transition, nil
+	return &state, nil
 }
 
 func (ds *DataStore) SetCollectionWorkflowStateId(ctx context.Context, id string, stateId string) error {
@@ -543,29 +560,41 @@ func (ds *DataStore) DeleteMetadata(ctx context.Context, id string) error {
 	return err
 }
 
-func (ds *DataStore) TransitionMetadataWorkflowStateId(ctx context.Context, id string, stateId string, principal string, status string, success bool) error {
-	row := ds.db.QueryRowContext(ctx, "select workflow_state_id from metadata where id = $1", id)
-	if row.Err() != nil {
-		return row.Err()
-	}
-	var fromStateId string
-	err := row.Scan(&fromStateId)
+func (ds *DataStore) TransitionMetadataWorkflowStateId(ctx context.Context, metadata *content.Metadata, toState *content.WorkflowState, status string, success bool, complete bool) error {
+	subjectId, err := identity.GetSubjectId(ctx)
 	if err != nil {
 		return err
 	}
+
 	txn, err := ds.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-	_, err = txn.ExecContext(ctx, "insert into metadata_workflow_state_history (metadata_id, from_state_id, to_state_id, principal, status, success) values ($1::uuid, $2, $3, $4, $5)", id, fromStateId, stateId, principal, status, success)
+	_, err = txn.ExecContext(ctx, "insert into metadata_workflow_state_history (metadata_id, from_state_id, to_state_id, subject, status, success, complete) values ($1::uuid, $2, $3, $4, $5, $6)", metadata.Id, metadata.WorkflowStateId, toState.Id, subjectId, status, success, complete)
 	if err != nil {
 		txn.Rollback()
 		return err
 	}
-	_, err = txn.ExecContext(ctx, "update metadata set workflow_state_id = $1 where id = $2::uuid", stateId, id)
-	if err != nil {
-		txn.Rollback()
-		return err
+	if !success {
+		_, err = txn.ExecContext(ctx, "update metadata set workflow_state_pending_id = null where id = $1::uuid", metadata.Id)
+		if err != nil {
+			txn.Rollback()
+			return err
+		}
+	} else {
+		if complete {
+			_, err = txn.ExecContext(ctx, "update metadata set workflow_state_id = $1, workflow_state_pending_id = null where id = $2::uuid", toState.Id, metadata.Id)
+			if err != nil {
+				txn.Rollback()
+				return err
+			}
+		} else {
+			_, err = txn.ExecContext(ctx, "update metadata set workflow_state_pending_id = $1 where id = $2::uuid", toState.Id, metadata.Id)
+			if err != nil {
+				txn.Rollback()
+				return err
+			}
+		}
 	}
 	return txn.Commit()
 }

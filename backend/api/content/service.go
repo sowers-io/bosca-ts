@@ -23,7 +23,6 @@ import (
 	"bosca.io/pkg/security"
 	"bosca.io/pkg/security/identity"
 	"bosca.io/pkg/workers/common"
-	"bosca.io/pkg/workers/metadata"
 	"context"
 	"errors"
 	"go.temporal.io/sdk/client"
@@ -367,6 +366,62 @@ func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.I
 	return svc.TransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: request.Id, StateId: WorkflowStateProcessing})
 }
 
+func (svc *service) executeEnterExitWorkflow(ctx context.Context, metadataId string, workflowId string, state *grpc.WorkflowState) error {
+	workflow, err := svc.ds.GetWorkflow(ctx, workflowId)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get workflow", slog.String("id", metadataId), slog.String("workflowId", workflowId))
+		return err
+	}
+	if workflow == nil {
+		slog.ErrorContext(ctx, "workflow not found", slog.String("id", metadataId), slog.String("workflowId", workflowId))
+		return status.Error(codes.Internal, "workflow not found")
+	}
+	workflowTransition := &common.WorkflowTransition{
+		MetadataId:            metadataId,
+		WorkflowConfiguration: workflow.Configuration,
+		StateConfiguration:    state.Configuration,
+	}
+	run, err := svc.temporalClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
+		TaskQueue: workflow.Queue,
+	}, workflow.Name, workflowTransition)
+	if err != nil {
+		return err
+	}
+	var result bool
+	err = run.Get(ctx, &result)
+	if err != nil {
+		return err
+	}
+	if !result {
+		return status.Error(codes.InvalidArgument, "transition validation failed")
+	}
+	return nil
+}
+
+func (svc *service) executeWorkflow(ctx context.Context, metadataId string, workflowId string, state *grpc.WorkflowState) error {
+	workflow, err := svc.ds.GetWorkflow(ctx, workflowId)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get workflow", slog.String("id", metadataId), slog.String("workflowId", workflowId))
+		return err
+	}
+	if workflow == nil {
+		slog.ErrorContext(ctx, "workflow not found", slog.String("id", metadataId), slog.String("workflowId", workflowId))
+		return status.Error(codes.Internal, "workflow not found")
+	}
+	workflowTransition := &common.WorkflowTransition{
+		MetadataId:            metadataId,
+		WorkflowConfiguration: workflow.Configuration,
+		StateConfiguration:    state.Configuration,
+	}
+	_, err = svc.temporalClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
+		TaskQueue: workflow.Queue,
+	}, workflow.Name, workflowTransition)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (svc *service) TransitionWorkflow(ctx context.Context, request *grpc.TransitionWorkflowRequest) (*protobuf.Empty, error) {
 	md, err := svc.ds.GetMetadata(ctx, request.MetadataId)
 	if err != nil {
@@ -381,64 +436,65 @@ func (svc *service) TransitionWorkflow(ctx context.Context, request *grpc.Transi
 		slog.WarnContext(ctx, "metadata already in state", slog.String("id", request.MetadataId), slog.String("state", request.StateId))
 		return &protobuf.Empty{}, nil
 	}
+
+	// verify transition
 	transition, err := svc.ds.GetWorkflowTransition(ctx, md.WorkflowStateId, request.StateId)
 	if err != nil {
+		slog.WarnContext(ctx, "getting transition failed", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId), slog.Any("error", err))
 		return nil, err
 	}
 	if transition == nil {
-		slog.WarnContext(ctx, "transition not found", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId))
+		slog.ErrorContext(ctx, "transition not found", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId))
 		return nil, status.Error(codes.InvalidArgument, "invalid transition")
 	}
-	if transition.ValidateWorkflowId != nil {
-		workflow, err := svc.ds.GetWorkflow(ctx, *transition.ValidateWorkflowId)
+
+	// ensure we can exit this state
+	currentState, err := svc.ds.GetWorkflowState(ctx, md.WorkflowStateId)
+	if err != nil {
+		slog.ErrorContext(ctx, "getting current state transition failed", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId), slog.Any("error", err))
+		return nil, err
+	}
+	if currentState.ExitWorkflowId != nil {
+		err = svc.executeEnterExitWorkflow(ctx, md.Id, *currentState.ExitWorkflowId, currentState)
 		if err != nil {
+			slog.ErrorContext(ctx, "current state transition failed", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId), slog.Any("error", err))
 			return nil, err
-		}
-		if workflow == nil {
-			slog.ErrorContext(ctx, "workflow not found", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId), slog.String("workflowId", *transition.ValidateWorkflowId))
-			return nil, status.Error(codes.Internal, "workflow not found")
-		}
-		transition = &common.WorkflowTransition{
-			MetadataId:    request.MetadataId,
-			Configuration: workflow.Configuration,
-		}
-		run, err := svc.temporalClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
-			TaskQueue: workflow.Queue,
-		}, workflow.Name, transition)
-		if err != nil {
-			return nil, err
-		}
-		var result bool
-		err = run.Get(ctx, &result)
-		if err != nil {
-			return nil, err
-		}
-		if !result {
-			return nil, status.Error(codes.InvalidArgument, "transition validation failed")
 		}
 	}
 
-	_, err := svc.temporalClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
-		TaskQueue: metadata.TaskQueue,
-	}, metadata.ProcessMetadata, request.Id)
+	// ensure we can enter this state
+	nextState, err := svc.ds.GetWorkflowState(ctx, request.StateId)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to execute process workflow", slog.String("id", request.Id), slog.Any("error", err))
+		slog.ErrorContext(ctx, "getting next state transition failed", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId), slog.Any("error", err))
 		return nil, err
 	}
-	err = svc.ds.SetMetadataStatus(ctx, request.Id, grpc.MetadataStatus_processing)
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to execute update status", slog.String("id", request.Id), slog.Any("error", err))
-		return nil, err
+	if nextState.EntryWorkflowId != nil {
+		err = svc.executeEnterExitWorkflow(ctx, md.Id, *nextState.EntryWorkflowId, nextState)
+		if err != nil {
+			slog.ErrorContext(ctx, "next state transition failed", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId), slog.Any("error", err))
+			return nil, err
+		}
 	}
-	return &protobuf.Empty{}, nil
-}
 
-func (svc *service) SetMetadataStatus(ctx context.Context, request *grpc.SetMetadataStatusRequest) (*protobuf.Empty, error) {
-	err := svc.ds.SetMetadataStatus(ctx, request.Id, request.Status)
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to set metadata status", slog.String("id", request.Id), slog.String("variant_id", request.VariantId), slog.String("status", request.Status.String()), slog.Any("error", err))
-		return nil, err
+	// enter the state
+	if nextState.WorkflowId != nil {
+		err = svc.ds.TransitionMetadataWorkflowStateId(ctx, md, nextState, request.Status, true, false)
+		if err != nil {
+			return nil, err
+		}
+		err = svc.executeWorkflow(ctx, md.Id, *nextState.WorkflowId, nextState)
+		if err != nil {
+			_ = svc.ds.TransitionMetadataWorkflowStateId(ctx, md, nextState, request.Status, false, true)
+			slog.ErrorContext(ctx, "transition failed", slog.String("id", request.MetadataId), slog.String("currentState", md.WorkflowStateId), slog.String("newState", request.StateId), slog.Any("error", err))
+			return nil, err
+		}
+	} else {
+		err = svc.ds.TransitionMetadataWorkflowStateId(ctx, md, nextState, request.Status, true, true)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	return &protobuf.Empty{}, nil
 }
 

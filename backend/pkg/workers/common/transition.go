@@ -1,6 +1,7 @@
 package common
 
 type WorkflowTransition struct {
-	MetadataId    string
-	Configuration map[string]string
+	MetadataId            string
+	WorkflowConfiguration map[string]string
+	StateConfiguration    map[string]string
 }

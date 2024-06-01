@@ -229,6 +229,7 @@ enum PermissionAction {
 message TransitionWorkflowRequest {
   string metadata_id = 1;
   string state_id = 2;
+  string status = 3;
 }
 
 message AddMetadataRelationshipRequest {
@@ -350,8 +351,10 @@ message WorkflowState {
   string name = 2;
   string description = 3;
   WorkflowStateType type = 4;
-  string enter_workflow_id = 5;
-  string workflow_id = 6;
+  map<string, string> configuration = 5;
+  optional string workflow_id = 6;
+  optional string entry_workflow_id = 7;
+  optional string exit_workflow_id = 8;
 }
 
 message WorkflowStateTransitions {
@@ -361,8 +364,7 @@ message WorkflowStateTransitions {
 message WorkflowStateTransition {
   string from_state_id = 1;
   string to_state_id = 2;
-  optional string validate_workflow_id = 3;
-  map<string, string> configuration = 4;
+  string description = 3;
 }
 
 message Traits {

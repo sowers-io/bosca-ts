@@ -33,27 +33,27 @@ import (
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
 
 	ctx := rootContext.Background()
 
 	cfg := configuration.NewWorkerConfiguration()
+	util.InitializeLogging(cfg)
+
 	connection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
 	if err != nil {
-		logger.Error("failed to get content service connection", slog.Any("error", err))
+		slog.Error("failed to get content service connection", slog.Any("error", err))
 		os.Exit(1)
 	}
 
 	searchClient, err := factory.NewSearch(cfg.Search)
 	if err != nil {
-		logger.Error("failed to get search client", slog.Any("error", err))
+		slog.Error("failed to get search client", slog.Any("error", err))
 		os.Exit(1)
 	}
 
 	qdrantClient, err := qdrant.NewQdrantClient(cfg.ClientEndPoints.QdrantApiAddress)
 	if err != nil {
-		logger.Error("failed to get qdrant client", slog.Any("error", err))
+		slog.Error("failed to get qdrant client", slog.Any("error", err))
 		os.Exit(1)
 	}
 
@@ -61,14 +61,14 @@ func main() {
 	propagator := common.NewContextPropagator(cfg, httpClient, content.NewContentServiceClient(connection), searchClient, qdrantClient)
 	client, err := temporal.NewClientWithPropagator(ctx, cfg.ClientEndPoints, propagator)
 	if err != nil {
-		logger.Error("Unable to create temporal client", slog.Any("error", err))
+		slog.Error("Unable to create temporal client", slog.Any("error", err))
 		os.Exit(1)
 	}
 	defer client.Close()
 
 	err = textextractor.NewWorker(client).Run(worker.InterruptCh())
 	if err != nil {
-		logger.Error("error starting worker", slog.Any("error", err))
+		slog.Error("error starting worker", slog.Any("error", err))
 		os.Exit(1)
 	}
 }

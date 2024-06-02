@@ -56,7 +56,10 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 	server := grpc.NewServer(grpcOpts...)
 	mux := runtime.NewServeMux()
 
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(104857600)),
+	}
 	register(ctx, server, mux, endpoint, opts)
 
 	protohealth.RegisterHealthServiceServer(server, health.NewHealthService())

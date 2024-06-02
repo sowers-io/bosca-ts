@@ -28,7 +28,7 @@ import (
 
 var Command = &cobra.Command{
 	Use:   "search [query]",
-	Short: "Search across all workflow",
+	Short: "Search across all metadata",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var err error

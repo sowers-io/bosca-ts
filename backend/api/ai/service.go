@@ -23,6 +23,7 @@ import (
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/vectorstores"
+	"log/slog"
 )
 
 type service struct {
@@ -45,18 +46,21 @@ func NewService(serviceAccountId string, permissions security.PermissionManager,
 }
 
 func (s *service) Chat(ctx context.Context, req *grpc.ChatRequest) (*grpc.ChatResponse, error) {
-	result, err := chains.Run(
+	slog.DebugContext(ctx, "chat request", slog.String("request", req.Query))
+	response, err := chains.Run(
 		ctx,
 		chains.NewRetrievalQAFromLLM(
 			s.model,
-			vectorstores.ToRetriever(s.store, 1000),
+			vectorstores.ToRetriever(s.store, 100),
 		),
 		req.Query,
 	)
 	if err != nil {
+		slog.ErrorContext(ctx, "failed chat request", slog.String("request", req.Query), slog.Any("error", err))
 		return nil, err
 	}
+	slog.InfoContext(ctx, "chat request", slog.String("request", req.Query), slog.String("response", response), slog.Any("error", err))
 	return &grpc.ChatResponse{
-		Response: result,
+		Response: response,
 	}, nil
 }

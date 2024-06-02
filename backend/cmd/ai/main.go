@@ -36,8 +36,7 @@ import (
 func main() {
 	cfg := configuration.NewServerConfiguration("ai", 5007, 5017)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
+	util.InitializeLogging(cfg)
 
 	permissions := spicedb.NewPermissionManager(spicedb.NewSpiceDBClient(cfg))
 

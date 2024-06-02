@@ -71,7 +71,7 @@ definition workflow {
     relation owners: group | user
 
     permission view = viewers->view + editors->view + owners->view
-    permission list = discoverers->list + editors->list + owners->list
+    permission list = discoverers->list + editors->list + owners->list + servicers->list
     permission edit = editors->edit + owners->edit
     permission manage = managers->manage + owners->manage
     permission service = owners->service + servicers->service
@@ -87,7 +87,7 @@ definition workflowstate {
     relation owners: group | user
 
     permission view = viewers->view + editors->view + owners->view
-    permission list = discoverers->list + editors->list + owners->list
+    permission list = discoverers->list + editors->list + owners->list + servicers->list
     permission edit = editors->edit + owners->edit
     permission manage = managers->manage + owners->manage
     permission service = owners->service + servicers->service

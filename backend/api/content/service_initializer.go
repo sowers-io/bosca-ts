@@ -18,18 +18,21 @@ package content
 
 import (
 	"context"
-	"log"
+	"log/slog"
+	"os"
 )
 
 func initializeService(dataStore *DataStore) {
 	ctx := context.Background()
 	if added, err := dataStore.AddRootCollection(ctx); added {
 		if err != nil {
-			log.Fatalf("error initializing root collection: %v", err)
+			slog.Error("error initializing root collection: %v", slog.Any("error", err))
+			os.Exit(1)
 		}
 	} else if err != nil {
-		log.Fatalf("failed to initialize root collection permission: %v", err)
+		slog.Error("failed to initialize root collection permission", slog.Any("error", err))
+		os.Exit(1)
 	} else {
-		println("root collection initialized")
+		slog.Info("root collection already initialized")
 	}
 }

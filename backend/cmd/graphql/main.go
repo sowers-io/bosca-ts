@@ -21,6 +21,7 @@ import (
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
+	"bosca.io/pkg/util"
 	"context"
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
@@ -31,6 +32,8 @@ import (
 
 func main() {
 	cfg := configuration.NewServerConfiguration("", 0, 0)
+
+	util.InitializeLogging(cfg)
 
 	contentConnection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
 	if err != nil {

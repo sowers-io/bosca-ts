@@ -28,5 +28,5 @@ Authorization: Bearer {{session_token}}
 Content-Type: application/json
 
 {
-  "query": "Who is Kyle?"
+  "query": "What were Eber's sons names?"
 }

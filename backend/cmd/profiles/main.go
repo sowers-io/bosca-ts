@@ -22,6 +22,7 @@ import (
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
 	"bosca.io/pkg/server"
+	"bosca.io/pkg/util"
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -32,6 +33,9 @@ import (
 
 func main() {
 	cfg := configuration.NewServerConfiguration("profiles", 5004, 5014)
+
+	util.InitializeLogging(cfg)
+
 	pool, err := datastore.NewDatabasePool(context.Background(), cfg)
 	if err != nil {
 		slog.Error("failed to connect to database", slog.Any("error", err))

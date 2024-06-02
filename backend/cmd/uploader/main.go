@@ -25,6 +25,7 @@ import (
 	"bosca.io/pkg/security"
 	securityFactory "bosca.io/pkg/security/factory"
 	"bosca.io/pkg/security/identity"
+	"bosca.io/pkg/util"
 	"context"
 	"errors"
 	"fmt"
@@ -106,12 +107,11 @@ func verify(cfg *configuration.ServerConfiguration, contentClient content.Conten
 func main() {
 	cfg := configuration.NewServerConfiguration("", 8099, 0)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
+	util.InitializeLogging(cfg)
 
 	contentConnection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
 	if err != nil {
-		logger.Error("failed to create content client: ", slog.Any("error", err))
+		slog.Error("failed to create content client: ", slog.Any("error", err))
 		os.Exit(1)
 	}
 	defer contentConnection.Close()
@@ -131,7 +131,7 @@ func main() {
 	)
 
 	if err != nil {
-		logger.Error("failed to create content client", slog.Any("error", err))
+		slog.Error("failed to create content client", slog.Any("error", err))
 		os.Exit(1)
 	}
 
@@ -163,7 +163,7 @@ func main() {
 		Cors:                    cors,
 		PreUploadCreateCallback: func(hook tusd.HookEvent) (response tusd.HTTPResponse, changes tusd.FileInfoChanges, error error) {
 			if err := verify(cfg, contentClient, subjectFinder, hook); err != nil {
-				logger.Error("verify failed", slog.Any("error", err))
+				slog.Error("verify failed", slog.Any("error", err))
 				response.StatusCode = 401
 				error = err
 				return
@@ -173,7 +173,7 @@ func main() {
 		},
 		PreFinishResponseCallback: func(hook tusd.HookEvent) (response tusd.HTTPResponse, error error) {
 			if err := verify(cfg, contentClient, subjectFinder, hook); err != nil {
-				logger.Error("verify failed", slog.Any("error", err))
+				slog.Error("verify failed", slog.Any("error", err))
 				response.StatusCode = 401
 				error = err
 				return
@@ -200,7 +200,7 @@ func main() {
 				HeaderValue: "Token " + cfg.Security.ServiceAccountToken,
 			}})
 			if err != nil {
-				logger.Error("unable to set metadata uploaded: ", slog.Any("error", err))
+				slog.Error("unable to set metadata uploaded: ", slog.Any("error", err))
 				response.StatusCode = 500
 				return response, err
 			}
@@ -209,7 +209,7 @@ func main() {
 	})
 
 	if err != nil {
-		logger.Error("unable to create handler: ", slog.Any("error", err))
+		slog.Error("unable to create handler: ", slog.Any("error", err))
 		os.Exit(1)
 	}
 
@@ -217,7 +217,7 @@ func main() {
 	http.Handle("/uploads", http.StripPrefix("/uploads", handler))
 	err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.RestPort), nil)
 	if err != nil {
-		logger.Error("unable to listen", slog.Int("port", cfg.RestPort), slog.Any("error", err))
+		slog.Error("unable to listen", slog.Int("port", cfg.RestPort), slog.Any("error", err))
 		os.Exit(1)
 	}
 }

@@ -25,6 +25,7 @@ import (
 	"bosca.io/pkg/security/spicedb"
 	"bosca.io/pkg/server"
 	"bosca.io/pkg/temporal"
+	"bosca.io/pkg/util"
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -35,14 +36,14 @@ import (
 
 func main() {
 	cfg := configuration.NewServerConfiguration("content", 5003, 5013)
+
+	util.InitializeLogging(cfg)
+
 	pool, err := datastore.NewDatabasePool(context.Background(), cfg)
 	if err != nil {
 		slog.Error("failed to connect to database", slog.Any("error", err))
 		os.Exit(1)
 	}
-
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
 
 	objectStore, err := factory.NewObjectStore(cfg.Storage)
 	if err != nil {

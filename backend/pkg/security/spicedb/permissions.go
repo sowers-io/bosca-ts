@@ -100,27 +100,44 @@ func (s *permissionManager) CheckWithError(ctx context.Context, objectType grpc.
 }
 
 func (s *permissionManager) CheckWithSubjectIdError(ctx context.Context, subjectType grpc.PermissionSubjectType, subjectId string, objectType grpc.PermissionObjectType, objectId string, action grpc.PermissionAction) error {
+	objectTypeString := s.getObjectType(objectType)
+	subjectTypeString := s.getSubjectType(subjectType)
+	actionString := s.getAction(action)
+
+	logAttrs := []any{
+		slog.String("objectType", objectTypeString),
+		slog.String("objectId", objectId),
+		slog.String("subjectType", subjectTypeString),
+		slog.String("subjectId", subjectId),
+		slog.String("action", actionString),
+	}
+
+	slog.DebugContext(ctx, "checking permissions", logAttrs...)
+
 	check := &pb.CheckPermissionRequest{
 		Resource: &pb.ObjectReference{
-			ObjectType: s.getObjectType(objectType),
+			ObjectType: objectTypeString,
 			ObjectId:   objectId,
 		},
-		Permission: s.getAction(action),
+		Permission: actionString,
 		Subject: &pb.SubjectReference{
 			Object: &pb.ObjectReference{
-				ObjectType: s.getSubjectType(subjectType),
+				ObjectType: subjectTypeString,
 				ObjectId:   subjectId,
 			},
 		},
 	}
 	r, err := s.permissionsClient.CheckPermission(ctx, check)
 	if err != nil {
+		slog.DebugContext(ctx, "error checking permissions", logAttrs...)
 		return err
 	}
 	if r.Permissionship == pb.CheckPermissionResponse_PERMISSIONSHIP_NO_PERMISSION ||
 		r.Permissionship == pb.CheckPermissionResponse_PERMISSIONSHIP_UNSPECIFIED {
+		slog.DebugContext(ctx, "permission check failed", logAttrs...)
 		return status.Errorf(codes.Unauthenticated, "permission check failed")
 	}
+	slog.DebugContext(ctx, "permission check successful", logAttrs...)
 	return nil
 }
 
@@ -243,8 +260,8 @@ func (s *permissionManager) CreateRelationships(ctx context.Context, objectType 
 				if match {
 					break
 				} else {
-					slog.Debug("permission not found, trying again")
-					time.Sleep(100 * time.Millisecond)
+					slog.Debug("permission not found while creating relationships, trying again in 500ms")
+					time.Sleep(500 * time.Millisecond)
 				}
 			}
 		}

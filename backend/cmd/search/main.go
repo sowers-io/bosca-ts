@@ -39,8 +39,7 @@ import (
 func main() {
 	cfg := configuration.NewServerConfiguration("search", 5005, 5015)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
+	util.InitializeLogging(cfg)
 
 	connection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)
 	if err != nil {

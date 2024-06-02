@@ -22,6 +22,14 @@ import (
 	"log"
 )
 
+type Configuration interface {
+	GetLogging() *LoggingConfiguration
+}
+
+type LoggingConfiguration struct {
+	Level string `envconfig:"LOGGING_LEVEL" required:"true"`
+}
+
 type ServerConfiguration struct {
 	RestPort        int                    `envconfig:"REST_PORT"`
 	GrpcPort        int                    `envconfig:"GRPC_PORT"`
@@ -33,6 +41,12 @@ type ServerConfiguration struct {
 	AIConfiguration *AIConfiguration       `ignored:"true"`
 }
 
+func (cfg *ServerConfiguration) GetLogging() *LoggingConfiguration {
+	return &LoggingConfiguration{
+		Level: "DEBUG",
+	}
+}
+
 type AIConfiguration struct {
 	DefaultLlmModel string `envconfig:"DEFAULT_LLM_MODEL" default:"llama3:latest"`
 }
@@ -42,6 +56,12 @@ type WorkerConfiguration struct {
 	Search          *SearchConfiguration   `ignored:"true"`
 	ClientEndPoints *ClientEndpoints       `ignored:"true"`
 	AIConfiguration *AIConfiguration       `ignored:"true"`
+}
+
+func (cfg *WorkerConfiguration) GetLogging() *LoggingConfiguration {
+	return &LoggingConfiguration{
+		Level: "DEBUG",
+	}
 }
 
 type SecurityConfiguration struct {

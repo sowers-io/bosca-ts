@@ -112,7 +112,10 @@ func (svc *authorizationService) GetMetadatas(ctx context.Context, request *prot
 func (svc *authorizationService) GetMetadataUploadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_edit)
 	if err != nil {
-		return nil, err
+		err = svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_edit)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return svc.service.GetMetadataUploadUrl(ctx, request)
 }
@@ -240,6 +243,7 @@ func (svc *authorizationService) AddCollectionPermission(ctx context.Context, pe
 }
 
 func (svc *authorizationService) GetTraits(ctx context.Context, request *protobuf.Empty) (*grpc.Traits, error) {
+	// TODO: maybe a trait permission object?
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
 	if err != nil {
 		return nil, err

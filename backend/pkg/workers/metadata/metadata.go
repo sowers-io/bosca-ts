@@ -28,9 +28,9 @@ import (
 
 func ProcessMetadata(ctx workflow.Context, id string) error {
 	retryPolicy := &temporal.RetryPolicy{
-		InitialInterval:        time.Second,
-		BackoffCoefficient:     2.0,
-		MaximumInterval:        100 * time.Second,
+		InitialInterval:        time.Second / 2,
+		BackoffCoefficient:     1.5,
+		MaximumInterval:        30 * time.Second,
 		MaximumAttempts:        500, // 0 is unlimited retries
 		NonRetryableErrorTypes: []string{"MissingMetadata"},
 	}

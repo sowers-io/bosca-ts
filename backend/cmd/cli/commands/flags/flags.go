@@ -20,6 +20,7 @@ const EndpointFlag = "endpoint"
 const ParentFlag = "parent"
 
 const RetryFlag = "retry"
+const TraitFlag = "trait"
 
 const UsernameFlag = "username"
 const PasswordFlag = "password"

@@ -182,9 +182,14 @@ func main() {
 			if collection == "" {
 				collection = content2.RootCollectionId
 			}
+			traits := make([]string, 0)
+			if hook.Upload.MetaData["trait"] != "" {
+				traits = append(traits, hook.Upload.MetaData["trait"])
+			}
 			metadata := &content.Metadata{
 				Name:          hook.Upload.MetaData["name"],
 				ContentType:   hook.Upload.MetaData["filetype"],
+				TraitIds:      traits,
 				ContentLength: hook.Upload.Size,
 				Source:        &hook.Upload.ID,
 			}
@@ -195,7 +200,7 @@ func main() {
 				HeaderValue: "Token " + cfg.Security.ServiceAccountToken,
 			}})
 			if err != nil {
-				logger.Error("unable to set workflow uploaded: ", slog.Any("error", err))
+				logger.Error("unable to set metadata uploaded: ", slog.Any("error", err))
 				response.StatusCode = 500
 				return response, err
 			}

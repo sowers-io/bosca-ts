@@ -19,55 +19,33 @@ package processor
 import (
 	"bosca.io/api/protobuf"
 	"bosca.io/api/protobuf/content"
-	"bosca.io/pkg/search"
 	"bosca.io/pkg/workers/common"
-	"bosca.io/pkg/workers/textextractor"
 	"context"
-	"log/slog"
-	"os"
 )
 
-func TransitionToDraft(ctx context.Context, metadata *content.Metadata) error {
+func CompleteTransition(ctx context.Context, metadata *content.Metadata) error {
 	contentService := common.GetContentService(ctx)
-	if metadata.WorkflowStateId == "processing" {
-		_, err := contentService.TransitionWorkflow(common.GetServiceAuthorizedContext(ctx), &content.TransitionWorkflowRequest{
-			MetadataId: metadata.Id,
-			StateId:    "draft",
-		})
-		return err
-	}
-	slog.Warn("Metadata is not in processing state", slog.String("metadataId", metadata.Id), slog.String("stateId", metadata.WorkflowStateId))
-	return nil
+	_, err := contentService.CompleteTransitionWorkflow(common.GetServiceAuthorizedContext(ctx), &content.CompleteTransitionWorkflowRequest{
+		MetadataId: metadata.Id,
+		Status:     "workflow transition",
+		Success:    true,
+	})
+	return err
 }
 
-func AddToSearchIndex(ctx context.Context, metadata *content.Metadata) error {
-	svc := common.GetContentService(ctx)
+type Transition struct {
+	Metadata *content.Metadata
+	StateId  string
+}
 
-	signedUrl, err := svc.GetMetadataSupplementaryDownloadUrl(common.GetServiceAuthorizedContext(ctx), &content.SupplementaryIdRequest{
-		Id:   metadata.Id,
-		Type: textextractor.SupplementalTextType,
+func TransitionTo(ctx context.Context, transition *Transition) error {
+	contentService := common.GetContentService(ctx)
+	_, err := contentService.BeginTransitionWorkflow(common.GetServiceAuthorizedContext(ctx), &content.TransitionWorkflowRequest{
+		MetadataId: transition.Metadata.Id,
+		StateId:    transition.StateId,
+		Status:     "workflow transition",
 	})
-	if err != nil {
-		return err
-	}
-
-	file, err := common.DownloadTemporaryFile(ctx, signedUrl)
-	if err != nil {
-		return err
-	}
-	defer os.Remove(file.Name())
-
-	body, err := os.ReadFile(file.Name())
-	if err != nil {
-		return err
-	}
-
-	client := common.GetSearchClient(ctx)
-	return client.Index(client.GetMetadataIndex(), &search.Document{
-		Id:   metadata.Id,
-		Name: metadata.Name,
-		Body: string(body),
-	})
+	return err
 }
 
 type TraitWorkflow struct {

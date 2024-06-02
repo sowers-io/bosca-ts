@@ -14,31 +14,18 @@
  * limitations under the License.
  */
 
-package bible
+package metadata
 
 import (
 	"bosca.io/api/protobuf/content"
-	"bosca.io/pkg/workers/bible/processor"
 	"bosca.io/pkg/workers/common"
-	"go.temporal.io/sdk/client"
+	"bosca.io/pkg/workers/metadata/processor"
 	"go.temporal.io/sdk/temporal"
-	"go.temporal.io/sdk/worker"
 	"go.temporal.io/sdk/workflow"
-
 	"time"
 )
 
-const TaskQueue = "bible"
-
-func NewWorker(client client.Client) worker.Worker {
-	w := worker.New(client, TaskQueue, worker.Options{})
-	w.RegisterWorkflow(ProcessBible)
-	w.RegisterActivity(common.GetMetadata)
-	w.RegisterActivity(processor.ProcessUSX)
-	return w
-}
-
-func ProcessBible(ctx workflow.Context, id string) error {
+func ProcessTraits(ctx workflow.Context, id string) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second,
 		BackoffCoefficient:     2.0,
@@ -60,9 +47,24 @@ func ProcessBible(ctx workflow.Context, id string) error {
 		return err
 	}
 
-	err = workflow.ExecuteActivity(ctx, processor.ProcessUSX, metadata).Get(ctx, nil)
-	if err != nil {
-		return err
+	if metadata.TraitIds != nil && len(metadata.TraitIds) > 0 {
+		var workflows []*processor.TraitWorkflow
+		err = workflow.ExecuteActivity(ctx, processor.GetTraitWorkflows, metadata).Get(ctx, &workflows)
+		if err != nil {
+			return err
+		}
+
+		if workflows != nil {
+			for _, trait := range workflows {
+				traitWorkflowCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
+					TaskQueue: trait.Queue,
+				})
+				err = workflow.ExecuteChildWorkflow(traitWorkflowCtx, trait.Id, metadata.Id).Get(ctx, nil)
+				if err != nil {
+					return err
+				}
+			}
+		}
 	}
 
 	return nil

@@ -52,6 +52,7 @@ const (
 	ContentService_GetMetadata_FullMethodName                         = "/bosca.content.ContentService/GetMetadata"
 	ContentService_GetMetadatas_FullMethodName                        = "/bosca.content.ContentService/GetMetadatas"
 	ContentService_AddMetadata_FullMethodName                         = "/bosca.content.ContentService/AddMetadata"
+	ContentService_AddMetadataTrait_FullMethodName                    = "/bosca.content.ContentService/AddMetadataTrait"
 	ContentService_DeleteMetadata_FullMethodName                      = "/bosca.content.ContentService/DeleteMetadata"
 	ContentService_GetMetadataUploadUrl_FullMethodName                = "/bosca.content.ContentService/GetMetadataUploadUrl"
 	ContentService_GetMetadataDownloadUrl_FullMethodName              = "/bosca.content.ContentService/GetMetadataDownloadUrl"
@@ -62,7 +63,8 @@ const (
 	ContentService_GetMetadataPermissions_FullMethodName              = "/bosca.content.ContentService/GetMetadataPermissions"
 	ContentService_AddMetadataPermissions_FullMethodName              = "/bosca.content.ContentService/AddMetadataPermissions"
 	ContentService_AddMetadataPermission_FullMethodName               = "/bosca.content.ContentService/AddMetadataPermission"
-	ContentService_TransitionWorkflow_FullMethodName                  = "/bosca.content.ContentService/TransitionWorkflow"
+	ContentService_BeginTransitionWorkflow_FullMethodName             = "/bosca.content.ContentService/BeginTransitionWorkflow"
+	ContentService_CompleteTransitionWorkflow_FullMethodName          = "/bosca.content.ContentService/CompleteTransitionWorkflow"
 	ContentService_AddMetadataRelationship_FullMethodName             = "/bosca.content.ContentService/AddMetadataRelationship"
 )
 
@@ -87,6 +89,7 @@ type ContentServiceClient interface {
 	GetMetadata(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Metadata, error)
 	GetMetadatas(ctx context.Context, in *protobuf.IdsRequest, opts ...grpc.CallOption) (*Metadatas, error)
 	AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*protobuf.IdResponse, error)
+	AddMetadataTrait(ctx context.Context, in *AddMetadataTraitRequest, opts ...grpc.CallOption) (*Metadata, error)
 	DeleteMetadata(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	GetMetadataUploadUrl(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
 	GetMetadataDownloadUrl(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
@@ -97,7 +100,8 @@ type ContentServiceClient interface {
 	GetMetadataPermissions(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
 	AddMetadataPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	AddMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*protobuf.Empty, error)
-	TransitionWorkflow(ctx context.Context, in *TransitionWorkflowRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
+	BeginTransitionWorkflow(ctx context.Context, in *TransitionWorkflowRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
+	CompleteTransitionWorkflow(ctx context.Context, in *CompleteTransitionWorkflowRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
 	AddMetadataRelationship(ctx context.Context, in *AddMetadataRelationshipRequest, opts ...grpc.CallOption) (*protobuf.Empty, error)
 }
 
@@ -279,6 +283,16 @@ func (c *contentServiceClient) AddMetadata(ctx context.Context, in *AddMetadataR
 	return out, nil
 }
 
+func (c *contentServiceClient) AddMetadataTrait(ctx context.Context, in *AddMetadataTraitRequest, opts ...grpc.CallOption) (*Metadata, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Metadata)
+	err := c.cc.Invoke(ctx, ContentService_AddMetadataTrait_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) DeleteMetadata(ctx context.Context, in *protobuf.IdRequest, opts ...grpc.CallOption) (*protobuf.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(protobuf.Empty)
@@ -379,10 +393,20 @@ func (c *contentServiceClient) AddMetadataPermission(ctx context.Context, in *Pe
 	return out, nil
 }
 
-func (c *contentServiceClient) TransitionWorkflow(ctx context.Context, in *TransitionWorkflowRequest, opts ...grpc.CallOption) (*protobuf.Empty, error) {
+func (c *contentServiceClient) BeginTransitionWorkflow(ctx context.Context, in *TransitionWorkflowRequest, opts ...grpc.CallOption) (*protobuf.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(protobuf.Empty)
-	err := c.cc.Invoke(ctx, ContentService_TransitionWorkflow_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ContentService_BeginTransitionWorkflow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) CompleteTransitionWorkflow(ctx context.Context, in *CompleteTransitionWorkflowRequest, opts ...grpc.CallOption) (*protobuf.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(protobuf.Empty)
+	err := c.cc.Invoke(ctx, ContentService_CompleteTransitionWorkflow_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -420,6 +444,7 @@ type ContentServiceServer interface {
 	GetMetadata(context.Context, *protobuf.IdRequest) (*Metadata, error)
 	GetMetadatas(context.Context, *protobuf.IdsRequest) (*Metadatas, error)
 	AddMetadata(context.Context, *AddMetadataRequest) (*protobuf.IdResponse, error)
+	AddMetadataTrait(context.Context, *AddMetadataTraitRequest) (*Metadata, error)
 	DeleteMetadata(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error)
 	GetMetadataUploadUrl(context.Context, *protobuf.IdRequest) (*SignedUrl, error)
 	GetMetadataDownloadUrl(context.Context, *protobuf.IdRequest) (*SignedUrl, error)
@@ -430,7 +455,8 @@ type ContentServiceServer interface {
 	GetMetadataPermissions(context.Context, *protobuf.IdRequest) (*Permissions, error)
 	AddMetadataPermissions(context.Context, *Permissions) (*protobuf.Empty, error)
 	AddMetadataPermission(context.Context, *Permission) (*protobuf.Empty, error)
-	TransitionWorkflow(context.Context, *TransitionWorkflowRequest) (*protobuf.Empty, error)
+	BeginTransitionWorkflow(context.Context, *TransitionWorkflowRequest) (*protobuf.Empty, error)
+	CompleteTransitionWorkflow(context.Context, *CompleteTransitionWorkflowRequest) (*protobuf.Empty, error)
 	AddMetadataRelationship(context.Context, *AddMetadataRelationshipRequest) (*protobuf.Empty, error)
 	mustEmbedUnimplementedContentServiceServer()
 }
@@ -490,6 +516,9 @@ func (UnimplementedContentServiceServer) GetMetadatas(context.Context, *protobuf
 func (UnimplementedContentServiceServer) AddMetadata(context.Context, *AddMetadataRequest) (*protobuf.IdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadata not implemented")
 }
+func (UnimplementedContentServiceServer) AddMetadataTrait(context.Context, *AddMetadataTraitRequest) (*Metadata, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataTrait not implemented")
+}
 func (UnimplementedContentServiceServer) DeleteMetadata(context.Context, *protobuf.IdRequest) (*protobuf.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMetadata not implemented")
 }
@@ -520,8 +549,11 @@ func (UnimplementedContentServiceServer) AddMetadataPermissions(context.Context,
 func (UnimplementedContentServiceServer) AddMetadataPermission(context.Context, *Permission) (*protobuf.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataPermission not implemented")
 }
-func (UnimplementedContentServiceServer) TransitionWorkflow(context.Context, *TransitionWorkflowRequest) (*protobuf.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TransitionWorkflow not implemented")
+func (UnimplementedContentServiceServer) BeginTransitionWorkflow(context.Context, *TransitionWorkflowRequest) (*protobuf.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BeginTransitionWorkflow not implemented")
+}
+func (UnimplementedContentServiceServer) CompleteTransitionWorkflow(context.Context, *CompleteTransitionWorkflowRequest) (*protobuf.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CompleteTransitionWorkflow not implemented")
 }
 func (UnimplementedContentServiceServer) AddMetadataRelationship(context.Context, *AddMetadataRelationshipRequest) (*protobuf.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataRelationship not implemented")
@@ -845,6 +877,24 @@ func _ContentService_AddMetadata_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_AddMetadataTrait_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMetadataTraitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).AddMetadataTrait(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_AddMetadataTrait_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).AddMetadataTrait(ctx, req.(*AddMetadataTraitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_DeleteMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(protobuf.IdRequest)
 	if err := dec(in); err != nil {
@@ -1025,20 +1075,38 @@ func _ContentService_AddMetadataPermission_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContentService_TransitionWorkflow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ContentService_BeginTransitionWorkflow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TransitionWorkflowRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContentServiceServer).TransitionWorkflow(ctx, in)
+		return srv.(ContentServiceServer).BeginTransitionWorkflow(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ContentService_TransitionWorkflow_FullMethodName,
+		FullMethod: ContentService_BeginTransitionWorkflow_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).TransitionWorkflow(ctx, req.(*TransitionWorkflowRequest))
+		return srv.(ContentServiceServer).BeginTransitionWorkflow(ctx, req.(*TransitionWorkflowRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_CompleteTransitionWorkflow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteTransitionWorkflowRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).CompleteTransitionWorkflow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_CompleteTransitionWorkflow_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).CompleteTransitionWorkflow(ctx, req.(*CompleteTransitionWorkflowRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1137,6 +1205,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_AddMetadata_Handler,
 		},
 		{
+			MethodName: "AddMetadataTrait",
+			Handler:    _ContentService_AddMetadataTrait_Handler,
+		},
+		{
 			MethodName: "DeleteMetadata",
 			Handler:    _ContentService_DeleteMetadata_Handler,
 		},
@@ -1177,8 +1249,12 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_AddMetadataPermission_Handler,
 		},
 		{
-			MethodName: "TransitionWorkflow",
-			Handler:    _ContentService_TransitionWorkflow_Handler,
+			MethodName: "BeginTransitionWorkflow",
+			Handler:    _ContentService_BeginTransitionWorkflow_Handler,
+		},
+		{
+			MethodName: "CompleteTransitionWorkflow",
+			Handler:    _ContentService_CompleteTransitionWorkflow_Handler,
 		},
 		{
 			MethodName: "AddMetadataRelationship",

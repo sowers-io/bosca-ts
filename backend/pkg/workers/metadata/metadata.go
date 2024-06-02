@@ -14,31 +14,19 @@
  * limitations under the License.
  */
 
-package bible
+package metadata
 
 import (
+	content2 "bosca.io/api/content"
 	"bosca.io/api/protobuf/content"
-	"bosca.io/pkg/workers/bible/processor"
 	"bosca.io/pkg/workers/common"
-	"go.temporal.io/sdk/client"
+	"bosca.io/pkg/workers/metadata/processor"
 	"go.temporal.io/sdk/temporal"
-	"go.temporal.io/sdk/worker"
 	"go.temporal.io/sdk/workflow"
-
 	"time"
 )
 
-const TaskQueue = "bible"
-
-func NewWorker(client client.Client) worker.Worker {
-	w := worker.New(client, TaskQueue, worker.Options{})
-	w.RegisterWorkflow(ProcessBible)
-	w.RegisterActivity(common.GetMetadata)
-	w.RegisterActivity(processor.ProcessUSX)
-	return w
-}
-
-func ProcessBible(ctx workflow.Context, id string) error {
+func ProcessMetadata(ctx workflow.Context, id string) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second,
 		BackoffCoefficient:     2.0,
@@ -60,10 +48,25 @@ func ProcessBible(ctx workflow.Context, id string) error {
 		return err
 	}
 
-	err = workflow.ExecuteActivity(ctx, processor.ProcessUSX, metadata).Get(ctx, nil)
+	if metadata.TraitIds == nil || len(metadata.TraitIds) == 0 {
+		// TODO: run activity to guess traits
+	} else {
+		traitsCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
+			TaskQueue: TaskQueue,
+		})
+		err = workflow.ExecuteChildWorkflow(traitsCtx, ProcessTraits, id).Get(ctx, nil)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = workflow.ExecuteActivity(ctx, processor.CompleteTransition, metadata).Get(ctx, &metadata)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	return workflow.ExecuteActivity(ctx, processor.TransitionTo, &processor.Transition{
+		Metadata: metadata,
+		StateId:  content2.WorkflowStateDraft,
+	}).Get(ctx, &metadata)
 }

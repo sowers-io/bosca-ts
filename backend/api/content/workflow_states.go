@@ -16,6 +16,7 @@
 
 package content
 
+const WorkflowStatePending = "pending"
 const WorkflowStateProcessing = "processing"
 const WorkflowStateDraft = "draft"
 const WorkflowStatePublished = "published"

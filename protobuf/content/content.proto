@@ -114,95 +114,108 @@ service ContentService {
 
   rpc GetMetadata(bosca.IdRequest) returns (Metadata) {
     option (google.api.http) = {
-      get: "/v1/content/workflow/{id}"
+      get: "/v1/content/metadata/{id}"
     };
   }
 
   rpc GetMetadatas(bosca.IdsRequest) returns (Metadatas) {
     option (google.api.http) = {
-      get: "/v1/content/workflow"
+      get: "/v1/content/metadata"
     };
   }
 
   rpc AddMetadata(AddMetadataRequest) returns (IdResponse) {
     option (google.api.http) = {
-      post: "/v1/content/workflow"
+      post: "/v1/content/metadata"
       body: "*"
+    };
+  }
+
+  rpc AddMetadataTrait(AddMetadataTraitRequest) returns (Metadata) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{metadata_id}/traits/{trait_id}"
     };
   }
 
   rpc DeleteMetadata(bosca.IdRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      delete: "/v1/content/workflow/{id}"
+      delete: "/v1/content/metadata/{id}"
     };
   }
 
   rpc GetMetadataUploadUrl(bosca.IdRequest) returns (SignedUrl) {
     option (google.api.http) = {
-      post: "/v1/content/workflow/{id}/url"
+      post: "/v1/content/metadata/{id}/url"
     };
   }
 
   rpc GetMetadataDownloadUrl(bosca.IdRequest) returns (SignedUrl) {
     option (google.api.http) = {
-      get: "/v1/content/workflow/{id}/url"
+      get: "/v1/content/metadata/{id}/url"
     };
   }
 
   rpc AddMetadataSupplementary(AddSupplementaryRequest) returns (SignedUrl) {
     option (google.api.http) = {
-      post: "/v1/content/workflow/{id}/url/supplementary/{type}/upload"
+      post: "/v1/content/metadata/{id}/url/supplementary/{type}/upload"
     };
   }
 
   rpc GetMetadataSupplementaryDownloadUrl(SupplementaryIdRequest) returns (SignedUrl) {
     option (google.api.http) = {
-      get: "/v1/content/workflow/{id}/url/supplementary/{type}/download"
+      get: "/v1/content/metadata/{id}/url/supplementary/{type}/download"
     };
   }
 
   rpc DeleteMetadataSupplementary(SupplementaryIdRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      delete: "/v1/content/workflow/{id}/url/supplementary/{type}"
+      delete: "/v1/content/metadata/{id}/url/supplementary/{type}"
     };
   }
 
   rpc SetMetadataUploaded(bosca.IdRequest) returns (Empty) {
     option (google.api.http) = {
-      post: "/v1/content/workflow/{id}/uploaded"
+      post: "/v1/content/metadata/{id}/uploaded"
     };
   }
 
   rpc GetMetadataPermissions(bosca.IdRequest) returns (Permissions) {
     option (google.api.http) = {
-      get: "/v1/content/workflow/{id}/permissions"
+      get: "/v1/content/metadata/{id}/permissions"
     };
   }
 
   rpc AddMetadataPermissions(Permissions) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/workflow/{id}/permissions"
+      post: "/v1/content/metadata/{id}/permissions"
       body: "*"
     };
   }
 
   rpc AddMetadataPermission(Permission) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/workflow/{id}/permission"
+      post: "/v1/content/metadata/{id}/permission"
       body: "*"
     };
   }
 
-  rpc TransitionWorkflow (TransitionWorkflowRequest) returns (bosca.Empty) {
+  rpc BeginTransitionWorkflow (TransitionWorkflowRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/workflow/{metadata_id}/workflow/{state_id}"
+      post: "/v1/content/metadata/{metadata_id}/workflow/{state_id}"
+      body: "*"
+    };
+  }
+
+  rpc CompleteTransitionWorkflow (CompleteTransitionWorkflowRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{metadata_id}/workflow/transition/complete"
       body: "*"
     };
   }
 
   rpc AddMetadataRelationship(AddMetadataRelationshipRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/workflow/{metadata_id1}/relationship/{metadata_id2}"
+      post: "/v1/content/metadata/{metadata_id1}/relationship/{metadata_id2}"
       body: "*"
     };
   }
@@ -231,6 +244,12 @@ message TransitionWorkflowRequest {
   string state_id = 2;
   string status = 3;
   bool retry = 4;
+}
+
+message CompleteTransitionWorkflowRequest {
+  string metadata_id = 1;
+  string status = 2;
+  bool success = 3;
 }
 
 message AddMetadataRelationshipRequest {
@@ -425,4 +444,9 @@ message AddMetadataRequest {
 
 message Metadatas {
   repeated Metadata metadata = 1;
+}
+
+message AddMetadataTraitRequest {
+  string metadata_id = 1;
+  string trait_id = 2;
 }

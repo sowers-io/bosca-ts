@@ -25,22 +25,32 @@ create table workflows
 );
 
 insert into workflows (id, name, description, queue)
-values ('workflow.ProcessMetadata', 'Process Metadata', 'Process Metadata', 'workflow');
+values ('ProcessMetadata', 'Process Metadata', 'Process Metadata', 'metadata');
 
 insert into workflows (id, name, description, queue)
-values ('bible.ProcessBible', 'Process Bible', 'Process Bible', 'bible');
+values ('ProcessTraits', 'Process Traits', 'Process Traits', 'metadata');
+
+insert into workflows (id, name, description, queue)
+values ('ProcessText', 'Process Text', 'Process Text', 'metadata');
+
+insert into workflows (id, name, description, queue)
+values ('ProcessBible', 'Process Bible', 'Process Bible', 'bible');
 
 create table traits
 (
-    id          uuid    not null default gen_random_uuid(),
+    id          varchar not null,
     name        varchar not null,
     workflow_id varchar not null,
     primary key (id),
     foreign key (workflow_id) references workflows (id)
 );
 
-insert into traits (name, workflow_id)
-values ('USX', 'bible.ProcessBible');
+insert into traits (id, name, workflow_id)
+values ('bible.usx', 'Digital Bible', 'ProcessBible');
+
+insert into traits (id, name, workflow_id)
+values ('common.text', 'Textual Content', 'ProcessText'),
+       ('bible.verse.text', 'Bible Verse Text', 'ProcessText');
 
 create table categories
 (
@@ -78,7 +88,7 @@ create table workflow_state_transitions
 
 insert into workflow_states (id, name, description, type, workflow_id)
 values ('processing', 'Processing', 'Initial Processing after Creation', 'processing'::workflow_state_type,
-        'workflow.ProcessMetadata');
+        'ProcessMetadata');
 
 insert into workflow_states (id, name, description, type)
 values ('pending', 'Pending', 'Pending', 'pending'::workflow_state_type),
@@ -93,6 +103,7 @@ values ('pending', 'processing', 'content is ready to be processed'),
        ('processing', 'draft', 'content has been processed, now in draft mode'),
        ('processing', 'failure', 'processing failed'),
        ('failure', 'processing', 'processing again'),
+       ('draft', 'processing', 'reprocessing draft'),
        ('draft', 'published', 'publishing draft');
 
 create
@@ -127,7 +138,7 @@ create table collection_collection_items
 create table collection_traits
 (
     collection_id uuid,
-    trait_id      uuid,
+    trait_id      varchar,
     primary key (collection_id, trait_id),
     foreign key (collection_id) references collections (id) on delete cascade,
     foreign key (trait_id) references traits (id) on delete cascade
@@ -223,7 +234,7 @@ create table metadata_relationship
 create table metadata_traits
 (
     metadata_id uuid,
-    trait_id    uuid,
+    trait_id    varchar,
     primary key (metadata_id, trait_id),
     foreign key (metadata_id) references metadata (id) on delete cascade,
     foreign key (trait_id) references traits (id) on delete cascade

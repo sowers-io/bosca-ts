@@ -1,31 +1,31 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Metadata Worker" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="Bible Worker" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="bosca" />
     <working_directory value="$PROJECT_DIR$/backend" />
     <envs>
-      <env name="BOSCA_OLLAMA_API_ADDRESS" value="http://localhost:11434" />
-      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
-      <env name="BOSCA_QDRANT_API_ADDRESS" value="localhost:6334" />
+      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:6013" />
       <env name="BOSCA_CONTENT_CONNECTION_STRING" value="postgresql://boscacontent:bosca@localhost:5432/boscacontent" />
+      <env name="BOSCA_OLLAMA_API_ADDRESS" value="http://localhost:11434" />
       <env name="BOSCA_PERMISSIONS_SHARED_TOKEN" value="bosca-spicedb" />
       <env name="BOSCA_PROFILES_CONNECTION_STRING" value="postgresql://boscaprofiles:bosca@localhost:5432/boscaprofiles" />
+      <env name="BOSCA_QDRANT_API_ADDRESS" value="localhost:6334" />
       <env name="BOSCA_S3_ACCESS_KEY_ID" value="67fO5gFs6BuksBrh6rMp" />
       <env name="BOSCA_S3_ENDPOINT" value="localhost:9010" />
+      <env name="BOSCA_S3_SECRET_ACCESS_KEY" value="eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm" />
+      <env name="BOSCA_SEARCH_API_KEY" value="p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M" />
+      <env name="BOSCA_SEARCH_ENDPOINT" value="http://localhost:7700" />
+      <env name="BOSCA_SECURITY_CONNECTION_STRING" value="postgresql://boscasecurity:bosca@localhost:5432/boscasecurity" />
       <env name="BOSCA_SERVICE_ACCOUNT_ID" value="sa" />
       <env name="BOSCA_SERVICE_ACCOUNT_TOKEN" value="sat" />
-      <env name="BOSCA_S3_SECRET_ACCESS_KEY" value="eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm" />
-      <env name="BOSCA_SECURITY_CONNECTION_STRING" value="postgresql://boscasecurity:bosca@localhost:5432/boscasecurity" />
       <env name="BOSCA_SESSION_ENDPOINT" value="http://localhost:4433/sessions/whoami" />
-      <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
       <env name="BOSCA_TEMPORAL_API_ADDRESS" value="localhost:7233" />
-      <env name="BOSCA_SEARCH_ENDPOINT" value="http://localhost:7700" />
-      <env name="BOSCA_SEARCH_API_KEY" value="p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M" />
+      <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
     </envs>
     <kind value="PACKAGE" />
-    <package value="bosca.io/cmd/workers/metadata" />
+    <package value="bosca.io/cmd/workers/bible" />
     <directory value="$PROJECT_DIR$" />
-    <filePath value="$PROJECT_DIR$/backend/cmd/workers/metadata/main.go" />
+    <filePath value="$PROJECT_DIR$/backend/cmd/workers/bible/main.go" />
     <method v="2" />
   </configuration>
 </component>

@@ -14,31 +14,19 @@
  * limitations under the License.
  */
 
-package bible
+package metadata
 
 import (
 	"bosca.io/api/protobuf/content"
-	"bosca.io/pkg/workers/bible/processor"
 	"bosca.io/pkg/workers/common"
-	"go.temporal.io/sdk/client"
+	"bosca.io/pkg/workers/metadata/processor"
+	"bosca.io/pkg/workers/textextractor"
 	"go.temporal.io/sdk/temporal"
-	"go.temporal.io/sdk/worker"
 	"go.temporal.io/sdk/workflow"
-
 	"time"
 )
 
-const TaskQueue = "bible"
-
-func NewWorker(client client.Client) worker.Worker {
-	w := worker.New(client, TaskQueue, worker.Options{})
-	w.RegisterWorkflow(ProcessBible)
-	w.RegisterActivity(common.GetMetadata)
-	w.RegisterActivity(processor.ProcessUSX)
-	return w
-}
-
-func ProcessBible(ctx workflow.Context, id string) error {
+func ProcessText(ctx workflow.Context, id string) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second,
 		BackoffCoefficient:     2.0,
@@ -60,10 +48,18 @@ func ProcessBible(ctx workflow.Context, id string) error {
 		return err
 	}
 
-	err = workflow.ExecuteActivity(ctx, processor.ProcessUSX, metadata).Get(ctx, nil)
+	textExtractorCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
+		TaskQueue: textextractor.TaskQueue,
+	})
+	err = workflow.ExecuteChildWorkflow(textExtractorCtx, textextractor.TextExtractor, metadata).Get(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	err = workflow.ExecuteActivity(ctx, processor.AddToSearchIndex, metadata).Get(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	return workflow.ExecuteActivity(ctx, processor.Vectorize, metadata).Get(ctx, &metadata)
 }

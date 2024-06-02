@@ -109,12 +109,32 @@ func (svc *authorizationService) GetMetadatas(ctx context.Context, request *prot
 	return svc.service.GetMetadatas(ctx, request)
 }
 
+func (svc *authorizationService) GetMetadataUploadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_edit)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetMetadataDownloadUrl(ctx, request)
+}
+
 func (svc *authorizationService) GetMetadataDownloadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_view)
 	if err != nil {
 		return nil, err
 	}
 	return svc.service.GetMetadataDownloadUrl(ctx, request)
+}
+
+func (svc *authorizationService) AddMetadataRelationship(ctx context.Context, request *grpc.AddMetadataRelationshipRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.MetadataId1, grpc.PermissionAction_edit)
+	if err != nil {
+		return nil, err
+	}
+	err = svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.MetadataId2, grpc.PermissionAction_edit)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.AddMetadataRelationship(ctx, request)
 }
 
 func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*protobuf.IdResponse, error) {
@@ -219,10 +239,42 @@ func (svc *authorizationService) AddCollectionPermission(ctx context.Context, pe
 	return svc.service.AddCollectionPermission(ctx, permission)
 }
 
+func (svc *authorizationService) GetTraits(ctx context.Context, request *protobuf.Empty) (*grpc.Traits, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetTraits(ctx, request)
+}
+
+func (svc *authorizationService) GetWorkflows(ctx context.Context, request *protobuf.Empty) (*grpc.Workflows, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetWorkflows(ctx, request)
+}
+
 func (svc *authorizationService) GetWorkflowStates(ctx context.Context, request *protobuf.Empty) (*grpc.WorkflowStates, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_state_type, "all", grpc.PermissionAction_list)
 	if err != nil {
 		return nil, err
 	}
 	return svc.service.GetWorkflowStates(ctx, request)
+}
+
+func (svc *authorizationService) BeginTransitionWorkflow(ctx context.Context, request *grpc.TransitionWorkflowRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.MetadataId, grpc.PermissionAction_manage)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.BeginTransitionWorkflow(ctx, request)
+}
+
+func (svc *authorizationService) CompleteTransitionWorkflow(ctx context.Context, request *grpc.CompleteTransitionWorkflowRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.MetadataId, grpc.PermissionAction_manage)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.CompleteTransitionWorkflow(ctx, request)
 }

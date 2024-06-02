@@ -17,7 +17,6 @@
 package processor
 
 import (
-	content2 "bosca.io/api/content"
 	"bosca.io/api/protobuf"
 	"bosca.io/api/protobuf/content"
 	"bosca.io/pkg/bible/usx"
@@ -66,6 +65,7 @@ func ProcessUSX(ctx context.Context, metadata *content.Metadata) error {
 							"translation.verse.usfm":         verse.GetUsfm(),
 							"translation.workflow.id":        metadata.Id,
 						},
+						TraitIds:      []string{"bible.verse.text"},
 						LanguageTag:   bundle.Metadata().Language.Iso,
 						ContentLength: int64(len(text)),
 						ContentType:   "text/plain",
@@ -84,9 +84,10 @@ func ProcessUSX(ctx context.Context, metadata *content.Metadata) error {
 				}
 				err = common.SetTextContent(ctx, response.Id, text)
 				if err != nil {
-					_, err2 := svc.TransitionWorkflow(ctx, &content.TransitionWorkflowRequest{
+					_, err2 := svc.CompleteTransitionWorkflow(ctx, &content.CompleteTransitionWorkflowRequest{
 						MetadataId: response.Id,
-						StateId:    content2.WorkflowStateFailed,
+						Status:     "failed to set text",
+						Success:    false,
 					})
 					if err2 != nil {
 						slog.ErrorContext(ctx, "failed to update workflow status to failed", slog.Any("error", err2))

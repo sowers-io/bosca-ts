@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package vectorizer
+package processor
 
 import (
 	"bosca.io/api/protobuf/content"

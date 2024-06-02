@@ -46,6 +46,32 @@ func (ds *DataStore) GetWorkflow(ctx context.Context, id string) (*content.Workf
 	return &workflow, nil
 }
 
+func (ds *DataStore) GetWorkflows(ctx context.Context) ([]*content.Workflow, error) {
+	result, err := ds.db.QueryContext(ctx, "SELECT id, name, description, queue, configuration FROM workflows")
+	if err != nil {
+		return nil, err
+	}
+	defer result.Close()
+	workflows := make([]*content.Workflow, 0)
+	for result.Next() {
+		var workflow content.Workflow
+		var configuration json.RawMessage
+		err := result.Scan(&workflow.Id, &workflow.Name, &workflow.Description, &workflow.Queue, &configuration)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, nil
+			}
+			return nil, err
+		}
+		err = json.Unmarshal(configuration, &workflow.Configuration)
+		if err != nil {
+			return nil, err
+		}
+		workflows = append(workflows, &workflow)
+	}
+	return workflows, nil
+}
+
 func (ds *DataStore) GetWorkflowTransition(ctx context.Context, fromStateId string, toStateId string) (*content.WorkflowStateTransition, error) {
 	row := ds.db.QueryRowContext(ctx, "SELECT from_state_id, to_state_id FROM workflow_state_transitions WHERE from_state_id = $1 AND to_state_id = $2", fromStateId, toStateId)
 	if row.Err() != nil {

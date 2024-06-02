@@ -39,7 +39,7 @@ var Command = &cobra.Command{
 			return err
 		}
 
-		_, err = client.TransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{
+		_, err = client.BeginTransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{
 			MetadataId: args[0],
 			StateId:    args[1],
 			Retry:      cmd.Flag(flags.RetryFlag).Value.String() == "true",

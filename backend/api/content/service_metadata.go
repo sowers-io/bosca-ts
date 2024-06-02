@@ -23,6 +23,7 @@ import (
 	"bosca.io/pkg/security/identity"
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"slices"
 	"strings"
@@ -44,6 +45,14 @@ func (svc *service) verifyUniqueName(ctx context.Context, collectionId string, n
 		return false, nil
 	}
 	return true, nil
+}
+
+func (svc *service) AddMetadataRelationship(ctx context.Context, request *grpc.AddMetadataRelationshipRequest) (*protobuf.Empty, error) {
+	err := svc.ds.AddMetadataRelationship(ctx, request.MetadataId1, request.MetadataId2, request.Relationship)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.Empty{}, nil
 }
 
 func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*protobuf.IdResponse, error) {
@@ -103,7 +112,7 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 		return nil, err
 	}
 	if request.Metadata.Source != nil && *request.Metadata.Source != "" {
-		_, err := svc.TransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: id, StateId: WorkflowStateProcessing})
+		_, err := svc.BeginTransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: id, StateId: WorkflowStateProcessing})
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to process workflow", slog.String("id", id), slog.Any("error", err))
 			return nil, err
@@ -143,6 +152,29 @@ func (svc *service) DeleteMetadata(ctx context.Context, request *protobuf.IdRequ
 	return &protobuf.Empty{}, nil
 }
 
+func (svc *service) GetMetadataUploadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
+	metadata, err := svc.ds.GetMetadata(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	if metadata.WorkflowStateId != WorkflowStatePending {
+		return nil, errors.New("invalid workflow state")
+	}
+	return svc.os.CreateUploadUrl(ctx, metadata.Id, metadata.Name, metadata.ContentType, metadata.ContentLength, nil)
+}
+
+func (svc *service) AddMetadataTrait(ctx context.Context, request *grpc.AddMetadataTraitRequest) (*grpc.Metadata, error) {
+	metadata, err := svc.ds.AddMetadataTrait(ctx, request.MetadataId, request.TraitId)
+	if err != nil {
+		return nil, err
+	}
+	_, err = svc.BeginTransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: request.MetadataId, Status: fmt.Sprintf("adding trait: %s", request.TraitId), StateId: WorkflowStateProcessing})
+	if err != nil {
+		return nil, err
+	}
+	return metadata, nil
+}
+
 func (svc *service) GetMetadata(ctx context.Context, request *protobuf.IdRequest) (*grpc.Metadata, error) {
 	return svc.ds.GetMetadata(ctx, request.Id)
 }
@@ -175,5 +207,5 @@ func (svc *service) GetMetadataDownloadUrl(ctx context.Context, request *protobu
 }
 
 func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	return svc.TransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: request.Id, StateId: WorkflowStateProcessing})
+	return svc.BeginTransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: request.Id, StateId: WorkflowStateProcessing})
 }

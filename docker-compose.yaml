@@ -240,7 +240,7 @@ services:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=workers/workflow
+        - BACKEND=workers/metadata
     env_file:
       - .env-dev
     depends_on:

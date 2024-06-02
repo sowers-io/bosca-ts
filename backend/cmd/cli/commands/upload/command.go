@@ -61,6 +61,7 @@ var Command = &cobra.Command{
 
 		upload.Metadata["name"] = f.Name()
 		upload.Metadata["filetype"] = http.DetectContentType(buf)
+		upload.Metadata["trait"] = cmd.Flag(flags.TraitFlag).Value.String()
 		uploader, err := client.CreateUpload(upload)
 		if err != nil {
 			return err
@@ -70,5 +71,6 @@ var Command = &cobra.Command{
 }
 
 func init() {
+	Command.PersistentFlags().String(flags.TraitFlag, "", "Trait ID")
 	Command.PersistentFlags().String(flags.EndpointFlag, "http://localhost:8099/uploads", "The endpoint to use.")
 }

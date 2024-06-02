@@ -22,6 +22,7 @@ import (
 	"bosca.io/pkg/bible/usx"
 	"bosca.io/pkg/workers/common"
 	"context"
+	"github.com/google/uuid"
 	"log/slog"
 	"os"
 )
@@ -55,7 +56,7 @@ func ProcessUSX(ctx context.Context, metadata *content.Metadata) error {
 				text := verse.GetText()
 				response, err := svc.AddMetadata(ctx, &content.AddMetadataRequest{
 					Metadata: &content.Metadata{
-						Name: verse.GetUsfm(), // TODO: use name
+						Name: verse.GetUsfm() + "-" + uuid.New().String(), // TODO: use name
 						Attributes: map[string]string{
 							"translation":                    bundle.Metadata().Identification.SystemId[0].ID,
 							"translation.name":               bundle.Metadata().Identification.NameLocal,

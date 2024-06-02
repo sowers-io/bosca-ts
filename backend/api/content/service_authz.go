@@ -114,7 +114,7 @@ func (svc *authorizationService) GetMetadataUploadUrl(ctx context.Context, reque
 	if err != nil {
 		return nil, err
 	}
-	return svc.service.GetMetadataDownloadUrl(ctx, request)
+	return svc.service.GetMetadataUploadUrl(ctx, request)
 }
 
 func (svc *authorizationService) GetMetadataDownloadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {

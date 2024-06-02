@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Bible Worker" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="Bible Worker2" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="bosca" />
     <working_directory value="$PROJECT_DIR$/backend" />
     <envs>

@@ -40,7 +40,7 @@ class AIServiceStub(object):
             channel: A grpc.Channel.
         """
         self.Chat = channel.unary_unary(
-                '/bosca.search.AIService/Chat',
+                '/bosca.ai.AIService/Chat',
                 request_serializer=bosca_dot_ai_dot_ai__pb2.ChatRequest.SerializeToString,
                 response_deserializer=bosca_dot_ai_dot_ai__pb2.ChatResponse.FromString,
                 _registered_method=True)
@@ -65,9 +65,9 @@ def add_AIServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'bosca.search.AIService', rpc_method_handlers)
+            'bosca.ai.AIService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('bosca.search.AIService', rpc_method_handlers)
+    server.add_registered_method_handlers('bosca.ai.AIService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -88,7 +88,7 @@ class AIService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/bosca.search.AIService/Chat',
+            '/bosca.ai.AIService/Chat',
             bosca_dot_ai_dot_ai__pb2.ChatRequest.SerializeToString,
             bosca_dot_ai_dot_ai__pb2.ChatResponse.FromString,
             options,

@@ -1,6 +1,7 @@
 import logging
 from datetime import timedelta
 
+from bosca.content.metadata_pb2 import Metadata
 from temporalio import workflow
 
 with workflow.unsafe.imports_passed_through():
@@ -11,7 +12,7 @@ with workflow.unsafe.imports_passed_through():
 class Workflow:
 
     @workflow.run
-    async def run(self, metadata: any) -> str:
-        logging.info("Workflow started with id: %s", metadata)
+    async def run(self, metadata: Metadata) -> str:
+        logging.info("Workflow started with id: %s", metadata.id)
 
-        return await workflow.execute_activity(vectorize, metadata, start_to_close_timeout=timedelta(seconds=5))
+        return await workflow.execute_activity(vectorize, metadata, start_to_close_timeout=timedelta(minutes=5))

@@ -28,5 +28,14 @@ Authorization: Bearer {{session_token}}
 Content-Type: application/json
 
 {
-  "query": "Who was Jehoiada?"
+  "query": "What was Jesus known for?"
+}
+
+
+### AI
+GRPC grpc://localhost:9095/bosca.search.AIService/Chat
+Authorization: Bearer {{session_token}}
+
+{
+  "query": "What was Jesus known for?"
 }

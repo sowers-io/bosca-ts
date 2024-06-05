@@ -1,7 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Search Service" type="GoApplicationRunConfiguration" factoryName="Go Application">
-    <module name="backend.core" />
-    <working_directory value="$PROJECT_DIR$/backend.core" />
+  <configuration default="false" name="AI gRPC" type="PythonConfigurationType" factoryName="Python">
+    <module name="backend.llamaindex" />
+    <option name="ENV_FILES" value="" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:6013" />
       <env name="BOSCA_CONTENT_CONNECTION_STRING" value="postgresql://boscacontent:bosca@localhost:5432/boscacontent" />
@@ -21,13 +23,21 @@
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
       <env name="BOSCA_TEMPORAL_API_ADDRESS" value="localhost:7233" />
       <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
-      <env name="GRPC_PORT" value="9999" />
-      <env name="REST_PORT" value="9998" />
+      <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
-    <kind value="PACKAGE" />
-    <package value="bosca.io/cmd/search" />
-    <directory value="$PROJECT_DIR$" />
-    <filePath value="$PROJECT_DIR$/backend/cmd/workers/metadata/main.go" />
+    <option name="SDK_HOME" value="" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend.llamaindex/api" />
+    <option name="IS_MODULE_SDK" value="true" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend.llamaindex/api/ai.py" />
+    <option name="PARAMETERS" value="" />
+    <option name="SHOW_COMMAND_LINE" value="false" />
+    <option name="EMULATE_TERMINAL" value="false" />
+    <option name="MODULE_MODE" value="false" />
+    <option name="REDIRECT_INPUT" value="false" />
+    <option name="INPUT_FILE" value="" />
     <method v="2" />
   </configuration>
 </component>

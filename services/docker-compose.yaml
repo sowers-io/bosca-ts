@@ -379,16 +379,16 @@ services:
 #      timeout: 10s
 #      retries: 3
 
-  ollama:
-    image: ollama/ollama:latest
-    ports:
-      - 11434:11434
-    volumes:
-      - ./ollama/ollama:/root/.ollama
-    tty: true
-    restart: always
-    networks:
-      - net1
+#  ollama:
+#    image: ollama/ollama:latest
+#    ports:
+#      - 11434:11434
+#    volumes:
+#      - ./ollama/ollama:/root/.ollama
+#    tty: true
+#    restart: always
+#    networks:
+#      - net1
 #    deploy:
 #      resources:
 #        reservations:
@@ -397,15 +397,15 @@ services:
 #              count: 1
 #              capabilities: [gpu]
 
-  ollama-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    restart: always
-    ports:
-      - 8086:8080
-    environment:
-      OLLAMA_BASE_URL: http://ollama:11434
-    networks:
-      - net1
+#  ollama-webui:
+#    image: ghcr.io/open-webui/open-webui:main
+#    restart: always
+#    ports:
+#      - 8086:8080
+#    environment:
+#      OLLAMA_BASE_URL: http://ollama:11434
+#    networks:
+#      - net1
 
   textextractor:
     image: ghcr.io/sowers-io/bosca/text-extractor:a35bff0b7cf9d7584f3d58269f9719a7d5778d02

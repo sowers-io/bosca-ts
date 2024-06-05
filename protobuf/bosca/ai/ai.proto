@@ -19,7 +19,7 @@ option go_package = "bosca.io/api/protobuf/search";
 
 import "google/api/annotations.proto";
 
-package bosca.search;
+package bosca.ai;
 
 service AIService {
   rpc Chat(ChatRequest) returns (ChatResponse) {

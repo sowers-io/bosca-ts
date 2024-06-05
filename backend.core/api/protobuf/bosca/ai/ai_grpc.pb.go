@@ -34,7 +34,7 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	AIService_Chat_FullMethodName = "/bosca.search.AIService/Chat"
+	AIService_Chat_FullMethodName = "/bosca.ai.AIService/Chat"
 )
 
 // AIServiceClient is the client API for AIService service.
@@ -112,7 +112,7 @@ func _AIService_Chat_Handler(srv interface{}, ctx context.Context, dec func(inte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AIService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "bosca.search.AIService",
+	ServiceName: "bosca.ai.AIService",
 	HandlerType: (*AIServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -68,7 +68,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
       labels:
         - ghcr.io/sowers-io/bosca/profiles:dev
       platforms:
@@ -94,7 +94,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
       labels:
         - ghcr.io/sowers-io/bosca/content:dev
       platforms:
@@ -126,7 +126,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
       labels:
         - ghcr.io/sowers-io/bosca/search:dev
       platforms:
@@ -154,7 +154,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
       labels:
         - ghcr.io/sowers-io/bosca/ai:dev
       platforms:
@@ -182,7 +182,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
       labels:
         - ghcr.io/sowers-io/bosca/security:dev
       platforms:
@@ -208,7 +208,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
       labels:
         - ghcr.io/sowers-io/bosca/uploader:dev
       platforms:
@@ -235,7 +235,7 @@ services:
       context: .
       labels:
         - ghcr.io/sowers-io/bosca/workers/workflow:dev
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
       platforms:
         - linux/arm64
         - linux/amd64
@@ -257,7 +257,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
       labels:
         - ghcr.io/sowers-io/bosca/workers/textextractor:dev
       platforms:
@@ -280,7 +280,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
       labels:
         - ghcr.io/sowers-io/bosca/workers/bible:dev
       platforms:

@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Metadata Worker" type="GoApplicationRunConfiguration" factoryName="Go Application">
-    <module name="bosca" />
-    <working_directory value="$PROJECT_DIR$/backend" />
+    <module name="backend.core" />
+    <working_directory value="$PROJECT_DIR$/backend.core" />
     <envs>
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:6013" />
       <env name="BOSCA_CONTENT_CONNECTION_STRING" value="postgresql://boscacontent:bosca@localhost:5432/boscacontent" />

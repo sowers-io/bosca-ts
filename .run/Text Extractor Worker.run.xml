@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Text Extractor Worker" type="GoApplicationRunConfiguration" factoryName="Go Application">
-    <module name="bosca" />
-    <working_directory value="$PROJECT_DIR$/backend" />
+    <module name="backend.core" />
+    <working_directory value="$PROJECT_DIR$/backend.core" />
     <envs>
       <env name="BOSCA_OLLAMA_API_ADDRESS" value="http://localhost:11434" />
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:6013" />

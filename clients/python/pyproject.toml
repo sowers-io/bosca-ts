@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "bosca"
+version = "0.1.0"
+description = ""
+authors = ["Kyle Brock <brock@donesky.io>"]
+license = "Apache 2.0"
+readme = "README.md"
+package-mode = true
+
+[tool.poetry.dependencies]
+python = "^3.9.6"
+grpcio = "^1.64.1"
+protobuf = "^5.27.0"
+googleapis-common-protos = "1.63.1"
+
+[tool.poetry.dev-dependencies]
+grpcio-tools = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

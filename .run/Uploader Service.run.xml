@@ -11,7 +11,6 @@
       <env name="BOSCA_S3_SECRET_ACCESS_KEY" value="eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm" />
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
       <env name="SERVICE_ACCOUNT_TOKEN" value="sat" />
-      <env name="REST_PORT" value="9099" />
     </envs>
     <kind value="PACKAGE" />
     <package value="bosca.io/cmd/uploader" />

@@ -18,6 +18,7 @@ googleapis-common-protos = "1.63.1"
 temporalio = "^1.6.0"
 requests = "2.32.3"
 llama_index = "0.10.43"
+llama-index-llms-ollama = "0.1.5"
 llama-index-embeddings-ollama = "0.1.2"
 llama-index-vector-stores-qdrant = "0.2.8"
 

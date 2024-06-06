@@ -33,6 +33,7 @@ type LoggingConfiguration struct {
 type ServerConfiguration struct {
 	RestPort        int                    `envconfig:"REST_PORT"`
 	GrpcPort        int                    `envconfig:"GRPC_PORT"`
+	GrpcDisabled    bool                   `envconfig:"GRPC_DISABLED" default:"false"`
 	Database        *DatabaseConfiguration `ignored:"true"`
 	Security        *SecurityConfiguration `ignored:"true"`
 	Storage         *StorageConfiguration  `ignored:"true"`

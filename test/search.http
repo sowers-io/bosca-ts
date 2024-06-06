@@ -33,9 +33,10 @@ Content-Type: application/json
 
 
 ### AI
-GRPC grpc://localhost:9095/bosca.search.AIService/Chat
+POST http://localhost:9096/v1/ai/chat
 Authorization: Bearer {{session_token}}
+Content-Type: application/json
 
 {
-  "query": "What was Jesus known for?"
+  "query": "How many cities did Jair have?"
 }

@@ -39,6 +39,25 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 	defer cancel()
 
 	endpoint := fmt.Sprintf("0.0.0.0:%d", cfg.GrpcPort)
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(104857600)),
+	}
+
+	if cfg.GrpcDisabled {
+		mux := runtime.NewServeMux()
+		err := register(ctx, nil, mux, endpoint, opts)
+		if err != nil {
+			slog.Error("failed to register endpoints", slog.Any("error", err))
+			return err
+		}
+		err = http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", cfg.RestPort), mux)
+		if err != nil {
+			log.Fatalf("failed to start HTTP server: %v", err)
+		}
+		return err
+	}
+
 	listen, err := net.Listen("tcp", endpoint)
 	if err != nil {
 		slog.Error("failed to listen", slog.Int("grpc_port", cfg.GrpcPort), slog.Any("error", err))
@@ -56,10 +75,6 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 	server := grpc.NewServer(grpcOpts...)
 	mux := runtime.NewServeMux()
 
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(104857600)),
-	}
 	err = register(ctx, server, mux, endpoint, opts)
 	if err != nil {
 		slog.Error("failed to register endpoints", slog.Any("error", err))

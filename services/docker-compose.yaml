@@ -32,7 +32,7 @@ services:
       - 6333:6333
       - 6334:6334
     volumes:
-      - ./qdrant:/qdrant/storage:z
+      - qdrant:/qdrant/storage:z
     networks:
       - net1
 
@@ -44,7 +44,7 @@ services:
     environment:
       MEILI_MASTER_KEY: p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M
     volumes:
-      - ./meilisearch/meili_data:/meili_data
+      - meilisearch:/meili_data
     networks:
       - net1
     healthcheck:
@@ -379,23 +379,23 @@ services:
 #      timeout: 10s
 #      retries: 3
 
-#  ollama:
-#    image: ollama/ollama:latest
-#    ports:
-#      - 11434:11434
-#    volumes:
-#      - ./ollama/ollama:/root/.ollama
-#    tty: true
-#    restart: always
-#    networks:
-#      - net1
-#    deploy:
-#      resources:
-#        reservations:
-#          devices:
-#            - driver: nvidia
-#              count: 1
-#              capabilities: [gpu]
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    volumes:
+      - ./ollama/ollama:/root/.ollama
+    tty: true
+    restart: always
+    networks:
+      - net1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
 #  ollama-webui:
 #    image: ghcr.io/open-webui/open-webui:main
@@ -436,3 +436,5 @@ volumes:
   minio-data3-2:
   minio-data4-1:
   minio-data4-2:
+  qdrant:
+  meilisearch:

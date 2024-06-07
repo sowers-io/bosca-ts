@@ -395,7 +395,11 @@ services:
           devices:
             - driver: nvidia
               count: 1
-              capabilities: [gpu]
+              capabilities:
+                - gpu
+                - utility
+                - compute
+                - video
 
 #  ollama-webui:
 #    image: ghcr.io/open-webui/open-webui:main

@@ -21,8 +21,8 @@
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
       <env name="BOSCA_TEMPORAL_API_ADDRESS" value="localhost:7233" />
       <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
-      <env name="GRPC_PORT" value="9095" />
-      <env name="REST_PORT" value="9096" />
+      <env name="GRPC_PORT" value="5007" />
+      <env name="REST_PORT" value="5017" />
     </envs>
     <kind value="PACKAGE" />
     <package value="bosca.io/cmd/ai" />

@@ -161,7 +161,7 @@ services:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=ai
+        - BACKEND=api/ai.py
         - GRPC_PORT=5007
         - REST_PORT=5017
     env_file:
@@ -189,7 +189,7 @@ services:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=ai-vectorizer
+        - BACKEND=workers/vectorizer/main.py
         - GRPC_PORT=5107
         - REST_PORT=5117
     env_file:

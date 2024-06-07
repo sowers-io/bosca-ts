@@ -16,14 +16,14 @@ async def main():
     logging.info("Starting Vectorizer")
 
     client = await Client.connect(os.environ["BOSCA_TEMPORAL_API_ADDRESS"])
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as activity_executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as activity_executor:
         worker = Worker(
             client,
             task_queue="vectorizer",
             workflows=[Workflow],
             activities=[vectorize],
             activity_executor=activity_executor,
-            max_concurrent_activities=8
+            max_concurrent_activities=1
         )
         await worker.run()
 

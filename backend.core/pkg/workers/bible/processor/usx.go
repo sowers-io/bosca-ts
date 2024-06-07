@@ -23,10 +23,10 @@ import (
 	"bosca.io/pkg/bible/usx"
 	"bosca.io/pkg/workers/common"
 	"context"
-	"fmt"
 	"google.golang.org/grpc/status"
 	"log/slog"
 	"os"
+	"strings"
 )
 
 func ProcessUSX(ctx context.Context, metadata *content.Metadata) error {
@@ -54,64 +54,64 @@ func ProcessUSX(ctx context.Context, metadata *content.Metadata) error {
 	bundle, err := usx.OpenBundle(metadataFile)
 	for _, book := range bundle.Books() {
 		for _, chapter := range book.FindChapterVerses() {
-			verseIndex := 0
+			text := strings.Builder{}
 			for _, verse := range chapter.Verses {
-				text := verse.GetText()
-				chapterUsfm := chapter.Chapter.GetUsfm()
-				verseUsfm := verse.GetUsfm()
-				slog.DebugContext(ctx, "processing verse", slog.String("usfm", verseUsfm), slog.String("chapterUsfm", chapterUsfm))
-				response, err := svc.AddMetadata(ctx, &content.AddMetadataRequest{
-					Metadata: &content.Metadata{
-						Name: fmt.Sprintf("%s-%d", verseUsfm, verseIndex),
-						Attributes: map[string]string{
-							"translation":                    bundle.Metadata().Identification.SystemId[0].ID,
-							"translation.name":               bundle.Metadata().Identification.NameLocal,
-							"translation.abbreviation":       bundle.Metadata().Identification.Abbreviation,
-							"translation.abbreviation.local": bundle.Metadata().Identification.AbbreviationLocal,
-							"translation.chapter.usfm":       chapterUsfm,
-							"translation.verse.usfm":         verseUsfm,
-							"translation.workflow.id":        metadata.Id,
-						},
-						TraitIds:      []string{"bible.verse.text"},
-						LanguageTag:   bundle.Metadata().Language.Iso,
-						ContentLength: int64(len(text)),
-						ContentType:   "text/plain",
+				text.Write([]byte(verse.GetText()))
+			}
+			if text.Len() == 0 {
+				continue
+			}
+			chapterUsfm := chapter.Chapter.GetUsfm()
+			slog.DebugContext(ctx, "processing chapter", slog.String("usfm", chapterUsfm))
+			response, err := svc.AddMetadata(ctx, &content.AddMetadataRequest{
+				Metadata: &content.Metadata{
+					Name: chapterUsfm,
+					Attributes: map[string]string{
+						"translation":                    bundle.Metadata().Identification.SystemId[0].ID,
+						"translation.name":               bundle.Metadata().Identification.NameLocal,
+						"translation.abbreviation":       bundle.Metadata().Identification.Abbreviation,
+						"translation.abbreviation.local": bundle.Metadata().Identification.AbbreviationLocal,
+						"translation.chapter.usfm":       chapterUsfm,
+						"translation.workflow.id":        metadata.Id,
 					},
-				})
-				verseIndex = verseIndex + 1
-				if err != nil {
-					if statusError, ok := status.FromError(err); ok {
-						if statusError.Message() == "name must be unique" {
-							continue
-						}
+					TraitIds:      []string{"bible.chapter.text"},
+					LanguageTag:   bundle.Metadata().Language.Iso,
+					ContentLength: int64(text.Len()),
+					ContentType:   "text/plain",
+				},
+			})
+			if err != nil {
+				if statusError, ok := status.FromError(err); ok {
+					if statusError.Message() == "name must be unique" {
+						continue
 					}
-					return err
 				}
-				_, err = svc.AddMetadataRelationship(ctx, &content.AddMetadataRelationshipRequest{
-					MetadataId1:  metadata.Id,
-					MetadataId2:  response.Id,
-					Relationship: "usx-verse",
+				return err
+			}
+			_, err = svc.AddMetadataRelationship(ctx, &content.AddMetadataRelationshipRequest{
+				MetadataId1:  metadata.Id,
+				MetadataId2:  response.Id,
+				Relationship: "usx-chapter",
+			})
+			err = common.SetTextContent(ctx, response.Id, text.String())
+			if err != nil {
+				_, err2 := svc.CompleteTransitionWorkflow(ctx, &content.CompleteTransitionWorkflowRequest{
+					MetadataId: response.Id,
+					Status:     "failed to set text",
+					Success:    false,
 				})
-				err = common.SetTextContent(ctx, response.Id, text)
+				if err2 != nil {
+					slog.ErrorContext(ctx, "failed to update workflow status to failed", slog.Any("error", err2))
+				}
+				return err
+			} else {
+				_, err = svc.BeginTransitionWorkflow(ctx, &content.TransitionWorkflowRequest{
+					MetadataId: response.Id,
+					StateId:    content2.WorkflowStateProcessing,
+					Status:     "chapter uploaded",
+				})
 				if err != nil {
-					_, err2 := svc.CompleteTransitionWorkflow(ctx, &content.CompleteTransitionWorkflowRequest{
-						MetadataId: response.Id,
-						Status:     "failed to set text",
-						Success:    false,
-					})
-					if err2 != nil {
-						slog.ErrorContext(ctx, "failed to update workflow status to failed", slog.Any("error", err2))
-					}
-					return err
-				} else {
-					_, err = svc.BeginTransitionWorkflow(ctx, &content.TransitionWorkflowRequest{
-						MetadataId: response.Id,
-						StateId:    content2.WorkflowStateProcessing,
-						Status:     "verse uploaded",
-					})
-					if err != nil {
-						slog.ErrorContext(ctx, "failed to update workflow status to processing for verse", slog.String("translation", bundle.Metadata().Identification.SystemId[0].ID), slog.String("verse", verseUsfm), slog.Any("error", err))
-					}
+					slog.ErrorContext(ctx, "failed to update workflow status to processing for chapter", slog.String("translation", bundle.Metadata().Identification.SystemId[0].ID), slog.String("usfm", chapterUsfm), slog.Any("error", err))
 				}
 			}
 		}

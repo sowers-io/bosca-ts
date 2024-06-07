@@ -49,7 +49,7 @@ curl \
 echo "Pull llm..."
 
 curl http://ollama:11434/api/pull -d '{
-  "name": "llama3"
+  "name": "llama3:latest"
 }'
 
 echo "...Done"

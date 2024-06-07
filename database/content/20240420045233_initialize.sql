@@ -50,7 +50,7 @@ values ('bible.usx', 'Digital Bible', 'ProcessBible');
 
 insert into traits (id, name, workflow_id)
 values ('common.text', 'Textual Content', 'ProcessText'),
-       ('bible.verse.text', 'Bible Verse Text', 'ProcessText');
+       ('bible.chapter.text', 'Bible Chapter Text', 'ProcessText');
 
 create table categories
 (

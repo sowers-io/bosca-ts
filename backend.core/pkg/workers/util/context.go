@@ -63,7 +63,7 @@ func NewAITemporalClient() (client.Client, error) {
 					VectorsConfig: &go_client.VectorsConfig{
 						Config: &go_client.VectorsConfig_Params{
 							Params: &go_client.VectorParams{
-								Size:     4096,
+								Size:     qdrant.MetadataVectorSize,
 								Distance: go_client.Distance_Cosine,
 							},
 						},

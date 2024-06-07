@@ -144,7 +144,6 @@ services:
     depends_on:
       - meilisearch
       - qdrant
-      - ollama
       - spicedb
     networks:
       - net1
@@ -172,7 +171,6 @@ services:
     depends_on:
       - meilisearch
       - qdrant
-      - ollama
       - spicedb
     networks:
       - net1
@@ -199,7 +197,6 @@ services:
       - "5117:5117"
     depends_on:
       - qdrant
-      - ollama
     networks:
       - net1
 
@@ -273,7 +270,6 @@ services:
       - temporal
       - meilisearch
       - qdrant
-      - ollama
       - spicedb
     networks:
       - net1

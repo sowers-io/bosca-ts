@@ -7,22 +7,31 @@ ARG REST_PORT
 EXPOSE $GRPC_PORT
 EXPOSE $REST_PORT
 
-RUN apt update && apt install -y pipx
-RUN pipx install poetry
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+ENV POETRY_NO_INTERACTION=1
+ENV VENV_PATH="/app/.venv"
+ENV PATH="$VENV_PATH/bin:$PATH"
 
-ENV PATH="/root/.local/bin:${PATH}"
+RUN adduser --uid 1000 --shell /bin/false user
+RUN apt update && apt install -y pipx
 
 WORKDIR /app
 
 COPY backend.llamaindex backend.llamaindex
 COPY clients/python clients/python
-RUN cd backend.llamaindex && poetry install
 
-RUN adduser --uid 1000 --shell /bin/false user
-RUN echo "echo 'Starting ${BACKEND} server...' && python /app/backend.llamaindex/${BACKEND}" > /app/entrypoint
+RUN chown -R 1000:1000 /app
 
 USER user
 
+RUN pipx install poetry
+
+ENV PATH="/home/user/.local/bin:${PATH}"
+
 WORKDIR /app/backend.llamaindex
+RUN cp $BACKEND main.py
+RUN poetry install --no-dev
+
+RUN echo "#!/bin/sh\n\necho 'Starting ${BACKEND} server...'\n\npoetry run python /app/backend.llamaindex/main.py" > /app/entrypoint
 
 ENTRYPOINT ["sh", "/app/entrypoint"]

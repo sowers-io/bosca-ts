@@ -21,7 +21,7 @@ class SearchService(bosca.search.search_pb2_grpc.SearchServiceServicer):
 async def serve() -> None:
     server = grpc.aio.server()
     bosca.search.search_pb2_grpc.add_SearchServiceServicer_to_server(SearchService(), server)
-    listen_addr = "[::]:" + os.getenv("GRPC_PORT", "9999")
+    listen_addr = "[::]:" + os.getenv("GRPC_PORT", "5005")
     server.add_insecure_port(listen_addr)
     logging.info("Starting server on %s", listen_addr)
     await server.start()

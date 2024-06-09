@@ -31,7 +31,7 @@ def initialize_llm():
 
     llm = Ollama(
         model=os.environ["BOSCA_OLLAMA_MODEL"],
-        context_window=160_000,
+        context_window=120_000,
         base_url=os.environ["BOSCA_OLLAMA_API_ADDRESS"],
         request_timeout=120
     )
@@ -45,11 +45,11 @@ def initialize_llm():
         grpc_port=int(client_connection_parts[1])
     )
 
-    Settings.chunk_size = 512
+    Settings.chunk_size = 1024
     Settings.chunk_overlap = 20
     Settings.llm = llm
     Settings.embed_model = embeddings
     Settings.callback_manager = llm.callback_manager
 
-    vector_store = QdrantVectorStore(client=qdrant_vector_client, collection_name="metadata", parallel=5)
+    vector_store = QdrantVectorStore(client=qdrant_vector_client, collection_name="metadata", parallel=2)
     vector_store_index = VectorStoreIndex.from_vector_store(vector_store=vector_store, embed_model=embeddings)

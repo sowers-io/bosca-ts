@@ -36,7 +36,7 @@ class AIService(bosca.ai.ai_pb2_grpc.AIServiceServicer):
 async def serve() -> None:
     server = grpc.aio.server()
     bosca.ai.ai_pb2_grpc.add_AIServiceServicer_to_server(AIService(), server)
-    listen_addr = "0.0.0.0:" + os.getenv("GRPC_PORT", "9095")
+    listen_addr = "0.0.0.0:" + os.getenv("GRPC_PORT", "5007")
     reflection.enable_server_reflection((
         bosca.ai.ai_pb2.DESCRIPTOR.services_by_name['AIService'].full_name,
         reflection.SERVICE_NAME,

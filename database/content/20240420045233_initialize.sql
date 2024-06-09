@@ -248,6 +248,33 @@ create table metadata_categories
     foreign key (metadata_id) references metadata (id) on delete cascade,
     foreign key (category_id) references categories (id) on delete cascade
 );
+
+create table models
+(
+    id            serial  not null,
+    type          varchar not null,
+    name          varchar not null,
+    description   varchar not null,
+    configuration jsonb   not null,
+    primary key (id)
+);
+
+insert into models (name, type, description, configuration)
+values ('phi3:medium-128k', 'llm', 'phi3:medium-128k', '{
+  "vectorSize": 5120
+}'::jsonb);
+
+create table vector_indexes
+(
+    id            bigserial not null,
+    model_id      int       not null,
+    name          varchar   not null,
+    description   varchar   not null,
+    enabled       boolean   not null default false,
+    configuration jsonb     not null,
+    primary key (id),
+    foreign key (model_id) references models (id)
+);
 -- +goose StatementEnd
 
 -- +goose Down

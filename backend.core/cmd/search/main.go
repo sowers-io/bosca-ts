@@ -61,7 +61,7 @@ func main() {
 	llm, err := ollama.New(
 		ollama.WithHTTPClient(httpClient),
 		ollama.WithServerURL(cfg.ClientEndPoints.OllamaApiAddress),
-		ollama.WithModel(cfg.AIConfiguration.DefaultLlmModel),
+		ollama.WithModel(cfg.AIConfiguration.OllamaLlmModel),
 	)
 	if err != nil {
 		log.Fatalf("failed to create model: %v", err)

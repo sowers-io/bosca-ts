@@ -49,7 +49,8 @@ func (cfg *ServerConfiguration) GetLogging() *LoggingConfiguration {
 }
 
 type AIConfiguration struct {
-	DefaultLlmModel string `envconfig:"DEFAULT_LLM_MODEL" default:"llama3:latest"`
+	OllamaLlmModel   string `envconfig:"OLLAMA_MODEL" default:"phi3:medium-128k"`
+	OllamaVectorSize int64  `envconfig:"OLLAMA_VECTOR_SIZE" default:"5120"`
 }
 
 type WorkerConfiguration struct {

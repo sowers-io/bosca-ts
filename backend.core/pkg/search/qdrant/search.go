@@ -25,7 +25,6 @@ import (
 )
 
 const MetadataIndex = "metadata"
-const MetadataVectorSize = 4096
 const ContentPayload = "content"
 
 type qdrantSearch struct {

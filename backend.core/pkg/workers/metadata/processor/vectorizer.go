@@ -34,7 +34,7 @@ func Vectorize(ctx context.Context, metadata *content.Metadata) error {
 	llm, err := ollama.New(
 		ollama.WithHTTPClient(common.GetHttpClient(ctx)),
 		ollama.WithServerURL(cfg.ClientEndPoints.OllamaApiAddress),
-		ollama.WithModel(cfg.AIConfiguration.DefaultLlmModel),
+		ollama.WithModel(cfg.AIConfiguration.OllamaLlmModel),
 	)
 	if err != nil {
 		return err

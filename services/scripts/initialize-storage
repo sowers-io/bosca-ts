@@ -46,10 +46,10 @@ curl \
     "primaryKey": "id"
   }'
 
-echo "Pull llm..."
-
-curl http://ollama:11434/api/pull -d '{
-  "name": "llama3:latest"
-}'
+#echo "Pull llm..."
+#
+#curl http://ollama:11434/api/pull -d "{
+#  \"name\": \"$BOSCA_OLLAMA_MODEL\"
+#}"
 
 echo "...Done"

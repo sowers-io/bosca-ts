@@ -32,7 +32,7 @@ services:
       - 6333:6333
       - 6334:6334
     volumes:
-      - ./qdrant:/qdrant/storage:z
+      - qdrant:/qdrant/storage:z
     networks:
       - net1
 
@@ -44,7 +44,7 @@ services:
     environment:
       MEILI_MASTER_KEY: p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M
     volumes:
-      - ./meilisearch/meili_data:/meili_data
+      - meilisearch:/meili_data
     networks:
       - net1
     healthcheck:
@@ -156,7 +156,7 @@ services:
         condition: service_completed_successfully
 
   spicedb:
-    image: authzed/spicedb:v1.31.0
+    image: authzed/spicedb:v1.33.0
     command: "serve"
     restart: "always"
     ports:
@@ -194,7 +194,7 @@ services:
       - net1
 
   spicedb-migrate:
-    image: authzed/spicedb:v1.31.0
+    image: authzed/spicedb:v1.33.0
     command: "migrate head"
     restart: "on-failure"
     environment:
@@ -268,37 +268,37 @@ services:
     networks:
       - net1
 
-  spark:
-    image: docker.io/bitnami/spark:3.5
-    environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - SPARK_USER=spark
-    ports:
-      - '9080:8080'
-      - '7077:7077'
-    networks:
-      - net1
+#  spark:
+#    image: docker.io/bitnami/spark:3.5
+#    environment:
+#      - SPARK_MODE=master
+#      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+#      - SPARK_RPC_ENCRYPTION_ENABLED=no
+#      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+#      - SPARK_SSL_ENABLED=no
+#      - SPARK_USER=spark
+#    ports:
+#      - '9080:8080'
+#      - '7077:7077'
+#    networks:
+#      - net1
 
-  spark-worker:
-    image: docker.io/bitnami/spark:3.5
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - SPARK_USER=spark
-    ports:
-      - '9081:8081'
-    networks:
-      - net1
+#  spark-worker:
+#    image: docker.io/bitnami/spark:3.5
+#    environment:
+#      - SPARK_MODE=worker
+#      - SPARK_MASTER_URL=spark://spark:7077
+#      - SPARK_WORKER_MEMORY=1G
+#      - SPARK_WORKER_CORES=1
+#      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+#      - SPARK_RPC_ENCRYPTION_ENABLED=no
+#      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+#      - SPARK_SSL_ENABLED=no
+#      - SPARK_USER=spark
+#    ports:
+#      - '9081:8081'
+#    networks:
+#      - net1
 
   temporal-admin-tools:
     container_name: temporal-admin-tools
@@ -353,59 +353,63 @@ services:
       postgres:
         condition: service_healthy
 
-  mlflow:
-    restart: always
-    platform: linux/amd64
-    image: ghcr.io/mlflow/mlflow:v2.0.1
-    depends_on:
-      postgres:
-        condition: service_healthy
-    ports:
-      - "5001:5000"
-    networks:
-      - net1
-    environment:
-      - AWS_ACCESS_KEY_ID=67fO5gFs6BuksBrh6rMp
-      - AWS_SECRET_ACCESS_KEY=eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
-      - MLFLOW_S3_ENDPOINT_URL=http://minio-nginx:9010
-      - MLFLOW_S3_IGNORE_TLS=true
-    command:
-      - bash
-      - -c
-      - "python3 -m pip install pip --upgrade && \ python3 -m pip install psycopg2-binary && \ mlflow server --backend-store-uri postgresql://bosca:bosca@postgres:5432/mlflow --host 0.0.0.0 --serve-artifacts --artifacts-destination s3://mlflow"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:5000/" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+#  mlflow:
+#    restart: always
+#    platform: linux/amd64
+#    image: ghcr.io/mlflow/mlflow:v2.0.1
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    ports:
+#      - "5001:5000"
+#    networks:
+#      - net1
+#    environment:
+#      - AWS_ACCESS_KEY_ID=67fO5gFs6BuksBrh6rMp
+#      - AWS_SECRET_ACCESS_KEY=eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
+#      - MLFLOW_S3_ENDPOINT_URL=http://minio-nginx:9010
+#      - MLFLOW_S3_IGNORE_TLS=true
+#    command:
+#      - bash
+#      - -c
+#      - "python3 -m pip install pip --upgrade && \ python3 -m pip install psycopg2-binary && \ mlflow server --backend.core-store-uri postgresql://bosca:bosca@postgres:5432/mlflow --host 0.0.0.0 --serve-artifacts --artifacts-destination s3://mlflow"
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:5000/" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
 
-  ollama:
-    image: ollama/ollama:latest
-    ports:
-      - 11434:11434
-    volumes:
-      - ./ollama/ollama:/root/.ollama
-    tty: true
-    restart: always
-    networks:
-      - net1
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+#  ollama:
+#    image: ollama/ollama:latest
+#    ports:
+#      - 11434:11434
+#    environment:
+#      OLLAMA_NUM_PARALLEL: 4
+#      OLLAMA_MAX_LOADED_MODELS: 4
+#      OLLAMA_DEBUG: 1
+#    volumes:
+#      - ./ollama/ollama:/root/.ollama
+#    tty: true
+#    restart: always
+#    networks:
+#      - net1
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: all
+#              capabilities: [gpu]
 
-  ollama-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    restart: always
-    ports:
-      - 8086:8080
-    environment:
-      OLLAMA_BASE_URL: http://ollama:11434
-    networks:
-      - net1
+#  ollama-webui:
+#    image: ghcr.io/open-webui/open-webui:main
+#    restart: always
+#    ports:
+#      - 8086:8080
+#    environment:
+#      OLLAMA_BASE_URL: http://ollama:11434
+#    networks:
+#      - net1
 
   textextractor:
     image: ghcr.io/sowers-io/bosca/text-extractor:a35bff0b7cf9d7584f3d58269f9719a7d5778d02
@@ -436,3 +440,5 @@ volumes:
   minio-data3-2:
   minio-data4-1:
   minio-data4-2:
+  qdrant:
+  meilisearch:

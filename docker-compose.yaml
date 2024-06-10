@@ -5,9 +5,10 @@ services:
 
   # Content DB Migration
   content-db-migration:
-    image: ghcr.io/sowers-io/bosca/content-db-migration:dev
     build:
       context: .
+      labels:
+        - ghcr.io/sowers-io/bosca/content-db-migration:dev
       dockerfile: Dockerfile-migration
       platforms:
         - linux/arm64
@@ -24,10 +25,11 @@ services:
 
   # Profiles DB Migration
   profiles-db-migration:
-    image: ghcr.io/sowers-io/bosca/profiles-db-migration:dev
     build:
       context: .
       dockerfile: Dockerfile-migration
+      labels:
+        - ghcr.io/sowers-io/bosca/profiles-db-migration:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -43,10 +45,11 @@ services:
 
   # Security DB Migration
   security-db-migration:
-    image: ghcr.io/sowers-io/bosca/security-db-migration:dev
     build:
       context: .
       dockerfile: Dockerfile-migration
+      labels:
+        - ghcr.io/sowers-io/bosca/security-db-migration:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -62,11 +65,12 @@ services:
 
   # Profiles gRPC Service
   profiles:
-    image: ghcr.io/sowers-io/bosca/profiles:dev
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
+      labels:
+        - ghcr.io/sowers-io/bosca/profiles:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -87,11 +91,12 @@ services:
 
   # Content gRPC Service
   content:
-    image: ghcr.io/sowers-io/bosca/content:dev
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
+      labels:
+        - ghcr.io/sowers-io/bosca/content:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -118,11 +123,12 @@ services:
 
   # Search gRPC Service
   search:
-    image: ghcr.io/sowers-io/bosca/search:dev
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
+      labels:
+        - ghcr.io/sowers-io/bosca/search:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -138,23 +144,23 @@ services:
     depends_on:
       - meilisearch
       - qdrant
-      - ollama
       - spicedb
     networks:
       - net1
 
   # AI gRPC Service
   ai:
-    image: ghcr.io/sowers-io/bosca/ai:dev
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-llamaindex
+      labels:
+        - ghcr.io/sowers-io/bosca/ai:dev
       platforms:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=ai
+        - BACKEND=api/ai.py
         - GRPC_PORT=5007
         - REST_PORT=5017
     env_file:
@@ -165,18 +171,43 @@ services:
     depends_on:
       - meilisearch
       - qdrant
-      - ollama
       - spicedb
+    networks:
+      - net1
+
+  # AI Vectorizer Worker
+  ai-vectorizer:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile-backend-llamaindex
+      labels:
+        - ghcr.io/sowers-io/bosca/ai-vectorizer:dev
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=workers/vectorizer/main.py
+        - GRPC_PORT=5107
+        - REST_PORT=5117
+    env_file:
+      - .env-dev
+    ports:
+      - "5107:5107"
+      - "5117:5117"
+    depends_on:
+      - qdrant
     networks:
       - net1
 
   # Security gRPC Service
   security:
-    image: ghcr.io/sowers-io/bosca/security:dev
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
+      labels:
+        - ghcr.io/sowers-io/bosca/security:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -197,11 +228,12 @@ services:
 
   # Uploader HTTP Server
   uploader:
-    image: ghcr.io/sowers-io/bosca/uploader:dev
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
+      labels:
+        - ghcr.io/sowers-io/bosca/uploader:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -221,11 +253,12 @@ services:
 
   # Metadata Worker
   metadata-worker:
-    image: ghcr.io/sowers-io/bosca/workers/metadata:dev
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      labels:
+        - ghcr.io/sowers-io/bosca/workers/workflow:dev
+      dockerfile: Dockerfile-backend-core
       platforms:
         - linux/arm64
         - linux/amd64
@@ -237,23 +270,46 @@ services:
       - temporal
       - meilisearch
       - qdrant
-      - ollama
       - spicedb
     networks:
       - net1
 
   # Text Extractor Worker
   textextractor-worker:
-    image: ghcr.io/sowers-io/bosca/workers/textextractor:dev
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-backend-core
+      labels:
+        - ghcr.io/sowers-io/bosca/workers/textextractor:dev
       platforms:
         - linux/arm64
         - linux/amd64
       args:
         - BACKEND=workers/textextractor
+    env_file:
+      - .env-dev
+    depends_on:
+      temporal:
+        condition: service_healthy
+      textextractor:
+        condition: service_healthy
+    networks:
+      - net1
+
+  # Bible Worker
+  bible-worker:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile-backend-core
+      labels:
+        - ghcr.io/sowers-io/bosca/workers/bible:dev
+      platforms:
+        - linux/arm64
+        - linux/amd64
+      args:
+        - BACKEND=workers/bible
     env_file:
       - .env-dev
     depends_on:

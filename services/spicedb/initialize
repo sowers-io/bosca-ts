@@ -3,10 +3,12 @@
 echo "Initializing SpiceDB..."
 
 zed schema write /app/schema --insecure --endpoint spicedb:50051 --token bosca-spicedb
+zed relationship create group:administrators serviceaccounts serviceaccount:sa --insecure --token bosca-spicedb --endpoint spicedb:50051
 zed relationship create collection:00000000-0000-0000-0000-000000000000 owners group:administrators --insecure --token bosca-spicedb --endpoint spicedb:50051
 zed relationship create collection:00000000-0000-0000-0000-000000000000 viewers group:users --insecure --token bosca-spicedb --endpoint spicedb:50051
 zed relationship create collection:00000000-0000-0000-0000-000000000000 discoverers group:users --insecure --token bosca-spicedb --endpoint spicedb:50051
-zed relationship create group:administrators serviceaccounts serviceaccount:sa --insecure --token bosca-spicedb --endpoint spicedb:50051
+zed relationship create workflow:all owners group:administrators --insecure --token bosca-spicedb --endpoint spicedb:50051
+zed relationship create workflowstate:all owners group:administrators --insecure --token bosca-spicedb --endpoint spicedb:50051
 
 cat /app/administrator.json | kratos import identities
 

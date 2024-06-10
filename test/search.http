@@ -19,7 +19,7 @@ Authorization: Bearer {{session_token}}
 Content-Type: application/json
 
 {
-  "query": "Features"
+  "query": "Judah"
 }
 
 ### AI
@@ -28,5 +28,24 @@ Authorization: Bearer {{session_token}}
 Content-Type: application/json
 
 {
-  "query": "Who is Kyle?"
+  "query": "What was Jesus known for?"
+}
+
+
+### AI
+POST http://localhost:9096/v1/ai/chat
+Authorization: Bearer {{session_token}}
+Content-Type: application/json
+
+{
+  "query": "How many cities did Jair have?"
+}
+
+### AI
+POST http://localhost:9096/v1/ai/chat
+Authorization: Bearer {{session_token}}
+Content-Type: application/json
+
+{
+  "query": "Who were the sons of Salma?"
 }

@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "backend-llamaindex"
+version = "0.1.0"
+description = ""
+authors = ["Kyle Brock <brock@donesky.io>"]
+license = "Apache 2.0"
+readme = "README.md"
+packages = [{include = "backend"}]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.10.12,<3.13"
+bosca = {path = "../clients/python"}
+grpcio = "^1.64.1"
+grpcio-reflection = "1.64.1"
+protobuf = "^5.27.0"
+googleapis-common-protos = "1.63.1"
+temporalio = "^1.6.0"
+requests = "2.32.3"
+llama_index = "0.10.43"
+llama-index-llms-ollama = "0.1.5"
+llama-index-embeddings-ollama = "0.1.2"
+llama-index-vector-stores-qdrant = "0.2.8"
+
+[tool.poetry.dev-dependencies]
+grpcio-tools = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

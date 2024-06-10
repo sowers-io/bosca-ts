@@ -383,6 +383,10 @@ services:
 #    image: ollama/ollama:latest
 #    ports:
 #      - 11434:11434
+#    environment:
+#      OLLAMA_NUM_PARALLEL: 4
+#      OLLAMA_MAX_LOADED_MODELS: 4
+#      OLLAMA_DEBUG: 1
 #    volumes:
 #      - ./ollama/ollama:/root/.ollama
 #    tty: true
@@ -394,12 +398,8 @@ services:
 #        reservations:
 #          devices:
 #            - driver: nvidia
-#              count: 1
-#              capabilities:
-#                - gpu
-#                - utility
-#                - compute
-#                - video
+#              count: all
+#              capabilities: [gpu]
 
 #  ollama-webui:
 #    image: ghcr.io/open-webui/open-webui:main

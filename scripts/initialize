@@ -16,22 +16,6 @@
 
 set -e
 
-if [ "$OSTYPE" = "darwin23" ]; then
-  brew install minio/stable/mc
-  brew install authzed/tap/zed
-else
-  sudo apt update && sudo apt install -y curl ca-certificates gpg
-  curl https://apt.fury.io/authzed/gpg.key | sudo apt-key add -
-  sudo sh -c 'echo "deb https://apt.fury.io/authzed/ * *" > /etc/apt/sources.list.d/fury.list'
-  sudo apt update && sudo apt install -y zed
-
-  mkdir -p $HOME/bin
-  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $HOME/bin/mc
-
-  chmod +x $HOME/bin/mc
-  export PATH=$PATH:$HOME/bin/mc
-fi
-
 go install github.com/pressly/goose/v3/cmd/goose@latest
 go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
 go install github.com/boumenot/gocover-cobertura@latest
@@ -41,4 +25,5 @@ go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
-cd backend; go mod download
+cd backend.core && go mod download
+cd backend.llamaindex && poetry install

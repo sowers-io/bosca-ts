@@ -39,7 +39,6 @@ type ServerConfiguration struct {
 	Storage         *StorageConfiguration  `ignored:"true"`
 	Search          *SearchConfiguration   `ignored:"true"`
 	ClientEndPoints *ClientEndpoints       `ignored:"true"`
-	AIConfiguration *AIConfiguration       `ignored:"true"`
 }
 
 func (cfg *ServerConfiguration) GetLogging() *LoggingConfiguration {
@@ -48,16 +47,10 @@ func (cfg *ServerConfiguration) GetLogging() *LoggingConfiguration {
 	}
 }
 
-type AIConfiguration struct {
-	OllamaLlmModel   string `envconfig:"OLLAMA_MODEL" default:"phi3:medium-128k"`
-	OllamaVectorSize int64  `envconfig:"OLLAMA_VECTOR_SIZE" default:"5120"`
-}
-
 type WorkerConfiguration struct {
 	Security        *SecurityConfiguration `ignored:"true"`
 	Search          *SearchConfiguration   `ignored:"true"`
 	ClientEndPoints *ClientEndpoints       `ignored:"true"`
-	AIConfiguration *AIConfiguration       `ignored:"true"`
 }
 
 func (cfg *WorkerConfiguration) GetLogging() *LoggingConfiguration {
@@ -137,15 +130,6 @@ func getClientEndpoints() *ClientEndpoints {
 	return endpoints
 }
 
-func getAIConfiguration() *AIConfiguration {
-	endpoints := &AIConfiguration{}
-	err := envconfig.Process("bosca", endpoints)
-	if err != nil {
-		log.Fatalf("failed to process ai configuration: %v", err)
-	}
-	return endpoints
-}
-
 func getDatabaseConfiguration(databasePrefix string) *DatabaseConfiguration {
 	database := &DatabaseConfiguration{}
 	err := envconfig.Process("bosca_"+databasePrefix, database)
@@ -206,7 +190,6 @@ func NewWorkerConfiguration() *WorkerConfiguration {
 	configuration.Security = getSecurityConfiguration()
 	configuration.Search = getSearchConfiguration()
 	configuration.ClientEndPoints = getClientEndpoints()
-	configuration.AIConfiguration = getAIConfiguration()
 	return configuration
 }
 
@@ -217,6 +200,5 @@ func NewServerConfiguration(databasePrefix string, defaultRestPort, defaultGrpcP
 	configuration.Security = getSecurityConfiguration()
 	configuration.Search = getSearchConfiguration()
 	configuration.ClientEndPoints = getClientEndpoints()
-	configuration.AIConfiguration = getAIConfiguration()
 	return configuration
 }

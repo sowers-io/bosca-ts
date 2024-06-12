@@ -14,24 +14,65 @@
 
 -- +goose Up
 -- +goose StatementBegin
-create table workflows
+create table models
 (
-    id            varchar not null, -- This is the identifier of the temporal workflow
+    id            serial  not null,
+    type          varchar not null,
     name          varchar not null,
     description   varchar not null,
-    queue         varchar not null,
-    configuration jsonb   not null default '{}',
+    configuration jsonb   not null,
     primary key (id)
 );
 
-insert into workflows (id, name, description, queue)
-values ('ProcessMetadata', 'Process Metadata', 'Process Metadata', 'metadata');
+insert into models (name, type, description, configuration)
+values ('phi3:medium-128k', 'llm', 'phi3:medium-128k', '{
+  "vectorSize": 5120
+}'::jsonb);
+
+create table vector_indexes
+(
+    id            bigserial not null,
+    model_id      int       not null,
+    name          varchar   not null,
+    description   varchar   not null,
+    enabled       boolean   not null default false,
+    configuration jsonb     not null,
+    primary key (id),
+    foreign key (model_id) references models (id)
+);
+
+create table workflows
+(
+    id              varchar not null, -- This is the identifier of the temporal workflow
+    name            varchar not null,
+    description     varchar not null,
+    queue           varchar not null,
+    configuration   jsonb   not null default '{}',
+    model_id        int generated always as (configuration ->> 'modelId') stored,
+    vector_index_id int generated always as (configuration ->> 'vectorIndexId') stored,
+    primary key (id),
+    foreign key (model_id) references models (id),
+    foreign key (vector_index_id) references vector_indexes (id),
+    check ( case
+                when vector_index_id is not null then (select count(*)
+                                                       from vector_indexes
+                                                       where vector_indexes.model_id = workflows.model_id
+                                                         and vector_indexes.id = workflows.vector_index_id) = 1
+                else true end )
+);
+
+insert into workflows (id, name, description, queue, configuration)
+values ('ProcessMetadata', 'Process Metadata', 'Process Metadata', 'metadata', '{
+  "finalStateId": "draft"
+}'::jsonb);
 
 insert into workflows (id, name, description, queue)
 values ('ProcessTraits', 'Process Traits', 'Process Traits', 'metadata');
 
-insert into workflows (id, name, description, queue)
-values ('ProcessText', 'Process Text', 'Process Text', 'metadata');
+insert into workflows (id, name, description, queue, configuration)
+values ('ProcessText', 'Process Text', 'Process Text', 'metadata', '{
+  "modelId": 1
+}'::jsonb);
 
 insert into workflows (id, name, description, queue)
 values ('ProcessBible', 'Process Bible', 'Process Bible', 'bible');
@@ -247,33 +288,6 @@ create table metadata_categories
     primary key (metadata_id, category_id),
     foreign key (metadata_id) references metadata (id) on delete cascade,
     foreign key (category_id) references categories (id) on delete cascade
-);
-
-create table models
-(
-    id            serial  not null,
-    type          varchar not null,
-    name          varchar not null,
-    description   varchar not null,
-    configuration jsonb   not null,
-    primary key (id)
-);
-
-insert into models (name, type, description, configuration)
-values ('phi3:medium-128k', 'llm', 'phi3:medium-128k', '{
-  "vectorSize": 5120
-}'::jsonb);
-
-create table vector_indexes
-(
-    id            bigserial not null,
-    model_id      int       not null,
-    name          varchar   not null,
-    description   varchar   not null,
-    enabled       boolean   not null default false,
-    configuration jsonb     not null,
-    primary key (id),
-    foreign key (model_id) references models (id)
 );
 -- +goose StatementEnd
 

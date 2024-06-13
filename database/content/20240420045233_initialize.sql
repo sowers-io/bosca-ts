@@ -48,17 +48,11 @@ create table workflows
     description     varchar not null,
     queue           varchar not null,
     configuration   jsonb   not null default '{}',
-    model_id        int generated always as (configuration ->> 'modelId') stored,
-    vector_index_id int generated always as (configuration ->> 'vectorIndexId') stored,
+    model_id        int generated always as ((configuration ->> 'modelId')::int) stored,
+    vector_index_id int generated always as ((configuration ->> 'vectorIndexId')::int) stored,
     primary key (id),
     foreign key (model_id) references models (id),
-    foreign key (vector_index_id) references vector_indexes (id),
-    check ( case
-                when vector_index_id is not null then (select count(*)
-                                                       from vector_indexes
-                                                       where vector_indexes.model_id = workflows.model_id
-                                                         and vector_indexes.id = workflows.vector_index_id) = 1
-                else true end )
+    foreign key (vector_index_id) references vector_indexes (id)
 );
 
 insert into workflows (id, name, description, queue, configuration)
@@ -319,4 +313,6 @@ drop
 drop table if exists workflow_states cascade;
 drop
     type if exists workflow_state_type cascade;
+drop table if exists models cascade;
+drop table if exists vector_indexes cascade;
 -- +goose StatementEnd

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+cd database/$1
+
+goose postgres "database=boscacontent host=localhost user=bosca password=bosca" $2

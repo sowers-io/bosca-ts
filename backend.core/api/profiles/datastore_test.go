@@ -17,7 +17,7 @@
 package profiles
 
 import (
-	"bosca.io/api/protobuf/profiles"
+	"bosca.io/api/protobuf/bosca/profiles"
 	"bosca.io/tests"
 	"context"
 	_ "github.com/pressly/goose/v3"

@@ -47,8 +47,9 @@ func newCollection(t *testing.T, ctx context.Context, ds *DataStore) string {
 
 func newMetadata(t *testing.T, ctx context.Context, ds *DataStore) string {
 	metadata := &content.Metadata{
-		Name:        "MD 1",
-		ContentType: "text/plain",
+		Name:          "MD 1",
+		ContentType:   "text/plain",
+		ContentLength: 100,
 	}
 
 	id, err := ds.AddMetadata(ctx, metadata)

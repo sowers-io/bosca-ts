@@ -17,7 +17,7 @@
 package ai
 
 import (
-	grpc "bosca.io/api/protobuf/ai"
+	grpc "bosca.io/api/protobuf/bosca/ai"
 	"bosca.io/pkg/security"
 	"context"
 	"github.com/tmc/langchaingo/chains"

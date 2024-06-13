@@ -17,9 +17,9 @@
 package search
 
 import (
-	grpcRequests "bosca.io/api/protobuf"
+	grpcRequests "bosca.io/api/protobuf/bosca"
 	grpcContent "bosca.io/api/protobuf/bosca/content"
-	grpc "bosca.io/api/protobuf/search"
+	grpc "bosca.io/api/protobuf/bosca/search"
 	"bosca.io/pkg/search"
 	"bosca.io/pkg/security/identity"
 	"context"

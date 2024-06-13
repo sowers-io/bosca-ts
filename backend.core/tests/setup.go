@@ -38,6 +38,7 @@ func Up(name string) *sql.DB {
 		if err := goose.SetDialect("postgres"); err != nil {
 			panic(err)
 		}
+		_ = goose.Reset(db, ".")
 		if err := goose.Up(db, "."); err != nil {
 			panic(err)
 		}
@@ -48,7 +49,7 @@ func Up(name string) *sql.DB {
 }
 
 func Down(db *sql.DB) {
-	err := goose.Down(db, ".")
+	err := goose.Reset(db, ".")
 	if err != nil {
 		panic(err)
 	}

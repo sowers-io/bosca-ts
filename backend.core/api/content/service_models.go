@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-syntax = "proto3";
 
-option go_package = "bosca.io/api/protobuf/bosca/content";
+package content
 
-package bosca.content;
+import (
+	"bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca/content"
+	"context"
+)
 
-message Model {
-  string id = 1;
-  string type = 2;
-  string name = 3;
-  string description = 4;
-  map<string, string> configuration = 5;
-}
-
-message Models {
-  repeated Model models = 1;
+func (svc *service) GetModels(ctx context.Context, request *bosca.Empty) (*content.Models, error) {
+	models, err := svc.ds.GetModels(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &content.Models{
+		Models: models,
+	}, nil
 }

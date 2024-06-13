@@ -17,16 +17,35 @@ syntax = "proto3";
 
 option go_package = "bosca.io/api/protobuf/bosca/content";
 
+import "bosca/content/model.proto";
+
 package bosca.content;
 
-message Model {
+enum StorageSystemType {
+  unknown_storage_system = 0;
+  vector_storage_system = 1;
+  search_storage_system = 2;
+  metadata_storage_system = 3;
+  supplementary_storage_system = 4;
+}
+
+message StorageSystem {
   string id = 1;
-  string type = 2;
+  StorageSystemType type = 2;
   string name = 3;
   string description = 4;
   map<string, string> configuration = 5;
 }
 
-message Models {
-  repeated Model models = 1;
+message StorageSystems {
+  repeated StorageSystem systems = 1;
+}
+
+message StorageSystemModel {
+    Model model = 2;
+    string type = 3;
+}
+
+message StorageSystemModels {
+    repeated StorageSystemModel models = 1;
 }

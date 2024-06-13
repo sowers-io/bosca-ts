@@ -54,56 +54,49 @@ func NewAITemporalClient() (client.Client, error) {
 		return nil, err
 	}
 
-	models, err := contentService.GetModels(ctx, &protobuf.Empty{})
+	systems, err := contentService.GetStorageSystems(ctx, &protobuf.Empty{})
 	if err != nil {
 		return nil, err
 	}
 
-	for _, model := range models.Models {
-		indexes, err := contentService.GetVectorIndexes(ctx, &protobuf.IntIdRequest{
-			Id: int64(model.Id),
+	for _, system := range systems.Systems {
+		if system.Type != content.StorageSystemType_vector_storage_system {
+			continue
+		}
+		_, err = qdrantClient.CollectionsClient.Get(ctx, &go_client.GetCollectionInfoRequest{
+			CollectionName: system.Configuration["indexName"],
 		})
 		if err != nil {
-			return nil, err
-		}
-
-		for _, index := range indexes.Indexes {
-			_, err = qdrantClient.CollectionsClient.Get(ctx, &go_client.GetCollectionInfoRequest{
-				CollectionName: index.Name,
-			})
-			if err != nil {
-				if s, ok := status.FromError(err); ok {
-					if s.Code() == codes.NotFound {
-						size, err := strconv.ParseInt(index.Configuration["vectorSize"], 0, 64)
-						if err != nil {
-							return nil, err
-						}
-						collection := &go_client.CreateCollection{
-							CollectionName: index.Name,
-							VectorsConfig: &go_client.VectorsConfig{
-								Config: &go_client.VectorsConfig_Params{
-									Params: &go_client.VectorParams{
-										Size:     uint64(size),
-										Distance: go_client.Distance_Cosine,
-									},
+			if s, ok := status.FromError(err); ok {
+				if s.Code() == codes.NotFound {
+					size, err := strconv.ParseInt(system.Configuration["vectorSize"], 0, 64)
+					if err != nil {
+						return nil, err
+					}
+					collection := &go_client.CreateCollection{
+						CollectionName: system.Configuration["indexName"],
+						VectorsConfig: &go_client.VectorsConfig{
+							Config: &go_client.VectorsConfig_Params{
+								Params: &go_client.VectorParams{
+									Size:     uint64(size),
+									Distance: go_client.Distance_Cosine,
 								},
 							},
-						}
-						result, err := qdrantClient.CollectionsClient.Create(ctx, collection)
-						if err != nil {
-							return nil, err
-						}
-						if !result.Result {
-							return nil, err
-						}
+						},
 					}
-				} else {
-					return nil, err
+					result, err := qdrantClient.CollectionsClient.Create(ctx, collection)
+					if err != nil {
+						return nil, err
+					}
+					if !result.Result {
+						return nil, err
+					}
 				}
+			} else {
+				return nil, err
 			}
 		}
 	}
-
 	httpClient := util.NewDefaultHttpClient()
 	propagator := common.NewContextPropagator(cfg, httpClient, contentService, searchClient, qdrantClient)
 	return temporal.NewClientWithPropagator(ctx, cfg.ClientEndPoints, propagator)

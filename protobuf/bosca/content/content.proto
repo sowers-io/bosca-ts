@@ -21,6 +21,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "bosca/content/metadata.proto";
 import "bosca/content/model.proto";
+import "bosca/content/storage_systems.proto";
 import "bosca/empty.proto";
 import "bosca/requests.proto";
 
@@ -45,9 +46,15 @@ service ContentService {
     };
   }
 
-  rpc GetVectorIndexes(bosca.IntIdRequest) returns (VectorIndexes) {
+  rpc GetStorageSystems(bosca.Empty) returns (StorageSystems) {
     option (google.api.http) = {
-      get: "/v1/content/models/{id}/vectorindexes"
+      get: "/v1/content/storagesystems"
+    };
+  }
+
+  rpc GetStorageSystemModels(bosca.IdRequest) returns (StorageSystemModels) {
+    option (google.api.http) = {
+      get: "/v1/content/storagesystems/{id}/models"
     };
   }
 

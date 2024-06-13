@@ -38,7 +38,8 @@ const (
 	ContentService_GetWorkflowById_FullMethodName                     = "/bosca.content.ContentService/GetWorkflowById"
 	ContentService_GetWorkflows_FullMethodName                        = "/bosca.content.ContentService/GetWorkflows"
 	ContentService_GetModels_FullMethodName                           = "/bosca.content.ContentService/GetModels"
-	ContentService_GetVectorIndexes_FullMethodName                    = "/bosca.content.ContentService/GetVectorIndexes"
+	ContentService_GetStorageSystems_FullMethodName                   = "/bosca.content.ContentService/GetStorageSystems"
+	ContentService_GetStorageSystemModels_FullMethodName              = "/bosca.content.ContentService/GetStorageSystemModels"
 	ContentService_GetWorkflowStateById_FullMethodName                = "/bosca.content.ContentService/GetWorkflowStateById"
 	ContentService_GetWorkflowStates_FullMethodName                   = "/bosca.content.ContentService/GetWorkflowStates"
 	ContentService_GetTraitById_FullMethodName                        = "/bosca.content.ContentService/GetTraitById"
@@ -77,7 +78,8 @@ type ContentServiceClient interface {
 	GetWorkflowById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Workflow, error)
 	GetWorkflows(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Workflows, error)
 	GetModels(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Models, error)
-	GetVectorIndexes(ctx context.Context, in *bosca.IntIdRequest, opts ...grpc.CallOption) (*VectorIndexes, error)
+	GetStorageSystems(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*StorageSystems, error)
+	GetStorageSystemModels(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystemModels, error)
 	GetWorkflowStateById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowState, error)
 	GetWorkflowStates(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*WorkflowStates, error)
 	GetTraitById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Trait, error)
@@ -147,10 +149,20 @@ func (c *contentServiceClient) GetModels(ctx context.Context, in *bosca.Empty, o
 	return out, nil
 }
 
-func (c *contentServiceClient) GetVectorIndexes(ctx context.Context, in *bosca.IntIdRequest, opts ...grpc.CallOption) (*VectorIndexes, error) {
+func (c *contentServiceClient) GetStorageSystems(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*StorageSystems, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(VectorIndexes)
-	err := c.cc.Invoke(ctx, ContentService_GetVectorIndexes_FullMethodName, in, out, cOpts...)
+	out := new(StorageSystems)
+	err := c.cc.Invoke(ctx, ContentService_GetStorageSystems_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetStorageSystemModels(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystemModels, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StorageSystemModels)
+	err := c.cc.Invoke(ctx, ContentService_GetStorageSystemModels_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -454,7 +466,8 @@ type ContentServiceServer interface {
 	GetWorkflowById(context.Context, *bosca.IdRequest) (*Workflow, error)
 	GetWorkflows(context.Context, *bosca.Empty) (*Workflows, error)
 	GetModels(context.Context, *bosca.Empty) (*Models, error)
-	GetVectorIndexes(context.Context, *bosca.IntIdRequest) (*VectorIndexes, error)
+	GetStorageSystems(context.Context, *bosca.Empty) (*StorageSystems, error)
+	GetStorageSystemModels(context.Context, *bosca.IdRequest) (*StorageSystemModels, error)
 	GetWorkflowStateById(context.Context, *bosca.IdRequest) (*WorkflowState, error)
 	GetWorkflowStates(context.Context, *bosca.Empty) (*WorkflowStates, error)
 	GetTraitById(context.Context, *bosca.IdRequest) (*Trait, error)
@@ -500,8 +513,11 @@ func (UnimplementedContentServiceServer) GetWorkflows(context.Context, *bosca.Em
 func (UnimplementedContentServiceServer) GetModels(context.Context, *bosca.Empty) (*Models, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetModels not implemented")
 }
-func (UnimplementedContentServiceServer) GetVectorIndexes(context.Context, *bosca.IntIdRequest) (*VectorIndexes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetVectorIndexes not implemented")
+func (UnimplementedContentServiceServer) GetStorageSystems(context.Context, *bosca.Empty) (*StorageSystems, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStorageSystems not implemented")
+}
+func (UnimplementedContentServiceServer) GetStorageSystemModels(context.Context, *bosca.IdRequest) (*StorageSystemModels, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStorageSystemModels not implemented")
 }
 func (UnimplementedContentServiceServer) GetWorkflowStateById(context.Context, *bosca.IdRequest) (*WorkflowState, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowStateById not implemented")
@@ -657,20 +673,38 @@ func _ContentService_GetModels_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContentService_GetVectorIndexes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(bosca.IntIdRequest)
+func _ContentService_GetStorageSystems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContentServiceServer).GetVectorIndexes(ctx, in)
+		return srv.(ContentServiceServer).GetStorageSystems(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ContentService_GetVectorIndexes_FullMethodName,
+		FullMethod: ContentService_GetStorageSystems_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).GetVectorIndexes(ctx, req.(*bosca.IntIdRequest))
+		return srv.(ContentServiceServer).GetStorageSystems(ctx, req.(*bosca.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetStorageSystemModels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetStorageSystemModels(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetStorageSystemModels_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetStorageSystemModels(ctx, req.(*bosca.IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1217,8 +1251,12 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_GetModels_Handler,
 		},
 		{
-			MethodName: "GetVectorIndexes",
-			Handler:    _ContentService_GetVectorIndexes_Handler,
+			MethodName: "GetStorageSystems",
+			Handler:    _ContentService_GetStorageSystems_Handler,
+		},
+		{
+			MethodName: "GetStorageSystemModels",
+			Handler:    _ContentService_GetStorageSystemModels_Handler,
 		},
 		{
 			MethodName: "GetWorkflowStateById",

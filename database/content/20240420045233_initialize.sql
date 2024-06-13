@@ -16,7 +16,7 @@
 -- +goose StatementBegin
 create table models
 (
-    id            serial  not null,
+    id            uuid    not null default gen_random_uuid(),
     type          varchar not null,
     name          varchar not null,
     description   varchar not null,
@@ -25,34 +25,62 @@ create table models
 );
 
 insert into models (name, type, description, configuration)
-values ('phi3:medium-128k', 'llm', 'phi3:medium-128k', '{
-  "vectorSize": 5120
+values ('phi3:medium-128k', 'ollama-llm', 'phi3:medium-128k', '{
+  "vectorSize": "5120"
 }'::jsonb);
 
-create table vector_indexes
+create type storage_system_type as enum ('vector', 'search', 'metadata', 'supplementary');
+
+create table storage_systems
 (
-    id            bigserial not null,
-    model_id      int       not null,
-    name          varchar   not null,
-    description   varchar   not null,
-    enabled       boolean   not null default false,
-    configuration jsonb     not null,
-    primary key (id),
+    id            uuid                not null default gen_random_uuid(),
+    name          varchar             not null,
+    description   varchar             not null,
+    type          storage_system_type not null,
+    configuration jsonb               not null,
+    primary key (id)
+);
+
+create table storage_system_models
+(
+    system_id uuid    not null,
+    model_id  uuid    not null,
+    type      varchar not null default 'default',
+    primary key (system_id, model_id),
+    foreign key (system_id) references storage_systems (id),
     foreign key (model_id) references models (id)
 );
 
+insert into storage_systems (name, description, type, configuration)
+values ('Metadata Search Index', 'Index search content', 'search'::storage_system_type, '{
+  "indexName": "metadata",
+  "type": "meilisearch"
+}'::jsonb),
+       ('Bible Chapter Vector Index', 'Store Bible Chapter Data', 'vector'::storage_system_type, '{
+         "indexName": "biblechapters",
+         "type": "qdrant"
+       }'::jsonb),
+       ('Bible Verse Vector Index', 'Store Bible Verse Data', 'vector'::storage_system_type, '{
+         "indexName": "bibleverses",
+         "type": "qdrant"
+       }'::jsonb);
+
+insert into storage_system_models (system_id, model_id)
+values ((select id from storage_systems where name = 'Bible Chapter Vector Index'),
+        (select id from models where name = 'phi3:medium-128k'));
+
+insert into storage_system_models (system_id, model_id)
+values ((select id from storage_systems where name = 'Bible Verse Vector Index'),
+        (select id from models where name = 'phi3:medium-128k'));
+
 create table workflows
 (
-    id              varchar not null, -- This is the identifier of the temporal workflow
-    name            varchar not null,
-    description     varchar not null,
-    queue           varchar not null,
-    configuration   jsonb   not null default '{}',
-    model_id        int generated always as ((configuration ->> 'modelId')::int) stored,
-    vector_index_id int generated always as ((configuration ->> 'vectorIndexId')::int) stored,
-    primary key (id),
-    foreign key (model_id) references models (id),
-    foreign key (vector_index_id) references vector_indexes (id)
+    id            varchar not null, -- This is the identifier of the temporal workflow
+    name          varchar not null,
+    description   varchar not null,
+    queue         varchar not null,
+    configuration jsonb   not null default '{}',
+    primary key (id)
 );
 
 insert into workflows (id, name, description, queue, configuration)
@@ -63,10 +91,11 @@ values ('ProcessMetadata', 'Process Metadata', 'Process Metadata', 'metadata', '
 insert into workflows (id, name, description, queue)
 values ('ProcessTraits', 'Process Traits', 'Process Traits', 'metadata');
 
-insert into workflows (id, name, description, queue, configuration)
-values ('ProcessText', 'Process Text', 'Process Text', 'metadata', '{
-  "modelId": 1
-}'::jsonb);
+insert into workflows (id, name, description, queue)
+values ('IndexVector', 'Index Vectors', 'Index Vector Data', 'vectors');
+
+insert into workflows (id, name, description, queue)
+values ('IndexSearch', 'Index Search', 'Index Search Data', 'search');
 
 insert into workflows (id, name, description, queue)
 values ('ProcessBible', 'Process Bible', 'Process Bible', 'bible');
@@ -75,17 +104,50 @@ create table traits
 (
     id          varchar not null,
     name        varchar not null,
+    description varchar not null,
+    primary key (id)
+);
+
+create table trait_workflows
+(
+    trait_id    varchar not null,
     workflow_id varchar not null,
-    primary key (id),
+    primary key (trait_id, workflow_id),
+    foreign key (trait_id) references traits (id),
     foreign key (workflow_id) references workflows (id)
 );
 
-insert into traits (id, name, workflow_id)
-values ('bible.usx', 'Digital Bible', 'ProcessBible');
+insert into traits (id, name, description)
+values ('common.text', 'Textual Content', 'Generic Common Text'),
+       ('bible.usx', 'Digital Bible', 'Generate vector and search indexed data.  Broken down by chapter and verse.'),
+       ('bible.chapter.text', 'Bible Chapter Text', 'Process Bible Chapter Text'),
+       ('bible.verse.text', 'Bible Verse Text', 'Process Bible Verse Text');
 
-insert into traits (id, name, workflow_id)
-values ('common.text', 'Textual Content', 'ProcessText'),
-       ('bible.chapter.text', 'Bible Chapter Text', 'ProcessText');
+insert into trait_workflows (trait_id, workflow_id)
+values ('bible.usx', 'ProcessBible'),
+       ('bible.chapter.text', 'IndexVector'),
+       ('bible.chapter.text', 'IndexSearch'),
+       ('bible.verse.text', 'IndexVector'),
+       ('bible.verse.text', 'IndexSearch');
+
+create table workflow_trait_storage_systems
+(
+    workflow_id       varchar not null,
+    storage_system_id uuid    not null,
+    trait_id          varchar not null,
+    primary key (workflow_id, trait_id, storage_system_id),
+    foreign key (workflow_id) references workflows (id),
+    foreign key (storage_system_id) references storage_systems (id),
+    foreign key (trait_id) references traits (id)
+);
+
+insert into workflow_trait_storage_systems (workflow_id, storage_system_id, trait_id)
+values ('IndexVector', (select id from storage_systems where name = 'Bible Chapter Vector Index'),
+        'bible.chapter.text'),
+       ('IndexVector', (select id from storage_systems where name = 'Bible Verse Vector Index'),
+        'bible.verse.text'),
+       ('IndexSearch', (select id from storage_systems where name = 'Metadata Search Index'),
+        'bible.verse.text');
 
 create table categories
 (
@@ -314,5 +376,9 @@ drop table if exists workflow_states cascade;
 drop
     type if exists workflow_state_type cascade;
 drop table if exists models cascade;
-drop table if exists vector_indexes cascade;
+drop table if exists trait_workflows cascade;
+drop table if exists workflow_trait_storage_systems cascade;
+drop table if exists storage_systems cascade;
+drop table if exists storage_system_models cascade;
+drop type storage_system_type;
 -- +goose StatementEnd

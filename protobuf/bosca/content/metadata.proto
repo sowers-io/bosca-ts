@@ -15,7 +15,7 @@
  */
 syntax = "proto3";
 
-option go_package = "bosca.io/api/protobuf/content";
+option go_package = "bosca.io/api/protobuf/bosca/content";
 
 import "google/protobuf/timestamp.proto";
 

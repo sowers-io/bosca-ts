@@ -17,7 +17,7 @@
 package util
 
 import (
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"net/http"
 )
 

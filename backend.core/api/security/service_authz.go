@@ -17,9 +17,9 @@
 package security
 
 import (
-	"bosca.io/api/protobuf"
-	"bosca.io/api/protobuf/content"
-	grpc "bosca.io/api/protobuf/security"
+	protobuf "bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca/content"
+	grpc "bosca.io/api/protobuf/bosca/security"
 	"bosca.io/pkg/security"
 	"context"
 )

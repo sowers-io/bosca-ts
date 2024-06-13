@@ -1,1 +1,5 @@
 syntax = "proto3";
+
+option go_package = "bosca.io/api/protobuf";
+
+package bosca;

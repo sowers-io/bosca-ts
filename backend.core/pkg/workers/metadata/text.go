@@ -17,7 +17,7 @@
 package metadata
 
 import (
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workers/common"
 	"bosca.io/pkg/workers/metadata/processor"
 	"bosca.io/pkg/workers/textextractor"

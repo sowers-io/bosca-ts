@@ -17,7 +17,7 @@
 package spicedb
 
 import (
-	grpc "bosca.io/api/protobuf/content"
+	grpc "bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/security"
 	"bosca.io/pkg/security/identity"
 	"context"

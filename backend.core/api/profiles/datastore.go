@@ -17,7 +17,7 @@
 package profiles
 
 import (
-	"bosca.io/api/protobuf/profiles"
+	"bosca.io/api/protobuf/bosca/profiles"
 	"context"
 	"database/sql"
 )

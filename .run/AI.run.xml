@@ -25,7 +25,7 @@
       <env name="REST_PORT" value="9096" />
     </envs>
     <kind value="PACKAGE" />
-    <package value="bosca.io/cmd/ai" />
+    <package value="bosca.io/cmd/servers/ai" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$/backend/cmd/ai/main.go" />
     <method v="2" />

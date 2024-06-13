@@ -12,4 +12,4 @@ Required Development Software
 Setup Development Environment
 --
 * Clone https://github.com/sowers-io/bosca
-* Run `./scripts/initialize`
+* Run `./scripts/initialize-dev`

@@ -17,8 +17,8 @@
 package processor
 
 import (
-	"bosca.io/api/protobuf"
-	"bosca.io/api/protobuf/content"
+	protobuf "bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workers/common"
 	"context"
 )

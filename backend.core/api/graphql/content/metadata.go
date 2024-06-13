@@ -17,7 +17,7 @@
 package content
 
 import (
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"github.com/graphql-go/graphql"
 )
 

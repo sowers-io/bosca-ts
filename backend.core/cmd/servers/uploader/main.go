@@ -19,7 +19,7 @@ package main
 import (
 	content2 "bosca.io/api/content"
 	"bosca.io/api/graphql/common"
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/security"

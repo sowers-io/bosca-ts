@@ -13,7 +13,7 @@
       <env name="SERVICE_ACCOUNT_TOKEN" value="sat" />
     </envs>
     <kind value="PACKAGE" />
-    <package value="bosca.io/cmd/uploader" />
+    <package value="bosca.io/cmd/servers/uploader" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$/backend/cmd/uploader/main.go" />
     <method v="2" />

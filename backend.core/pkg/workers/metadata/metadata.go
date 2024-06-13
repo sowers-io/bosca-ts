@@ -18,7 +18,7 @@ package metadata
 
 import (
 	content2 "bosca.io/api/content"
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workers/common"
 	"bosca.io/pkg/workers/metadata/processor"
 	"go.temporal.io/sdk/temporal"

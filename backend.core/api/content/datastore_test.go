@@ -17,7 +17,7 @@
 package content
 
 import (
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/tests"
 	"context"
 	_ "github.com/pressly/goose/v3"

@@ -25,7 +25,7 @@
       <env name="REST_PORT" value="9998" />
     </envs>
     <kind value="PACKAGE" />
-    <package value="bosca.io/cmd/search" />
+    <package value="bosca.io/cmd/servers/search" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$/backend/cmd/workers/metadata/main.go" />
     <method v="2" />

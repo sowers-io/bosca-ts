@@ -17,8 +17,8 @@
 package profiles
 
 import (
-	"bosca.io/api/protobuf"
-	grpc "bosca.io/api/protobuf/profiles"
+	protobuf "bosca.io/api/protobuf/bosca"
+	grpc "bosca.io/api/protobuf/bosca/profiles"
 	"context"
 )
 

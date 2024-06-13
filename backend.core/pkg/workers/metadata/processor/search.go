@@ -17,7 +17,7 @@
 package processor
 
 import (
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/search"
 	"bosca.io/pkg/workers/common"
 	"bosca.io/pkg/workers/textextractor"

@@ -17,11 +17,14 @@
 package main
 
 import (
-	"bosca.io/api/profiles"
-	protoprofiles "bosca.io/api/protobuf/profiles"
+	"bosca.io/api/content"
+	protocontent "bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
+	"bosca.io/pkg/objectstore/factory"
+	"bosca.io/pkg/security/spicedb"
 	"bosca.io/pkg/server"
+	"bosca.io/pkg/temporal"
 	"bosca.io/pkg/util"
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -32,7 +35,7 @@ import (
 )
 
 func main() {
-	cfg := configuration.NewServerConfiguration("profiles", 5004, 5014)
+	cfg := configuration.NewServerConfiguration("content", 5003, 5013)
 
 	util.InitializeLogging(cfg)
 
@@ -41,19 +44,34 @@ func main() {
 		slog.Error("failed to connect to database", slog.Any("error", err))
 		os.Exit(1)
 	}
-	ds := profiles.NewDataStore(stdlib.OpenDBFromPool(pool))
-	svc := profiles.NewService(ds)
+
+	objectStore, err := factory.NewObjectStore(cfg.Storage)
+	if err != nil {
+		slog.Error("failed to create object store", slog.Any("error", err))
+		os.Exit(1)
+	}
+
+	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
+	permissions := spicedb.NewPermissionManager(spicedb.NewSpiceDBClient(cfg))
+
+	temporalClient, err := temporal.NewClient(context.Background(), cfg.ClientEndPoints)
+	if err != nil {
+		slog.Error("failed to create temporal client", slog.Any("error", err))
+		os.Exit(1)
+	}
+
+	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, cfg.Security.ServiceAccountId, objectStore, permissions, temporalClient))
 	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
-		protoprofiles.RegisterProfilesServiceServer(grpcSvr, svc)
-		err := protoprofiles.RegisterProfilesServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
+		protocontent.RegisterContentServiceServer(grpcSvr, svc)
+		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
-			slog.Error("failed to register profiles", slog.Any("error", err))
+			slog.Error("failed to register content", slog.Any("error", err))
 			return err
 		}
-		return nil
+		return err
 	})
 	if err != nil {
-		slog.Error("failed to start server", slog.Any("error", err))
+		slog.Error("failed start server", slog.Any("error", err))
 		os.Exit(1)
 	}
 }

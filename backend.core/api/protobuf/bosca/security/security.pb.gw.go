@@ -13,7 +13,7 @@ import (
 	"io"
 	"net/http"
 
-	"bosca.io/api/protobuf"
+	"bosca.io/api/protobuf/bosca"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
@@ -33,7 +33,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 func request_SecurityService_GetGroups_0(ctx context.Context, marshaler runtime.Marshaler, client SecurityServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq protobuf.Empty
+	var protoReq bosca.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.GetGroups(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -42,7 +42,7 @@ func request_SecurityService_GetGroups_0(ctx context.Context, marshaler runtime.
 }
 
 func local_request_SecurityService_GetGroups_0(ctx context.Context, marshaler runtime.Marshaler, server SecurityServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq protobuf.Empty
+	var protoReq bosca.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.GetGroups(ctx, &protoReq)

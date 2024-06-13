@@ -18,7 +18,6 @@ package server
 
 import (
 	"bosca.io/api/health"
-	protohealth "bosca.io/api/protobuf/health"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/security"
 	securityFactory "bosca.io/pkg/security/factory"
@@ -27,6 +26,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	protohealth "google.golang.org/grpc/health/grpc_health_v1"
 	"log"
 	"log/slog"
 	"net"
@@ -81,12 +81,7 @@ func StartServer(cfg *configuration.ServerConfiguration, register func(context.C
 		return err
 	}
 
-	protohealth.RegisterHealthServiceServer(server, health.NewHealthService())
-	err = protohealth.RegisterHealthServiceHandlerFromEndpoint(ctx, mux, endpoint, opts)
-	if err != nil {
-		slog.Error("failed to register health endpoints", slog.Any("error", err))
-		return nil
-	}
+	protohealth.RegisterHealthServer(server, health.NewHealthService())
 
 	go func() {
 		err = http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", cfg.RestPort), mux)

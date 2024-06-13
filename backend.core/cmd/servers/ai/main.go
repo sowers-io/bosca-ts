@@ -17,7 +17,7 @@
 package main
 
 import (
-	protoai "bosca.io/api/protobuf/ai"
+	protoai "bosca.io/api/protobuf/bosca/ai"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/server"
 	"bosca.io/pkg/util"

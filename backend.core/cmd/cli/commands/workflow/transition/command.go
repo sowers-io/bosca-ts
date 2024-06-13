@@ -17,7 +17,7 @@
 package transition
 
 import (
-	grpc "bosca.io/api/protobuf/content"
+	grpc "bosca.io/api/protobuf/bosca/content"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
 	"context"

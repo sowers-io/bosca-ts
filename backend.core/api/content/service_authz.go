@@ -17,8 +17,8 @@
 package content
 
 import (
-	"bosca.io/api/protobuf"
-	grpc "bosca.io/api/protobuf/content"
+	protobuf "bosca.io/api/protobuf/bosca"
+	grpc "bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/security"
 	"context"
 	"errors"

@@ -8,7 +8,7 @@ services:
     build:
       context: .
       labels:
-        - ghcr.io/sowers-io/bosca/content-db-migration:dev
+        - ghcr.io/sowers-io/bosca/migration/content:dev
       dockerfile: Dockerfile-migration
       platforms:
         - linux/arm64
@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: Dockerfile-migration
       labels:
-        - ghcr.io/sowers-io/bosca/profiles-db-migration:dev
+        - ghcr.io/sowers-io/bosca/migration/profile:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -49,7 +49,7 @@ services:
       context: .
       dockerfile: Dockerfile-migration
       labels:
-        - ghcr.io/sowers-io/bosca/security-db-migration:dev
+        - ghcr.io/sowers-io/bosca/migration/security:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -70,12 +70,12 @@ services:
       context: .
       dockerfile: Dockerfile-backend-core
       labels:
-        - ghcr.io/sowers-io/bosca/profiles:dev
+        - ghcr.io/sowers-io/bosca/server/profiles:dev
       platforms:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=profiles
+        - BACKEND=servers/profiles
         - GRPC_PORT=5004
         - REST_PORT=5014
     env_file:
@@ -96,12 +96,12 @@ services:
       context: .
       dockerfile: Dockerfile-backend-core
       labels:
-        - ghcr.io/sowers-io/bosca/content:dev
+        - ghcr.io/sowers-io/bosca/server/content:dev
       platforms:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=content
+        - BACKEND=servers/content
         - GRPC_PORT=5003
         - REST_PORT=5013
     env_file:
@@ -128,12 +128,12 @@ services:
       context: .
       dockerfile: Dockerfile-backend-core
       labels:
-        - ghcr.io/sowers-io/bosca/search:dev
+        - ghcr.io/sowers-io/bosca/server/search:dev
       platforms:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=search
+        - BACKEND=servers/search
         - GRPC_PORT=5005
         - REST_PORT=5015
     env_file:
@@ -155,12 +155,12 @@ services:
       context: .
       dockerfile: Dockerfile-backend-llamaindex
       labels:
-        - ghcr.io/sowers-io/bosca/ai:dev
+        - ghcr.io/sowers-io/bosca/server/ai:dev
       platforms:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=api/ai.py
+        - BACKEND=servers/ai
         - GRPC_PORT=5007
         - REST_PORT=5017
     env_file:
@@ -182,12 +182,12 @@ services:
       context: .
       dockerfile: Dockerfile-backend-llamaindex
       labels:
-        - ghcr.io/sowers-io/bosca/ai-vectorizer:dev
+        - ghcr.io/sowers-io/bosca/worker/ai-vectorizer:dev
       platforms:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=workers/vectorizer/main.py
+        - BACKEND=workers/vectorizer
         - GRPC_PORT=5107
         - REST_PORT=5117
     env_file:
@@ -207,12 +207,12 @@ services:
       context: .
       dockerfile: Dockerfile-backend-core
       labels:
-        - ghcr.io/sowers-io/bosca/security:dev
+        - ghcr.io/sowers-io/bosca/server/security:dev
       platforms:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=security
+        - BACKEND=servers/security
         - GRPC_PORT=5006
         - REST_PORT=5016
     env_file:
@@ -233,12 +233,12 @@ services:
       context: .
       dockerfile: Dockerfile-backend-core
       labels:
-        - ghcr.io/sowers-io/bosca/uploader:dev
+        - ghcr.io/sowers-io/bosca/server/uploader:dev
       platforms:
         - linux/arm64
         - linux/amd64
       args:
-        - BACKEND=uploader
+        - BACKEND=servers/uploader
         - REST_PORT=8099
     env_file:
       - .env-dev
@@ -257,7 +257,7 @@ services:
     build:
       context: .
       labels:
-        - ghcr.io/sowers-io/bosca/workers/workflow:dev
+        - ghcr.io/sowers-io/bosca/worker/metadata:dev
       dockerfile: Dockerfile-backend-core
       platforms:
         - linux/arm64
@@ -281,7 +281,7 @@ services:
       context: .
       dockerfile: Dockerfile-backend-core
       labels:
-        - ghcr.io/sowers-io/bosca/workers/textextractor:dev
+        - ghcr.io/sowers-io/bosca/worker/textextractor:dev
       platforms:
         - linux/arm64
         - linux/amd64
@@ -304,7 +304,7 @@ services:
       context: .
       dockerfile: Dockerfile-backend-core
       labels:
-        - ghcr.io/sowers-io/bosca/workers/bible:dev
+        - ghcr.io/sowers-io/bosca/worker/bible:dev
       platforms:
         - linux/arm64
         - linux/amd64

@@ -13,7 +13,7 @@ import (
 	"io"
 	"net/http"
 
-	"bosca.io/api/protobuf"
+	"bosca.io/api/protobuf/bosca"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
@@ -33,7 +33,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 func request_ProfilesService_GetConfiguration_0(ctx context.Context, marshaler runtime.Marshaler, client ProfilesServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq protobuf.Empty
+	var protoReq bosca.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.GetConfiguration(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -42,7 +42,7 @@ func request_ProfilesService_GetConfiguration_0(ctx context.Context, marshaler r
 }
 
 func local_request_ProfilesService_GetConfiguration_0(ctx context.Context, marshaler runtime.Marshaler, server ProfilesServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq protobuf.Empty
+	var protoReq bosca.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.GetConfiguration(ctx, &protoReq)
@@ -51,7 +51,7 @@ func local_request_ProfilesService_GetConfiguration_0(ctx context.Context, marsh
 }
 
 func request_ProfilesService_GetMyProfile_0(ctx context.Context, marshaler runtime.Marshaler, client ProfilesServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq protobuf.Empty
+	var protoReq bosca.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.GetMyProfile(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -60,7 +60,7 @@ func request_ProfilesService_GetMyProfile_0(ctx context.Context, marshaler runti
 }
 
 func local_request_ProfilesService_GetMyProfile_0(ctx context.Context, marshaler runtime.Marshaler, server ProfilesServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq protobuf.Empty
+	var protoReq bosca.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.GetMyProfile(ctx, &protoReq)
@@ -73,7 +73,7 @@ var (
 )
 
 func request_ProfilesService_GetProfileAttributeTypes_0(ctx context.Context, marshaler runtime.Marshaler, client ProfilesServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq protobuf.IdsRequest
+	var protoReq bosca.IdsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -89,7 +89,7 @@ func request_ProfilesService_GetProfileAttributeTypes_0(ctx context.Context, mar
 }
 
 func local_request_ProfilesService_GetProfileAttributeTypes_0(ctx context.Context, marshaler runtime.Marshaler, server ProfilesServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq protobuf.IdsRequest
+	var protoReq bosca.IdsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {

@@ -17,7 +17,7 @@
 package search
 
 import (
-	grpc "bosca.io/api/protobuf/search"
+	grpc "bosca.io/api/protobuf/bosca/search"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
 	"context"

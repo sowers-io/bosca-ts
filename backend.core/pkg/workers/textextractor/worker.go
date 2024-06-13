@@ -17,7 +17,7 @@
 package textextractor
 
 import (
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workers/textextractor/extractor"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"

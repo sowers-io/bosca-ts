@@ -15,9 +15,13 @@
  */
 syntax = "proto3";
 
-option go_package = "bosca.io/api/protobuf";
+option go_package = "bosca.io/api/protobuf/bosca";
 
 package bosca;
+
+message IntIdRequest {
+  int64 id = 1;
+}
 
 message IdRequest {
   string id = 1;

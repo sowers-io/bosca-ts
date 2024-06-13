@@ -18,8 +18,8 @@ package processor
 
 import (
 	content2 "bosca.io/api/content"
-	"bosca.io/api/protobuf"
-	"bosca.io/api/protobuf/content"
+	protobuf "bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/bible/usx"
 	"bosca.io/pkg/workers/common"
 	"context"

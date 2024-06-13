@@ -19,7 +19,7 @@ package graphql
 import (
 	"bosca.io/api/graphql/common"
 	"bosca.io/api/graphql/content"
-	grpc "bosca.io/api/protobuf/content"
+	grpc "bosca.io/api/protobuf/bosca/content"
 	"github.com/graphql-go/graphql"
 	opts "google.golang.org/grpc"
 )

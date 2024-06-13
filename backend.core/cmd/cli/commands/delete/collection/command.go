@@ -17,7 +17,7 @@
 package collection
 
 import (
-	grpcRequests "bosca.io/api/protobuf"
+	grpcRequests "bosca.io/api/protobuf/bosca"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
 	"context"

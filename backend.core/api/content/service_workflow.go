@@ -17,8 +17,8 @@
 package content
 
 import (
-	"bosca.io/api/protobuf"
-	grpc "bosca.io/api/protobuf/content"
+	protobuf "bosca.io/api/protobuf/bosca"
+	grpc "bosca.io/api/protobuf/bosca/content"
 	"context"
 	"go.temporal.io/sdk/client"
 	"google.golang.org/grpc/codes"

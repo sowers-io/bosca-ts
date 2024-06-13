@@ -20,39 +20,76 @@ echo "Building Docker Images...."
 
 ROOT=`pwd`
 
+ARG="$1"
+
 tag="latest"
 
 if [ "$IMAGE_TAG" != "" ]; then
   tag="$IMAGE_TAG"
 fi
 
-build_app() {
+build_core() {
     app=$1
+    type=$2
 
-    echo "Building $app...\n"
+    echo "Building $app core...\n"
 
-    docker build --build-arg="BACKEND=$app" -t ghcr.io/sowers-io/bosca/$app:latest .
-    docker image tag ghcr.io/sowers-io/bosca/$app:latest ghcr.io/sowers-io/bosca/$app:$tag
+    docker build --build-arg="BACKEND=${type}s/$app" -f Dockerfile-backend-core -t ghcr.io/sowers-io/bosca/$type/$app:latest .
+    docker image tag ghcr.io/sowers-io/bosca/$type/$app:latest ghcr.io/sowers-io/bosca/$type/$app:$tag
+
+    if [ "$ARG" = "publish" ]; then
+      docker push ghcr.io/sowers-io/bosca/$type/$app
+    fi
+}
+
+build_llamaindex() {
+    app=$1
+    type=$2
+
+    echo "Building $app llamaindex...\n"
+
+    docker build --build-arg="BACKEND=${type}s/$app" -f Dockerfile-backend-llamaindex -t ghcr.io/sowers-io/bosca/$type/$app:latest .
+    docker image tag ghcr.io/sowers-io/bosca/$type/$app:latest ghcr.io/sowers-io/bosca/$type/$app:$tag
+
+    if [ "$ARG" = "publish" ]; then
+      docker push ghcr.io/sowers-io/bosca/$type/$app
+    fi
 }
 
 build_migrations() {
   app=$1
 
-  if [ -d "$ROOT/database/$app" ]; then
-    echo "Building $app migration...\n"
+  echo "Building $app migration...\n"
 
-    docker build --build-arg="BACKEND=$app" -f Dockerfile-migration -t ghcr.io/sowers-io/bosca/$app-migrations:latest .
-    docker image tag ghcr.io/sowers-io/bosca/$app-migrations:latest ghcr.io/sowers-io/bosca/$app-migrations:$tag
-  else
-    echo "No migrations found for $ROOT/database/$app"
+  docker build --build-arg="BACKEND=$app" -f Dockerfile-migration -t ghcr.io/sowers-io/bosca/migration/$app:latest .
+  docker image tag ghcr.io/sowers-io/bosca/migration/$app:latest ghcr.io/sowers-io/bosca/migration/$app:$tag
+
+  if [ "$ARG" = "publish" ]; then
+    docker push ghcr.io/sowers-io/bosca/$type/$app
   fi
 }
 
-while IFS= read -r app
-do
-  build_app "$app"
-  build_migrations "$app"
-done < "$ROOT/scripts/apps"
+build_llamaindex ai server
+build_llamaindex search server
 
+build_llamaindex vectorizer worker
+
+build_migrations content
+build_migrations profiles
+build_migrations security
+
+build_core ai server
+build_core content server
+build_core graphql server
+build_core profiles server
+build_core search server
+build_core security server
+build_core uploader server
+
+build_core bible worker
+build_core metadata worker
+build_core textextractor worker
+
+./build-cli
 
 echo "...done"

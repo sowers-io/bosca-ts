@@ -15,11 +15,12 @@
  */
 syntax = "proto3";
 
-option go_package = "bosca.io/api/protobuf/content";
+option go_package = "bosca.io/api/protobuf/bosca/content";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "bosca/content/metadata.proto";
+import "bosca/content/model.proto";
 import "bosca/empty.proto";
 import "bosca/requests.proto";
 
@@ -35,6 +36,18 @@ service ContentService {
   rpc GetWorkflows(bosca.Empty) returns (Workflows) {
     option (google.api.http) = {
       get: "/v1/content/workflows"
+    };
+  }
+
+  rpc GetModels(bosca.Empty) returns (Models) {
+    option (google.api.http) = {
+      get: "/v1/content/models"
+    };
+  }
+
+  rpc GetVectorIndexes(bosca.IntIdRequest) returns (VectorIndexes) {
+    option (google.api.http) = {
+      get: "/v1/content/models/{id}/vectorindexes"
     };
   }
 

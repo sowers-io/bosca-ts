@@ -17,7 +17,7 @@
 package s3
 
 import (
-	model "bosca.io/api/protobuf/content"
+	model "bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/objectstore"
 	"context"

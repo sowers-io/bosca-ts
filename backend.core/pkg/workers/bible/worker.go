@@ -17,7 +17,7 @@
 package bible
 
 import (
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workers/bible/processor"
 	"bosca.io/pkg/workers/common"
 	"go.temporal.io/sdk/client"

@@ -17,7 +17,7 @@
 package content
 
 import (
-	grpc "bosca.io/api/protobuf/content"
+	grpc "bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/objectstore"
 	"bosca.io/pkg/security"
 	"go.temporal.io/sdk/client"

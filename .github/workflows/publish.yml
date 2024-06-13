@@ -32,11 +32,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'backend.core/go.mod'
-      - name: Initialize CI
-        run: ./scripts/initialize
       - name: Test
         run: ./scripts/test
       - name: Build
-        run: ./scripts/build
-      - name: Publish
-        run: ./scripts/publish-docker
+        run: ./scripts/build publish

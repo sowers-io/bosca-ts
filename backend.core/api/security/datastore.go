@@ -17,7 +17,7 @@
 package security
 
 import (
-	grpc "bosca.io/api/protobuf/security"
+	grpc "bosca.io/api/protobuf/bosca/security"
 	"context"
 	"database/sql"
 )

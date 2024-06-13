@@ -18,7 +18,7 @@ package main
 
 import (
 	graphqlConfig "bosca.io/api/graphql"
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/util"

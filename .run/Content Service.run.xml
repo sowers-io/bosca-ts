@@ -22,7 +22,7 @@
       <env name="GRPC_PORT" value="6013" />
     </envs>
     <kind value="PACKAGE" />
-    <package value="bosca.io/cmd/content" />
+    <package value="bosca.io/cmd/servers/content" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$/backend/cmd/content/main.go" />
     <method v="2" />

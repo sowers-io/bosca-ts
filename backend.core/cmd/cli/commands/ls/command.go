@@ -17,8 +17,8 @@
 package ls
 
 import (
-	grpcRequests "bosca.io/api/protobuf"
-	"bosca.io/api/protobuf/content"
+	grpcRequests "bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
 	"context"

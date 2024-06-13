@@ -17,15 +17,15 @@
 package health
 
 import (
-	grpc "bosca.io/api/protobuf/health"
 	"context"
+	grpc "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 type healthService struct {
-	grpc.UnimplementedHealthServiceServer
+	grpc.UnimplementedHealthServer
 }
 
-func NewHealthService() grpc.HealthServiceServer {
+func NewHealthService() grpc.HealthServer {
 	return &healthService{}
 }
 
@@ -35,7 +35,7 @@ func (svc *healthService) Check(context.Context, *grpc.HealthCheckRequest) (*grp
 	}, nil
 }
 
-func (svc *healthService) Watch(request *grpc.HealthCheckRequest, server grpc.HealthService_WatchServer) error {
+func (svc *healthService) Watch(request *grpc.HealthCheckRequest, server grpc.Health_WatchServer) error {
 	c, err := svc.Check(context.Background(), nil)
 	if err != nil {
 		return err

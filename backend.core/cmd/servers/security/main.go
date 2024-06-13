@@ -17,14 +17,12 @@
 package main
 
 import (
-	"bosca.io/api/content"
-	protocontent "bosca.io/api/protobuf/content"
+	protosecurity "bosca.io/api/protobuf/bosca/security"
+	api "bosca.io/api/security"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
-	"bosca.io/pkg/objectstore/factory"
 	"bosca.io/pkg/security/spicedb"
 	"bosca.io/pkg/server"
-	"bosca.io/pkg/temporal"
 	"bosca.io/pkg/util"
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -35,7 +33,7 @@ import (
 )
 
 func main() {
-	cfg := configuration.NewServerConfiguration("content", 5003, 5013)
+	cfg := configuration.NewServerConfiguration("security", 5006, 5016)
 
 	util.InitializeLogging(cfg)
 
@@ -45,33 +43,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	objectStore, err := factory.NewObjectStore(cfg.Storage)
-	if err != nil {
-		slog.Error("failed to create object store", slog.Any("error", err))
-		os.Exit(1)
-	}
-
-	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
-	permissions := spicedb.NewPermissionManager(spicedb.NewSpiceDBClient(cfg))
-
-	temporalClient, err := temporal.NewClient(context.Background(), cfg.ClientEndPoints)
-	if err != nil {
-		slog.Error("failed to create temporal client", slog.Any("error", err))
-		os.Exit(1)
-	}
-
-	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, cfg.Security.ServiceAccountId, objectStore, permissions, temporalClient))
+	ds := api.NewDataStore(stdlib.OpenDBFromPool(pool))
+	permissionsClient := spicedb.NewSpiceDBClient(cfg)
+	mgr := spicedb.NewPermissionManager(permissionsClient)
+	svc := api.NewAuthorizationService(mgr, api.NewService(ds))
 	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
-		protocontent.RegisterContentServiceServer(grpcSvr, svc)
-		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
+		protosecurity.RegisterSecurityServiceServer(grpcSvr, svc)
+		err := protosecurity.RegisterSecurityServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
-			slog.Error("failed to register content", slog.Any("error", err))
+			slog.Error("failed to register profiles", slog.Any("error", err))
 			return err
 		}
-		return err
+		return nil
 	})
 	if err != nil {
-		slog.Error("failed start server", slog.Any("error", err))
+		slog.Error("failed to start server", slog.Any("error", err))
 		os.Exit(1)
 	}
 }

@@ -17,7 +17,7 @@
 package common
 
 import (
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/search"
 	"bosca.io/pkg/search/qdrant"

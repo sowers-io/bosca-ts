@@ -17,11 +17,10 @@
 package main
 
 import (
-	protosecurity "bosca.io/api/protobuf/security"
-	api "bosca.io/api/security"
+	"bosca.io/api/profiles"
+	protoprofiles "bosca.io/api/protobuf/bosca/profiles"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
-	"bosca.io/pkg/security/spicedb"
 	"bosca.io/pkg/server"
 	"bosca.io/pkg/util"
 	"context"
@@ -33,7 +32,7 @@ import (
 )
 
 func main() {
-	cfg := configuration.NewServerConfiguration("security", 5006, 5016)
+	cfg := configuration.NewServerConfiguration("profiles", 5004, 5014)
 
 	util.InitializeLogging(cfg)
 
@@ -42,14 +41,11 @@ func main() {
 		slog.Error("failed to connect to database", slog.Any("error", err))
 		os.Exit(1)
 	}
-
-	ds := api.NewDataStore(stdlib.OpenDBFromPool(pool))
-	permissionsClient := spicedb.NewSpiceDBClient(cfg)
-	mgr := spicedb.NewPermissionManager(permissionsClient)
-	svc := api.NewAuthorizationService(mgr, api.NewService(ds))
+	ds := profiles.NewDataStore(stdlib.OpenDBFromPool(pool))
+	svc := profiles.NewService(ds)
 	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
-		protosecurity.RegisterSecurityServiceServer(grpcSvr, svc)
-		err := protosecurity.RegisterSecurityServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
+		protoprofiles.RegisterProfilesServiceServer(grpcSvr, svc)
+		err := protoprofiles.RegisterProfilesServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)
 		if err != nil {
 			slog.Error("failed to register profiles", slog.Any("error", err))
 			return err

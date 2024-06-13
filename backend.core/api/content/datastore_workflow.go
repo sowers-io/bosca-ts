@@ -17,7 +17,7 @@
 package content
 
 import (
-	"bosca.io/api/protobuf/content"
+	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/security/identity"
 	"context"
 	"database/sql"

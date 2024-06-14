@@ -120,27 +120,6 @@ func (ds *DataStore) GetMetadata(ctx context.Context, id string) (*content.Metad
 	return metadatas[0], nil
 }
 
-func (ds *DataStore) GetTraits(ctx context.Context) ([]*content.Trait, error) {
-	query := "select id, name, workflow_id from traits"
-	rows, err := ds.db.QueryContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	traits := make([]*content.Trait, 0)
-	for rows.Next() {
-		trait := &content.Trait{}
-		err := rows.Scan(&trait.Id, &trait.Name, &trait.WorkflowId)
-		if err != nil {
-			return nil, err
-		}
-		traits = append(traits, trait)
-	}
-
-	return traits, nil
-}
-
 func (ds *DataStore) AddMetadataTrait(ctx context.Context, id string, trait string) (*content.Metadata, error) {
 	metadata, err := ds.GetMetadata(ctx, id)
 	if err != nil {

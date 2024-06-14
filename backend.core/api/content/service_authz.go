@@ -251,6 +251,15 @@ func (svc *authorizationService) GetTraits(ctx context.Context, request *protobu
 	return svc.service.GetTraits(ctx, request)
 }
 
+func (svc *authorizationService) GetTraitWorkflowStorageSystems(ctx context.Context, request *grpc.TraitWorkflowStorageSystemRequest) (*grpc.StorageSystems, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetTraitWorkflowStorageSystems(ctx, request)
+}
+
 func (svc *authorizationService) GetModels(ctx context.Context, request *protobuf.Empty) (*grpc.Models, error) {
 	// TODO: permission type?
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
@@ -267,6 +276,15 @@ func (svc *authorizationService) GetStorageSystems(ctx context.Context, request 
 		return nil, err
 	}
 	return svc.service.GetStorageSystems(ctx, request)
+}
+
+func (svc *authorizationService) GetStorageSystem(ctx context.Context, request *protobuf.IdRequest) (*grpc.StorageSystem, error) {
+	// TODO: permission type?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetStorageSystem(ctx, request)
 }
 
 func (svc *authorizationService) GetStorageSystemModels(ctx context.Context, request *protobuf.IdRequest) (*grpc.StorageSystemModels, error) {

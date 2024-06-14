@@ -48,18 +48,18 @@ func ProcessTraits(ctx workflow.Context, id string) error {
 	}
 
 	if metadata.TraitIds != nil && len(metadata.TraitIds) > 0 {
-		var workflows []*processor.TraitWorkflow
+		var workflows []*content.TraitWorkflow
 		err = workflow.ExecuteActivity(ctx, processor.GetTraitWorkflows, metadata).Get(ctx, &workflows)
 		if err != nil {
 			return err
 		}
 
 		if workflows != nil {
-			for _, trait := range workflows {
+			for _, wf := range workflows {
 				traitWorkflowCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
-					TaskQueue: trait.Queue,
+					TaskQueue: wf.Queue,
 				})
-				err = workflow.ExecuteChildWorkflow(traitWorkflowCtx, trait.Id, metadata.Id).Get(ctx, nil)
+				err = workflow.ExecuteChildWorkflow(traitWorkflowCtx, wf.WorkflowId, wf).Get(ctx, nil)
 				if err != nil {
 					return err
 				}

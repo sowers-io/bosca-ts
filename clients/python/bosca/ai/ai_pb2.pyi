@@ -5,13 +5,15 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class ChatRequest(_message.Message):
-    __slots__ = ("query",)
+class QueryRequest(_message.Message):
+    __slots__ = ("storage_system", "query")
+    STORAGE_SYSTEM_FIELD_NUMBER: _ClassVar[int]
     QUERY_FIELD_NUMBER: _ClassVar[int]
+    storage_system: str
     query: str
-    def __init__(self, query: _Optional[str] = ...) -> None: ...
+    def __init__(self, storage_system: _Optional[str] = ..., query: _Optional[str] = ...) -> None: ...
 
-class ChatResponse(_message.Message):
+class QueryResponse(_message.Message):
     __slots__ = ("response",)
     RESPONSE_FIELD_NUMBER: _ClassVar[int]
     response: str

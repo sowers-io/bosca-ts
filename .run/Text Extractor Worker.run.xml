@@ -4,7 +4,7 @@
     <working_directory value="$PROJECT_DIR$/backend.core" />
     <envs>
       <env name="BOSCA_OLLAMA_API_ADDRESS" value="http://localhost:11434" />
-      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:6013" />
+      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
       <env name="BOSCA_QDRANT_API_ADDRESS" value="localhost:6334" />
       <env name="BOSCA_CONTENT_CONNECTION_STRING" value="postgresql://boscacontent:bosca@localhost:5432/boscacontent" />
       <env name="BOSCA_PERMISSIONS_SHARED_TOKEN" value="bosca-spicedb" />

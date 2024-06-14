@@ -6,7 +6,7 @@
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
-      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:6013" />
+      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
       <env name="BOSCA_CONTENT_CONNECTION_STRING" value="postgresql://boscacontent:bosca@localhost:5432/boscacontent" />
       <env name="BOSCA_OLLAMA_API_ADDRESS" value="http://localhost:11434" />
       <env name="BOSCA_OLLAMA_MODEL" value="phi3:medium-128k" />
@@ -32,7 +32,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend.llamaindex/api/ai.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend.llamaindex/servers/ai.py" />
     <option name="PARAMETERS" value="" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

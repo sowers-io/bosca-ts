@@ -22,18 +22,19 @@ import "google/api/annotations.proto";
 package bosca.ai;
 
 service AIService {
-  rpc Chat(ChatRequest) returns (ChatResponse) {
+  rpc Query(QueryRequest) returns (QueryResponse) {
     option (google.api.http) = {
-      post: "/v1/ai/chat"
+      post: "/v1/ai/query"
       body: "*"
     };
   }
 }
 
-message ChatRequest {
-  string query = 1;
+message QueryRequest {
+  string storage_system = 1;
+  string query = 2;
 }
 
-message ChatResponse {
+message QueryResponse {
   string response = 1;
 }

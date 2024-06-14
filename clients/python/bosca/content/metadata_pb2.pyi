@@ -46,3 +46,57 @@ class Metadata(_message.Message):
     workflow_state_id: str
     workflow_state_pending_id: str
     def __init__(self, default_id: _Optional[str] = ..., id: _Optional[str] = ..., name: _Optional[str] = ..., content_type: _Optional[str] = ..., source: _Optional[str] = ..., language_tag: _Optional[str] = ..., content_length: _Optional[int] = ..., trait_ids: _Optional[_Iterable[str]] = ..., category_ids: _Optional[_Iterable[str]] = ..., tags: _Optional[_Iterable[str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., created: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., modified: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., workflow_state_id: _Optional[str] = ..., workflow_state_pending_id: _Optional[str] = ...) -> None: ...
+
+class AddMetadataRequest(_message.Message):
+    __slots__ = ("collection", "metadata")
+    COLLECTION_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    collection: str
+    metadata: Metadata
+    def __init__(self, collection: _Optional[str] = ..., metadata: _Optional[_Union[Metadata, _Mapping]] = ...) -> None: ...
+
+class Metadatas(_message.Message):
+    __slots__ = ("metadata",)
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    metadata: _containers.RepeatedCompositeFieldContainer[Metadata]
+    def __init__(self, metadata: _Optional[_Iterable[_Union[Metadata, _Mapping]]] = ...) -> None: ...
+
+class AddMetadataRelationshipRequest(_message.Message):
+    __slots__ = ("metadata_id1", "metadata_id2", "relationship")
+    METADATA_ID1_FIELD_NUMBER: _ClassVar[int]
+    METADATA_ID2_FIELD_NUMBER: _ClassVar[int]
+    RELATIONSHIP_FIELD_NUMBER: _ClassVar[int]
+    metadata_id1: str
+    metadata_id2: str
+    relationship: str
+    def __init__(self, metadata_id1: _Optional[str] = ..., metadata_id2: _Optional[str] = ..., relationship: _Optional[str] = ...) -> None: ...
+
+class AddMetadataTraitRequest(_message.Message):
+    __slots__ = ("metadata_id", "trait_id")
+    METADATA_ID_FIELD_NUMBER: _ClassVar[int]
+    TRAIT_ID_FIELD_NUMBER: _ClassVar[int]
+    metadata_id: str
+    trait_id: str
+    def __init__(self, metadata_id: _Optional[str] = ..., trait_id: _Optional[str] = ...) -> None: ...
+
+class AddSupplementaryRequest(_message.Message):
+    __slots__ = ("id", "type", "name", "content_type", "content_length")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_LENGTH_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    type: str
+    name: str
+    content_type: str
+    content_length: int
+    def __init__(self, id: _Optional[str] = ..., type: _Optional[str] = ..., name: _Optional[str] = ..., content_type: _Optional[str] = ..., content_length: _Optional[int] = ...) -> None: ...
+
+class SupplementaryIdRequest(_message.Message):
+    __slots__ = ("id", "type")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    type: str
+    def __init__(self, id: _Optional[str] = ..., type: _Optional[str] = ...) -> None: ...

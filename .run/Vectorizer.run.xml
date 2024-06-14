@@ -6,7 +6,7 @@
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
-      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:6013" />
+      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
       <env name="BOSCA_CONTENT_CONNECTION_STRING" value="postgresql://boscacontent:bosca@localhost:5432/boscacontent" />
       <env name="BOSCA_OLLAMA_API_ADDRESS" value="http://localhost:11434" />
       <env name="BOSCA_OLLAMA_MODEL" value="phi3:medium-128k" />
@@ -27,7 +27,7 @@
       <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
     </envs>
     <option name="SDK_HOME" value="" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend.llamaindex/workers/vectorizer" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend.llamaindex" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />

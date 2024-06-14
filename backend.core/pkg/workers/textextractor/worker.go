@@ -40,7 +40,7 @@ func NewWorker(client client.Client) worker.Worker {
 	return w
 }
 
-func TextExtractor(ctx workflow.Context, metadata *content.Metadata) error {
+func TextExtractor(ctx workflow.Context, traitWorkflow *content.TraitWorkflow) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second / 2,
 		BackoffCoefficient:     1.5,
@@ -57,7 +57,7 @@ func TextExtractor(ctx workflow.Context, metadata *content.Metadata) error {
 	ctx = workflow.WithActivityOptions(ctx, options)
 
 	extractRequest := &extractor.ExtractRequest{
-		Metadata: metadata,
+		Metadata: traitWorkflow.Metadata,
 		Type:     "text",
 		Name:     "Extracted Text",
 	}
@@ -65,7 +65,7 @@ func TextExtractor(ctx workflow.Context, metadata *content.Metadata) error {
 	return workflow.ExecuteActivity(ctx, extractor.Extract, extractRequest).Get(ctx, nil)
 }
 
-func TextExtractorCleanup(ctx workflow.Context, metadata *content.Metadata) error {
+func TextExtractorCleanup(ctx workflow.Context, traitWorkflow *content.TraitWorkflow) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:    time.Second,
 		BackoffCoefficient: 2.0,
@@ -81,7 +81,7 @@ func TextExtractorCleanup(ctx workflow.Context, metadata *content.Metadata) erro
 	ctx = workflow.WithActivityOptions(ctx, options)
 
 	extractRequest := &extractor.ExtractRequest{
-		Metadata: metadata,
+		Metadata: traitWorkflow.Metadata,
 		Type:     SupplementalTextType,
 		Name:     "Extracted Text",
 	}

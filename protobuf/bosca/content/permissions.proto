@@ -1,0 +1,78 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+syntax = "proto3";
+
+option go_package = "bosca.io/api/protobuf/bosca/content";
+
+package bosca.content;
+
+enum PermissionRelation {
+  viewers = 0;
+  discoverers = 1;
+  editors = 2;
+  managers = 3;
+  serviceaccounts = 4;
+  owners = 5;
+}
+
+enum PermissionAction {
+  view = 0;
+  list = 2;
+  edit = 3;
+  manage = 4;
+  service = 5;
+  delete = 6;
+}
+
+message PermissionCheckRequest {
+  string object = 1;
+  PermissionObjectType object_type = 2;
+  string subject = 3;
+  PermissionSubjectType subject_type = 4;
+  PermissionAction action = 5;
+}
+
+message PermissionCheckResponse {
+  bool allowed = 1;
+}
+
+message Permissions {
+  string id = 1;
+  repeated Permission permissions = 2;
+}
+
+enum PermissionObjectType {
+  unknown_object_type = 0;
+  collection_type = 1;
+  metadata_type = 2;
+  system_resource_type = 3;
+  workflow_type = 4;
+  workflow_state_type = 5;
+}
+
+enum PermissionSubjectType {
+  unknown_subject_type = 0;
+  user = 1;
+  group = 2;
+  service_account = 3;
+}
+
+message Permission {
+  string id = 1;
+  string subject = 2;
+  PermissionSubjectType subject_type = 3;
+  PermissionRelation relation = 5;
+}

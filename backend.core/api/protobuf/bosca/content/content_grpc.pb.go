@@ -39,11 +39,13 @@ const (
 	ContentService_GetWorkflows_FullMethodName                        = "/bosca.content.ContentService/GetWorkflows"
 	ContentService_GetModels_FullMethodName                           = "/bosca.content.ContentService/GetModels"
 	ContentService_GetStorageSystems_FullMethodName                   = "/bosca.content.ContentService/GetStorageSystems"
+	ContentService_GetStorageSystem_FullMethodName                    = "/bosca.content.ContentService/GetStorageSystem"
 	ContentService_GetStorageSystemModels_FullMethodName              = "/bosca.content.ContentService/GetStorageSystemModels"
 	ContentService_GetWorkflowStateById_FullMethodName                = "/bosca.content.ContentService/GetWorkflowStateById"
 	ContentService_GetWorkflowStates_FullMethodName                   = "/bosca.content.ContentService/GetWorkflowStates"
 	ContentService_GetTraitById_FullMethodName                        = "/bosca.content.ContentService/GetTraitById"
 	ContentService_GetTraits_FullMethodName                           = "/bosca.content.ContentService/GetTraits"
+	ContentService_GetTraitWorkflowStorageSystems_FullMethodName      = "/bosca.content.ContentService/GetTraitWorkflowStorageSystems"
 	ContentService_GetRootCollectionItems_FullMethodName              = "/bosca.content.ContentService/GetRootCollectionItems"
 	ContentService_GetCollectionItems_FullMethodName                  = "/bosca.content.ContentService/GetCollectionItems"
 	ContentService_AddCollection_FullMethodName                       = "/bosca.content.ContentService/AddCollection"
@@ -79,11 +81,13 @@ type ContentServiceClient interface {
 	GetWorkflows(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Workflows, error)
 	GetModels(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Models, error)
 	GetStorageSystems(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*StorageSystems, error)
+	GetStorageSystem(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystem, error)
 	GetStorageSystemModels(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystemModels, error)
 	GetWorkflowStateById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowState, error)
 	GetWorkflowStates(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*WorkflowStates, error)
 	GetTraitById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Trait, error)
 	GetTraits(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Traits, error)
+	GetTraitWorkflowStorageSystems(ctx context.Context, in *TraitWorkflowStorageSystemRequest, opts ...grpc.CallOption) (*StorageSystems, error)
 	GetRootCollectionItems(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*CollectionItems, error)
 	GetCollectionItems(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*CollectionItems, error)
 	AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*bosca.IdResponse, error)
@@ -159,6 +163,16 @@ func (c *contentServiceClient) GetStorageSystems(ctx context.Context, in *bosca.
 	return out, nil
 }
 
+func (c *contentServiceClient) GetStorageSystem(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystem, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StorageSystem)
+	err := c.cc.Invoke(ctx, ContentService_GetStorageSystem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) GetStorageSystemModels(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystemModels, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StorageSystemModels)
@@ -203,6 +217,16 @@ func (c *contentServiceClient) GetTraits(ctx context.Context, in *bosca.Empty, o
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Traits)
 	err := c.cc.Invoke(ctx, ContentService_GetTraits_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetTraitWorkflowStorageSystems(ctx context.Context, in *TraitWorkflowStorageSystemRequest, opts ...grpc.CallOption) (*StorageSystems, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StorageSystems)
+	err := c.cc.Invoke(ctx, ContentService_GetTraitWorkflowStorageSystems_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -467,11 +491,13 @@ type ContentServiceServer interface {
 	GetWorkflows(context.Context, *bosca.Empty) (*Workflows, error)
 	GetModels(context.Context, *bosca.Empty) (*Models, error)
 	GetStorageSystems(context.Context, *bosca.Empty) (*StorageSystems, error)
+	GetStorageSystem(context.Context, *bosca.IdRequest) (*StorageSystem, error)
 	GetStorageSystemModels(context.Context, *bosca.IdRequest) (*StorageSystemModels, error)
 	GetWorkflowStateById(context.Context, *bosca.IdRequest) (*WorkflowState, error)
 	GetWorkflowStates(context.Context, *bosca.Empty) (*WorkflowStates, error)
 	GetTraitById(context.Context, *bosca.IdRequest) (*Trait, error)
 	GetTraits(context.Context, *bosca.Empty) (*Traits, error)
+	GetTraitWorkflowStorageSystems(context.Context, *TraitWorkflowStorageSystemRequest) (*StorageSystems, error)
 	GetRootCollectionItems(context.Context, *bosca.Empty) (*CollectionItems, error)
 	GetCollectionItems(context.Context, *bosca.IdRequest) (*CollectionItems, error)
 	AddCollection(context.Context, *AddCollectionRequest) (*bosca.IdResponse, error)
@@ -516,6 +542,9 @@ func (UnimplementedContentServiceServer) GetModels(context.Context, *bosca.Empty
 func (UnimplementedContentServiceServer) GetStorageSystems(context.Context, *bosca.Empty) (*StorageSystems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageSystems not implemented")
 }
+func (UnimplementedContentServiceServer) GetStorageSystem(context.Context, *bosca.IdRequest) (*StorageSystem, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStorageSystem not implemented")
+}
 func (UnimplementedContentServiceServer) GetStorageSystemModels(context.Context, *bosca.IdRequest) (*StorageSystemModels, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageSystemModels not implemented")
 }
@@ -530,6 +559,9 @@ func (UnimplementedContentServiceServer) GetTraitById(context.Context, *bosca.Id
 }
 func (UnimplementedContentServiceServer) GetTraits(context.Context, *bosca.Empty) (*Traits, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTraits not implemented")
+}
+func (UnimplementedContentServiceServer) GetTraitWorkflowStorageSystems(context.Context, *TraitWorkflowStorageSystemRequest) (*StorageSystems, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTraitWorkflowStorageSystems not implemented")
 }
 func (UnimplementedContentServiceServer) GetRootCollectionItems(context.Context, *bosca.Empty) (*CollectionItems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRootCollectionItems not implemented")
@@ -691,6 +723,24 @@ func _ContentService_GetStorageSystems_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_GetStorageSystem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetStorageSystem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetStorageSystem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetStorageSystem(ctx, req.(*bosca.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_GetStorageSystemModels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.IdRequest)
 	if err := dec(in); err != nil {
@@ -777,6 +827,24 @@ func _ContentService_GetTraits_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).GetTraits(ctx, req.(*bosca.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetTraitWorkflowStorageSystems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TraitWorkflowStorageSystemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetTraitWorkflowStorageSystems(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetTraitWorkflowStorageSystems_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetTraitWorkflowStorageSystems(ctx, req.(*TraitWorkflowStorageSystemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1255,6 +1323,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_GetStorageSystems_Handler,
 		},
 		{
+			MethodName: "GetStorageSystem",
+			Handler:    _ContentService_GetStorageSystem_Handler,
+		},
+		{
 			MethodName: "GetStorageSystemModels",
 			Handler:    _ContentService_GetStorageSystemModels_Handler,
 		},
@@ -1273,6 +1345,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTraits",
 			Handler:    _ContentService_GetTraits_Handler,
+		},
+		{
+			MethodName: "GetTraitWorkflowStorageSystems",
+			Handler:    _ContentService_GetTraitWorkflowStorageSystems_Handler,
 		},
 		{
 			MethodName: "GetRootCollectionItems",

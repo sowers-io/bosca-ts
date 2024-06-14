@@ -19,7 +19,6 @@ package bible
 import (
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workers/bible/processor"
-	"bosca.io/pkg/workers/common"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
@@ -33,12 +32,11 @@ const TaskQueue = "bible"
 func NewWorker(client client.Client) worker.Worker {
 	w := worker.New(client, TaskQueue, worker.Options{})
 	w.RegisterWorkflow(ProcessBible)
-	w.RegisterActivity(common.GetMetadata)
 	w.RegisterActivity(processor.ProcessUSX)
 	return w
 }
 
-func ProcessBible(ctx workflow.Context, id string) error {
+func ProcessBible(ctx workflow.Context, traitWorkflow *content.TraitWorkflow) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second / 2,
 		BackoffCoefficient:     1.5,
@@ -54,13 +52,7 @@ func ProcessBible(ctx workflow.Context, id string) error {
 
 	ctx = workflow.WithActivityOptions(ctx, options)
 
-	var metadata *content.Metadata
-	err := workflow.ExecuteActivity(ctx, common.GetMetadata, id).Get(ctx, &metadata)
-	if err != nil {
-		return err
-	}
-
-	err = workflow.ExecuteActivity(ctx, processor.ProcessUSX, metadata).Get(ctx, nil)
+	err := workflow.ExecuteActivity(ctx, processor.ProcessUSX, traitWorkflow).Get(ctx, nil)
 	if err != nil {
 		return err
 	}

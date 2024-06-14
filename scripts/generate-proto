@@ -15,14 +15,14 @@ protoc -I $ROOT/protobuf --go_out=$OUTDIR --go_opt=paths=source_relative \
   $ROOT/protobuf/**/*.proto \
   $ROOT/protobuf/*.proto
 
-#echo "Generating Python Protobuf"
-#python -m grpc_tools.protoc -I$ROOT/protobuf \
-#  --python_out=$PYTHONOUTDIR \
-#  --pyi_out=$PYTHONOUTDIR \
-#  --grpc_python_out=$PYTHONOUTDIR \
-#  $ROOT/protobuf/**/**/*.proto \
-#  $ROOT/protobuf/**/*.proto \
-#  $ROOT/protobuf/*.proto
+echo "Generating Python Protobuf"
+python -m grpc_tools.protoc -I$ROOT/protobuf \
+  --python_out=$PYTHONOUTDIR \
+  --pyi_out=$PYTHONOUTDIR \
+  --grpc_python_out=$PYTHONOUTDIR \
+  $ROOT/protobuf/**/**/*.proto \
+  $ROOT/protobuf/**/*.proto \
+  $ROOT/protobuf/*.proto
 
 #mkdir -p build/ts/api/protobuf
 #npm --prefix build install protoc-gen-ts grpc-tools @grpc/grpc-js google-protobuf

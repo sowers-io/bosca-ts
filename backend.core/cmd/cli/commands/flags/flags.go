@@ -17,6 +17,7 @@
 package flags
 
 const EndpointFlag = "endpoint"
+const StorageSystemFlag = "storage-system"
 const ParentFlag = "parent"
 
 const RetryFlag = "retry"

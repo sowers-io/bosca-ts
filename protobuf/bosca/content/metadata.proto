@@ -44,3 +44,36 @@ message Metadata {
   string workflow_state_id = 31;
   optional string workflow_state_pending_id = 32;
 }
+
+message AddMetadataRequest {
+  string collection = 1;
+  Metadata metadata = 2;
+}
+
+message Metadatas {
+  repeated Metadata metadata = 1;
+}
+
+message AddMetadataRelationshipRequest {
+  string metadata_id1 = 1;
+  string metadata_id2 = 2;
+  string relationship = 3;
+}
+
+message AddMetadataTraitRequest {
+  string metadata_id = 1;
+  string trait_id = 2;
+}
+
+message AddSupplementaryRequest {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+  string content_type = 4;
+  int64 content_length = 5;
+}
+
+message SupplementaryIdRequest {
+  string id = 1;
+  string type = 2;
+}

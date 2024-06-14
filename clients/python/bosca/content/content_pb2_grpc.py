@@ -3,8 +3,14 @@
 import grpc
 import warnings
 
-from bosca.content import content_pb2 as bosca_dot_content_dot_content__pb2
+from bosca.content import collections_pb2 as bosca_dot_content_dot_collections__pb2
 from bosca.content import metadata_pb2 as bosca_dot_content_dot_metadata__pb2
+from bosca.content import model_pb2 as bosca_dot_content_dot_model__pb2
+from bosca.content import permissions_pb2 as bosca_dot_content_dot_permissions__pb2
+from bosca.content import storage_systems_pb2 as bosca_dot_content_dot_storage__systems__pb2
+from bosca.content import traits_pb2 as bosca_dot_content_dot_traits__pb2
+from bosca.content import url_pb2 as bosca_dot_content_dot_url__pb2
+from bosca.content import workflows_pb2 as bosca_dot_content_dot_workflows__pb2
 from bosca import empty_pb2 as bosca_dot_empty__pb2
 from bosca import requests_pb2 as bosca_dot_requests__pb2
 
@@ -45,52 +51,77 @@ class ContentServiceStub(object):
         self.GetWorkflowById = channel.unary_unary(
                 '/bosca.content.ContentService/GetWorkflowById',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.Workflow.FromString,
+                response_deserializer=bosca_dot_content_dot_workflows__pb2.Workflow.FromString,
                 _registered_method=True)
         self.GetWorkflows = channel.unary_unary(
                 '/bosca.content.ContentService/GetWorkflows',
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.Workflows.FromString,
+                response_deserializer=bosca_dot_content_dot_workflows__pb2.Workflows.FromString,
+                _registered_method=True)
+        self.GetModels = channel.unary_unary(
+                '/bosca.content.ContentService/GetModels',
+                request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_model__pb2.Models.FromString,
+                _registered_method=True)
+        self.GetStorageSystems = channel.unary_unary(
+                '/bosca.content.ContentService/GetStorageSystems',
+                request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystems.FromString,
+                _registered_method=True)
+        self.GetStorageSystem = channel.unary_unary(
+                '/bosca.content.ContentService/GetStorageSystem',
+                request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystem.FromString,
+                _registered_method=True)
+        self.GetStorageSystemModels = channel.unary_unary(
+                '/bosca.content.ContentService/GetStorageSystemModels',
+                request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystemModels.FromString,
                 _registered_method=True)
         self.GetWorkflowStateById = channel.unary_unary(
                 '/bosca.content.ContentService/GetWorkflowStateById',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.WorkflowState.FromString,
+                response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowState.FromString,
                 _registered_method=True)
         self.GetWorkflowStates = channel.unary_unary(
                 '/bosca.content.ContentService/GetWorkflowStates',
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.WorkflowStates.FromString,
+                response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowStates.FromString,
                 _registered_method=True)
         self.GetTraitById = channel.unary_unary(
                 '/bosca.content.ContentService/GetTraitById',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.Trait.FromString,
+                response_deserializer=bosca_dot_content_dot_traits__pb2.Trait.FromString,
                 _registered_method=True)
         self.GetTraits = channel.unary_unary(
                 '/bosca.content.ContentService/GetTraits',
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.Traits.FromString,
+                response_deserializer=bosca_dot_content_dot_traits__pb2.Traits.FromString,
+                _registered_method=True)
+        self.GetTraitWorkflowStorageSystems = channel.unary_unary(
+                '/bosca.content.ContentService/GetTraitWorkflowStorageSystems',
+                request_serializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowStorageSystemRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystems.FromString,
                 _registered_method=True)
         self.GetRootCollectionItems = channel.unary_unary(
                 '/bosca.content.ContentService/GetRootCollectionItems',
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.CollectionItems.FromString,
+                response_deserializer=bosca_dot_content_dot_collections__pb2.CollectionItems.FromString,
                 _registered_method=True)
         self.GetCollectionItems = channel.unary_unary(
                 '/bosca.content.ContentService/GetCollectionItems',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.CollectionItems.FromString,
+                response_deserializer=bosca_dot_content_dot_collections__pb2.CollectionItems.FromString,
                 _registered_method=True)
         self.AddCollection = channel.unary_unary(
                 '/bosca.content.ContentService/AddCollection',
-                request_serializer=bosca_dot_content_dot_content__pb2.AddCollectionRequest.SerializeToString,
+                request_serializer=bosca_dot_content_dot_collections__pb2.AddCollectionRequest.SerializeToString,
                 response_deserializer=bosca_dot_requests__pb2.IdResponse.FromString,
                 _registered_method=True)
         self.GetCollection = channel.unary_unary(
                 '/bosca.content.ContentService/GetCollection',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.Collection.FromString,
+                response_deserializer=bosca_dot_content_dot_collections__pb2.Collection.FromString,
                 _registered_method=True)
         self.DeleteCollection = channel.unary_unary(
                 '/bosca.content.ContentService/DeleteCollection',
@@ -100,17 +131,17 @@ class ContentServiceStub(object):
         self.GetCollectionPermissions = channel.unary_unary(
                 '/bosca.content.ContentService/GetCollectionPermissions',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.Permissions.FromString,
+                response_deserializer=bosca_dot_content_dot_permissions__pb2.Permissions.FromString,
                 _registered_method=True)
         self.AddCollectionPermission = channel.unary_unary(
                 '/bosca.content.ContentService/AddCollectionPermission',
-                request_serializer=bosca_dot_content_dot_content__pb2.Permission.SerializeToString,
+                request_serializer=bosca_dot_content_dot_permissions__pb2.Permission.SerializeToString,
                 response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.CheckPermission = channel.unary_unary(
                 '/bosca.content.ContentService/CheckPermission',
-                request_serializer=bosca_dot_content_dot_content__pb2.PermissionCheckRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.PermissionCheckResponse.FromString,
+                request_serializer=bosca_dot_content_dot_permissions__pb2.PermissionCheckRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_permissions__pb2.PermissionCheckResponse.FromString,
                 _registered_method=True)
         self.GetMetadata = channel.unary_unary(
                 '/bosca.content.ContentService/GetMetadata',
@@ -120,16 +151,16 @@ class ContentServiceStub(object):
         self.GetMetadatas = channel.unary_unary(
                 '/bosca.content.ContentService/GetMetadatas',
                 request_serializer=bosca_dot_requests__pb2.IdsRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.Metadatas.FromString,
+                response_deserializer=bosca_dot_content_dot_metadata__pb2.Metadatas.FromString,
                 _registered_method=True)
         self.AddMetadata = channel.unary_unary(
                 '/bosca.content.ContentService/AddMetadata',
-                request_serializer=bosca_dot_content_dot_content__pb2.AddMetadataRequest.SerializeToString,
+                request_serializer=bosca_dot_content_dot_metadata__pb2.AddMetadataRequest.SerializeToString,
                 response_deserializer=bosca_dot_requests__pb2.IdResponse.FromString,
                 _registered_method=True)
         self.AddMetadataTrait = channel.unary_unary(
                 '/bosca.content.ContentService/AddMetadataTrait',
-                request_serializer=bosca_dot_content_dot_content__pb2.AddMetadataTraitRequest.SerializeToString,
+                request_serializer=bosca_dot_content_dot_metadata__pb2.AddMetadataTraitRequest.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_metadata__pb2.Metadata.FromString,
                 _registered_method=True)
         self.DeleteMetadata = channel.unary_unary(
@@ -140,26 +171,26 @@ class ContentServiceStub(object):
         self.GetMetadataUploadUrl = channel.unary_unary(
                 '/bosca.content.ContentService/GetMetadataUploadUrl',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.SignedUrl.FromString,
+                response_deserializer=bosca_dot_content_dot_url__pb2.SignedUrl.FromString,
                 _registered_method=True)
         self.GetMetadataDownloadUrl = channel.unary_unary(
                 '/bosca.content.ContentService/GetMetadataDownloadUrl',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.SignedUrl.FromString,
+                response_deserializer=bosca_dot_content_dot_url__pb2.SignedUrl.FromString,
                 _registered_method=True)
         self.AddMetadataSupplementary = channel.unary_unary(
                 '/bosca.content.ContentService/AddMetadataSupplementary',
-                request_serializer=bosca_dot_content_dot_content__pb2.AddSupplementaryRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.SignedUrl.FromString,
+                request_serializer=bosca_dot_content_dot_metadata__pb2.AddSupplementaryRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_url__pb2.SignedUrl.FromString,
                 _registered_method=True)
         self.GetMetadataSupplementaryDownloadUrl = channel.unary_unary(
                 '/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl',
-                request_serializer=bosca_dot_content_dot_content__pb2.SupplementaryIdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.SignedUrl.FromString,
+                request_serializer=bosca_dot_content_dot_metadata__pb2.SupplementaryIdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_url__pb2.SignedUrl.FromString,
                 _registered_method=True)
         self.DeleteMetadataSupplementary = channel.unary_unary(
                 '/bosca.content.ContentService/DeleteMetadataSupplementary',
-                request_serializer=bosca_dot_content_dot_content__pb2.SupplementaryIdRequest.SerializeToString,
+                request_serializer=bosca_dot_content_dot_metadata__pb2.SupplementaryIdRequest.SerializeToString,
                 response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.SetMetadataUploaded = channel.unary_unary(
@@ -170,31 +201,31 @@ class ContentServiceStub(object):
         self.GetMetadataPermissions = channel.unary_unary(
                 '/bosca.content.ContentService/GetMetadataPermissions',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_content__pb2.Permissions.FromString,
+                response_deserializer=bosca_dot_content_dot_permissions__pb2.Permissions.FromString,
                 _registered_method=True)
         self.AddMetadataPermissions = channel.unary_unary(
                 '/bosca.content.ContentService/AddMetadataPermissions',
-                request_serializer=bosca_dot_content_dot_content__pb2.Permissions.SerializeToString,
+                request_serializer=bosca_dot_content_dot_permissions__pb2.Permissions.SerializeToString,
                 response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.AddMetadataPermission = channel.unary_unary(
                 '/bosca.content.ContentService/AddMetadataPermission',
-                request_serializer=bosca_dot_content_dot_content__pb2.Permission.SerializeToString,
+                request_serializer=bosca_dot_content_dot_permissions__pb2.Permission.SerializeToString,
                 response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.BeginTransitionWorkflow = channel.unary_unary(
                 '/bosca.content.ContentService/BeginTransitionWorkflow',
-                request_serializer=bosca_dot_content_dot_content__pb2.TransitionWorkflowRequest.SerializeToString,
+                request_serializer=bosca_dot_content_dot_workflows__pb2.TransitionWorkflowRequest.SerializeToString,
                 response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.CompleteTransitionWorkflow = channel.unary_unary(
                 '/bosca.content.ContentService/CompleteTransitionWorkflow',
-                request_serializer=bosca_dot_content_dot_content__pb2.CompleteTransitionWorkflowRequest.SerializeToString,
+                request_serializer=bosca_dot_content_dot_workflows__pb2.CompleteTransitionWorkflowRequest.SerializeToString,
                 response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.AddMetadataRelationship = channel.unary_unary(
                 '/bosca.content.ContentService/AddMetadataRelationship',
-                request_serializer=bosca_dot_content_dot_content__pb2.AddMetadataRelationshipRequest.SerializeToString,
+                request_serializer=bosca_dot_content_dot_metadata__pb2.AddMetadataRelationshipRequest.SerializeToString,
                 response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
 
@@ -209,6 +240,30 @@ class ContentServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetWorkflows(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetModels(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetStorageSystems(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetStorageSystem(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetStorageSystemModels(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -233,6 +288,12 @@ class ContentServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetTraits(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTraitWorkflowStorageSystems(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -394,52 +455,77 @@ def add_ContentServiceServicer_to_server(servicer, server):
             'GetWorkflowById': grpc.unary_unary_rpc_method_handler(
                     servicer.GetWorkflowById,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.Workflow.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_workflows__pb2.Workflow.SerializeToString,
             ),
             'GetWorkflows': grpc.unary_unary_rpc_method_handler(
                     servicer.GetWorkflows,
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.Workflows.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_workflows__pb2.Workflows.SerializeToString,
+            ),
+            'GetModels': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetModels,
+                    request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
+                    response_serializer=bosca_dot_content_dot_model__pb2.Models.SerializeToString,
+            ),
+            'GetStorageSystems': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetStorageSystems,
+                    request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
+                    response_serializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystems.SerializeToString,
+            ),
+            'GetStorageSystem': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetStorageSystem,
+                    request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystem.SerializeToString,
+            ),
+            'GetStorageSystemModels': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetStorageSystemModels,
+                    request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystemModels.SerializeToString,
             ),
             'GetWorkflowStateById': grpc.unary_unary_rpc_method_handler(
                     servicer.GetWorkflowStateById,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.WorkflowState.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowState.SerializeToString,
             ),
             'GetWorkflowStates': grpc.unary_unary_rpc_method_handler(
                     servicer.GetWorkflowStates,
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.WorkflowStates.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowStates.SerializeToString,
             ),
             'GetTraitById': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTraitById,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.Trait.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_traits__pb2.Trait.SerializeToString,
             ),
             'GetTraits': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTraits,
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.Traits.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_traits__pb2.Traits.SerializeToString,
+            ),
+            'GetTraitWorkflowStorageSystems': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTraitWorkflowStorageSystems,
+                    request_deserializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowStorageSystemRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystems.SerializeToString,
             ),
             'GetRootCollectionItems': grpc.unary_unary_rpc_method_handler(
                     servicer.GetRootCollectionItems,
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.CollectionItems.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_collections__pb2.CollectionItems.SerializeToString,
             ),
             'GetCollectionItems': grpc.unary_unary_rpc_method_handler(
                     servicer.GetCollectionItems,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.CollectionItems.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_collections__pb2.CollectionItems.SerializeToString,
             ),
             'AddCollection': grpc.unary_unary_rpc_method_handler(
                     servicer.AddCollection,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.AddCollectionRequest.FromString,
+                    request_deserializer=bosca_dot_content_dot_collections__pb2.AddCollectionRequest.FromString,
                     response_serializer=bosca_dot_requests__pb2.IdResponse.SerializeToString,
             ),
             'GetCollection': grpc.unary_unary_rpc_method_handler(
                     servicer.GetCollection,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.Collection.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_collections__pb2.Collection.SerializeToString,
             ),
             'DeleteCollection': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteCollection,
@@ -449,17 +535,17 @@ def add_ContentServiceServicer_to_server(servicer, server):
             'GetCollectionPermissions': grpc.unary_unary_rpc_method_handler(
                     servicer.GetCollectionPermissions,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.Permissions.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_permissions__pb2.Permissions.SerializeToString,
             ),
             'AddCollectionPermission': grpc.unary_unary_rpc_method_handler(
                     servicer.AddCollectionPermission,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.Permission.FromString,
+                    request_deserializer=bosca_dot_content_dot_permissions__pb2.Permission.FromString,
                     response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
             ),
             'CheckPermission': grpc.unary_unary_rpc_method_handler(
                     servicer.CheckPermission,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.PermissionCheckRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.PermissionCheckResponse.SerializeToString,
+                    request_deserializer=bosca_dot_content_dot_permissions__pb2.PermissionCheckRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_permissions__pb2.PermissionCheckResponse.SerializeToString,
             ),
             'GetMetadata': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMetadata,
@@ -469,16 +555,16 @@ def add_ContentServiceServicer_to_server(servicer, server):
             'GetMetadatas': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMetadatas,
                     request_deserializer=bosca_dot_requests__pb2.IdsRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.Metadatas.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_metadata__pb2.Metadatas.SerializeToString,
             ),
             'AddMetadata': grpc.unary_unary_rpc_method_handler(
                     servicer.AddMetadata,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.AddMetadataRequest.FromString,
+                    request_deserializer=bosca_dot_content_dot_metadata__pb2.AddMetadataRequest.FromString,
                     response_serializer=bosca_dot_requests__pb2.IdResponse.SerializeToString,
             ),
             'AddMetadataTrait': grpc.unary_unary_rpc_method_handler(
                     servicer.AddMetadataTrait,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.AddMetadataTraitRequest.FromString,
+                    request_deserializer=bosca_dot_content_dot_metadata__pb2.AddMetadataTraitRequest.FromString,
                     response_serializer=bosca_dot_content_dot_metadata__pb2.Metadata.SerializeToString,
             ),
             'DeleteMetadata': grpc.unary_unary_rpc_method_handler(
@@ -489,26 +575,26 @@ def add_ContentServiceServicer_to_server(servicer, server):
             'GetMetadataUploadUrl': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMetadataUploadUrl,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.SignedUrl.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_url__pb2.SignedUrl.SerializeToString,
             ),
             'GetMetadataDownloadUrl': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMetadataDownloadUrl,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.SignedUrl.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_url__pb2.SignedUrl.SerializeToString,
             ),
             'AddMetadataSupplementary': grpc.unary_unary_rpc_method_handler(
                     servicer.AddMetadataSupplementary,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.AddSupplementaryRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.SignedUrl.SerializeToString,
+                    request_deserializer=bosca_dot_content_dot_metadata__pb2.AddSupplementaryRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_url__pb2.SignedUrl.SerializeToString,
             ),
             'GetMetadataSupplementaryDownloadUrl': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMetadataSupplementaryDownloadUrl,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.SupplementaryIdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.SignedUrl.SerializeToString,
+                    request_deserializer=bosca_dot_content_dot_metadata__pb2.SupplementaryIdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_url__pb2.SignedUrl.SerializeToString,
             ),
             'DeleteMetadataSupplementary': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteMetadataSupplementary,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.SupplementaryIdRequest.FromString,
+                    request_deserializer=bosca_dot_content_dot_metadata__pb2.SupplementaryIdRequest.FromString,
                     response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
             ),
             'SetMetadataUploaded': grpc.unary_unary_rpc_method_handler(
@@ -519,31 +605,31 @@ def add_ContentServiceServicer_to_server(servicer, server):
             'GetMetadataPermissions': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMetadataPermissions,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_content__pb2.Permissions.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_permissions__pb2.Permissions.SerializeToString,
             ),
             'AddMetadataPermissions': grpc.unary_unary_rpc_method_handler(
                     servicer.AddMetadataPermissions,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.Permissions.FromString,
+                    request_deserializer=bosca_dot_content_dot_permissions__pb2.Permissions.FromString,
                     response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
             ),
             'AddMetadataPermission': grpc.unary_unary_rpc_method_handler(
                     servicer.AddMetadataPermission,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.Permission.FromString,
+                    request_deserializer=bosca_dot_content_dot_permissions__pb2.Permission.FromString,
                     response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
             ),
             'BeginTransitionWorkflow': grpc.unary_unary_rpc_method_handler(
                     servicer.BeginTransitionWorkflow,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.TransitionWorkflowRequest.FromString,
+                    request_deserializer=bosca_dot_content_dot_workflows__pb2.TransitionWorkflowRequest.FromString,
                     response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
             ),
             'CompleteTransitionWorkflow': grpc.unary_unary_rpc_method_handler(
                     servicer.CompleteTransitionWorkflow,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.CompleteTransitionWorkflowRequest.FromString,
+                    request_deserializer=bosca_dot_content_dot_workflows__pb2.CompleteTransitionWorkflowRequest.FromString,
                     response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
             ),
             'AddMetadataRelationship': grpc.unary_unary_rpc_method_handler(
                     servicer.AddMetadataRelationship,
-                    request_deserializer=bosca_dot_content_dot_content__pb2.AddMetadataRelationshipRequest.FromString,
+                    request_deserializer=bosca_dot_content_dot_metadata__pb2.AddMetadataRelationshipRequest.FromString,
                     response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
             ),
     }
@@ -573,7 +659,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetWorkflowById',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.Workflow.FromString,
+            bosca_dot_content_dot_workflows__pb2.Workflow.FromString,
             options,
             channel_credentials,
             insecure,
@@ -600,7 +686,115 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetWorkflows',
             bosca_dot_empty__pb2.Empty.SerializeToString,
-            bosca_dot_content_dot_content__pb2.Workflows.FromString,
+            bosca_dot_content_dot_workflows__pb2.Workflows.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetModels(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetModels',
+            bosca_dot_empty__pb2.Empty.SerializeToString,
+            bosca_dot_content_dot_model__pb2.Models.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetStorageSystems(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetStorageSystems',
+            bosca_dot_empty__pb2.Empty.SerializeToString,
+            bosca_dot_content_dot_storage__systems__pb2.StorageSystems.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetStorageSystem(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetStorageSystem',
+            bosca_dot_requests__pb2.IdRequest.SerializeToString,
+            bosca_dot_content_dot_storage__systems__pb2.StorageSystem.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetStorageSystemModels(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetStorageSystemModels',
+            bosca_dot_requests__pb2.IdRequest.SerializeToString,
+            bosca_dot_content_dot_storage__systems__pb2.StorageSystemModels.FromString,
             options,
             channel_credentials,
             insecure,
@@ -627,7 +821,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetWorkflowStateById',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.WorkflowState.FromString,
+            bosca_dot_content_dot_workflows__pb2.WorkflowState.FromString,
             options,
             channel_credentials,
             insecure,
@@ -654,7 +848,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetWorkflowStates',
             bosca_dot_empty__pb2.Empty.SerializeToString,
-            bosca_dot_content_dot_content__pb2.WorkflowStates.FromString,
+            bosca_dot_content_dot_workflows__pb2.WorkflowStates.FromString,
             options,
             channel_credentials,
             insecure,
@@ -681,7 +875,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetTraitById',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.Trait.FromString,
+            bosca_dot_content_dot_traits__pb2.Trait.FromString,
             options,
             channel_credentials,
             insecure,
@@ -708,7 +902,34 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetTraits',
             bosca_dot_empty__pb2.Empty.SerializeToString,
-            bosca_dot_content_dot_content__pb2.Traits.FromString,
+            bosca_dot_content_dot_traits__pb2.Traits.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetTraitWorkflowStorageSystems(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetTraitWorkflowStorageSystems',
+            bosca_dot_content_dot_traits__pb2.TraitWorkflowStorageSystemRequest.SerializeToString,
+            bosca_dot_content_dot_storage__systems__pb2.StorageSystems.FromString,
             options,
             channel_credentials,
             insecure,
@@ -735,7 +956,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetRootCollectionItems',
             bosca_dot_empty__pb2.Empty.SerializeToString,
-            bosca_dot_content_dot_content__pb2.CollectionItems.FromString,
+            bosca_dot_content_dot_collections__pb2.CollectionItems.FromString,
             options,
             channel_credentials,
             insecure,
@@ -762,7 +983,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetCollectionItems',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.CollectionItems.FromString,
+            bosca_dot_content_dot_collections__pb2.CollectionItems.FromString,
             options,
             channel_credentials,
             insecure,
@@ -788,7 +1009,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/AddCollection',
-            bosca_dot_content_dot_content__pb2.AddCollectionRequest.SerializeToString,
+            bosca_dot_content_dot_collections__pb2.AddCollectionRequest.SerializeToString,
             bosca_dot_requests__pb2.IdResponse.FromString,
             options,
             channel_credentials,
@@ -816,7 +1037,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetCollection',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.Collection.FromString,
+            bosca_dot_content_dot_collections__pb2.Collection.FromString,
             options,
             channel_credentials,
             insecure,
@@ -870,7 +1091,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetCollectionPermissions',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.Permissions.FromString,
+            bosca_dot_content_dot_permissions__pb2.Permissions.FromString,
             options,
             channel_credentials,
             insecure,
@@ -896,7 +1117,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/AddCollectionPermission',
-            bosca_dot_content_dot_content__pb2.Permission.SerializeToString,
+            bosca_dot_content_dot_permissions__pb2.Permission.SerializeToString,
             bosca_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
@@ -923,8 +1144,8 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/CheckPermission',
-            bosca_dot_content_dot_content__pb2.PermissionCheckRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.PermissionCheckResponse.FromString,
+            bosca_dot_content_dot_permissions__pb2.PermissionCheckRequest.SerializeToString,
+            bosca_dot_content_dot_permissions__pb2.PermissionCheckResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -978,7 +1199,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetMetadatas',
             bosca_dot_requests__pb2.IdsRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.Metadatas.FromString,
+            bosca_dot_content_dot_metadata__pb2.Metadatas.FromString,
             options,
             channel_credentials,
             insecure,
@@ -1004,7 +1225,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/AddMetadata',
-            bosca_dot_content_dot_content__pb2.AddMetadataRequest.SerializeToString,
+            bosca_dot_content_dot_metadata__pb2.AddMetadataRequest.SerializeToString,
             bosca_dot_requests__pb2.IdResponse.FromString,
             options,
             channel_credentials,
@@ -1031,7 +1252,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/AddMetadataTrait',
-            bosca_dot_content_dot_content__pb2.AddMetadataTraitRequest.SerializeToString,
+            bosca_dot_content_dot_metadata__pb2.AddMetadataTraitRequest.SerializeToString,
             bosca_dot_content_dot_metadata__pb2.Metadata.FromString,
             options,
             channel_credentials,
@@ -1086,7 +1307,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetMetadataUploadUrl',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.SignedUrl.FromString,
+            bosca_dot_content_dot_url__pb2.SignedUrl.FromString,
             options,
             channel_credentials,
             insecure,
@@ -1113,7 +1334,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetMetadataDownloadUrl',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.SignedUrl.FromString,
+            bosca_dot_content_dot_url__pb2.SignedUrl.FromString,
             options,
             channel_credentials,
             insecure,
@@ -1139,8 +1360,8 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/AddMetadataSupplementary',
-            bosca_dot_content_dot_content__pb2.AddSupplementaryRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.SignedUrl.FromString,
+            bosca_dot_content_dot_metadata__pb2.AddSupplementaryRequest.SerializeToString,
+            bosca_dot_content_dot_url__pb2.SignedUrl.FromString,
             options,
             channel_credentials,
             insecure,
@@ -1166,8 +1387,8 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl',
-            bosca_dot_content_dot_content__pb2.SupplementaryIdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.SignedUrl.FromString,
+            bosca_dot_content_dot_metadata__pb2.SupplementaryIdRequest.SerializeToString,
+            bosca_dot_content_dot_url__pb2.SignedUrl.FromString,
             options,
             channel_credentials,
             insecure,
@@ -1193,7 +1414,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/DeleteMetadataSupplementary',
-            bosca_dot_content_dot_content__pb2.SupplementaryIdRequest.SerializeToString,
+            bosca_dot_content_dot_metadata__pb2.SupplementaryIdRequest.SerializeToString,
             bosca_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
@@ -1248,7 +1469,7 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/GetMetadataPermissions',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_content__pb2.Permissions.FromString,
+            bosca_dot_content_dot_permissions__pb2.Permissions.FromString,
             options,
             channel_credentials,
             insecure,
@@ -1274,7 +1495,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/AddMetadataPermissions',
-            bosca_dot_content_dot_content__pb2.Permissions.SerializeToString,
+            bosca_dot_content_dot_permissions__pb2.Permissions.SerializeToString,
             bosca_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
@@ -1301,7 +1522,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/AddMetadataPermission',
-            bosca_dot_content_dot_content__pb2.Permission.SerializeToString,
+            bosca_dot_content_dot_permissions__pb2.Permission.SerializeToString,
             bosca_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
@@ -1328,7 +1549,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/BeginTransitionWorkflow',
-            bosca_dot_content_dot_content__pb2.TransitionWorkflowRequest.SerializeToString,
+            bosca_dot_content_dot_workflows__pb2.TransitionWorkflowRequest.SerializeToString,
             bosca_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
@@ -1355,7 +1576,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/CompleteTransitionWorkflow',
-            bosca_dot_content_dot_content__pb2.CompleteTransitionWorkflowRequest.SerializeToString,
+            bosca_dot_content_dot_workflows__pb2.CompleteTransitionWorkflowRequest.SerializeToString,
             bosca_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
@@ -1382,7 +1603,7 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/AddMetadataRelationship',
-            bosca_dot_content_dot_content__pb2.AddMetadataRelationshipRequest.SerializeToString,
+            bosca_dot_content_dot_metadata__pb2.AddMetadataRelationshipRequest.SerializeToString,
             bosca_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,

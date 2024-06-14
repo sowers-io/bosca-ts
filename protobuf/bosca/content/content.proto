@@ -18,10 +18,14 @@ syntax = "proto3";
 option go_package = "bosca.io/api/protobuf/bosca/content";
 
 import "google/api/annotations.proto";
-import "google/protobuf/timestamp.proto";
+import "bosca/content/collections.proto";
 import "bosca/content/metadata.proto";
 import "bosca/content/model.proto";
+import "bosca/content/workflows.proto";
 import "bosca/content/storage_systems.proto";
+import "bosca/content/traits.proto";
+import "bosca/content/permissions.proto";
+import "bosca/content/url.proto";
 import "bosca/empty.proto";
 import "bosca/requests.proto";
 
@@ -52,6 +56,12 @@ service ContentService {
     };
   }
 
+  rpc GetStorageSystem(bosca.IdRequest) returns (StorageSystem) {
+    option (google.api.http) = {
+      get: "/v1/content/storagesystems/{id}"
+    };
+  }
+
   rpc GetStorageSystemModels(bosca.IdRequest) returns (StorageSystemModels) {
     option (google.api.http) = {
       get: "/v1/content/storagesystems/{id}/models"
@@ -79,6 +89,12 @@ service ContentService {
   rpc GetTraits(bosca.Empty) returns (Traits) {
     option (google.api.http) = {
       get: "/v1/content/traits"
+    };
+  }
+
+  rpc GetTraitWorkflowStorageSystems(TraitWorkflowStorageSystemRequest) returns (StorageSystems) {
+    option (google.api.http) = {
+      get: "/v1/content/traits/{trait_id}/workflow/{workflow_id}/storagesystems"
     };
   }
 
@@ -241,232 +257,3 @@ service ContentService {
   }
 }
 
-enum PermissionRelation {
-  viewers = 0;
-  discoverers = 1;
-  editors = 2;
-  managers = 3;
-  serviceaccounts = 4;
-  owners = 5;
-}
-
-enum PermissionAction {
-  view = 0;
-  list = 2;
-  edit = 3;
-  manage = 4;
-  service = 5;
-  delete = 6;
-}
-
-message TransitionWorkflowRequest {
-  string metadata_id = 1;
-  string state_id = 2;
-  string status = 3;
-  bool retry = 4;
-}
-
-message CompleteTransitionWorkflowRequest {
-  string metadata_id = 1;
-  string status = 2;
-  bool success = 3;
-}
-
-message AddMetadataRelationshipRequest {
-  string metadata_id1 = 1;
-  string metadata_id2 = 2;
-  string relationship = 3;
-}
-
-message AddSupplementaryRequest {
-  string id = 1;
-  string type = 2;
-  string name = 3;
-  string content_type = 4;
-  int64 content_length = 5;
-}
-
-message SupplementaryIdRequest {
-  string id = 1;
-  string type = 2;
-}
-
-message PermissionCheckRequest {
-  string object = 1;
-  PermissionObjectType object_type = 2;
-  string subject = 3;
-  PermissionSubjectType subject_type = 4;
-  PermissionAction action = 5;
-}
-
-message PermissionCheckResponse {
-  bool allowed = 1;
-}
-
-message Permissions {
-  string id = 1;
-  repeated Permission permissions = 2;
-}
-
-enum PermissionObjectType {
-  unknown_object_type = 0;
-  collection_type = 1;
-  metadata_type = 2;
-  system_resource_type = 3;
-  workflow_type = 4;
-  workflow_state_type = 5;
-}
-
-enum PermissionSubjectType {
-  unknown_subject_type = 0;
-  user = 1;
-  group = 2;
-  service_account = 3;
-}
-
-message Permission {
-  string id = 1;
-  string subject = 2;
-  PermissionSubjectType subject_type = 3;
-  PermissionRelation relation = 5;
-}
-
-enum ItemType {
-  unknown = 0;
-  collection = 1;
-  metadata = 2;
-  metadata_variant = 3;
-}
-
-message Item {
-  string id = 2;
-  string name = 3;
-
-  repeated string category_ids = 12;
-  repeated string tags = 13;
-  map<string, string> attributes = 14;
-
-  google.protobuf.Timestamp created = 20;
-  google.protobuf.Timestamp modified = 21;
-}
-
-enum CollectionType {
-  standard = 0;
-  folder = 1;
-  root = 2;
-}
-
-message AddCollectionRequest {
-  string parent = 1;
-  Collection collection = 2;
-}
-
-message Workflows {
-  repeated Workflow workflows = 1;
-}
-
-message Workflow {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  string queue = 4;
-  map<string, string> configuration = 5;
-}
-
-message WorkflowStates {
-  repeated WorkflowState states = 1;
-}
-
-enum WorkflowStateType {
-  unknown_workflow_type = 0;
-  processing = 1;
-  draft = 2;
-  pending = 3;
-  approval = 4;
-  approved = 5;
-  published = 6;
-  failure = 7;
-}
-
-message WorkflowState {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  WorkflowStateType type = 4;
-  map<string, string> configuration = 5;
-  optional string workflow_id = 6;
-  optional string entry_workflow_id = 7;
-  optional string exit_workflow_id = 8;
-}
-
-message WorkflowStateTransitions {
-  repeated WorkflowStateTransition transitions = 1;
-}
-
-message WorkflowStateTransition {
-  string from_state_id = 1;
-  string to_state_id = 2;
-  string description = 3;
-}
-
-message Traits {
-  repeated Trait traits = 1;
-}
-
-message Trait {
-  string id = 1;
-  string name = 2;
-  string workflow_id = 3;
-}
-
-message Collection {
-  string id = 2;
-  string name = 3;
-
-  CollectionType type = 5;
-
-  repeated string category_ids = 12;
-  repeated string tags = 13;
-  map<string, string> attributes = 14;
-
-  google.protobuf.Timestamp created = 20;
-  google.protobuf.Timestamp modified = 21;
-}
-
-message CollectionItems {
-  repeated CollectionItem items = 1;
-}
-
-message CollectionItem {
-  oneof Item {
-    Metadata metadata = 1;
-    Collection collection = 3;
-  }
-}
-
-message SignedUrlHeader {
-  string name = 1;
-  string value = 2;
-}
-
-message SignedUrl {
-  string id = 1;
-  string url = 2;
-  string method = 3;
-  repeated SignedUrlHeader headers = 4;
-  map<string, string> attributes = 5;
-}
-
-message AddMetadataRequest {
-  string collection = 1;
-  Metadata metadata = 2;
-}
-
-message Metadatas {
-  repeated Metadata metadata = 1;
-}
-
-message AddMetadataTraitRequest {
-  string metadata_id = 1;
-  string trait_id = 2;
-}

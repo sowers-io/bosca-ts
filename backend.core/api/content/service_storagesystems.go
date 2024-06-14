@@ -32,6 +32,14 @@ func (svc *service) GetStorageSystems(ctx context.Context, request *bosca.Empty)
 	}, nil
 }
 
+func (svc *service) GetStorageSystem(ctx context.Context, request *bosca.IdRequest) (*content.StorageSystem, error) {
+	system, err := svc.ds.GetStorageSystem(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	return system, nil
+}
+
 func (svc *service) GetStorageSystemModels(ctx context.Context, request *bosca.IdRequest) (*content.StorageSystemModels, error) {
 	models, err := svc.ds.GetStorageSystemModels(ctx, request.Id)
 	if err != nil {

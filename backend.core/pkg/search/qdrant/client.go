@@ -18,6 +18,7 @@ package qdrant
 
 import (
 	"bosca.io/pkg/clients"
+	"google.golang.org/grpc"
 
 	"context"
 	"errors"
@@ -31,6 +32,8 @@ import (
 type Client struct {
 	go_client.PointsClient
 	go_client.CollectionsClient
+
+	qdrantConnection *grpc.ClientConn
 }
 
 func NewQdrantClient(endpoint string) (*Client, error) {
@@ -40,10 +43,16 @@ func NewQdrantClient(endpoint string) (*Client, error) {
 	}
 	qdrantPointsClient := go_client.NewPointsClient(qdrantConnection)
 	qdrantCollectionsClient := go_client.NewCollectionsClient(qdrantConnection)
-	return &Client{
-		qdrantPointsClient,
-		qdrantCollectionsClient,
-	}, nil
+	client := &Client{
+		PointsClient:      qdrantPointsClient,
+		CollectionsClient: qdrantCollectionsClient,
+		qdrantConnection:  qdrantConnection,
+	}
+	return client, nil
+}
+
+func (client *Client) Close() error {
+	return client.qdrantConnection.Close()
 }
 
 type vectorStore struct {

@@ -60,7 +60,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, cfg.Security.ServiceAccountId, objectStore, permissions, temporalClient))
+	svc := content.NewAuthorizationService(permissions, ds, content.NewService(cfg, ds, cfg.Security.ServiceAccountId, objectStore, permissions, temporalClient))
 	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
 		protocontent.RegisterContentServiceServer(grpcSvr, svc)
 		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)

@@ -17,6 +17,7 @@
 package commands
 
 import (
+	"bosca.io/cmd/cli/commands/ai"
 	"bosca.io/cmd/cli/commands/create"
 	del "bosca.io/cmd/cli/commands/delete"
 	"bosca.io/cmd/cli/commands/login"
@@ -36,7 +37,7 @@ var command = &cobra.Command{
 }
 
 func init() {
-	command.AddCommand(ls.Command, login.Command, workflow.Command, create.Command, del.Command, upload.Command, search.Command)
+	command.AddCommand(ls.Command, login.Command, workflow.Command, create.Command, del.Command, upload.Command, search.Command, ai.Command)
 }
 
 func Execute() {

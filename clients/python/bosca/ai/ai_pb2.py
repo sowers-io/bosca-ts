@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x62osca/ai/ai.proto\x12\x08\x62osca.ai\x1a\x1cgoogle/api/annotations.proto\"\x1c\n\x0b\x43hatRequest\x12\r\n\x05query\x18\x01 \x01(\t\" \n\x0c\x43hatResponse\x12\x10\n\x08response\x18\x01 \x01(\t2Z\n\tAIService\x12M\n\x04\x43hat\x12\x15.bosca.ai.ChatRequest\x1a\x16.bosca.ai.ChatResponse\"\x16\x82\xd3\xe4\x93\x02\x10\"\x0b/v1/ai/chat:\x01*B\x1eZ\x1c\x62osca.io/api/protobuf/searchb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x62osca/ai/ai.proto\x12\x08\x62osca.ai\x1a\x1cgoogle/api/annotations.proto\"5\n\x0cQueryRequest\x12\x16\n\x0estorage_system\x18\x01 \x01(\t\x12\r\n\x05query\x18\x02 \x01(\t\"!\n\rQueryResponse\x12\x10\n\x08response\x18\x01 \x01(\t2^\n\tAIService\x12Q\n\x05Query\x12\x16.bosca.ai.QueryRequest\x1a\x17.bosca.ai.QueryResponse\"\x17\x82\xd3\xe4\x93\x02\x11\"\x0c/v1/ai/query:\x01*B\x1eZ\x1c\x62osca.io/api/protobuf/searchb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,12 +23,12 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'bosca.ai.ai_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z\034bosca.io/api/protobuf/search'
-  _globals['_AISERVICE'].methods_by_name['Chat']._loaded_options = None
-  _globals['_AISERVICE'].methods_by_name['Chat']._serialized_options = b'\202\323\344\223\002\020\"\013/v1/ai/chat:\001*'
-  _globals['_CHATREQUEST']._serialized_start=61
-  _globals['_CHATREQUEST']._serialized_end=89
-  _globals['_CHATRESPONSE']._serialized_start=91
-  _globals['_CHATRESPONSE']._serialized_end=123
-  _globals['_AISERVICE']._serialized_start=125
-  _globals['_AISERVICE']._serialized_end=215
+  _globals['_AISERVICE'].methods_by_name['Query']._loaded_options = None
+  _globals['_AISERVICE'].methods_by_name['Query']._serialized_options = b'\202\323\344\223\002\021\"\014/v1/ai/query:\001*'
+  _globals['_QUERYREQUEST']._serialized_start=61
+  _globals['_QUERYREQUEST']._serialized_end=114
+  _globals['_QUERYRESPONSE']._serialized_start=116
+  _globals['_QUERYRESPONSE']._serialized_end=149
+  _globals['_AISERVICE']._serialized_start=151
+  _globals['_AISERVICE']._serialized_end=245
 # @@protoc_insertion_point(module_scope)

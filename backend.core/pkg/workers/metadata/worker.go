@@ -29,10 +29,8 @@ func NewWorker(client client.Client) worker.Worker {
 	w := worker.New(client, TaskQueue, worker.Options{})
 	w.RegisterWorkflow(ProcessMetadata)
 	w.RegisterWorkflow(ProcessTraits)
-	w.RegisterWorkflow(ProcessText)
 
 	w.RegisterActivity(common.GetMetadata)
-	w.RegisterActivity(processor.AddToSearchIndex)
 	w.RegisterActivity(processor.GetTraitWorkflows)
 	w.RegisterActivity(processor.CompleteTransition)
 	w.RegisterActivity(processor.TransitionTo)

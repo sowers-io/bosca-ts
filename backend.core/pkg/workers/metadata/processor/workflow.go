@@ -48,12 +48,7 @@ func TransitionTo(ctx context.Context, transition *Transition) error {
 	return err
 }
 
-type TraitWorkflow struct {
-	Id    string
-	Queue string
-}
-
-func GetTraitWorkflows(ctx context.Context, metadata *content.Metadata) ([]*TraitWorkflow, error) {
+func GetTraitWorkflows(ctx context.Context, metadata *content.Metadata) ([]*content.TraitWorkflow, error) {
 	if metadata.TraitIds == nil || len(metadata.TraitIds) == 0 {
 		return nil, nil
 	}
@@ -80,14 +75,18 @@ func GetTraitWorkflows(ctx context.Context, metadata *content.Metadata) ([]*Trai
 		workflowsById[workflow.Id] = workflow
 	}
 
-	traitWorkflows := make([]*TraitWorkflow, 0, len(metadata.TraitIds))
+	traitWorkflows := make([]*content.TraitWorkflow, 0, len(metadata.TraitIds))
 	for _, id := range metadata.TraitIds {
 		if trait, ok := traitsById[id]; ok {
-			if workflow, ok := workflowsById[trait.WorkflowId]; ok {
-				traitWorkflows = append(traitWorkflows, &TraitWorkflow{
-					Id:    workflow.Id,
-					Queue: workflow.Queue,
-				})
+			for _, workflowId := range trait.TraitWorkflowIds {
+				if workflow, ok := workflowsById[workflowId]; ok {
+					traitWorkflows = append(traitWorkflows, &content.TraitWorkflow{
+						TraitId:    trait.Id,
+						WorkflowId: workflow.Id,
+						Queue:      workflow.Queue,
+						Metadata:   metadata,
+					})
+				}
 			}
 		}
 	}

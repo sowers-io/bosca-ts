@@ -37,15 +37,6 @@ curl \
   -H 'Authorization: Bearer p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M' \
   -H 'Accept: application/json' | jq
 
-curl \
-  -X POST 'http://meilisearch:7700/indexes' \
-  -H 'Authorization: Bearer p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M' \
-  -H 'Content-Type: application/json' \
-  --data-binary '{
-    "uid": "metadata",
-    "primaryKey": "id"
-  }'
-
 echo "Pull llm..."
 
 curl http://ollama:11434/api/pull -d "{

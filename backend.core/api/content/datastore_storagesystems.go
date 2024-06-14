@@ -19,8 +19,36 @@ package content
 import (
 	model "bosca.io/api/protobuf/bosca/content"
 	"context"
+	"database/sql"
 	"encoding/json"
 )
+
+func getStorageSystem(results *sql.Rows) (*model.StorageSystem, error) {
+	i := &model.StorageSystem{}
+	var configurationJson json.RawMessage
+	var storageType string
+	err := results.Scan(&i.Id, &i.Name, &i.Description, &storageType, &configurationJson)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(configurationJson, &i.Configuration)
+	if err != nil {
+		return nil, err
+	}
+	switch storageType {
+	case "vector":
+		i.Type = model.StorageSystemType_vector_storage_system
+	case "search":
+		i.Type = model.StorageSystemType_search_storage_system
+	case "metadata":
+		i.Type = model.StorageSystemType_metadata_storage_system
+	case "supplementary":
+		i.Type = model.StorageSystemType_supplementary_storage_system
+	default:
+		i.Type = model.StorageSystemType_unknown_storage_system
+	}
+	return i, nil
+}
 
 func (ds *DataStore) GetStorageSystems(ctx context.Context) ([]*model.StorageSystem, error) {
 	results, err := ds.db.QueryContext(ctx, "select id::varchar, name, description, type, configuration from storage_systems")
@@ -30,32 +58,25 @@ func (ds *DataStore) GetStorageSystems(ctx context.Context) ([]*model.StorageSys
 	defer results.Close()
 	systems := make([]*model.StorageSystem, 0)
 	for results.Next() {
-		i := &model.StorageSystem{}
-		var configurationJson json.RawMessage
-		var storageType string
-		err = results.Scan(&i.Id, &i.Name, &i.Description, &storageType, &configurationJson)
+		system, err := getStorageSystem(results)
 		if err != nil {
 			return nil, err
 		}
-		err = json.Unmarshal(configurationJson, &i.Configuration)
-		if err != nil {
-			return nil, err
-		}
-		switch storageType {
-		case "vector":
-			i.Type = model.StorageSystemType_vector_storage_system
-		case "search":
-			i.Type = model.StorageSystemType_search_storage_system
-		case "metadata":
-			i.Type = model.StorageSystemType_metadata_storage_system
-		case "supplementary":
-			i.Type = model.StorageSystemType_supplementary_storage_system
-		default:
-			i.Type = model.StorageSystemType_unknown_storage_system
-		}
-		systems = append(systems, i)
+		systems = append(systems, system)
 	}
 	return systems, nil
+}
+
+func (ds *DataStore) GetStorageSystem(ctx context.Context, id string) (*model.StorageSystem, error) {
+	results, err := ds.db.QueryContext(ctx, "select id::varchar, name, description, type, configuration from storage_systems where id = $1::uuid", id)
+	if err != nil {
+		return nil, err
+	}
+	defer results.Close()
+	if results.Next() {
+		return getStorageSystem(results)
+	}
+	return nil, nil
 }
 
 func (ds *DataStore) GetStorageSystemModels(ctx context.Context, id string) ([]*model.StorageSystemModel, error) {

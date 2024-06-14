@@ -26,8 +26,13 @@ create table models
 
 insert into models (name, type, description, configuration)
 values ('phi3:medium-128k', 'ollama-llm', 'phi3:medium-128k', '{
-  "vectorSize": "5120"
-}'::jsonb);
+  "vectorSize": "5120",
+  "contextWindow": "120000"
+}'::jsonb),
+       ('phi3:mini', 'ollama-llm', 'phi3:mini', '{
+         "vectorSize": "3072",
+         "contextWindow": "8000"
+       }'::jsonb);
 
 create type storage_system_type as enum ('vector', 'search', 'metadata', 'supplementary');
 
@@ -58,20 +63,22 @@ values ('Metadata Search Index', 'Index search content', 'search'::storage_syste
 }'::jsonb),
        ('Bible Chapter Vector Index', 'Store Bible Chapter Data', 'vector'::storage_system_type, '{
          "indexName": "biblechapters",
-         "type": "qdrant"
+         "type": "qdrant",
+         "vectorSize": "3072"
        }'::jsonb),
        ('Bible Verse Vector Index', 'Store Bible Verse Data', 'vector'::storage_system_type, '{
          "indexName": "bibleverses",
-         "type": "qdrant"
+         "type": "qdrant",
+         "vectorSize": "3072"
        }'::jsonb);
 
 insert into storage_system_models (system_id, model_id)
 values ((select id from storage_systems where name = 'Bible Chapter Vector Index'),
-        (select id from models where name = 'phi3:medium-128k'));
+        (select id from models where name = 'phi3:mini'));
 
 insert into storage_system_models (system_id, model_id)
 values ((select id from storage_systems where name = 'Bible Verse Vector Index'),
-        (select id from models where name = 'phi3:medium-128k'));
+        (select id from models where name = 'phi3:mini'));
 
 create table workflows
 (
@@ -92,7 +99,7 @@ insert into workflows (id, name, description, queue)
 values ('ProcessTraits', 'Process Traits', 'Process Traits', 'metadata');
 
 insert into workflows (id, name, description, queue)
-values ('IndexVector', 'Index Vectors', 'Index Vector Data', 'vectors');
+values ('IndexVectors', 'Index Vectors', 'Index Vector Data', 'vectors');
 
 insert into workflows (id, name, description, queue)
 values ('IndexSearch', 'Index Search', 'Index Search Data', 'search');
@@ -117,20 +124,7 @@ create table trait_workflows
     foreign key (workflow_id) references workflows (id)
 );
 
-insert into traits (id, name, description)
-values ('common.text', 'Textual Content', 'Generic Common Text'),
-       ('bible.usx', 'Digital Bible', 'Generate vector and search indexed data.  Broken down by chapter and verse.'),
-       ('bible.chapter.text', 'Bible Chapter Text', 'Process Bible Chapter Text'),
-       ('bible.verse.text', 'Bible Verse Text', 'Process Bible Verse Text');
-
-insert into trait_workflows (trait_id, workflow_id)
-values ('bible.usx', 'ProcessBible'),
-       ('bible.chapter.text', 'IndexVector'),
-       ('bible.chapter.text', 'IndexSearch'),
-       ('bible.verse.text', 'IndexVector'),
-       ('bible.verse.text', 'IndexSearch');
-
-create table workflow_trait_storage_systems
+create table trait_workflow_storage_systems
 (
     workflow_id       varchar not null,
     storage_system_id uuid    not null,
@@ -141,13 +135,23 @@ create table workflow_trait_storage_systems
     foreign key (trait_id) references traits (id)
 );
 
-insert into workflow_trait_storage_systems (workflow_id, storage_system_id, trait_id)
-values ('IndexVector', (select id from storage_systems where name = 'Bible Chapter Vector Index'),
-        'bible.chapter.text'),
-       ('IndexVector', (select id from storage_systems where name = 'Bible Verse Vector Index'),
-        'bible.verse.text'),
-       ('IndexSearch', (select id from storage_systems where name = 'Metadata Search Index'),
-        'bible.verse.text');
+insert into traits (id, name, description)
+values ('common.text', 'Textual Content', 'Generic Common Text'),
+       ('bible.usx', 'Digital Bible', 'Generate vector and search indexed data.  Broken down by chapter and verse.'),
+       ('bible.chapter.text', 'Bible Chapter Text', 'Process Bible Chapter Text'),
+       ('bible.verse.text', 'Bible Verse Text', 'Process Bible Verse Text');
+
+insert into trait_workflows (trait_id, workflow_id)
+values ('bible.usx', 'ProcessBible'),
+       ('bible.chapter.text', 'IndexVectors'),
+       ('bible.verse.text', 'IndexVectors'),
+       ('bible.verse.text', 'IndexSearch');
+
+insert into trait_workflow_storage_systems (trait_id, workflow_id, storage_system_id)
+values ('bible.chapter.text', 'IndexVectors',
+        (select id from storage_systems where name = 'Bible Chapter Vector Index')),
+       ('bible.verse.text', 'IndexVectors', (select id from storage_systems where name = 'Bible Verse Vector Index')),
+       ('bible.verse.text', 'IndexSearch', (select id from storage_systems where name = 'Metadata Search Index'));
 
 create table categories
 (

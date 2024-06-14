@@ -39,17 +39,17 @@ class AIServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Chat = channel.unary_unary(
-                '/bosca.ai.AIService/Chat',
-                request_serializer=bosca_dot_ai_dot_ai__pb2.ChatRequest.SerializeToString,
-                response_deserializer=bosca_dot_ai_dot_ai__pb2.ChatResponse.FromString,
+        self.Query = channel.unary_unary(
+                '/bosca.ai.AIService/Query',
+                request_serializer=bosca_dot_ai_dot_ai__pb2.QueryRequest.SerializeToString,
+                response_deserializer=bosca_dot_ai_dot_ai__pb2.QueryResponse.FromString,
                 _registered_method=True)
 
 
 class AIServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def Chat(self, request, context):
+    def Query(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -58,10 +58,10 @@ class AIServiceServicer(object):
 
 def add_AIServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Chat': grpc.unary_unary_rpc_method_handler(
-                    servicer.Chat,
-                    request_deserializer=bosca_dot_ai_dot_ai__pb2.ChatRequest.FromString,
-                    response_serializer=bosca_dot_ai_dot_ai__pb2.ChatResponse.SerializeToString,
+            'Query': grpc.unary_unary_rpc_method_handler(
+                    servicer.Query,
+                    request_deserializer=bosca_dot_ai_dot_ai__pb2.QueryRequest.FromString,
+                    response_serializer=bosca_dot_ai_dot_ai__pb2.QueryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -75,7 +75,7 @@ class AIService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def Chat(request,
+    def Query(request,
             target,
             options=(),
             channel_credentials=None,
@@ -88,9 +88,9 @@ class AIService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/bosca.ai.AIService/Chat',
-            bosca_dot_ai_dot_ai__pb2.ChatRequest.SerializeToString,
-            bosca_dot_ai_dot_ai__pb2.ChatResponse.FromString,
+            '/bosca.ai.AIService/Query',
+            bosca_dot_ai_dot_ai__pb2.QueryRequest.SerializeToString,
+            bosca_dot_ai_dot_ai__pb2.QueryResponse.FromString,
             options,
             channel_credentials,
             insecure,

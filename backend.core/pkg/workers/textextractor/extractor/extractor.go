@@ -36,7 +36,7 @@ type ExtractRequest struct {
 	Name     string
 }
 
-func ExtractText(ctx context.Context, contentType string, metadataFile *os.File) (*http.Response, error) {
+func extractText(ctx context.Context, contentType string, metadataFile *os.File) (*http.Response, error) {
 	cfg := common.GetConfiguration(ctx)
 	extractorUrl, err := url.Parse(cfg.ClientEndPoints.TextExtractorApiAddress)
 	if err != nil {
@@ -114,7 +114,7 @@ func Extract(ctx context.Context, extractRequest *ExtractRequest) error {
 		return err
 	}
 	defer os.Remove(metadataFile.Name())
-	response, err := ExtractText(ctx, extractRequest.Metadata.ContentType, metadataFile)
+	response, err := extractText(ctx, extractRequest.Metadata.ContentType, metadataFile)
 	if err != nil {
 		return err
 	}

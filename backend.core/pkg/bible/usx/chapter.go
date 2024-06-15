@@ -29,8 +29,8 @@ type Chapter struct {
 	Children  []Node
 }
 
-func (v *Chapter) GetUsfm() string {
-	return strings.Replace(strings.Replace(v.Sid, " ", ".", -1), ":", ".", -1)
+func (c *Chapter) GetUsfm() string {
+	return strings.Replace(strings.Replace(c.Sid, " ", ".", -1), ":", ".", -1)
 }
 
 func (c *Chapter) AddText(text string) error {
@@ -43,6 +43,10 @@ func (c *Chapter) AddNode(node Node) {
 
 func (c *Chapter) GetChildren() []Node {
 	return c.Children
+}
+
+func (c *Chapter) FindVerses() []*Verse {
+	return findVerses(c)
 }
 
 type ChapterStart struct {

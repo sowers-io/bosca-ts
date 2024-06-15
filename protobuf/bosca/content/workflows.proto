@@ -18,11 +18,36 @@ syntax = "proto3";
 option go_package = "bosca.io/api/protobuf/bosca/content";
 
 import "bosca/content/metadata.proto";
+import "bosca/content/prompts.proto";
+import "bosca/content/storage_systems.proto";
 
 package bosca.content;
 
 message Workflows {
   repeated Workflow workflows = 1;
+}
+
+enum WorkflowActivityParameterType {
+  unknown_activity_parameter_type = 0;
+  context = 1;
+  supplementary = 2;
+  supplementary_array = 3;
+}
+
+message WorkflowActivityParameter {
+  string name = 1;
+  WorkflowActivityParameterType type = 2;
+}
+
+message WorkflowActivity {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  bool child_workflow = 4;
+  optional string child_workflow_queue = 5;
+  map<string, string> configuration = 6;
+  map<string, WorkflowActivityParameter> inputs = 7;
+  map<string, WorkflowActivityParameter> outputs = 8;
 }
 
 message Workflow {
@@ -82,9 +107,60 @@ message CompleteTransitionWorkflowRequest {
   bool success = 3;
 }
 
-message TraitWorkflow {
+message WorkflowActivityInstance {
+  int64 id = 1;
+  WorkflowActivity activity = 2;
+  int32 execution_group = 3;
+  map<string, string> configuration = 4;
+}
+
+message WorkflowInstance {
   string trait_id = 1;
-  string workflow_id = 2;
-  string queue = 3;
-  Metadata metadata = 4;
+  Workflow workflow = 2;
+  repeated WorkflowActivityInstance activities = 3;
+  string queue = 4;
+  Metadata metadata = 5;
+  map<string, string> context = 6;
+}
+
+message WorkflowActivityParameterValue {
+  oneof value {
+    string single_value = 1;
+    WorkflowActivityParameterValues array_value = 2;
+  }
+}
+
+message WorkflowActivityParameterValues {
+  repeated string values = 2;
+}
+
+message WorkflowActivityExecutionContext {
+  WorkflowInstance workflow = 1;
+  WorkflowActivityInstance activity = 2;
+  Metadata metadata = 3;
+  map<string, WorkflowActivityParameterValue> context = 4;
+  map<string, WorkflowActivityParameterValue> inputs = 5;
+}
+
+message WorkflowActivityResult {
+  map<string, WorkflowActivityParameterValue> context = 2;
+  map<string, WorkflowActivityParameterValue> outputs = 1;
+}
+
+message WorkflowActivityStorageSystem {
+  StorageSystem storage_system = 1;
+  map<string, string> configuration = 2;
+}
+
+message WorkflowActivityStorageSystems {
+  repeated WorkflowActivityStorageSystem systems = 1;
+}
+
+message WorkflowActivityPrompt {
+  Prompt prompt = 1;
+  map<string, string> configuration = 2;
+}
+
+message WorkflowActivityPrompts {
+  WorkflowActivityPrompt prompts = 1;
 }

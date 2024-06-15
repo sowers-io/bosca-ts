@@ -87,7 +87,18 @@ func GetServiceAuthorizedContext(context context.Context) context.Context {
 	return metadata.NewOutgoingContext(context, md)
 }
 
+func GetWorkflowServiceAuthorizedContext(ctx workflow.Context) context.Context {
+	cfg := GetWorkflowConfiguration(ctx)
+	md := metadata.New(make(map[string]string))
+	md["x-service-authorization"] = []string{"Token " + cfg.Security.ServiceAccountToken}
+	return metadata.NewOutgoingContext(context.Background(), md)
+}
+
 func GetConfiguration(context context.Context) *configuration.WorkerConfiguration {
+	return context.Value(configurationKey).(*configuration.WorkerConfiguration)
+}
+
+func GetWorkflowConfiguration(context workflow.Context) *configuration.WorkerConfiguration {
 	return context.Value(configurationKey).(*configuration.WorkerConfiguration)
 }
 
@@ -96,6 +107,10 @@ func GetHttpClient(context context.Context) *http.Client {
 }
 
 func GetContentService(context context.Context) content.ContentServiceClient {
+	return context.Value(contentServiceKey).(content.ContentServiceClient)
+}
+
+func GetWorkflowContentService(context workflow.Context) content.ContentServiceClient {
 	return context.Value(contentServiceKey).(content.ContentServiceClient)
 }
 

@@ -7,6 +7,8 @@ from bosca.content import collections_pb2 as bosca_dot_content_dot_collections__
 from bosca.content import metadata_pb2 as bosca_dot_content_dot_metadata__pb2
 from bosca.content import model_pb2 as bosca_dot_content_dot_model__pb2
 from bosca.content import permissions_pb2 as bosca_dot_content_dot_permissions__pb2
+from bosca.content import prompts_pb2 as bosca_dot_content_dot_prompts__pb2
+from bosca.content import sources_pb2 as bosca_dot_content_dot_sources__pb2
 from bosca.content import storage_systems_pb2 as bosca_dot_content_dot_storage__systems__pb2
 from bosca.content import traits_pb2 as bosca_dot_content_dot_traits__pb2
 from bosca.content import url_pb2 as bosca_dot_content_dot_url__pb2
@@ -48,20 +50,35 @@ class ContentServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetWorkflowById = channel.unary_unary(
-                '/bosca.content.ContentService/GetWorkflowById',
+        self.GetSources = channel.unary_unary(
+                '/bosca.content.ContentService/GetSources',
+                request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_sources__pb2.Sources.FromString,
+                _registered_method=True)
+        self.GetSource = channel.unary_unary(
+                '/bosca.content.ContentService/GetSource',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_workflows__pb2.Workflow.FromString,
+                response_deserializer=bosca_dot_content_dot_sources__pb2.Source.FromString,
                 _registered_method=True)
         self.GetWorkflows = channel.unary_unary(
                 '/bosca.content.ContentService/GetWorkflows',
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_workflows__pb2.Workflows.FromString,
                 _registered_method=True)
+        self.GetWorkflow = channel.unary_unary(
+                '/bosca.content.ContentService/GetWorkflow',
+                request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_workflows__pb2.Workflow.FromString,
+                _registered_method=True)
         self.GetModels = channel.unary_unary(
                 '/bosca.content.ContentService/GetModels',
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_model__pb2.Models.FromString,
+                _registered_method=True)
+        self.GetPrompts = channel.unary_unary(
+                '/bosca.content.ContentService/GetPrompts',
+                request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_prompts__pb2.Prompts.FromString,
                 _registered_method=True)
         self.GetStorageSystems = channel.unary_unary(
                 '/bosca.content.ContentService/GetStorageSystems',
@@ -78,8 +95,8 @@ class ContentServiceStub(object):
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystemModels.FromString,
                 _registered_method=True)
-        self.GetWorkflowStateById = channel.unary_unary(
-                '/bosca.content.ContentService/GetWorkflowStateById',
+        self.GetWorkflowState = channel.unary_unary(
+                '/bosca.content.ContentService/GetWorkflowState',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowState.FromString,
                 _registered_method=True)
@@ -88,20 +105,30 @@ class ContentServiceStub(object):
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowStates.FromString,
                 _registered_method=True)
-        self.GetTraitById = channel.unary_unary(
-                '/bosca.content.ContentService/GetTraitById',
-                request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_traits__pb2.Trait.FromString,
-                _registered_method=True)
         self.GetTraits = channel.unary_unary(
                 '/bosca.content.ContentService/GetTraits',
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_traits__pb2.Traits.FromString,
                 _registered_method=True)
+        self.GetTrait = channel.unary_unary(
+                '/bosca.content.ContentService/GetTrait',
+                request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_traits__pb2.Trait.FromString,
+                _registered_method=True)
+        self.GetTraitWorkflowInstance = channel.unary_unary(
+                '/bosca.content.ContentService/GetTraitWorkflowInstance',
+                request_serializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowIdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowInstance.FromString,
+                _registered_method=True)
         self.GetTraitWorkflowStorageSystems = channel.unary_unary(
                 '/bosca.content.ContentService/GetTraitWorkflowStorageSystems',
-                request_serializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowStorageSystemRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystems.FromString,
+                request_serializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityStorageSystems.FromString,
+                _registered_method=True)
+        self.GetTraitWorkflowPrompts = channel.unary_unary(
+                '/bosca.content.ContentService/GetTraitWorkflowPrompts',
+                request_serializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityPrompts.FromString,
                 _registered_method=True)
         self.GetRootCollectionItems = channel.unary_unary(
                 '/bosca.content.ContentService/GetRootCollectionItems',
@@ -136,6 +163,11 @@ class ContentServiceStub(object):
         self.AddCollectionPermission = channel.unary_unary(
                 '/bosca.content.ContentService/AddCollectionPermission',
                 request_serializer=bosca_dot_content_dot_permissions__pb2.Permission.SerializeToString,
+                response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
+                _registered_method=True)
+        self.AddCollectionItem = channel.unary_unary(
+                '/bosca.content.ContentService/AddCollectionItem',
+                request_serializer=bosca_dot_content_dot_collections__pb2.AddCollectionItemRequest.SerializeToString,
                 response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.CheckPermission = channel.unary_unary(
@@ -233,7 +265,13 @@ class ContentServiceStub(object):
 class ContentServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetWorkflowById(self, request, context):
+    def GetSources(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetSource(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -245,7 +283,19 @@ class ContentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetWorkflow(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetModels(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetPrompts(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -269,7 +319,7 @@ class ContentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetWorkflowStateById(self, request, context):
+    def GetWorkflowState(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -281,19 +331,31 @@ class ContentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetTraitById(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def GetTraits(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetTrait(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTraitWorkflowInstance(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetTraitWorkflowStorageSystems(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTraitWorkflowPrompts(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -336,6 +398,12 @@ class ContentServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def AddCollectionPermission(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AddCollectionItem(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -452,20 +520,35 @@ class ContentServiceServicer(object):
 
 def add_ContentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetWorkflowById': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetWorkflowById,
+            'GetSources': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSources,
+                    request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
+                    response_serializer=bosca_dot_content_dot_sources__pb2.Sources.SerializeToString,
+            ),
+            'GetSource': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSource,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_workflows__pb2.Workflow.SerializeToString,
+                    response_serializer=bosca_dot_content_dot_sources__pb2.Source.SerializeToString,
             ),
             'GetWorkflows': grpc.unary_unary_rpc_method_handler(
                     servicer.GetWorkflows,
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                     response_serializer=bosca_dot_content_dot_workflows__pb2.Workflows.SerializeToString,
             ),
+            'GetWorkflow': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetWorkflow,
+                    request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_workflows__pb2.Workflow.SerializeToString,
+            ),
             'GetModels': grpc.unary_unary_rpc_method_handler(
                     servicer.GetModels,
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                     response_serializer=bosca_dot_content_dot_model__pb2.Models.SerializeToString,
+            ),
+            'GetPrompts': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPrompts,
+                    request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
+                    response_serializer=bosca_dot_content_dot_prompts__pb2.Prompts.SerializeToString,
             ),
             'GetStorageSystems': grpc.unary_unary_rpc_method_handler(
                     servicer.GetStorageSystems,
@@ -482,8 +565,8 @@ def add_ContentServiceServicer_to_server(servicer, server):
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
                     response_serializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystemModels.SerializeToString,
             ),
-            'GetWorkflowStateById': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetWorkflowStateById,
+            'GetWorkflowState': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetWorkflowState,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
                     response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowState.SerializeToString,
             ),
@@ -492,20 +575,30 @@ def add_ContentServiceServicer_to_server(servicer, server):
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                     response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowStates.SerializeToString,
             ),
-            'GetTraitById': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetTraitById,
-                    request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_traits__pb2.Trait.SerializeToString,
-            ),
             'GetTraits': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTraits,
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                     response_serializer=bosca_dot_content_dot_traits__pb2.Traits.SerializeToString,
             ),
+            'GetTrait': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTrait,
+                    request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_traits__pb2.Trait.SerializeToString,
+            ),
+            'GetTraitWorkflowInstance': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTraitWorkflowInstance,
+                    request_deserializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowIdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowInstance.SerializeToString,
+            ),
             'GetTraitWorkflowStorageSystems': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTraitWorkflowStorageSystems,
-                    request_deserializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowStorageSystemRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_storage__systems__pb2.StorageSystems.SerializeToString,
+                    request_deserializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityStorageSystems.SerializeToString,
+            ),
+            'GetTraitWorkflowPrompts': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTraitWorkflowPrompts,
+                    request_deserializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityPrompts.SerializeToString,
             ),
             'GetRootCollectionItems': grpc.unary_unary_rpc_method_handler(
                     servicer.GetRootCollectionItems,
@@ -540,6 +633,11 @@ def add_ContentServiceServicer_to_server(servicer, server):
             'AddCollectionPermission': grpc.unary_unary_rpc_method_handler(
                     servicer.AddCollectionPermission,
                     request_deserializer=bosca_dot_content_dot_permissions__pb2.Permission.FromString,
+                    response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
+            ),
+            'AddCollectionItem': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddCollectionItem,
+                    request_deserializer=bosca_dot_content_dot_collections__pb2.AddCollectionItemRequest.FromString,
                     response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
             ),
             'CheckPermission': grpc.unary_unary_rpc_method_handler(
@@ -644,7 +742,7 @@ class ContentService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetWorkflowById(request,
+    def GetSources(request,
             target,
             options=(),
             channel_credentials=None,
@@ -657,9 +755,36 @@ class ContentService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/bosca.content.ContentService/GetWorkflowById',
+            '/bosca.content.ContentService/GetSources',
+            bosca_dot_empty__pb2.Empty.SerializeToString,
+            bosca_dot_content_dot_sources__pb2.Sources.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetSource(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetSource',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_workflows__pb2.Workflow.FromString,
+            bosca_dot_content_dot_sources__pb2.Source.FromString,
             options,
             channel_credentials,
             insecure,
@@ -698,6 +823,33 @@ class ContentService(object):
             _registered_method=True)
 
     @staticmethod
+    def GetWorkflow(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetWorkflow',
+            bosca_dot_requests__pb2.IdRequest.SerializeToString,
+            bosca_dot_content_dot_workflows__pb2.Workflow.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def GetModels(request,
             target,
             options=(),
@@ -714,6 +866,33 @@ class ContentService(object):
             '/bosca.content.ContentService/GetModels',
             bosca_dot_empty__pb2.Empty.SerializeToString,
             bosca_dot_content_dot_model__pb2.Models.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetPrompts(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetPrompts',
+            bosca_dot_empty__pb2.Empty.SerializeToString,
+            bosca_dot_content_dot_prompts__pb2.Prompts.FromString,
             options,
             channel_credentials,
             insecure,
@@ -806,7 +985,7 @@ class ContentService(object):
             _registered_method=True)
 
     @staticmethod
-    def GetWorkflowStateById(request,
+    def GetWorkflowState(request,
             target,
             options=(),
             channel_credentials=None,
@@ -819,7 +998,7 @@ class ContentService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/bosca.content.ContentService/GetWorkflowStateById',
+            '/bosca.content.ContentService/GetWorkflowState',
             bosca_dot_requests__pb2.IdRequest.SerializeToString,
             bosca_dot_content_dot_workflows__pb2.WorkflowState.FromString,
             options,
@@ -860,33 +1039,6 @@ class ContentService(object):
             _registered_method=True)
 
     @staticmethod
-    def GetTraitById(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/bosca.content.ContentService/GetTraitById',
-            bosca_dot_requests__pb2.IdRequest.SerializeToString,
-            bosca_dot_content_dot_traits__pb2.Trait.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
     def GetTraits(request,
             target,
             options=(),
@@ -914,6 +1066,60 @@ class ContentService(object):
             _registered_method=True)
 
     @staticmethod
+    def GetTrait(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetTrait',
+            bosca_dot_requests__pb2.IdRequest.SerializeToString,
+            bosca_dot_content_dot_traits__pb2.Trait.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetTraitWorkflowInstance(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetTraitWorkflowInstance',
+            bosca_dot_content_dot_traits__pb2.TraitWorkflowIdRequest.SerializeToString,
+            bosca_dot_content_dot_workflows__pb2.WorkflowInstance.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def GetTraitWorkflowStorageSystems(request,
             target,
             options=(),
@@ -928,8 +1134,35 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/GetTraitWorkflowStorageSystems',
-            bosca_dot_content_dot_traits__pb2.TraitWorkflowStorageSystemRequest.SerializeToString,
-            bosca_dot_content_dot_storage__systems__pb2.StorageSystems.FromString,
+            bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.SerializeToString,
+            bosca_dot_content_dot_workflows__pb2.WorkflowActivityStorageSystems.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetTraitWorkflowPrompts(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetTraitWorkflowPrompts',
+            bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.SerializeToString,
+            bosca_dot_content_dot_workflows__pb2.WorkflowActivityPrompts.FromString,
             options,
             channel_credentials,
             insecure,
@@ -1118,6 +1351,33 @@ class ContentService(object):
             target,
             '/bosca.content.ContentService/AddCollectionPermission',
             bosca_dot_content_dot_permissions__pb2.Permission.SerializeToString,
+            bosca_dot_empty__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AddCollectionItem(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/AddCollectionItem',
+            bosca_dot_content_dot_collections__pb2.AddCollectionItemRequest.SerializeToString,
             bosca_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,

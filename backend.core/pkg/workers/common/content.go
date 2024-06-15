@@ -29,11 +29,37 @@ import (
 	"strings"
 )
 
+func GetWorkflow(ctx context.Context, id string) (*content.Workflow, error) {
+	contentService := GetContentService(ctx)
+	return contentService.GetWorkflow(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
+		Id: id,
+	})
+}
+
 func GetMetadata(ctx context.Context, id string) (*content.Metadata, error) {
 	contentService := GetContentService(ctx)
 	return contentService.GetMetadata(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
 		Id: id,
 	})
+}
+
+func DeleteMetadata(ctx context.Context, id string) error {
+	contentService := GetContentService(ctx)
+	_, err := contentService.DeleteMetadata(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
+		Id: id,
+	})
+	return err
+}
+
+func DownloadTemporaryMetadataFile(ctx context.Context, id string) (*os.File, error) {
+	client := GetContentService(ctx)
+	signedUrl, err := client.GetMetadataDownloadUrl(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
+		Id: id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return DownloadTemporaryFile(ctx, signedUrl)
 }
 
 func DownloadTemporaryFile(ctx context.Context, signedUrl *content.SignedUrl) (*os.File, error) {

@@ -43,7 +43,7 @@ message StorageSystems {
 
 message StorageSystemModel {
     Model model = 2;
-    string type = 3;
+    map<string, string> configuration = 3;
 }
 
 message StorageSystemModels {

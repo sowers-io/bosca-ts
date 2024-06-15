@@ -24,17 +24,25 @@ import "bosca/content/model.proto";
 import "bosca/content/workflows.proto";
 import "bosca/content/storage_systems.proto";
 import "bosca/content/traits.proto";
+import "bosca/content/prompts.proto";
 import "bosca/content/permissions.proto";
 import "bosca/content/url.proto";
+import "bosca/content/sources.proto";
 import "bosca/empty.proto";
 import "bosca/requests.proto";
 
 package bosca.content;
 
 service ContentService {
-  rpc GetWorkflowById(bosca.IdRequest) returns (Workflow) {
+  rpc GetSources(bosca.Empty) returns (Sources) {
     option (google.api.http) = {
-      get: "/v1/content/workflows/{id}"
+      get: "/v1/content/sources"
+    };
+  }
+
+  rpc GetSource(bosca.IdRequest) returns (Source) {
+    option (google.api.http) = {
+      get: "/v1/content/sources/{id}"
     };
   }
 
@@ -44,9 +52,21 @@ service ContentService {
     };
   }
 
+  rpc GetWorkflow(bosca.IdRequest) returns (Workflow) {
+    option (google.api.http) = {
+      get: "/v1/content/workflows/{id}"
+    };
+  }
+
   rpc GetModels(bosca.Empty) returns (Models) {
     option (google.api.http) = {
       get: "/v1/content/models"
+    };
+  }
+
+  rpc GetPrompts(bosca.Empty) returns (Prompts) {
+    option (google.api.http) = {
+      get: "/v1/content/prompts"
     };
   }
 
@@ -68,7 +88,7 @@ service ContentService {
     };
   }
 
-  rpc GetWorkflowStateById(bosca.IdRequest) returns (WorkflowState) {
+  rpc GetWorkflowState(bosca.IdRequest) returns (WorkflowState) {
     option (google.api.http) = {
       get: "/v1/content/workflowstates/{id}"
     };
@@ -80,21 +100,33 @@ service ContentService {
     };
   }
 
-  rpc GetTraitById(bosca.IdRequest) returns (Trait) {
-    option (google.api.http) = {
-      get: "/v1/content/traits/{id}"
-    };
-  }
-
   rpc GetTraits(bosca.Empty) returns (Traits) {
     option (google.api.http) = {
       get: "/v1/content/traits"
     };
   }
 
-  rpc GetTraitWorkflowStorageSystems(TraitWorkflowStorageSystemRequest) returns (StorageSystems) {
+  rpc GetTrait(bosca.IdRequest) returns (Trait) {
     option (google.api.http) = {
-      get: "/v1/content/traits/{trait_id}/workflow/{workflow_id}/storagesystems"
+      get: "/v1/content/traits/{id}"
+    };
+  }
+
+  rpc GetTraitWorkflowInstance(TraitWorkflowIdRequest) returns (WorkflowInstance) {
+    option (google.api.http) = {
+      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}"
+    };
+  }
+
+  rpc GetTraitWorkflowStorageSystems(TraitWorkflowActivityIdRequest) returns (WorkflowActivityStorageSystems) {
+    option (google.api.http) = {
+      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/storagesystems"
+    };
+  }
+
+  rpc GetTraitWorkflowPrompts(TraitWorkflowActivityIdRequest) returns (WorkflowActivityPrompts) {
+    option (google.api.http) = {
+      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/prompts"
     };
   }
 
@@ -138,6 +170,13 @@ service ContentService {
   rpc AddCollectionPermission(Permission) returns (bosca.Empty) {
     option (google.api.http) = {
       post: "/v1/content/collections/{id}/permissions"
+      body: "*"
+    };
+  }
+
+  rpc AddCollectionItem(AddCollectionItemRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/collections/{collection_id}/item"
       body: "*"
     };
   }

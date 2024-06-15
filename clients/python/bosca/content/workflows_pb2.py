@@ -13,9 +13,11 @@ _sym_db = _symbol_database.Default()
 
 
 from bosca.content import metadata_pb2 as bosca_dot_content_dot_metadata__pb2
+from bosca.content import prompts_pb2 as bosca_dot_content_dot_prompts__pb2
+from bosca.content import storage_systems_pb2 as bosca_dot_content_dot_storage__systems__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1d\x62osca/content/workflows.proto\x12\rbosca.content\x1a\x1c\x62osca/content/metadata.proto\"7\n\tWorkflows\x12*\n\tworkflows\x18\x01 \x03(\x0b\x32\x17.bosca.content.Workflow\"\xc1\x01\n\x08Workflow\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\r\n\x05queue\x18\x04 \x01(\t\x12\x41\n\rconfiguration\x18\x05 \x03(\x0b\x32*.bosca.content.Workflow.ConfigurationEntry\x1a\x34\n\x12\x43onfigurationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\">\n\x0eWorkflowStates\x12,\n\x06states\x18\x01 \x03(\x0b\x32\x1c.bosca.content.WorkflowState\"\x80\x03\n\rWorkflowState\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12.\n\x04type\x18\x04 \x01(\x0e\x32 .bosca.content.WorkflowStateType\x12\x46\n\rconfiguration\x18\x05 \x03(\x0b\x32/.bosca.content.WorkflowState.ConfigurationEntry\x12\x18\n\x0bworkflow_id\x18\x06 \x01(\tH\x00\x88\x01\x01\x12\x1e\n\x11\x65ntry_workflow_id\x18\x07 \x01(\tH\x01\x88\x01\x01\x12\x1d\n\x10\x65xit_workflow_id\x18\x08 \x01(\tH\x02\x88\x01\x01\x1a\x34\n\x12\x43onfigurationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0e\n\x0c_workflow_idB\x14\n\x12_entry_workflow_idB\x13\n\x11_exit_workflow_id\"W\n\x18WorkflowStateTransitions\x12;\n\x0btransitions\x18\x01 \x03(\x0b\x32&.bosca.content.WorkflowStateTransition\"Z\n\x17WorkflowStateTransition\x12\x15\n\rfrom_state_id\x18\x01 \x01(\t\x12\x13\n\x0bto_state_id\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\"a\n\x19TransitionWorkflowRequest\x12\x13\n\x0bmetadata_id\x18\x01 \x01(\t\x12\x10\n\x08state_id\x18\x02 \x01(\t\x12\x0e\n\x06status\x18\x03 \x01(\t\x12\r\n\x05retry\x18\x04 \x01(\x08\"Y\n!CompleteTransitionWorkflowRequest\x12\x13\n\x0bmetadata_id\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\x12\x0f\n\x07success\x18\x03 \x01(\x08\"p\n\rTraitWorkflow\x12\x10\n\x08trait_id\x18\x01 \x01(\t\x12\x13\n\x0bworkflow_id\x18\x02 \x01(\t\x12\r\n\x05queue\x18\x03 \x01(\t\x12)\n\x08metadata\x18\x04 \x01(\x0b\x32\x17.bosca.content.Metadata*\x8e\x01\n\x11WorkflowStateType\x12\x19\n\x15unknown_workflow_type\x10\x00\x12\x0e\n\nprocessing\x10\x01\x12\t\n\x05\x64raft\x10\x02\x12\x0b\n\x07pending\x10\x03\x12\x0c\n\x08\x61pproval\x10\x04\x12\x0c\n\x08\x61pproved\x10\x05\x12\r\n\tpublished\x10\x06\x12\x0b\n\x07\x66\x61ilure\x10\x07\x42%Z#bosca.io/api/protobuf/bosca/contentb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1d\x62osca/content/workflows.proto\x12\rbosca.content\x1a\x1c\x62osca/content/metadata.proto\x1a\x1b\x62osca/content/prompts.proto\x1a#bosca/content/storage_systems.proto\"7\n\tWorkflows\x12*\n\tworkflows\x18\x01 \x03(\x0b\x32\x17.bosca.content.Workflow\"e\n\x19WorkflowActivityParameter\x12\x0c\n\x04name\x18\x01 \x01(\t\x12:\n\x04type\x18\x02 \x01(\x0e\x32,.bosca.content.WorkflowActivityParameterType\"\xc5\x04\n\x10WorkflowActivity\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x16\n\x0e\x63hild_workflow\x18\x04 \x01(\x08\x12!\n\x14\x63hild_workflow_queue\x18\x05 \x01(\tH\x00\x88\x01\x01\x12I\n\rconfiguration\x18\x06 \x03(\x0b\x32\x32.bosca.content.WorkflowActivity.ConfigurationEntry\x12;\n\x06inputs\x18\x07 \x03(\x0b\x32+.bosca.content.WorkflowActivity.InputsEntry\x12=\n\x07outputs\x18\x08 \x03(\x0b\x32,.bosca.content.WorkflowActivity.OutputsEntry\x1a\x34\n\x12\x43onfigurationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1aW\n\x0bInputsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x37\n\x05value\x18\x02 \x01(\x0b\x32(.bosca.content.WorkflowActivityParameter:\x02\x38\x01\x1aX\n\x0cOutputsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x37\n\x05value\x18\x02 \x01(\x0b\x32(.bosca.content.WorkflowActivityParameter:\x02\x38\x01\x42\x17\n\x15_child_workflow_queue\"\xc1\x01\n\x08Workflow\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\r\n\x05queue\x18\x04 \x01(\t\x12\x41\n\rconfiguration\x18\x05 \x03(\x0b\x32*.bosca.content.Workflow.ConfigurationEntry\x1a\x34\n\x12\x43onfigurationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\">\n\x0eWorkflowStates\x12,\n\x06states\x18\x01 \x03(\x0b\x32\x1c.bosca.content.WorkflowState\"\x80\x03\n\rWorkflowState\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12.\n\x04type\x18\x04 \x01(\x0e\x32 .bosca.content.WorkflowStateType\x12\x46\n\rconfiguration\x18\x05 \x03(\x0b\x32/.bosca.content.WorkflowState.ConfigurationEntry\x12\x18\n\x0bworkflow_id\x18\x06 \x01(\tH\x00\x88\x01\x01\x12\x1e\n\x11\x65ntry_workflow_id\x18\x07 \x01(\tH\x01\x88\x01\x01\x12\x1d\n\x10\x65xit_workflow_id\x18\x08 \x01(\tH\x02\x88\x01\x01\x1a\x34\n\x12\x43onfigurationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0e\n\x0c_workflow_idB\x14\n\x12_entry_workflow_idB\x13\n\x11_exit_workflow_id\"W\n\x18WorkflowStateTransitions\x12;\n\x0btransitions\x18\x01 \x03(\x0b\x32&.bosca.content.WorkflowStateTransition\"Z\n\x17WorkflowStateTransition\x12\x15\n\rfrom_state_id\x18\x01 \x01(\t\x12\x13\n\x0bto_state_id\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\"a\n\x19TransitionWorkflowRequest\x12\x13\n\x0bmetadata_id\x18\x01 \x01(\t\x12\x10\n\x08state_id\x18\x02 \x01(\t\x12\x0e\n\x06status\x18\x03 \x01(\t\x12\r\n\x05retry\x18\x04 \x01(\x08\"Y\n!CompleteTransitionWorkflowRequest\x12\x13\n\x0bmetadata_id\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\x12\x0f\n\x07success\x18\x03 \x01(\x08\"\xfb\x01\n\x18WorkflowActivityInstance\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x31\n\x08\x61\x63tivity\x18\x02 \x01(\x0b\x32\x1f.bosca.content.WorkflowActivity\x12\x17\n\x0f\x65xecution_group\x18\x03 \x01(\x05\x12Q\n\rconfiguration\x18\x04 \x03(\x0b\x32:.bosca.content.WorkflowActivityInstance.ConfigurationEntry\x1a\x34\n\x12\x43onfigurationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xb5\x02\n\x10WorkflowInstance\x12\x10\n\x08trait_id\x18\x01 \x01(\t\x12)\n\x08workflow\x18\x02 \x01(\x0b\x32\x17.bosca.content.Workflow\x12;\n\nactivities\x18\x03 \x03(\x0b\x32\'.bosca.content.WorkflowActivityInstance\x12\r\n\x05queue\x18\x04 \x01(\t\x12)\n\x08metadata\x18\x05 \x01(\x0b\x32\x17.bosca.content.Metadata\x12=\n\x07\x63ontext\x18\x06 \x03(\x0b\x32,.bosca.content.WorkflowInstance.ContextEntry\x1a.\n\x0c\x43ontextEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x88\x01\n\x1eWorkflowActivityParameterValue\x12\x16\n\x0csingle_value\x18\x01 \x01(\tH\x00\x12\x45\n\x0b\x61rray_value\x18\x02 \x01(\x0b\x32..bosca.content.WorkflowActivityParameterValuesH\x00\x42\x07\n\x05value\"1\n\x1fWorkflowActivityParameterValues\x12\x0e\n\x06values\x18\x02 \x03(\t\"\x94\x04\n WorkflowActivityExecutionContext\x12\x31\n\x08workflow\x18\x01 \x01(\x0b\x32\x1f.bosca.content.WorkflowInstance\x12\x39\n\x08\x61\x63tivity\x18\x02 \x01(\x0b\x32\'.bosca.content.WorkflowActivityInstance\x12)\n\x08metadata\x18\x03 \x01(\x0b\x32\x17.bosca.content.Metadata\x12M\n\x07\x63ontext\x18\x04 \x03(\x0b\x32<.bosca.content.WorkflowActivityExecutionContext.ContextEntry\x12K\n\x06inputs\x18\x05 \x03(\x0b\x32;.bosca.content.WorkflowActivityExecutionContext.InputsEntry\x1a]\n\x0c\x43ontextEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12<\n\x05value\x18\x02 \x01(\x0b\x32-.bosca.content.WorkflowActivityParameterValue:\x02\x38\x01\x1a\\\n\x0bInputsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12<\n\x05value\x18\x02 \x01(\x0b\x32-.bosca.content.WorkflowActivityParameterValue:\x02\x38\x01\"\xe0\x02\n\x16WorkflowActivityResult\x12\x43\n\x07\x63ontext\x18\x02 \x03(\x0b\x32\x32.bosca.content.WorkflowActivityResult.ContextEntry\x12\x43\n\x07outputs\x18\x01 \x03(\x0b\x32\x32.bosca.content.WorkflowActivityResult.OutputsEntry\x1a]\n\x0c\x43ontextEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12<\n\x05value\x18\x02 \x01(\x0b\x32-.bosca.content.WorkflowActivityParameterValue:\x02\x38\x01\x1a]\n\x0cOutputsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12<\n\x05value\x18\x02 \x01(\x0b\x32-.bosca.content.WorkflowActivityParameterValue:\x02\x38\x01\"\xe3\x01\n\x1dWorkflowActivityStorageSystem\x12\x34\n\x0estorage_system\x18\x01 \x01(\x0b\x32\x1c.bosca.content.StorageSystem\x12V\n\rconfiguration\x18\x02 \x03(\x0b\x32?.bosca.content.WorkflowActivityStorageSystem.ConfigurationEntry\x1a\x34\n\x12\x43onfigurationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"_\n\x1eWorkflowActivityStorageSystems\x12=\n\x07systems\x18\x01 \x03(\x0b\x32,.bosca.content.WorkflowActivityStorageSystem\"\xc6\x01\n\x16WorkflowActivityPrompt\x12%\n\x06prompt\x18\x01 \x01(\x0b\x32\x15.bosca.content.Prompt\x12O\n\rconfiguration\x18\x02 \x03(\x0b\x32\x38.bosca.content.WorkflowActivityPrompt.ConfigurationEntry\x1a\x34\n\x12\x43onfigurationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"Q\n\x17WorkflowActivityPrompts\x12\x36\n\x07prompts\x18\x01 \x01(\x0b\x32%.bosca.content.WorkflowActivityPrompt*}\n\x1dWorkflowActivityParameterType\x12#\n\x1funknown_activity_parameter_type\x10\x00\x12\x0b\n\x07\x63ontext\x10\x01\x12\x11\n\rsupplementary\x10\x02\x12\x17\n\x13supplementary_array\x10\x03*\x8e\x01\n\x11WorkflowStateType\x12\x19\n\x15unknown_workflow_type\x10\x00\x12\x0e\n\nprocessing\x10\x01\x12\t\n\x05\x64raft\x10\x02\x12\x0b\n\x07pending\x10\x03\x12\x0c\n\x08\x61pproval\x10\x04\x12\x0c\n\x08\x61pproved\x10\x05\x12\r\n\tpublished\x10\x06\x12\x0b\n\x07\x66\x61ilure\x10\x07\x42%Z#bosca.io/api/protobuf/bosca/contentb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,32 +25,100 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'bosca.content.workflows_pb2
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z#bosca.io/api/protobuf/bosca/content'
+  _globals['_WORKFLOWACTIVITY_CONFIGURATIONENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITY_CONFIGURATIONENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWACTIVITY_INPUTSENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITY_INPUTSENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWACTIVITY_OUTPUTSENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITY_OUTPUTSENTRY']._serialized_options = b'8\001'
   _globals['_WORKFLOW_CONFIGURATIONENTRY']._loaded_options = None
   _globals['_WORKFLOW_CONFIGURATIONENTRY']._serialized_options = b'8\001'
   _globals['_WORKFLOWSTATE_CONFIGURATIONENTRY']._loaded_options = None
   _globals['_WORKFLOWSTATE_CONFIGURATIONENTRY']._serialized_options = b'8\001'
-  _globals['_WORKFLOWSTATETYPE']._serialized_start=1268
-  _globals['_WORKFLOWSTATETYPE']._serialized_end=1410
-  _globals['_WORKFLOWS']._serialized_start=78
-  _globals['_WORKFLOWS']._serialized_end=133
-  _globals['_WORKFLOW']._serialized_start=136
-  _globals['_WORKFLOW']._serialized_end=329
-  _globals['_WORKFLOW_CONFIGURATIONENTRY']._serialized_start=277
-  _globals['_WORKFLOW_CONFIGURATIONENTRY']._serialized_end=329
-  _globals['_WORKFLOWSTATES']._serialized_start=331
-  _globals['_WORKFLOWSTATES']._serialized_end=393
-  _globals['_WORKFLOWSTATE']._serialized_start=396
-  _globals['_WORKFLOWSTATE']._serialized_end=780
-  _globals['_WORKFLOWSTATE_CONFIGURATIONENTRY']._serialized_start=277
-  _globals['_WORKFLOWSTATE_CONFIGURATIONENTRY']._serialized_end=329
-  _globals['_WORKFLOWSTATETRANSITIONS']._serialized_start=782
-  _globals['_WORKFLOWSTATETRANSITIONS']._serialized_end=869
-  _globals['_WORKFLOWSTATETRANSITION']._serialized_start=871
-  _globals['_WORKFLOWSTATETRANSITION']._serialized_end=961
-  _globals['_TRANSITIONWORKFLOWREQUEST']._serialized_start=963
-  _globals['_TRANSITIONWORKFLOWREQUEST']._serialized_end=1060
-  _globals['_COMPLETETRANSITIONWORKFLOWREQUEST']._serialized_start=1062
-  _globals['_COMPLETETRANSITIONWORKFLOWREQUEST']._serialized_end=1151
-  _globals['_TRAITWORKFLOW']._serialized_start=1153
-  _globals['_TRAITWORKFLOW']._serialized_end=1265
+  _globals['_WORKFLOWACTIVITYINSTANCE_CONFIGURATIONENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITYINSTANCE_CONFIGURATIONENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWINSTANCE_CONTEXTENTRY']._loaded_options = None
+  _globals['_WORKFLOWINSTANCE_CONTEXTENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT_CONTEXTENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT_CONTEXTENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT_INPUTSENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT_INPUTSENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWACTIVITYRESULT_CONTEXTENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITYRESULT_CONTEXTENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWACTIVITYRESULT_OUTPUTSENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITYRESULT_OUTPUTSENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWACTIVITYSTORAGESYSTEM_CONFIGURATIONENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITYSTORAGESYSTEM_CONFIGURATIONENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWACTIVITYPROMPT_CONFIGURATIONENTRY']._loaded_options = None
+  _globals['_WORKFLOWACTIVITYPROMPT_CONFIGURATIONENTRY']._serialized_options = b'8\001'
+  _globals['_WORKFLOWACTIVITYPARAMETERTYPE']._serialized_start=4163
+  _globals['_WORKFLOWACTIVITYPARAMETERTYPE']._serialized_end=4288
+  _globals['_WORKFLOWSTATETYPE']._serialized_start=4291
+  _globals['_WORKFLOWSTATETYPE']._serialized_end=4433
+  _globals['_WORKFLOWS']._serialized_start=144
+  _globals['_WORKFLOWS']._serialized_end=199
+  _globals['_WORKFLOWACTIVITYPARAMETER']._serialized_start=201
+  _globals['_WORKFLOWACTIVITYPARAMETER']._serialized_end=302
+  _globals['_WORKFLOWACTIVITY']._serialized_start=305
+  _globals['_WORKFLOWACTIVITY']._serialized_end=886
+  _globals['_WORKFLOWACTIVITY_CONFIGURATIONENTRY']._serialized_start=630
+  _globals['_WORKFLOWACTIVITY_CONFIGURATIONENTRY']._serialized_end=682
+  _globals['_WORKFLOWACTIVITY_INPUTSENTRY']._serialized_start=684
+  _globals['_WORKFLOWACTIVITY_INPUTSENTRY']._serialized_end=771
+  _globals['_WORKFLOWACTIVITY_OUTPUTSENTRY']._serialized_start=773
+  _globals['_WORKFLOWACTIVITY_OUTPUTSENTRY']._serialized_end=861
+  _globals['_WORKFLOW']._serialized_start=889
+  _globals['_WORKFLOW']._serialized_end=1082
+  _globals['_WORKFLOW_CONFIGURATIONENTRY']._serialized_start=630
+  _globals['_WORKFLOW_CONFIGURATIONENTRY']._serialized_end=682
+  _globals['_WORKFLOWSTATES']._serialized_start=1084
+  _globals['_WORKFLOWSTATES']._serialized_end=1146
+  _globals['_WORKFLOWSTATE']._serialized_start=1149
+  _globals['_WORKFLOWSTATE']._serialized_end=1533
+  _globals['_WORKFLOWSTATE_CONFIGURATIONENTRY']._serialized_start=630
+  _globals['_WORKFLOWSTATE_CONFIGURATIONENTRY']._serialized_end=682
+  _globals['_WORKFLOWSTATETRANSITIONS']._serialized_start=1535
+  _globals['_WORKFLOWSTATETRANSITIONS']._serialized_end=1622
+  _globals['_WORKFLOWSTATETRANSITION']._serialized_start=1624
+  _globals['_WORKFLOWSTATETRANSITION']._serialized_end=1714
+  _globals['_TRANSITIONWORKFLOWREQUEST']._serialized_start=1716
+  _globals['_TRANSITIONWORKFLOWREQUEST']._serialized_end=1813
+  _globals['_COMPLETETRANSITIONWORKFLOWREQUEST']._serialized_start=1815
+  _globals['_COMPLETETRANSITIONWORKFLOWREQUEST']._serialized_end=1904
+  _globals['_WORKFLOWACTIVITYINSTANCE']._serialized_start=1907
+  _globals['_WORKFLOWACTIVITYINSTANCE']._serialized_end=2158
+  _globals['_WORKFLOWACTIVITYINSTANCE_CONFIGURATIONENTRY']._serialized_start=630
+  _globals['_WORKFLOWACTIVITYINSTANCE_CONFIGURATIONENTRY']._serialized_end=682
+  _globals['_WORKFLOWINSTANCE']._serialized_start=2161
+  _globals['_WORKFLOWINSTANCE']._serialized_end=2470
+  _globals['_WORKFLOWINSTANCE_CONTEXTENTRY']._serialized_start=2424
+  _globals['_WORKFLOWINSTANCE_CONTEXTENTRY']._serialized_end=2470
+  _globals['_WORKFLOWACTIVITYPARAMETERVALUE']._serialized_start=2473
+  _globals['_WORKFLOWACTIVITYPARAMETERVALUE']._serialized_end=2609
+  _globals['_WORKFLOWACTIVITYPARAMETERVALUES']._serialized_start=2611
+  _globals['_WORKFLOWACTIVITYPARAMETERVALUES']._serialized_end=2660
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT']._serialized_start=2663
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT']._serialized_end=3195
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT_CONTEXTENTRY']._serialized_start=3008
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT_CONTEXTENTRY']._serialized_end=3101
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT_INPUTSENTRY']._serialized_start=3103
+  _globals['_WORKFLOWACTIVITYEXECUTIONCONTEXT_INPUTSENTRY']._serialized_end=3195
+  _globals['_WORKFLOWACTIVITYRESULT']._serialized_start=3198
+  _globals['_WORKFLOWACTIVITYRESULT']._serialized_end=3550
+  _globals['_WORKFLOWACTIVITYRESULT_CONTEXTENTRY']._serialized_start=3008
+  _globals['_WORKFLOWACTIVITYRESULT_CONTEXTENTRY']._serialized_end=3101
+  _globals['_WORKFLOWACTIVITYRESULT_OUTPUTSENTRY']._serialized_start=3457
+  _globals['_WORKFLOWACTIVITYRESULT_OUTPUTSENTRY']._serialized_end=3550
+  _globals['_WORKFLOWACTIVITYSTORAGESYSTEM']._serialized_start=3553
+  _globals['_WORKFLOWACTIVITYSTORAGESYSTEM']._serialized_end=3780
+  _globals['_WORKFLOWACTIVITYSTORAGESYSTEM_CONFIGURATIONENTRY']._serialized_start=630
+  _globals['_WORKFLOWACTIVITYSTORAGESYSTEM_CONFIGURATIONENTRY']._serialized_end=682
+  _globals['_WORKFLOWACTIVITYSTORAGESYSTEMS']._serialized_start=3782
+  _globals['_WORKFLOWACTIVITYSTORAGESYSTEMS']._serialized_end=3877
+  _globals['_WORKFLOWACTIVITYPROMPT']._serialized_start=3880
+  _globals['_WORKFLOWACTIVITYPROMPT']._serialized_end=4078
+  _globals['_WORKFLOWACTIVITYPROMPT_CONFIGURATIONENTRY']._serialized_start=630
+  _globals['_WORKFLOWACTIVITYPROMPT_CONFIGURATIONENTRY']._serialized_end=682
+  _globals['_WORKFLOWACTIVITYPROMPTS']._serialized_start=4080
+  _globals['_WORKFLOWACTIVITYPROMPTS']._serialized_end=4161
 # @@protoc_insertion_point(module_scope)

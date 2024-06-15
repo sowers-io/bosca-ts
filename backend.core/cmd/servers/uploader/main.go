@@ -19,6 +19,7 @@ package main
 import (
 	content2 "bosca.io/api/content"
 	"bosca.io/api/graphql/common"
+	"bosca.io/api/protobuf/bosca"
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
@@ -118,6 +119,18 @@ func main() {
 
 	contentClient := content.NewContentServiceClient(contentConnection)
 
+	source, err := contentClient.GetSource(context.Background(), &bosca.IdRequest{
+		Id: "uploader",
+	})
+	if err != nil {
+		slog.Error("failed to get source: ", slog.Any("error", err))
+		os.Exit(1)
+	}
+	if source == nil {
+		slog.Error("source (uploader) is missing: ", slog.Any("error", err))
+		os.Exit(1)
+	}
+
 	s3config, err := config.LoadDefaultConfig(
 		context.Background(),
 		config.WithRegion(cfg.Storage.S3.Region),
@@ -186,12 +199,14 @@ func main() {
 			if hook.Upload.MetaData["trait"] != "" {
 				traits = append(traits, hook.Upload.MetaData["trait"])
 			}
+
 			metadata := &content.Metadata{
-				Name:          hook.Upload.MetaData["name"],
-				ContentType:   hook.Upload.MetaData["filetype"],
-				TraitIds:      traits,
-				ContentLength: hook.Upload.Size,
-				Source:        &hook.Upload.ID,
+				Name:             hook.Upload.MetaData["name"],
+				ContentType:      hook.Upload.MetaData["filetype"],
+				TraitIds:         traits,
+				ContentLength:    hook.Upload.Size,
+				SourceId:         &source.Id,
+				SourceIdentifier: &hook.Upload.ID,
 			}
 			_, err := contentClient.AddMetadata(context.Background(), &content.AddMetadataRequest{
 				Collection: collection,

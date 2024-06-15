@@ -12,21 +12,31 @@ class Traits(_message.Message):
     def __init__(self, traits: _Optional[_Iterable[_Union[Trait, _Mapping]]] = ...) -> None: ...
 
 class Trait(_message.Message):
-    __slots__ = ("id", "name", "description", "trait_workflow_ids")
+    __slots__ = ("id", "name", "description", "workflow_ids")
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
-    TRAIT_WORKFLOW_IDS_FIELD_NUMBER: _ClassVar[int]
+    WORKFLOW_IDS_FIELD_NUMBER: _ClassVar[int]
     id: str
     name: str
     description: str
-    trait_workflow_ids: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., description: _Optional[str] = ..., trait_workflow_ids: _Optional[_Iterable[str]] = ...) -> None: ...
+    workflow_ids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., description: _Optional[str] = ..., workflow_ids: _Optional[_Iterable[str]] = ...) -> None: ...
 
-class TraitWorkflowStorageSystemRequest(_message.Message):
+class TraitWorkflowIdRequest(_message.Message):
     __slots__ = ("trait_id", "workflow_id")
     TRAIT_ID_FIELD_NUMBER: _ClassVar[int]
     WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
     trait_id: str
     workflow_id: str
     def __init__(self, trait_id: _Optional[str] = ..., workflow_id: _Optional[str] = ...) -> None: ...
+
+class TraitWorkflowActivityIdRequest(_message.Message):
+    __slots__ = ("trait_id", "workflow_id", "activity_id")
+    TRAIT_ID_FIELD_NUMBER: _ClassVar[int]
+    WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
+    ACTIVITY_ID_FIELD_NUMBER: _ClassVar[int]
+    trait_id: str
+    workflow_id: str
+    activity_id: str
+    def __init__(self, trait_id: _Optional[str] = ..., workflow_id: _Optional[str] = ..., activity_id: _Optional[str] = ...) -> None: ...

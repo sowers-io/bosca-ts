@@ -89,6 +89,24 @@ func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollecti
 	return &protobuf.IdResponse{Id: id}, nil
 }
 
+func (svc *service) AddCollectionItem(ctx context.Context, request *grpc.AddCollectionItemRequest) (*protobuf.Empty, error) {
+	if request.GetChildCollectionId() != "" {
+		err := svc.ds.AddCollectionCollectionItems(ctx, request.CollectionId, []string{request.GetChildCollectionId()})
+		if err != nil {
+			return nil, err
+		}
+		return &protobuf.Empty{}, nil
+	}
+	if request.GetChildMetadataId() != "" {
+		err := svc.ds.AddCollectionMetadataItems(ctx, request.CollectionId, []string{request.GetChildMetadataId()})
+		if err != nil {
+			return nil, err
+		}
+		return &protobuf.Empty{}, nil
+	}
+	return nil, errors.New("must specify either childCollectionId or childMetadataId")
+}
+
 func (svc *service) DeleteCollection(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
 	err := svc.ds.DeleteCollection(ctx, request.Id)
 	if err != nil {

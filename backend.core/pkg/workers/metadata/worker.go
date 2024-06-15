@@ -17,8 +17,6 @@
 package metadata
 
 import (
-	"bosca.io/pkg/workers/common"
-	"bosca.io/pkg/workers/metadata/processor"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 )
@@ -29,10 +27,6 @@ func NewWorker(client client.Client) worker.Worker {
 	w := worker.New(client, TaskQueue, worker.Options{})
 	w.RegisterWorkflow(ProcessMetadata)
 	w.RegisterWorkflow(ProcessTraits)
-
-	w.RegisterActivity(common.GetMetadata)
-	w.RegisterActivity(processor.GetTraitWorkflows)
-	w.RegisterActivity(processor.CompleteTransition)
-	w.RegisterActivity(processor.TransitionTo)
+	w.RegisterWorkflow(DeleteTemporary)
 	return w
 }

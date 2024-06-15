@@ -48,12 +48,19 @@ class StorageSystems(_message.Message):
     def __init__(self, systems: _Optional[_Iterable[_Union[StorageSystem, _Mapping]]] = ...) -> None: ...
 
 class StorageSystemModel(_message.Message):
-    __slots__ = ("model", "type")
+    __slots__ = ("model", "configuration")
+    class ConfigurationEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     MODEL_FIELD_NUMBER: _ClassVar[int]
-    TYPE_FIELD_NUMBER: _ClassVar[int]
+    CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
     model: _model_pb2.Model
-    type: str
-    def __init__(self, model: _Optional[_Union[_model_pb2.Model, _Mapping]] = ..., type: _Optional[str] = ...) -> None: ...
+    configuration: _containers.ScalarMap[str, str]
+    def __init__(self, model: _Optional[_Union[_model_pb2.Model, _Mapping]] = ..., configuration: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class StorageSystemModels(_message.Message):
     __slots__ = ("models",)

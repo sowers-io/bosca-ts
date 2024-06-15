@@ -36,19 +36,19 @@ func (u *USX) FindChapterVerses() []*ChapterVerses {
 	for _, chapter := range u.Chapters {
 		chapters = append(chapters, &ChapterVerses{
 			Chapter: chapter,
-			Verses:  u.findVerses(chapter),
+			Verses:  findVerses(chapter),
 		})
 	}
 	return chapters
 }
 
-func (u *USX) findVerses(container NodeContainer) []*Verse {
+func findVerses(container NodeContainer) []*Verse {
 	verses := make([]*Verse, 0)
 	for _, node := range container.GetChildren() {
 		if verse, ok := node.(*Verse); ok {
 			verses = append(verses, verse)
 		} else if container, ok := node.(NodeContainer); ok {
-			verses = append(verses, u.findVerses(container)...)
+			verses = append(verses, findVerses(container)...)
 		}
 	}
 	return verses

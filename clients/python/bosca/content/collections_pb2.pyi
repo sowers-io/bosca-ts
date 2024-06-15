@@ -25,6 +25,16 @@ class AddCollectionRequest(_message.Message):
     collection: Collection
     def __init__(self, parent: _Optional[str] = ..., collection: _Optional[_Union[Collection, _Mapping]] = ...) -> None: ...
 
+class AddCollectionItemRequest(_message.Message):
+    __slots__ = ("collection_id", "child_collection_id", "child_metadata_id")
+    COLLECTION_ID_FIELD_NUMBER: _ClassVar[int]
+    CHILD_COLLECTION_ID_FIELD_NUMBER: _ClassVar[int]
+    CHILD_METADATA_ID_FIELD_NUMBER: _ClassVar[int]
+    collection_id: str
+    child_collection_id: str
+    child_metadata_id: str
+    def __init__(self, collection_id: _Optional[str] = ..., child_collection_id: _Optional[str] = ..., child_metadata_id: _Optional[str] = ...) -> None: ...
+
 class Collection(_message.Message):
     __slots__ = ("id", "name", "type", "category_ids", "tags", "attributes", "created", "modified")
     class AttributesEntry(_message.Message):

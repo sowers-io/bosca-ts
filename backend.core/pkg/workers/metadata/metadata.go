@@ -17,10 +17,8 @@
 package metadata
 
 import (
-	content2 "bosca.io/api/content"
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workers/common"
-	"bosca.io/pkg/workers/metadata/processor"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
 	"time"
@@ -48,6 +46,12 @@ func ProcessMetadata(ctx workflow.Context, id string) error {
 		return err
 	}
 
+	var wf *content.Workflow
+	err = workflow.ExecuteActivity(ctx, common.GetWorkflow, id).Get(ctx, &wf)
+	if err != nil {
+		return err
+	}
+
 	if metadata.TraitIds == nil || len(metadata.TraitIds) == 0 {
 		// TODO: run activity to guess traits
 	} else {
@@ -60,13 +64,10 @@ func ProcessMetadata(ctx workflow.Context, id string) error {
 		}
 	}
 
-	err = workflow.ExecuteActivity(ctx, processor.CompleteTransition, metadata).Get(ctx, &metadata)
+	err = workflow.ExecuteActivity(ctx, CompleteTransition, metadata.Id).Get(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	return workflow.ExecuteActivity(ctx, processor.TransitionTo, &processor.Transition{
-		Metadata: metadata,
-		StateId:  content2.WorkflowStateDraft,
-	}).Get(ctx, &metadata)
+	return workflow.ExecuteActivity(ctx, TransitionTo, metadata.Id, wf.Configuration["finalStateId"]).Get(ctx, nil)
 }

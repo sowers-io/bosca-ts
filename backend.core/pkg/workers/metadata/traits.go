@@ -17,9 +17,9 @@
 package metadata
 
 import (
+	"bosca.io/api/protobuf/bosca"
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workers/common"
-	"bosca.io/pkg/workers/metadata/processor"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
 	"time"
@@ -48,18 +48,31 @@ func ProcessTraits(ctx workflow.Context, id string) error {
 	}
 
 	if metadata.TraitIds != nil && len(metadata.TraitIds) > 0 {
-		var workflows []*content.TraitWorkflow
-		err = workflow.ExecuteActivity(ctx, processor.GetTraitWorkflows, metadata).Get(ctx, &workflows)
-		if err != nil {
-			return err
-		}
-
-		if workflows != nil {
-			for _, wf := range workflows {
+		contentService := common.GetWorkflowContentService(ctx)
+		serviceCtx := common.GetWorkflowServiceAuthorizedContext(ctx)
+		for _, traitId := range metadata.TraitIds {
+			trait, err := contentService.GetTrait(serviceCtx, &bosca.IdRequest{
+				Id: traitId,
+			})
+			if err != nil {
+				return err
+			}
+			for _, workflowId := range trait.WorkflowIds {
+				workflowInstance, err := contentService.GetTraitWorkflowInstance(
+					serviceCtx,
+					&content.TraitWorkflowIdRequest{
+						TraitId:    traitId,
+						WorkflowId: workflowId,
+					},
+				)
+				if err != nil {
+					return err
+				}
+				workflowInstance.Metadata = metadata
 				traitWorkflowCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
-					TaskQueue: wf.Queue,
+					TaskQueue: workflowInstance.Queue,
 				})
-				err = workflow.ExecuteChildWorkflow(traitWorkflowCtx, wf.WorkflowId, wf).Get(ctx, nil)
+				err = workflow.ExecuteChildWorkflow(traitWorkflowCtx, workflowId, workflowInstance).Get(ctx, nil)
 				if err != nil {
 					return err
 				}

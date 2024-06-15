@@ -33,6 +33,14 @@ message AddCollectionRequest {
   Collection collection = 2;
 }
 
+message AddCollectionItemRequest {
+  string collection_id = 1;
+  oneof item_id {
+    string child_collection_id = 2;
+    string child_metadata_id = 3;
+  }
+}
+
 message Collection {
   string id = 2;
   string name = 3;

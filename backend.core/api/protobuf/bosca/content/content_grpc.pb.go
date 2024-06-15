@@ -35,17 +35,22 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	ContentService_GetWorkflowById_FullMethodName                     = "/bosca.content.ContentService/GetWorkflowById"
+	ContentService_GetSources_FullMethodName                          = "/bosca.content.ContentService/GetSources"
+	ContentService_GetSource_FullMethodName                           = "/bosca.content.ContentService/GetSource"
 	ContentService_GetWorkflows_FullMethodName                        = "/bosca.content.ContentService/GetWorkflows"
+	ContentService_GetWorkflow_FullMethodName                         = "/bosca.content.ContentService/GetWorkflow"
 	ContentService_GetModels_FullMethodName                           = "/bosca.content.ContentService/GetModels"
+	ContentService_GetPrompts_FullMethodName                          = "/bosca.content.ContentService/GetPrompts"
 	ContentService_GetStorageSystems_FullMethodName                   = "/bosca.content.ContentService/GetStorageSystems"
 	ContentService_GetStorageSystem_FullMethodName                    = "/bosca.content.ContentService/GetStorageSystem"
 	ContentService_GetStorageSystemModels_FullMethodName              = "/bosca.content.ContentService/GetStorageSystemModels"
-	ContentService_GetWorkflowStateById_FullMethodName                = "/bosca.content.ContentService/GetWorkflowStateById"
+	ContentService_GetWorkflowState_FullMethodName                    = "/bosca.content.ContentService/GetWorkflowState"
 	ContentService_GetWorkflowStates_FullMethodName                   = "/bosca.content.ContentService/GetWorkflowStates"
-	ContentService_GetTraitById_FullMethodName                        = "/bosca.content.ContentService/GetTraitById"
 	ContentService_GetTraits_FullMethodName                           = "/bosca.content.ContentService/GetTraits"
+	ContentService_GetTrait_FullMethodName                            = "/bosca.content.ContentService/GetTrait"
+	ContentService_GetTraitWorkflowInstance_FullMethodName            = "/bosca.content.ContentService/GetTraitWorkflowInstance"
 	ContentService_GetTraitWorkflowStorageSystems_FullMethodName      = "/bosca.content.ContentService/GetTraitWorkflowStorageSystems"
+	ContentService_GetTraitWorkflowPrompts_FullMethodName             = "/bosca.content.ContentService/GetTraitWorkflowPrompts"
 	ContentService_GetRootCollectionItems_FullMethodName              = "/bosca.content.ContentService/GetRootCollectionItems"
 	ContentService_GetCollectionItems_FullMethodName                  = "/bosca.content.ContentService/GetCollectionItems"
 	ContentService_AddCollection_FullMethodName                       = "/bosca.content.ContentService/AddCollection"
@@ -53,6 +58,7 @@ const (
 	ContentService_DeleteCollection_FullMethodName                    = "/bosca.content.ContentService/DeleteCollection"
 	ContentService_GetCollectionPermissions_FullMethodName            = "/bosca.content.ContentService/GetCollectionPermissions"
 	ContentService_AddCollectionPermission_FullMethodName             = "/bosca.content.ContentService/AddCollectionPermission"
+	ContentService_AddCollectionItem_FullMethodName                   = "/bosca.content.ContentService/AddCollectionItem"
 	ContentService_CheckPermission_FullMethodName                     = "/bosca.content.ContentService/CheckPermission"
 	ContentService_GetMetadata_FullMethodName                         = "/bosca.content.ContentService/GetMetadata"
 	ContentService_GetMetadatas_FullMethodName                        = "/bosca.content.ContentService/GetMetadatas"
@@ -77,17 +83,22 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ContentServiceClient interface {
-	GetWorkflowById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Workflow, error)
+	GetSources(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Sources, error)
+	GetSource(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Source, error)
 	GetWorkflows(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Workflows, error)
+	GetWorkflow(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Workflow, error)
 	GetModels(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Models, error)
+	GetPrompts(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Prompts, error)
 	GetStorageSystems(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*StorageSystems, error)
 	GetStorageSystem(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystem, error)
 	GetStorageSystemModels(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystemModels, error)
-	GetWorkflowStateById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowState, error)
+	GetWorkflowState(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowState, error)
 	GetWorkflowStates(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*WorkflowStates, error)
-	GetTraitById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Trait, error)
 	GetTraits(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Traits, error)
-	GetTraitWorkflowStorageSystems(ctx context.Context, in *TraitWorkflowStorageSystemRequest, opts ...grpc.CallOption) (*StorageSystems, error)
+	GetTrait(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Trait, error)
+	GetTraitWorkflowInstance(ctx context.Context, in *TraitWorkflowIdRequest, opts ...grpc.CallOption) (*WorkflowInstance, error)
+	GetTraitWorkflowStorageSystems(ctx context.Context, in *TraitWorkflowActivityIdRequest, opts ...grpc.CallOption) (*WorkflowActivityStorageSystems, error)
+	GetTraitWorkflowPrompts(ctx context.Context, in *TraitWorkflowActivityIdRequest, opts ...grpc.CallOption) (*WorkflowActivityPrompts, error)
 	GetRootCollectionItems(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*CollectionItems, error)
 	GetCollectionItems(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*CollectionItems, error)
 	AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*bosca.IdResponse, error)
@@ -95,6 +106,7 @@ type ContentServiceClient interface {
 	DeleteCollection(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetCollectionPermissions(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
 	AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
+	AddCollectionItem(ctx context.Context, in *AddCollectionItemRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	CheckPermission(ctx context.Context, in *PermissionCheckRequest, opts ...grpc.CallOption) (*PermissionCheckResponse, error)
 	GetMetadata(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Metadata, error)
 	GetMetadatas(ctx context.Context, in *bosca.IdsRequest, opts ...grpc.CallOption) (*Metadatas, error)
@@ -123,10 +135,20 @@ func NewContentServiceClient(cc grpc.ClientConnInterface) ContentServiceClient {
 	return &contentServiceClient{cc}
 }
 
-func (c *contentServiceClient) GetWorkflowById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Workflow, error) {
+func (c *contentServiceClient) GetSources(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Sources, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Workflow)
-	err := c.cc.Invoke(ctx, ContentService_GetWorkflowById_FullMethodName, in, out, cOpts...)
+	out := new(Sources)
+	err := c.cc.Invoke(ctx, ContentService_GetSources_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetSource(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Source, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Source)
+	err := c.cc.Invoke(ctx, ContentService_GetSource_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -143,10 +165,30 @@ func (c *contentServiceClient) GetWorkflows(ctx context.Context, in *bosca.Empty
 	return out, nil
 }
 
+func (c *contentServiceClient) GetWorkflow(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Workflow, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Workflow)
+	err := c.cc.Invoke(ctx, ContentService_GetWorkflow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) GetModels(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Models, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Models)
 	err := c.cc.Invoke(ctx, ContentService_GetModels_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetPrompts(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Prompts, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Prompts)
+	err := c.cc.Invoke(ctx, ContentService_GetPrompts_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -183,10 +225,10 @@ func (c *contentServiceClient) GetStorageSystemModels(ctx context.Context, in *b
 	return out, nil
 }
 
-func (c *contentServiceClient) GetWorkflowStateById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowState, error) {
+func (c *contentServiceClient) GetWorkflowState(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowState, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(WorkflowState)
-	err := c.cc.Invoke(ctx, ContentService_GetWorkflowStateById_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ContentService_GetWorkflowState_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -203,16 +245,6 @@ func (c *contentServiceClient) GetWorkflowStates(ctx context.Context, in *bosca.
 	return out, nil
 }
 
-func (c *contentServiceClient) GetTraitById(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Trait, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Trait)
-	err := c.cc.Invoke(ctx, ContentService_GetTraitById_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *contentServiceClient) GetTraits(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Traits, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Traits)
@@ -223,10 +255,40 @@ func (c *contentServiceClient) GetTraits(ctx context.Context, in *bosca.Empty, o
 	return out, nil
 }
 
-func (c *contentServiceClient) GetTraitWorkflowStorageSystems(ctx context.Context, in *TraitWorkflowStorageSystemRequest, opts ...grpc.CallOption) (*StorageSystems, error) {
+func (c *contentServiceClient) GetTrait(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Trait, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(StorageSystems)
+	out := new(Trait)
+	err := c.cc.Invoke(ctx, ContentService_GetTrait_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetTraitWorkflowInstance(ctx context.Context, in *TraitWorkflowIdRequest, opts ...grpc.CallOption) (*WorkflowInstance, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowInstance)
+	err := c.cc.Invoke(ctx, ContentService_GetTraitWorkflowInstance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetTraitWorkflowStorageSystems(ctx context.Context, in *TraitWorkflowActivityIdRequest, opts ...grpc.CallOption) (*WorkflowActivityStorageSystems, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowActivityStorageSystems)
 	err := c.cc.Invoke(ctx, ContentService_GetTraitWorkflowStorageSystems_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetTraitWorkflowPrompts(ctx context.Context, in *TraitWorkflowActivityIdRequest, opts ...grpc.CallOption) (*WorkflowActivityPrompts, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowActivityPrompts)
+	err := c.cc.Invoke(ctx, ContentService_GetTraitWorkflowPrompts_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -297,6 +359,16 @@ func (c *contentServiceClient) AddCollectionPermission(ctx context.Context, in *
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.Empty)
 	err := c.cc.Invoke(ctx, ContentService_AddCollectionPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) AddCollectionItem(ctx context.Context, in *AddCollectionItemRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_AddCollectionItem_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -487,17 +559,22 @@ func (c *contentServiceClient) AddMetadataRelationship(ctx context.Context, in *
 // All implementations must embed UnimplementedContentServiceServer
 // for forward compatibility
 type ContentServiceServer interface {
-	GetWorkflowById(context.Context, *bosca.IdRequest) (*Workflow, error)
+	GetSources(context.Context, *bosca.Empty) (*Sources, error)
+	GetSource(context.Context, *bosca.IdRequest) (*Source, error)
 	GetWorkflows(context.Context, *bosca.Empty) (*Workflows, error)
+	GetWorkflow(context.Context, *bosca.IdRequest) (*Workflow, error)
 	GetModels(context.Context, *bosca.Empty) (*Models, error)
+	GetPrompts(context.Context, *bosca.Empty) (*Prompts, error)
 	GetStorageSystems(context.Context, *bosca.Empty) (*StorageSystems, error)
 	GetStorageSystem(context.Context, *bosca.IdRequest) (*StorageSystem, error)
 	GetStorageSystemModels(context.Context, *bosca.IdRequest) (*StorageSystemModels, error)
-	GetWorkflowStateById(context.Context, *bosca.IdRequest) (*WorkflowState, error)
+	GetWorkflowState(context.Context, *bosca.IdRequest) (*WorkflowState, error)
 	GetWorkflowStates(context.Context, *bosca.Empty) (*WorkflowStates, error)
-	GetTraitById(context.Context, *bosca.IdRequest) (*Trait, error)
 	GetTraits(context.Context, *bosca.Empty) (*Traits, error)
-	GetTraitWorkflowStorageSystems(context.Context, *TraitWorkflowStorageSystemRequest) (*StorageSystems, error)
+	GetTrait(context.Context, *bosca.IdRequest) (*Trait, error)
+	GetTraitWorkflowInstance(context.Context, *TraitWorkflowIdRequest) (*WorkflowInstance, error)
+	GetTraitWorkflowStorageSystems(context.Context, *TraitWorkflowActivityIdRequest) (*WorkflowActivityStorageSystems, error)
+	GetTraitWorkflowPrompts(context.Context, *TraitWorkflowActivityIdRequest) (*WorkflowActivityPrompts, error)
 	GetRootCollectionItems(context.Context, *bosca.Empty) (*CollectionItems, error)
 	GetCollectionItems(context.Context, *bosca.IdRequest) (*CollectionItems, error)
 	AddCollection(context.Context, *AddCollectionRequest) (*bosca.IdResponse, error)
@@ -505,6 +582,7 @@ type ContentServiceServer interface {
 	DeleteCollection(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
 	GetCollectionPermissions(context.Context, *bosca.IdRequest) (*Permissions, error)
 	AddCollectionPermission(context.Context, *Permission) (*bosca.Empty, error)
+	AddCollectionItem(context.Context, *AddCollectionItemRequest) (*bosca.Empty, error)
 	CheckPermission(context.Context, *PermissionCheckRequest) (*PermissionCheckResponse, error)
 	GetMetadata(context.Context, *bosca.IdRequest) (*Metadata, error)
 	GetMetadatas(context.Context, *bosca.IdsRequest) (*Metadatas, error)
@@ -530,14 +608,23 @@ type ContentServiceServer interface {
 type UnimplementedContentServiceServer struct {
 }
 
-func (UnimplementedContentServiceServer) GetWorkflowById(context.Context, *bosca.IdRequest) (*Workflow, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowById not implemented")
+func (UnimplementedContentServiceServer) GetSources(context.Context, *bosca.Empty) (*Sources, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSources not implemented")
+}
+func (UnimplementedContentServiceServer) GetSource(context.Context, *bosca.IdRequest) (*Source, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSource not implemented")
 }
 func (UnimplementedContentServiceServer) GetWorkflows(context.Context, *bosca.Empty) (*Workflows, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflows not implemented")
 }
+func (UnimplementedContentServiceServer) GetWorkflow(context.Context, *bosca.IdRequest) (*Workflow, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflow not implemented")
+}
 func (UnimplementedContentServiceServer) GetModels(context.Context, *bosca.Empty) (*Models, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetModels not implemented")
+}
+func (UnimplementedContentServiceServer) GetPrompts(context.Context, *bosca.Empty) (*Prompts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPrompts not implemented")
 }
 func (UnimplementedContentServiceServer) GetStorageSystems(context.Context, *bosca.Empty) (*StorageSystems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageSystems not implemented")
@@ -548,20 +635,26 @@ func (UnimplementedContentServiceServer) GetStorageSystem(context.Context, *bosc
 func (UnimplementedContentServiceServer) GetStorageSystemModels(context.Context, *bosca.IdRequest) (*StorageSystemModels, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageSystemModels not implemented")
 }
-func (UnimplementedContentServiceServer) GetWorkflowStateById(context.Context, *bosca.IdRequest) (*WorkflowState, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowStateById not implemented")
+func (UnimplementedContentServiceServer) GetWorkflowState(context.Context, *bosca.IdRequest) (*WorkflowState, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowState not implemented")
 }
 func (UnimplementedContentServiceServer) GetWorkflowStates(context.Context, *bosca.Empty) (*WorkflowStates, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowStates not implemented")
 }
-func (UnimplementedContentServiceServer) GetTraitById(context.Context, *bosca.IdRequest) (*Trait, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTraitById not implemented")
-}
 func (UnimplementedContentServiceServer) GetTraits(context.Context, *bosca.Empty) (*Traits, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTraits not implemented")
 }
-func (UnimplementedContentServiceServer) GetTraitWorkflowStorageSystems(context.Context, *TraitWorkflowStorageSystemRequest) (*StorageSystems, error) {
+func (UnimplementedContentServiceServer) GetTrait(context.Context, *bosca.IdRequest) (*Trait, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTrait not implemented")
+}
+func (UnimplementedContentServiceServer) GetTraitWorkflowInstance(context.Context, *TraitWorkflowIdRequest) (*WorkflowInstance, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTraitWorkflowInstance not implemented")
+}
+func (UnimplementedContentServiceServer) GetTraitWorkflowStorageSystems(context.Context, *TraitWorkflowActivityIdRequest) (*WorkflowActivityStorageSystems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTraitWorkflowStorageSystems not implemented")
+}
+func (UnimplementedContentServiceServer) GetTraitWorkflowPrompts(context.Context, *TraitWorkflowActivityIdRequest) (*WorkflowActivityPrompts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTraitWorkflowPrompts not implemented")
 }
 func (UnimplementedContentServiceServer) GetRootCollectionItems(context.Context, *bosca.Empty) (*CollectionItems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRootCollectionItems not implemented")
@@ -583,6 +676,9 @@ func (UnimplementedContentServiceServer) GetCollectionPermissions(context.Contex
 }
 func (UnimplementedContentServiceServer) AddCollectionPermission(context.Context, *Permission) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollectionPermission not implemented")
+}
+func (UnimplementedContentServiceServer) AddCollectionItem(context.Context, *AddCollectionItemRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCollectionItem not implemented")
 }
 func (UnimplementedContentServiceServer) CheckPermission(context.Context, *PermissionCheckRequest) (*PermissionCheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPermission not implemented")
@@ -651,20 +747,38 @@ func RegisterContentServiceServer(s grpc.ServiceRegistrar, srv ContentServiceSer
 	s.RegisterService(&ContentService_ServiceDesc, srv)
 }
 
-func _ContentService_GetWorkflowById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ContentService_GetSources_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetSources(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetSources_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetSources(ctx, req.(*bosca.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.IdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContentServiceServer).GetWorkflowById(ctx, in)
+		return srv.(ContentServiceServer).GetSource(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ContentService_GetWorkflowById_FullMethodName,
+		FullMethod: ContentService_GetSource_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).GetWorkflowById(ctx, req.(*bosca.IdRequest))
+		return srv.(ContentServiceServer).GetSource(ctx, req.(*bosca.IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -687,6 +801,24 @@ func _ContentService_GetWorkflows_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_GetWorkflow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetWorkflow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetWorkflow_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetWorkflow(ctx, req.(*bosca.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_GetModels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.Empty)
 	if err := dec(in); err != nil {
@@ -701,6 +833,24 @@ func _ContentService_GetModels_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).GetModels(ctx, req.(*bosca.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetPrompts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetPrompts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetPrompts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetPrompts(ctx, req.(*bosca.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -759,20 +909,20 @@ func _ContentService_GetStorageSystemModels_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContentService_GetWorkflowStateById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ContentService_GetWorkflowState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.IdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContentServiceServer).GetWorkflowStateById(ctx, in)
+		return srv.(ContentServiceServer).GetWorkflowState(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ContentService_GetWorkflowStateById_FullMethodName,
+		FullMethod: ContentService_GetWorkflowState_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).GetWorkflowStateById(ctx, req.(*bosca.IdRequest))
+		return srv.(ContentServiceServer).GetWorkflowState(ctx, req.(*bosca.IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -795,24 +945,6 @@ func _ContentService_GetWorkflowStates_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContentService_GetTraitById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(bosca.IdRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ContentServiceServer).GetTraitById(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ContentService_GetTraitById_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).GetTraitById(ctx, req.(*bosca.IdRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ContentService_GetTraits_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.Empty)
 	if err := dec(in); err != nil {
@@ -831,8 +963,44 @@ func _ContentService_GetTraits_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_GetTrait_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetTrait(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetTrait_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetTrait(ctx, req.(*bosca.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetTraitWorkflowInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TraitWorkflowIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetTraitWorkflowInstance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetTraitWorkflowInstance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetTraitWorkflowInstance(ctx, req.(*TraitWorkflowIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_GetTraitWorkflowStorageSystems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TraitWorkflowStorageSystemRequest)
+	in := new(TraitWorkflowActivityIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -844,7 +1012,25 @@ func _ContentService_GetTraitWorkflowStorageSystems_Handler(srv interface{}, ctx
 		FullMethod: ContentService_GetTraitWorkflowStorageSystems_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).GetTraitWorkflowStorageSystems(ctx, req.(*TraitWorkflowStorageSystemRequest))
+		return srv.(ContentServiceServer).GetTraitWorkflowStorageSystems(ctx, req.(*TraitWorkflowActivityIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetTraitWorkflowPrompts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TraitWorkflowActivityIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetTraitWorkflowPrompts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetTraitWorkflowPrompts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetTraitWorkflowPrompts(ctx, req.(*TraitWorkflowActivityIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -971,6 +1157,24 @@ func _ContentService_AddCollectionPermission_Handler(srv interface{}, ctx contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).AddCollectionPermission(ctx, req.(*Permission))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_AddCollectionItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCollectionItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).AddCollectionItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_AddCollectionItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).AddCollectionItem(ctx, req.(*AddCollectionItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1307,16 +1511,28 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ContentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetWorkflowById",
-			Handler:    _ContentService_GetWorkflowById_Handler,
+			MethodName: "GetSources",
+			Handler:    _ContentService_GetSources_Handler,
+		},
+		{
+			MethodName: "GetSource",
+			Handler:    _ContentService_GetSource_Handler,
 		},
 		{
 			MethodName: "GetWorkflows",
 			Handler:    _ContentService_GetWorkflows_Handler,
 		},
 		{
+			MethodName: "GetWorkflow",
+			Handler:    _ContentService_GetWorkflow_Handler,
+		},
+		{
 			MethodName: "GetModels",
 			Handler:    _ContentService_GetModels_Handler,
+		},
+		{
+			MethodName: "GetPrompts",
+			Handler:    _ContentService_GetPrompts_Handler,
 		},
 		{
 			MethodName: "GetStorageSystems",
@@ -1331,24 +1547,32 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_GetStorageSystemModels_Handler,
 		},
 		{
-			MethodName: "GetWorkflowStateById",
-			Handler:    _ContentService_GetWorkflowStateById_Handler,
+			MethodName: "GetWorkflowState",
+			Handler:    _ContentService_GetWorkflowState_Handler,
 		},
 		{
 			MethodName: "GetWorkflowStates",
 			Handler:    _ContentService_GetWorkflowStates_Handler,
 		},
 		{
-			MethodName: "GetTraitById",
-			Handler:    _ContentService_GetTraitById_Handler,
-		},
-		{
 			MethodName: "GetTraits",
 			Handler:    _ContentService_GetTraits_Handler,
 		},
 		{
+			MethodName: "GetTrait",
+			Handler:    _ContentService_GetTrait_Handler,
+		},
+		{
+			MethodName: "GetTraitWorkflowInstance",
+			Handler:    _ContentService_GetTraitWorkflowInstance_Handler,
+		},
+		{
 			MethodName: "GetTraitWorkflowStorageSystems",
 			Handler:    _ContentService_GetTraitWorkflowStorageSystems_Handler,
+		},
+		{
+			MethodName: "GetTraitWorkflowPrompts",
+			Handler:    _ContentService_GetTraitWorkflowPrompts_Handler,
 		},
 		{
 			MethodName: "GetRootCollectionItems",
@@ -1377,6 +1601,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddCollectionPermission",
 			Handler:    _ContentService_AddCollectionPermission_Handler,
+		},
+		{
+			MethodName: "AddCollectionItem",
+			Handler:    _ContentService_AddCollectionItem_Handler,
 		},
 		{
 			MethodName: "CheckPermission",

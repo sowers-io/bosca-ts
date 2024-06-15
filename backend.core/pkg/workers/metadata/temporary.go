@@ -14,29 +14,16 @@
  * limitations under the License.
  */
 
-package bible
+package metadata
 
 import (
-	"bosca.io/api/protobuf/bosca/content"
-	"bosca.io/pkg/workers/bible/processor"
-	"go.temporal.io/sdk/client"
+	"bosca.io/pkg/workers/common"
 	"go.temporal.io/sdk/temporal"
-	"go.temporal.io/sdk/worker"
 	"go.temporal.io/sdk/workflow"
-
 	"time"
 )
 
-const TaskQueue = "bible"
-
-func NewWorker(client client.Client) worker.Worker {
-	w := worker.New(client, TaskQueue, worker.Options{})
-	w.RegisterWorkflow(ProcessBible)
-	w.RegisterActivity(processor.ProcessUSX)
-	return w
-}
-
-func ProcessBible(ctx workflow.Context, traitWorkflow *content.TraitWorkflow) error {
+func DeleteTemporary(ctx workflow.Context, id string) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second / 2,
 		BackoffCoefficient:     1.5,
@@ -52,7 +39,7 @@ func ProcessBible(ctx workflow.Context, traitWorkflow *content.TraitWorkflow) er
 
 	ctx = workflow.WithActivityOptions(ctx, options)
 
-	err := workflow.ExecuteActivity(ctx, processor.ProcessUSX, traitWorkflow).Get(ctx, nil)
+	err := workflow.ExecuteActivity(ctx, common.DeleteMetadata, id).Get(ctx, nil)
 	if err != nil {
 		return err
 	}

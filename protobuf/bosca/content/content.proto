@@ -120,13 +120,13 @@ service ContentService {
 
   rpc GetTraitWorkflowStorageSystems(TraitWorkflowActivityIdRequest) returns (WorkflowActivityStorageSystems) {
     option (google.api.http) = {
-      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/storagesystems"
+      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_instance_id}/storagesystems"
     };
   }
 
   rpc GetTraitWorkflowPrompts(TraitWorkflowActivityIdRequest) returns (WorkflowActivityPrompts) {
     option (google.api.http) = {
-      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/prompts"
+      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_instance_id}/prompts"
     };
   }
 
@@ -288,9 +288,16 @@ service ContentService {
     };
   }
 
-  rpc AddMetadataRelationship(AddMetadataRelationshipRequest) returns (bosca.Empty) {
+  rpc AddMetadataRelationship(MetadataRelationship) returns (bosca.Empty) {
     option (google.api.http) = {
       post: "/v1/content/metadata/{metadata_id1}/relationship/{metadata_id2}"
+      body: "*"
+    };
+  }
+
+  rpc GetMetadataRelationships(MetadataRelationshipIdRequest) returns (MetadataRelationships) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/relationships/{relationship}"
       body: "*"
     };
   }

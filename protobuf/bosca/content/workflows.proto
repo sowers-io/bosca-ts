@@ -112,6 +112,8 @@ message WorkflowActivityInstance {
   WorkflowActivity activity = 2;
   int32 execution_group = 3;
   map<string, string> configuration = 4;
+  map<string, WorkflowActivityParameterValue> inputs = 7;
+  map<string, WorkflowActivityParameterValue> outputs = 8;
 }
 
 message WorkflowInstance {
@@ -139,6 +141,7 @@ message WorkflowActivityExecutionContext {
   WorkflowActivityInstance activity = 2;
   Metadata metadata = 3;
   map<string, WorkflowActivityParameterValue> context = 4;
+  /* inputs from previous activity */
   map<string, WorkflowActivityParameterValue> inputs = 5;
 }
 

@@ -16,7 +16,7 @@
 
 import os
 
-from llama_index.core import VectorStoreIndex, Settings
+from llama_index.core import VectorStoreIndex, Settings, ServiceContext
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.llms.ollama import Ollama
 from llama_index.vector_stores.qdrant import QdrantVectorStore
@@ -28,7 +28,7 @@ from bosca.content.model_pb2 import Model
 
 class ChatContext(object):
 
-    def __init__(self, model: Model, storage_system: StorageSystem):
+    def __init__(self, model: Model, storage_system: StorageSystem, service_context: ServiceContext | None = None):
         client_connection_parts = os.environ["BOSCA_QDRANT_API_ADDRESS"].split(":")
 
         self.llm = Ollama(
@@ -53,9 +53,11 @@ class ChatContext(object):
         Settings.embed_model = self.embeddings
         Settings.callback_manager = self.llm.callback_manager
 
+        self.service_context = service_context
         self.vector_store = QdrantVectorStore(client=self.qdrant_vector_client,
                                               collection_name=storage_system.configuration["indexName"],
                                               parallel=2)
 
         self.vector_store_index = VectorStoreIndex.from_vector_store(vector_store=self.vector_store,
-                                                                     embed_model=self.embeddings)
+                                                                     embed_model=self.embeddings,
+                                                                     service_context=self.service_context)

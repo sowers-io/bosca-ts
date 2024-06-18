@@ -21,39 +21,34 @@ from temporalio import activity
 
 from bosca.content.content_pb2_grpc import ContentServiceStub
 from bosca.content.storage_systems_pb2 import StorageSystemType
-from bosca.content.traits_pb2 import TraitWorkflowStorageSystemRequest
-from bosca.content.workflows_pb2 import TraitWorkflow
+from bosca.content.traits_pb2 import TraitWorkflowActivityIdRequest
+from bosca.content.workflows_pb2 import WorkflowActivityExecutionContext
 from bosca.requests_pb2 import IdRequest
 from services.channel import new_channel
+from util.chat_context_factory import get_chat_context
 from util.download import download_file
-
-from util.chat_context import ChatContext
 
 
 @activity.defn(name="Vectorize")
-async def vectorize(workflow: TraitWorkflow):
+async def vectorize(execution_context: WorkflowActivityExecutionContext):
     logging.info('Starting to vectorize metadata')
 
     with new_channel() as channel:
         service = ContentServiceStub(channel=channel)
-        request = TraitWorkflowStorageSystemRequest(trait_id=workflow.trait_id, workflow_id=workflow.workflow_id)
+        request = TraitWorkflowActivityIdRequest(trait_id=execution_context.workflow.trait_id, workflow_id=execution_context.workflow.workflow.id, activity_instance_id=execution_context.activity.id)
         storage_systems = service.GetTraitWorkflowStorageSystems(request)
         for storage_system in storage_systems.systems:
             if storage_system.type == StorageSystemType.vector_storage_system:
-                models_request = IdRequest(id=storage_system.id)
-                models = service.GetStorageSystemModels(models_request)
-                for model in models.models:
-                    if model.type == "default":
-                        ctx = ChatContext(model=model.model, storage_system=storage_system)
-                        break
+                ctx = await get_chat_context(storage_system.id)
+                break
 
-        request = IdRequest(id=workflow.metadata.id)
+        request = IdRequest(id=execution_context.metadata.id)
         signed_url = service.GetMetadataDownloadUrl(request)
 
     file = download_file(signed_url)
     document = Document()
-    document.id_ = workflow.metadata.id
-    document.metadata["id"] = workflow.metadata.id
+    document.id_ = execution_context.metadata.id
+    document.metadata["id"] = execution_context.metadata.id
     document.set_content(file)
 
     ctx.vector_store_index.insert(document)

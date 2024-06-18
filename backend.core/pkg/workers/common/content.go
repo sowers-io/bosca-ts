@@ -20,41 +20,32 @@ import (
 	protobuf "bosca.io/api/protobuf/bosca"
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/util"
+	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 )
-
-func GetWorkflow(ctx context.Context, id string) (*content.Workflow, error) {
-	contentService := GetContentService(ctx)
-	return contentService.GetWorkflow(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
-		Id: id,
-	})
-}
-
-func GetMetadata(ctx context.Context, id string) (*content.Metadata, error) {
-	contentService := GetContentService(ctx)
-	return contentService.GetMetadata(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
-		Id: id,
-	})
-}
-
-func DeleteMetadata(ctx context.Context, id string) error {
-	contentService := GetContentService(ctx)
-	_, err := contentService.DeleteMetadata(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
-		Id: id,
-	})
-	return err
-}
 
 func DownloadTemporaryMetadataFile(ctx context.Context, id string) (*os.File, error) {
 	client := GetContentService(ctx)
 	signedUrl, err := client.GetMetadataDownloadUrl(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
 		Id: id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return DownloadTemporaryFile(ctx, signedUrl)
+}
+
+func DownloadTemporarySupplementaryFile(ctx context.Context, id string, supplementaryId *content.WorkflowActivityParameterValue) (*os.File, error) {
+	client := GetContentService(ctx)
+	signedUrl, err := client.GetMetadataSupplementaryDownloadUrl(GetServiceAuthorizedContext(ctx), &content.SupplementaryIdRequest{
+		Id:   id,
+		Type: supplementaryId.GetSingleValue(),
 	})
 	if err != nil {
 		return nil, err
@@ -89,10 +80,10 @@ func DownloadTemporaryFile(ctx context.Context, signedUrl *content.SignedUrl) (*
 	return file, err
 }
 
-func SetTextContent(ctx context.Context, id string, text string) error {
+func SetContent(ctx context.Context, metadataId string, data []byte) error {
 	contentService := GetContentService(ctx)
 	signedUrl, err := contentService.GetMetadataUploadUrl(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
-		Id: id,
+		Id: metadataId,
 	})
 	if err != nil {
 		return err
@@ -106,8 +97,8 @@ func SetTextContent(ctx context.Context, id string, text string) error {
 		Method:        signedUrl.Method,
 		URL:           uploadUrl,
 		Header:        util.GetSignedUrlHeaders(signedUrl),
-		Body:          io.NopCloser(strings.NewReader(text)),
-		ContentLength: int64(len(text)),
+		Body:          io.NopCloser(bytes.NewBuffer(data)),
+		ContentLength: int64(len(data)),
 	}
 	response, err := client.Do(request)
 	if err != nil {
@@ -116,6 +107,75 @@ func SetTextContent(ctx context.Context, id string, text string) error {
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK && response.StatusCode != http.StatusCreated && response.StatusCode != http.StatusAccepted && response.StatusCode != http.StatusNoContent {
 		return errors.New("failed to upload")
+	}
+	return nil
+}
+
+func SetSupplementaryContent(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext, supplementaryId *content.WorkflowActivityParameterValue, contentType string, data []byte) error {
+	svc := GetContentService(ctx)
+	uploadSignedUrl, err := svc.AddMetadataSupplementary(GetServiceAuthorizedContext(ctx), &content.AddSupplementaryRequest{
+		Id:            executionContext.Metadata.Id,
+		Type:          supplementaryId.GetSingleValue(),
+		Name:          "",
+		ContentType:   contentType,
+		ContentLength: int64(len(data)),
+	})
+	if err != nil {
+		return err
+	}
+	uploadUrl, err := url.Parse(uploadSignedUrl.Url)
+	if err != nil {
+		return err
+	}
+	request := &http.Request{
+		URL:           uploadUrl,
+		Method:        uploadSignedUrl.Method,
+		Header:        util.GetSignedUrlHeaders(uploadSignedUrl),
+		ContentLength: int64(len(data)),
+		Body:          io.NopCloser(bytes.NewBuffer(data)),
+	}
+	response, err := GetHttpClient(ctx).Do(request)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to upload extracted text: %d", response.StatusCode)
+	}
+	return nil
+}
+
+func SetSupplementaryContentFile(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext, supplementaryId *content.WorkflowActivityParameterValue, contentType string, file *os.File) error {
+	info, _ := file.Stat()
+	svc := GetContentService(ctx)
+	uploadSignedUrl, err := svc.AddMetadataSupplementary(GetServiceAuthorizedContext(ctx), &content.AddSupplementaryRequest{
+		Id:            executionContext.Metadata.Id,
+		Type:          supplementaryId.GetSingleValue(),
+		Name:          "",
+		ContentType:   contentType,
+		ContentLength: info.Size(),
+	})
+	if err != nil {
+		return err
+	}
+	uploadUrl, err := url.Parse(uploadSignedUrl.Url)
+	if err != nil {
+		return err
+	}
+	request := &http.Request{
+		URL:           uploadUrl,
+		Method:        uploadSignedUrl.Method,
+		Header:        util.GetSignedUrlHeaders(uploadSignedUrl),
+		ContentLength: info.Size(),
+		Body:          file,
+	}
+	response, err := GetHttpClient(ctx).Do(request)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to upload extracted text: %d", response.StatusCode)
 	}
 	return nil
 }

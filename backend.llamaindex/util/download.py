@@ -31,3 +31,13 @@ def download_file(signed_url: SignedUrl) -> str:
     if not response.ok:
         raise Exception("failed to download file")
     return response.text
+
+
+def upload_file(signed_url: SignedUrl, data: bytes):
+    headers = {}
+    for header in signed_url.headers:
+        headers[header.name] = header.value
+    response = requests.post(signed_url.url, headers=headers, data=data)
+    logging.debug("downloaded file: %s -> %s", signed_url.url, response.text)
+    if not response.ok:
+        raise Exception("failed to download file")

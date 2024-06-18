@@ -22,8 +22,8 @@ import os
 from temporalio.client import Client
 from temporalio.worker import Worker
 
-from workflows.vectorizer.vectorize import vectorize
-from workflows.vectorizer.workflow import Workflow
+from workflows.execute_table_prompt.execute_table_prompt import execute_table_prompt
+from workflows.execute_table_prompt.workflow import Workflow
 
 
 async def main():
@@ -37,7 +37,7 @@ async def main():
             client,
             task_queue="vectors",
             workflows=[Workflow],
-            activities=[vectorize],
+            activities=[execute_table_prompt],
             activity_executor=activity_executor,
             max_concurrent_activities=1
         )

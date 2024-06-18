@@ -19,16 +19,16 @@ from datetime import timedelta
 
 from temporalio import workflow
 
-from bosca.content.workflows_pb2 import TraitWorkflow
+from bosca.content.workflows_pb2 import WorkflowActivityExecutionContext
 
 with workflow.unsafe.imports_passed_through():
-    from workflows.vectorizer.vectorize import vectorize
+    from workflows.execute_table_prompt.execute_table_prompt import execute_table_prompt
 
 
-@workflow.defn(name="IndexVectors")
+@workflow.defn(name="ExecuteTablePrompt")
 class Workflow:
 
     @workflow.run
-    async def run(self, trait_workflow: TraitWorkflow) -> str:
-        logging.info("Workflow started with id: %s", trait_workflow.metadata.id)
-        return await workflow.execute_activity(vectorize, trait_workflow, start_to_close_timeout=timedelta(minutes=5))
+    async def run(self, execution_context: WorkflowActivityExecutionContext) -> str:
+        logging.info("Workflow started with id: %s", execution_context.metadata.id)
+        return await workflow.execute_activity(execute_table_prompt, execution_context, start_to_close_timeout=timedelta(minutes=5))

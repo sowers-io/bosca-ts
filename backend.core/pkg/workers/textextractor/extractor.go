@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package extractor
+package textextractor
 
 import (
 	protobuf "bosca.io/api/protobuf/bosca"
 	"bosca.io/api/protobuf/bosca/content"
-	"bosca.io/pkg/util"
 	"bosca.io/pkg/workers/common"
 	"context"
 	"fmt"
@@ -29,12 +28,6 @@ import (
 	"net/url"
 	"os"
 )
-
-type ExtractRequest struct {
-	Metadata *content.Metadata
-	Type     string
-	Name     string
-}
 
 func extractText(ctx context.Context, contentType string, metadataFile *os.File) (*http.Response, error) {
 	cfg := common.GetConfiguration(ctx)
@@ -51,7 +44,8 @@ func extractText(ctx context.Context, contentType string, metadataFile *os.File)
 			"Content-Type":   {contentType},
 			"Content-Length": {fmt.Sprintf("%d", file.Size())},
 		},
-		Body: metadataFile,
+		ContentLength: file.Size(),
+		Body:          metadataFile,
 	}
 	response, err := client.Do(request)
 	if err != nil {
@@ -63,50 +57,15 @@ func extractText(ctx context.Context, contentType string, metadataFile *os.File)
 	return response, nil
 }
 
-func AddSupplementaryText(ctx context.Context, extractRequest *ExtractRequest, file *os.File) error {
-	info, _ := file.Stat()
-	svc := common.GetContentService(ctx)
-	uploadSignedUrl, err := svc.AddMetadataSupplementary(common.GetServiceAuthorizedContext(ctx), &content.AddSupplementaryRequest{
-		Id:            extractRequest.Metadata.Id,
-		Type:          extractRequest.Type,
-		Name:          extractRequest.Name,
-		ContentType:   "text/plain",
-		ContentLength: info.Size(),
-	})
-	if err != nil {
-		return err
-	}
-	uploadUrl, err := url.Parse(uploadSignedUrl.Url)
-	if err != nil {
-		return err
-	}
-	request := &http.Request{
-		URL:           uploadUrl,
-		Method:        uploadSignedUrl.Method,
-		Header:        util.GetSignedUrlHeaders(uploadSignedUrl),
-		ContentLength: info.Size(),
-		Body:          file,
-	}
-	response, err := common.GetHttpClient(ctx).Do(request)
-	if err != nil {
-		return err
-	}
-	defer response.Body.Close()
-	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to upload extracted text: %d", response.StatusCode)
-	}
-	return nil
-}
-
-func Extract(ctx context.Context, extractRequest *ExtractRequest) error {
+func ExtractToSupplementaryText(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
 	metadataDownloadUrl, err := common.GetContentService(ctx).GetMetadataDownloadUrl(common.GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
-		Id: extractRequest.Metadata.Id,
+		Id: executionContext.Metadata.Id,
 	})
 	if err != nil {
 		return err
 	}
 	if metadataDownloadUrl == nil {
-		slog.WarnContext(ctx, "workflow download url is nil, nothing to do", slog.String("metadata_id", extractRequest.Metadata.Id))
+		slog.WarnContext(ctx, "workflow download url is nil, nothing to do", slog.String("metadata_id", executionContext.Metadata.Id))
 		return nil
 	}
 	metadataFile, err := common.DownloadTemporaryFile(ctx, metadataDownloadUrl)
@@ -114,27 +73,18 @@ func Extract(ctx context.Context, extractRequest *ExtractRequest) error {
 		return err
 	}
 	defer os.Remove(metadataFile.Name())
-	response, err := extractText(ctx, extractRequest.Metadata.ContentType, metadataFile)
+	response, err := extractText(ctx, executionContext.Metadata.ContentType, metadataFile)
 	if err != nil {
 		return err
 	}
 	defer response.Body.Close()
-
 	file, err := os.CreateTemp("/tmp", "extracted-text")
 	if err != nil {
 		return err
 	}
+	defer os.Remove(file.Name())
 	_, err = io.Copy(file, response.Body)
 	_, _ = file.Seek(0, 0)
-	defer os.Remove(file.Name())
-	return AddSupplementaryText(ctx, extractRequest, file)
-}
-
-func Cleanup(ctx context.Context, extractRequest ExtractRequest) error {
-	svc := common.GetContentService(ctx)
-	_, err := svc.DeleteMetadataSupplementary(common.GetServiceAuthorizedContext(ctx), &content.SupplementaryIdRequest{
-		Id:   extractRequest.Metadata.Id,
-		Type: extractRequest.Type,
-	})
-	return err
+	supplementaryId := executionContext.Activity.Outputs["supplementaryId"]
+	return common.SetSupplementaryContentFile(ctx, executionContext, supplementaryId, "text/plain", file)
 }

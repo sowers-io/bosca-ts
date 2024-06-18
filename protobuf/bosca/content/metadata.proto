@@ -58,10 +58,19 @@ message Metadatas {
   repeated Metadata metadata = 1;
 }
 
-message AddMetadataRelationshipRequest {
+message MetadataRelationshipIdRequest {
+  string id = 1;
+  string relationship = 2;
+}
+
+message MetadataRelationship {
   string metadata_id1 = 1;
   string metadata_id2 = 2;
   string relationship = 3;
+}
+
+message MetadataRelationships {
+    repeated MetadataRelationship relationships = 1;
 }
 
 message AddMetadataTraitRequest {

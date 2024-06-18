@@ -66,7 +66,15 @@ class Metadatas(_message.Message):
     metadata: _containers.RepeatedCompositeFieldContainer[Metadata]
     def __init__(self, metadata: _Optional[_Iterable[_Union[Metadata, _Mapping]]] = ...) -> None: ...
 
-class AddMetadataRelationshipRequest(_message.Message):
+class MetadataRelationshipIdRequest(_message.Message):
+    __slots__ = ("id", "relationship")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    RELATIONSHIP_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    relationship: str
+    def __init__(self, id: _Optional[str] = ..., relationship: _Optional[str] = ...) -> None: ...
+
+class MetadataRelationship(_message.Message):
     __slots__ = ("metadata_id1", "metadata_id2", "relationship")
     METADATA_ID1_FIELD_NUMBER: _ClassVar[int]
     METADATA_ID2_FIELD_NUMBER: _ClassVar[int]
@@ -75,6 +83,12 @@ class AddMetadataRelationshipRequest(_message.Message):
     metadata_id2: str
     relationship: str
     def __init__(self, metadata_id1: _Optional[str] = ..., metadata_id2: _Optional[str] = ..., relationship: _Optional[str] = ...) -> None: ...
+
+class MetadataRelationships(_message.Message):
+    __slots__ = ("relationships",)
+    RELATIONSHIPS_FIELD_NUMBER: _ClassVar[int]
+    relationships: _containers.RepeatedCompositeFieldContainer[MetadataRelationship]
+    def __init__(self, relationships: _Optional[_Iterable[_Union[MetadataRelationship, _Mapping]]] = ...) -> None: ...
 
 class AddMetadataTraitRequest(_message.Message):
     __slots__ = ("metadata_id", "trait_id")

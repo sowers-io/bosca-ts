@@ -18,7 +18,6 @@ package search
 
 import (
 	"bosca.io/api/protobuf/bosca/content"
-	"bosca.io/pkg/workers/search/processor"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
@@ -31,12 +30,12 @@ const TaskQueue = "search"
 
 func NewWorker(client client.Client) worker.Worker {
 	w := worker.New(client, TaskQueue, worker.Options{})
-	w.RegisterWorkflow(IndexSearch)
-	w.RegisterActivity(processor.AddToSearchIndex)
+	w.RegisterWorkflow(AddToSearchIndex)
+	w.RegisterActivity(AddToSearchIndex)
 	return w
 }
 
-func IndexSearch(ctx workflow.Context, traitWorkflow *content.TraitWorkflow) error {
+func AddToSearchIndex(ctx workflow.Context, executionContext *content.WorkflowActivityExecutionContext) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second / 2,
 		BackoffCoefficient:     1.5,
@@ -52,7 +51,7 @@ func IndexSearch(ctx workflow.Context, traitWorkflow *content.TraitWorkflow) err
 
 	ctx = workflow.WithActivityOptions(ctx, options)
 
-	err := workflow.ExecuteActivity(ctx, processor.AddToSearchIndex, traitWorkflow).Get(ctx, nil)
+	err := workflow.ExecuteActivity(ctx, AddToSearchIndex, executionContext).Get(ctx, nil)
 	if err != nil {
 		return err
 	}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package processor
+package activities
 
 import (
 	"bosca.io/api/protobuf/bosca"
@@ -25,11 +25,11 @@ import (
 	"os"
 )
 
-func AddToSearchIndex(ctx context.Context, traitWorkflow *content.TraitWorkflow) error {
+func AddToSearchIndex(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
 	svc := common.GetContentService(ctx)
 
 	signedUrl, err := svc.GetMetadataDownloadUrl(common.GetServiceAuthorizedContext(ctx), &bosca.IdRequest{
-		Id: traitWorkflow.Metadata.Id,
+		Id: executionContext.Metadata.Id,
 	})
 	if err != nil {
 		return err
@@ -48,8 +48,8 @@ func AddToSearchIndex(ctx context.Context, traitWorkflow *content.TraitWorkflow)
 
 	client := common.GetSearchClient(ctx)
 	return client.Index(client.GetMetadataIndex(), &search.Document{
-		Id:   traitWorkflow.Metadata.Id,
-		Name: traitWorkflow.Metadata.Name,
+		Id:   executionContext.Metadata.Id,
+		Name: executionContext.Metadata.Name,
 		Body: string(body),
 	})
 }

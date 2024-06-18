@@ -3,6 +3,8 @@ package workers
 import (
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workers/bible"
+	"bosca.io/pkg/workers/embeddings"
+	"bosca.io/pkg/workers/textextractor"
 	"context"
 	"errors"
 	"go.temporal.io/sdk/activity"
@@ -52,19 +54,19 @@ func ProcessWorkflow(ctx workflow.Context, executionContext *content.WorkflowAct
 	for _, group := range executionGroup {
 		futures := make([]workflow.Future, len(group))
 		for i, instance := range group {
-			instanceExecutionContextClone := make(map[string]*content.WorkflowActivityParameterValue)
-			for key, value := range executionContext.Context {
-				instanceExecutionContextClone[key] = value
+			inputs := make(map[string]*content.WorkflowActivityParameterValue)
+			for k, input := range instance.Inputs {
+				inputs[k] = input
 			}
-			instanceExecutionInputClone := make(map[string]*content.WorkflowActivityParameterValue)
-			for key, value := range executionContext.Inputs {
-				instanceExecutionInputClone[key] = value
+			for k, input := range executionContext.Inputs {
+				inputs[k] = input
 			}
 			instanceExecutionContext := &content.WorkflowActivityExecutionContext{
+				Metadata: executionContext.Metadata,
 				Workflow: executionContext.Workflow,
 				Activity: instance,
-				Context:  instanceExecutionContextClone,
-				Inputs:   instanceExecutionInputClone,
+				Context:  executionContext.Context,
+				Inputs:   inputs,
 			}
 			if instance.Activity.ChildWorkflow {
 				childQueue := executionContext.Workflow.Queue
@@ -99,27 +101,24 @@ func ProcessWorkflow(ctx workflow.Context, executionContext *content.WorkflowAct
 
 func ProcessActivity(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
 	switch executionContext.Activity.Activity.Id {
-	case "GenerateChapters":
-		return bible.GenerateChapters(ctx, executionContext)
-	/*
-			('ProcessTraits', 'Process Metadata Traits', 'Execute workflows based on metadata traits', '{}'::jsonb),
-		       ('ProcessSupplementaryTraits', 'Process Supplementary Metadata Traits', 'Execute workflows based on metadata supplementary traits', '{}'::jsonb),
-		       ('GeneratePendingEmbeddingsFromTable', 'Generate Pending Embeddings from a Table', 'Generate Pending Embeddings from a Table, the supplied `column` will be the data', '{}'::jsonb),
-		       ('ProcessUSX', 'Process USX', '', '{}'::jsonb),
-		       ('GenerateChapters', 'Generate chapters', '', '{}'::jsonb),
-		       ('GenerateChapterVerses', 'Generate verses', '', '{}'::jsonb),
-		       ('GenerateChapterVerseTable', 'Generate Chapter Verse Table', 'Generate chapter verse table for the purposes of generating verse labels', '{}'::jsonb),
-		       ('GenerateVerseLabelPendingEmbeddings', 'Generate Verse Label Pending Embeddings', '', '{}'::jsonb),
-		       ('ExtractText', 'Extract Text from Content', 'Extract text from the main content', '{}'::jsonb),
-		       ('ExecuteTablePrompt', 'Execute a table prompt', 'Execute a prompt by using the supplementary table data and save the results as supplementary data.  Uses context to leverage `inSupplementaryId` and `outSupplementaryId`', '{}'::jsonb),
-		       ('GenerateTextEmbeddings', 'Generate Embeddings', 'Generate embeddings based on main content', '{}'::jsonb),
-		       ('GenerateSupplementaryPendingEmbeddings', 'Generate Supplementary Embeddings', 'Generate embeddings based on supplementary content', '{}'::jsonb),
-		       ('AddToVectorIndex', 'Add to Vector Index', 'Add pending embeddings to vector index', '{}'::jsonb),
-		       ('AddToSearchIndex', 'Add to Search Index', 'Add text to search index', '{}'::jsonb),
-		       ('DeleteMetadata', 'Delete Metadata', 'Delete metadata', '{}'::jsonb),
-		       ('DeleteSupplementary', 'Del
-	*/
+	case "ProcessSupplementaryTraits":
+		panic("TODO")
+	case "ExtractToSupplementaryText":
+		return textextractor.ExtractToSupplementaryText(ctx, executionContext)
+	case "ExtractChaptersToMetadata":
+		return bible.ExtractChaptersToMetadata(ctx, executionContext)
+	case "ExtractVersesToMetadata":
+		return bible.ExtractVersesToMetadata(ctx, executionContext)
+	case "CreateSupplementaryVerseMarkdownTable":
+		return bible.CreateSupplementaryVerseMarkdownTable(ctx, executionContext)
+	case "CreatePendingEmbeddingsFromMarkdownTable":
+		return embeddings.CreatePendingEmbeddingsFromMarkdownTable(ctx, executionContext)
+	case "DeleteMetadata":
+		panic("TODO")
+	case "DeleteSupplementary":
+		panic("TODO")
 	default:
 		return errors.New("unknown activity id: " + executionContext.Activity.Activity.Id)
 	}
+	return nil
 }

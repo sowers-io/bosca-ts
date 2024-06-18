@@ -573,14 +573,14 @@ func request_ContentService_GetTraitWorkflowStorageSystems_0(ctx context.Context
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workflow_id", err)
 	}
 
-	val, ok = pathParams["activity_id"]
+	val, ok = pathParams["activity_instance_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "activity_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "activity_instance_id")
 	}
 
-	protoReq.ActivityId, err = runtime.String(val)
+	protoReq.ActivityInstanceId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "activity_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "activity_instance_id", err)
 	}
 
 	msg, err := client.GetTraitWorkflowStorageSystems(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -619,14 +619,14 @@ func local_request_ContentService_GetTraitWorkflowStorageSystems_0(ctx context.C
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workflow_id", err)
 	}
 
-	val, ok = pathParams["activity_id"]
+	val, ok = pathParams["activity_instance_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "activity_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "activity_instance_id")
 	}
 
-	protoReq.ActivityId, err = runtime.String(val)
+	protoReq.ActivityInstanceId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "activity_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "activity_instance_id", err)
 	}
 
 	msg, err := server.GetTraitWorkflowStorageSystems(ctx, &protoReq)
@@ -665,14 +665,14 @@ func request_ContentService_GetTraitWorkflowPrompts_0(ctx context.Context, marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workflow_id", err)
 	}
 
-	val, ok = pathParams["activity_id"]
+	val, ok = pathParams["activity_instance_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "activity_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "activity_instance_id")
 	}
 
-	protoReq.ActivityId, err = runtime.String(val)
+	protoReq.ActivityInstanceId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "activity_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "activity_instance_id", err)
 	}
 
 	msg, err := client.GetTraitWorkflowPrompts(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -711,14 +711,14 @@ func local_request_ContentService_GetTraitWorkflowPrompts_0(ctx context.Context,
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workflow_id", err)
 	}
 
-	val, ok = pathParams["activity_id"]
+	val, ok = pathParams["activity_instance_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "activity_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "activity_instance_id")
 	}
 
-	protoReq.ActivityId, err = runtime.String(val)
+	protoReq.ActivityInstanceId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "activity_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "activity_instance_id", err)
 	}
 
 	msg, err := server.GetTraitWorkflowPrompts(ctx, &protoReq)
@@ -2075,7 +2075,7 @@ func local_request_ContentService_CompleteTransitionWorkflow_0(ctx context.Conte
 }
 
 func request_ContentService_AddMetadataRelationship_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq AddMetadataRelationshipRequest
+	var protoReq MetadataRelationship
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
@@ -2115,7 +2115,7 @@ func request_ContentService_AddMetadataRelationship_0(ctx context.Context, marsh
 }
 
 func local_request_ContentService_AddMetadataRelationship_0(ctx context.Context, marshaler runtime.Marshaler, server ContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq AddMetadataRelationshipRequest
+	var protoReq MetadataRelationship
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
@@ -2150,6 +2150,86 @@ func local_request_ContentService_AddMetadataRelationship_0(ctx context.Context,
 	}
 
 	msg, err := server.AddMetadataRelationship(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_ContentService_GetMetadataRelationships_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MetadataRelationshipIdRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	val, ok = pathParams["relationship"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "relationship")
+	}
+
+	protoReq.Relationship, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "relationship", err)
+	}
+
+	msg, err := client.GetMetadataRelationships(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_ContentService_GetMetadataRelationships_0(ctx context.Context, marshaler runtime.Marshaler, server ContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MetadataRelationshipIdRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	val, ok = pathParams["relationship"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "relationship")
+	}
+
+	protoReq.Relationship, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "relationship", err)
+	}
+
+	msg, err := server.GetMetadataRelationships(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -2518,7 +2598,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetTraitWorkflowStorageSystems", runtime.WithHTTPPathPattern("/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/storagesystems"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetTraitWorkflowStorageSystems", runtime.WithHTTPPathPattern("/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_instance_id}/storagesystems"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2543,7 +2623,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetTraitWorkflowPrompts", runtime.WithHTTPPathPattern("/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/prompts"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetTraitWorkflowPrompts", runtime.WithHTTPPathPattern("/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_instance_id}/prompts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3210,6 +3290,31 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 
 	})
 
+	mux.Handle("POST", pattern_ContentService_GetMetadataRelationships_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataRelationships", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/relationships/{relationship}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_ContentService_GetMetadataRelationships_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_GetMetadataRelationships_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -3565,7 +3670,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetTraitWorkflowStorageSystems", runtime.WithHTTPPathPattern("/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/storagesystems"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetTraitWorkflowStorageSystems", runtime.WithHTTPPathPattern("/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_instance_id}/storagesystems"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3587,7 +3692,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetTraitWorkflowPrompts", runtime.WithHTTPPathPattern("/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/prompts"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetTraitWorkflowPrompts", runtime.WithHTTPPathPattern("/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_instance_id}/prompts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4175,6 +4280,28 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 
 	})
 
+	mux.Handle("POST", pattern_ContentService_GetMetadataRelationships_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataRelationships", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/relationships/{relationship}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ContentService_GetMetadataRelationships_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_GetMetadataRelationships_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -4207,9 +4334,9 @@ var (
 
 	pattern_ContentService_GetTraitWorkflowInstance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "traits", "trait_id", "workflows", "workflow_id"}, ""))
 
-	pattern_ContentService_GetTraitWorkflowStorageSystems_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"v1", "content", "traits", "trait_id", "workflows", "workflow_id", "activities", "activity_id", "storagesystems"}, ""))
+	pattern_ContentService_GetTraitWorkflowStorageSystems_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"v1", "content", "traits", "trait_id", "workflows", "workflow_id", "activities", "activity_instance_id", "storagesystems"}, ""))
 
-	pattern_ContentService_GetTraitWorkflowPrompts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"v1", "content", "traits", "trait_id", "workflows", "workflow_id", "activities", "activity_id", "prompts"}, ""))
+	pattern_ContentService_GetTraitWorkflowPrompts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 7, 2, 8}, []string{"v1", "content", "traits", "trait_id", "workflows", "workflow_id", "activities", "activity_instance_id", "prompts"}, ""))
 
 	pattern_ContentService_GetRootCollectionItems_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "content", "collections"}, ""))
 
@@ -4262,6 +4389,8 @@ var (
 	pattern_ContentService_CompleteTransitionWorkflow_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 2, 6}, []string{"v1", "content", "metadata", "metadata_id", "workflow", "transition", "complete"}, ""))
 
 	pattern_ContentService_AddMetadataRelationship_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "metadata", "metadata_id1", "relationship", "metadata_id2"}, ""))
+
+	pattern_ContentService_GetMetadataRelationships_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "metadata", "id", "relationships", "relationship"}, ""))
 )
 
 var (
@@ -4348,4 +4477,6 @@ var (
 	forward_ContentService_CompleteTransitionWorkflow_0 = runtime.ForwardResponseMessage
 
 	forward_ContentService_AddMetadataRelationship_0 = runtime.ForwardResponseMessage
+
+	forward_ContentService_GetMetadataRelationships_0 = runtime.ForwardResponseMessage
 )

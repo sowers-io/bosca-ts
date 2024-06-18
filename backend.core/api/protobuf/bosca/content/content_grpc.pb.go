@@ -77,6 +77,7 @@ const (
 	ContentService_BeginTransitionWorkflow_FullMethodName             = "/bosca.content.ContentService/BeginTransitionWorkflow"
 	ContentService_CompleteTransitionWorkflow_FullMethodName          = "/bosca.content.ContentService/CompleteTransitionWorkflow"
 	ContentService_AddMetadataRelationship_FullMethodName             = "/bosca.content.ContentService/AddMetadataRelationship"
+	ContentService_GetMetadataRelationships_FullMethodName            = "/bosca.content.ContentService/GetMetadataRelationships"
 )
 
 // ContentServiceClient is the client API for ContentService service.
@@ -124,7 +125,8 @@ type ContentServiceClient interface {
 	AddMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
 	BeginTransitionWorkflow(ctx context.Context, in *TransitionWorkflowRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	CompleteTransitionWorkflow(ctx context.Context, in *CompleteTransitionWorkflowRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
-	AddMetadataRelationship(ctx context.Context, in *AddMetadataRelationshipRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	AddMetadataRelationship(ctx context.Context, in *MetadataRelationship, opts ...grpc.CallOption) (*bosca.Empty, error)
+	GetMetadataRelationships(ctx context.Context, in *MetadataRelationshipIdRequest, opts ...grpc.CallOption) (*MetadataRelationships, error)
 }
 
 type contentServiceClient struct {
@@ -545,10 +547,20 @@ func (c *contentServiceClient) CompleteTransitionWorkflow(ctx context.Context, i
 	return out, nil
 }
 
-func (c *contentServiceClient) AddMetadataRelationship(ctx context.Context, in *AddMetadataRelationshipRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+func (c *contentServiceClient) AddMetadataRelationship(ctx context.Context, in *MetadataRelationship, opts ...grpc.CallOption) (*bosca.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.Empty)
 	err := c.cc.Invoke(ctx, ContentService_AddMetadataRelationship_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetMetadataRelationships(ctx context.Context, in *MetadataRelationshipIdRequest, opts ...grpc.CallOption) (*MetadataRelationships, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MetadataRelationships)
+	err := c.cc.Invoke(ctx, ContentService_GetMetadataRelationships_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -600,7 +612,8 @@ type ContentServiceServer interface {
 	AddMetadataPermission(context.Context, *Permission) (*bosca.Empty, error)
 	BeginTransitionWorkflow(context.Context, *TransitionWorkflowRequest) (*bosca.Empty, error)
 	CompleteTransitionWorkflow(context.Context, *CompleteTransitionWorkflowRequest) (*bosca.Empty, error)
-	AddMetadataRelationship(context.Context, *AddMetadataRelationshipRequest) (*bosca.Empty, error)
+	AddMetadataRelationship(context.Context, *MetadataRelationship) (*bosca.Empty, error)
+	GetMetadataRelationships(context.Context, *MetadataRelationshipIdRequest) (*MetadataRelationships, error)
 	mustEmbedUnimplementedContentServiceServer()
 }
 
@@ -731,8 +744,11 @@ func (UnimplementedContentServiceServer) BeginTransitionWorkflow(context.Context
 func (UnimplementedContentServiceServer) CompleteTransitionWorkflow(context.Context, *CompleteTransitionWorkflowRequest) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CompleteTransitionWorkflow not implemented")
 }
-func (UnimplementedContentServiceServer) AddMetadataRelationship(context.Context, *AddMetadataRelationshipRequest) (*bosca.Empty, error) {
+func (UnimplementedContentServiceServer) AddMetadataRelationship(context.Context, *MetadataRelationship) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataRelationship not implemented")
+}
+func (UnimplementedContentServiceServer) GetMetadataRelationships(context.Context, *MetadataRelationshipIdRequest) (*MetadataRelationships, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataRelationships not implemented")
 }
 func (UnimplementedContentServiceServer) mustEmbedUnimplementedContentServiceServer() {}
 
@@ -1486,7 +1502,7 @@ func _ContentService_CompleteTransitionWorkflow_Handler(srv interface{}, ctx con
 }
 
 func _ContentService_AddMetadataRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddMetadataRelationshipRequest)
+	in := new(MetadataRelationship)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1498,7 +1514,25 @@ func _ContentService_AddMetadataRelationship_Handler(srv interface{}, ctx contex
 		FullMethod: ContentService_AddMetadataRelationship_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).AddMetadataRelationship(ctx, req.(*AddMetadataRelationshipRequest))
+		return srv.(ContentServiceServer).AddMetadataRelationship(ctx, req.(*MetadataRelationship))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetMetadataRelationships_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MetadataRelationshipIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetMetadataRelationships(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetMetadataRelationships_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetMetadataRelationships(ctx, req.(*MetadataRelationshipIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1677,6 +1711,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddMetadataRelationship",
 			Handler:    _ContentService_AddMetadataRelationship_Handler,
+		},
+		{
+			MethodName: "GetMetadataRelationships",
+			Handler:    _ContentService_GetMetadataRelationships_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

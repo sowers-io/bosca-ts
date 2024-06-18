@@ -257,8 +257,13 @@ class ContentServiceStub(object):
                 _registered_method=True)
         self.AddMetadataRelationship = channel.unary_unary(
                 '/bosca.content.ContentService/AddMetadataRelationship',
-                request_serializer=bosca_dot_content_dot_metadata__pb2.AddMetadataRelationshipRequest.SerializeToString,
+                request_serializer=bosca_dot_content_dot_metadata__pb2.MetadataRelationship.SerializeToString,
                 response_deserializer=bosca_dot_empty__pb2.Empty.FromString,
+                _registered_method=True)
+        self.GetMetadataRelationships = channel.unary_unary(
+                '/bosca.content.ContentService/GetMetadataRelationships',
+                request_serializer=bosca_dot_content_dot_metadata__pb2.MetadataRelationshipIdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_metadata__pb2.MetadataRelationships.FromString,
                 _registered_method=True)
 
 
@@ -517,6 +522,12 @@ class ContentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetMetadataRelationships(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ContentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -727,8 +738,13 @@ def add_ContentServiceServicer_to_server(servicer, server):
             ),
             'AddMetadataRelationship': grpc.unary_unary_rpc_method_handler(
                     servicer.AddMetadataRelationship,
-                    request_deserializer=bosca_dot_content_dot_metadata__pb2.AddMetadataRelationshipRequest.FromString,
+                    request_deserializer=bosca_dot_content_dot_metadata__pb2.MetadataRelationship.FromString,
                     response_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
+            ),
+            'GetMetadataRelationships': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetMetadataRelationships,
+                    request_deserializer=bosca_dot_content_dot_metadata__pb2.MetadataRelationshipIdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_metadata__pb2.MetadataRelationships.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -1863,8 +1879,35 @@ class ContentService(object):
             request,
             target,
             '/bosca.content.ContentService/AddMetadataRelationship',
-            bosca_dot_content_dot_metadata__pb2.AddMetadataRelationshipRequest.SerializeToString,
+            bosca_dot_content_dot_metadata__pb2.MetadataRelationship.SerializeToString,
             bosca_dot_empty__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetMetadataRelationships(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetMetadataRelationships',
+            bosca_dot_content_dot_metadata__pb2.MetadataRelationshipIdRequest.SerializeToString,
+            bosca_dot_content_dot_metadata__pb2.MetadataRelationships.FromString,
             options,
             channel_credentials,
             insecure,

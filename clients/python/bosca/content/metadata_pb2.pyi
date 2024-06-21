@@ -75,14 +75,23 @@ class MetadataRelationshipIdRequest(_message.Message):
     def __init__(self, id: _Optional[str] = ..., relationship: _Optional[str] = ...) -> None: ...
 
 class MetadataRelationship(_message.Message):
-    __slots__ = ("metadata_id1", "metadata_id2", "relationship")
+    __slots__ = ("metadata_id1", "metadata_id2", "relationship", "attributes")
+    class AttributesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     METADATA_ID1_FIELD_NUMBER: _ClassVar[int]
     METADATA_ID2_FIELD_NUMBER: _ClassVar[int]
     RELATIONSHIP_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     metadata_id1: str
     metadata_id2: str
     relationship: str
-    def __init__(self, metadata_id1: _Optional[str] = ..., metadata_id2: _Optional[str] = ..., relationship: _Optional[str] = ...) -> None: ...
+    attributes: _containers.ScalarMap[str, str]
+    def __init__(self, metadata_id1: _Optional[str] = ..., metadata_id2: _Optional[str] = ..., relationship: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class MetadataRelationships(_message.Message):
     __slots__ = ("relationships",)

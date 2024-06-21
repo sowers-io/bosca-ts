@@ -24,10 +24,6 @@ create table models
     primary key (id)
 );
 
-insert into models (name, type, description, configuration)
-values ('phi3:medium-128k', 'ollama-llm', 'phi3:medium-128k', '{"vectorSize": "5120", "contextWindow": "120000"}'::jsonb),
-       ('phi3:mini', 'ollama-llm', 'phi3:mini', '{"vectorSize": "3072", "contextWindow": "8000"}'::jsonb);
-
 create table prompts
 (
     id          uuid    not null default gen_random_uuid(),
@@ -36,38 +32,6 @@ create table prompts
     prompt      text    not null,
     primary key (id)
 );
-
-insert into prompts (name, description, prompt)
-values ('Verse Labeler', '', $$You are a Biblical theologian who is also an expert in felt needs.  Your job is to classify verses, annotating them with felt needs.  Examples of the felt needs are:
-* salvation
-* forgiveness
-* assurance
-* deliverance
-* healing
-* provision
-* protection
-* guidance
-* wisdom
-* comfort
-* peace
-* joy
-* love
-* belonging
-* purpose
-* restoration
-* vindication
-* hope
-* strength
-* patience
-* faith
-* mercy
-* humility
-* holiness
-* worship
-You to add a column to the markdown table called `tags`, and fill that column with a set of felt needs that best apply to the given verse.
-
-{table}
-$$);
 
 create type storage_system_type as enum ('vector', 'search', 'supplementary');
 
@@ -85,25 +49,13 @@ create table storage_system_models
 (
     system_id     uuid  not null,
     model_id      uuid  not null,
-    configuration jsonb not null default '{"type": "default"}'::jsonb,
+    configuration jsonb not null default '{
+      "type": "default"
+    }'::jsonb,
     primary key (system_id, model_id),
     foreign key (system_id) references storage_systems (id),
     foreign key (model_id) references models (id)
 );
-
-insert into storage_systems (name, description, type, configuration)
-values ('Metadata Search Index', 'Index search content', 'search'::storage_system_type, '{"indexName": "metadata", "type": "meilisearch"}'::jsonb),
-       ('Bible Chapter Vector Index', 'Store Bible Chapter Data', 'vector'::storage_system_type, '{"indexName": "biblechapters", "type": "qdrant", "vectorSize": "3072"}'::jsonb),
-       ('Bible Verse Vector Index', 'Store Bible Verse Data', 'vector'::storage_system_type, '{"indexName": "bibleverses", "type": "qdrant", "vectorSize": "3072"}'::jsonb),
-       ('Bible Verse Label Vector Index', 'Store Bible Verse Label Data', 'vector'::storage_system_type, '{"indexName": "bibleverselabels", "type": "qdrant", "vectorSize": "3072"}'::jsonb);
-
-insert into storage_system_models (system_id, model_id)
-values ((select id from storage_systems where name = 'Bible Chapter Vector Index'),
-        (select id from models where name = 'phi3:mini'));
-
-insert into storage_system_models (system_id, model_id)
-values ((select id from storage_systems where name = 'Bible Verse Vector Index'),
-        (select id from models where name = 'phi3:mini'));
 
 create table workflows
 (
@@ -176,69 +128,6 @@ create table workflow_activity_instance_outputs
 
 create index ix_workflow_activity_instances_ix on workflow_activity_instances (workflow_id);
 
-insert into workflows (id, name, description, queue, configuration)
-values ('ProcessMetadata', 'Process Metadata', 'Process Metadata', 'metadata', '{"finalStateId": "draft"}'::jsonb),
-       ('DeleteTemporary', 'Delete Temporary Metadata', 'Delete Temporary Metadata', 'metadata', '{}'::jsonb),
-       ('ProcessTraits', 'Re-process traits', 'Process once they''ve already been processed', 'metadata', '{}'::jsonb),
-       ('ProcessBible', 'Process Bible', 'Process Bible', 'bible', '{}'::jsonb),
-       ('ProcessChapter', 'Process Chapter', 'Process Chapter', 'bible', '{}'::jsonb);
-
-insert into workflow_activities (id, name, description)
-values ('ProcessTraits', 'Process Metadata Traits', 'Execute workflows based on metadata traits'),
-       ('ProcessSupplementaryTraits', 'Process Supplementary Metadata Traits', 'Execute workflows based on metadata supplementary traits'),
-       ('GeneratePendingEmbeddingsFromTable', 'Generate Pending Embeddings from a Table', 'Generate Pending Embeddings from a Table, the supplied `column` will be the data'),
-       ('GenerateChapters', 'Generate chapters', ''),
-       ('GenerateChapterVerses', 'Generate verses', ''),
-       ('GenerateChapterVerseTable', 'Generate Chapter Verse Table', 'Generate chapter verse table for the purposes of generating verse labels'),
-       ('GenerateVerseLabelPendingEmbeddings', 'Generate Verse Label Pending Embeddings', ''),
-       ('ExtractText', 'Extract Text from main content', 'Extract text from the main content'),
-       ('ExecuteTablePrompt', 'Execute a table prompt', 'Execute a prompt by using the supplementary table data and save the results as supplementary data.  Uses context to leverage `inSupplementaryId` and `outSupplementaryId`'),
-       ('GenerateTextEmbeddings', 'Generate Embeddings', 'Generate embeddings based on main content'),
-       ('GenerateSupplementaryPendingEmbeddings', 'Generate Supplementary Embeddings', 'Generate embeddings based on supplementary content'),
-       ('DeleteMetadata', 'Delete Metadata', 'Delete metadata'),
-       ('DeleteSupplementary', 'Delete Supplementary Content', 'Delete supplementary Content, uses context with `supplementaryId` as the id to delete');
-
-insert into workflow_activities (id, name, description, child_workflow, child_workflow_queue)
-values ('AddToVectorIndex', 'Add to Vector Index', 'Add pending embeddings to vector index', true, 'vectors');
-insert into workflow_activities (id, name, description, child_workflow, child_workflow_queue)
-values ('AddToSearchIndex', 'Add to Search Index', 'Add text to search index', true, 'vectors');
-
-insert into workflow_activity_inputs (activity_id, name, type)
-values ('ExecuteTablePrompt', 'supplementaryId', 'supplementary'::workflow_activity_parameter_type),
-       ('GeneratePendingEmbeddingsFromTable', 'supplementaryId', 'supplementary'::workflow_activity_parameter_type),
-       ('GeneratePendingEmbeddingsFromTable', 'column', 'context'::workflow_activity_parameter_type),
-       ('AddToVectorIndex', 'supplementaryId', 'supplementary'::workflow_activity_parameter_type),
-       ('DeleteSupplementary', 'supplementaryIds', 'supplementary_array'::workflow_activity_parameter_type);
-
-insert into workflow_activity_outputs (activity_id, name, type)
-values ('GenerateChapterVerseTable', 'supplementaryId', 'supplementary'::workflow_activity_parameter_type),
-       ('ExecuteTablePrompt', 'supplementaryId', 'supplementary'::workflow_activity_parameter_type),
-       ('ExtractText', 'supplementaryId', 'supplementary'::workflow_activity_parameter_type),
-       ('GeneratePendingEmbeddingsFromTable', 'supplementaryId', 'supplementary'::workflow_activity_parameter_type);
-
-insert into workflow_activity_instances (workflow_id, activity_id, execution_group)
-values ('ProcessMetadata', 'ProcessTraits', 1),
-       ('DeleteTemporary', 'DeleteMetadata', 1),
-       ('ProcessBible', 'GenerateChapters', 1),
-       ('ProcessChapter', 'GenerateChapterVerses', 1),
-       ('ProcessChapter', 'GenerateChapterVerseTable', 1),
-       ('ProcessChapter', 'ExecuteTablePrompt', 2),
-       ('ProcessChapter', 'GeneratePendingEmbeddingsFromTable', 3),
-       ('ProcessChapter', 'AddToVectorIndex', 4),
-       ('ProcessChapter', 'DeleteSupplementary', 5);
-
-insert into workflow_activity_instance_inputs (instance_id, name, value)
-values ((select id from workflow_activity_instances where activity_id = 'ExecuteTablePrompt'), 'supplementaryId', '{"value": "chapter-verse-table"}'::jsonb),
-       ((select id from workflow_activity_instances where activity_id = 'GeneratePendingEmbeddingsFromTable'), 'column', '{"value": "Labels"}'::jsonb),
-       ((select id from workflow_activity_instances where activity_id = 'GeneratePendingEmbeddingsFromTable'), 'supplementaryId', '{"value": "chapter-verse-table-prompt-result"}'::jsonb),
-       ((select id from workflow_activity_instances where activity_id = 'AddToVectorIndex'), 'supplementaryId', '{"value": "chapter-verse-pending-embeddings"}'::jsonb),
-       ((select id from workflow_activity_instances where activity_id = 'DeleteSupplementary'), 'supplementaryIds', '{"values": ["chapter-verse-table", "chapter-verse-table-prompted", "chapter-verse-pending-embeddings"]}'::jsonb);
-
-insert into workflow_activity_instance_outputs (instance_id, name, value)
-values ((select id from workflow_activity_instances where activity_id = 'GenerateChapterVerseTable'), 'supplementaryId', '{"value": "chapter-verse-table"}'::jsonb),
-       ((select id from workflow_activity_instances where activity_id = 'ExecuteTablePrompt'), 'supplementaryId', '{"value": "chapter-verse-table-prompt-result"}'::jsonb),
-       ((select id from workflow_activity_instances where activity_id = 'GeneratePendingEmbeddingsFromTable'), 'supplementaryId', '{"value": "chapter-verse-pending-embeddings"}'::jsonb);
-
 create table traits
 (
     id          varchar not null,
@@ -284,20 +173,6 @@ create table trait_workflow_activity_prompts
     foreign key (prompt_id) references prompts (id)
 );
 
-insert into traits (id, name, description)
-values ('common.text', 'Textual Content', 'Generic Common Text'),
-       ('bible.usx', 'Digital Bible', 'Generate vector and search indexed data.  Broken down by chapter and verse.'),
-       ('bible.usx.chapter', 'Bible Chapter', 'USX Bible Chapter'),
-       ('common.temporary', 'Temporary Content', 'Temporary Content');
-
-insert into trait_workflows (trait_id, workflow_id)
-values ('bible.usx', 'ProcessBible'),
-       ('bible.usx.chapter', 'ProcessChapter'),
-       ('common.temporary', 'DeleteTemporary');
-
-insert into trait_workflow_activity_prompts (trait_id, workflow_id, activity_id, prompt_id, configuration)
-values ('bible.usx.chapter', 'ProcessChapter', 'ExecuteTablePrompt', (select id from prompts where name = 'Verse Labeler'), '{}'::jsonb);
-
 create table categories
 (
     id   uuid    not null default gen_random_uuid(),
@@ -331,26 +206,6 @@ create table workflow_state_transitions
     foreign key (from_state_id) references workflow_states (id),
     foreign key (to_state_id) references workflow_states (id)
 );
-
-insert into workflow_states (id, name, description, type, workflow_id)
-values ('processing', 'Processing', 'Initial Processing after Creation',
-        'processing'::workflow_state_type, 'ProcessMetadata');
-
-insert into workflow_states (id, name, description, type)
-values ('pending', 'Pending', 'Pending', 'pending'::workflow_state_type),
-       ('draft', 'Draft', 'Draft', 'draft'::workflow_state_type),
-       ('pending_approval', 'Pending Approval', 'Pending Approval', 'approval'::workflow_state_type),
-       ('approved', 'Approved', 'Approved', 'approved'::workflow_state_type),
-       ('published', 'Published', 'Published', 'published'::workflow_state_type),
-       ('failure', 'Failure', 'Failure', 'failure'::workflow_state_type);
-
-insert into workflow_state_transitions (from_state_id, to_state_id, description)
-values ('pending', 'processing', 'content is ready to be processed'),
-       ('processing', 'draft', 'content has been processed, now in draft mode'),
-       ('processing', 'failure', 'processing failed'),
-       ('failure', 'processing', 'processing again'),
-       ('draft', 'processing', 'reprocessing draft'),
-       ('draft', 'published', 'publishing draft');
 
 create type collection_type as enum ('root', 'standard', 'folder', 'queue');
 
@@ -499,6 +354,7 @@ create table metadata_relationship
     metadata1_id uuid,
     metadata2_id uuid,
     relationship varchar,
+    attributes   jsonb,
     primary key (metadata1_id, metadata2_id, relationship),
     foreign key (metadata1_id) references metadata (id) on delete cascade,
     foreign key (metadata2_id) references metadata (id) on delete cascade

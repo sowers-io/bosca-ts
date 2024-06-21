@@ -67,6 +67,7 @@ message MetadataRelationship {
   string metadata_id1 = 1;
   string metadata_id2 = 2;
   string relationship = 3;
+  map<string, string> attributes = 4;
 }
 
 message MetadataRelationships {

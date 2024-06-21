@@ -10,6 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.11
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.53.1
 	github.com/eventials/go-tus v0.0.0-20220610120217-05d0564bb571
+	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/gomarkdown/markdown v0.0.0-20240419095408-642f0ee99ae2
 	github.com/google/uuid v1.6.0
 	github.com/graphql-go/graphql v0.8.1
@@ -28,7 +29,6 @@ require (
 	github.com/spf13/viper v1.12.0
 	github.com/tmc/langchaingo v0.1.9
 	github.com/tus/tusd/v2 v2.4.0
-	github.com/yuin/goldmark v1.4.13
 	go.temporal.io/sdk v1.26.1
 	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be
 	google.golang.org/grpc v1.63.2

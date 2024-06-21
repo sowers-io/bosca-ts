@@ -1,0 +1,248 @@
+traits:
+  common.text: { }
+  bible.usx: { }
+  bible.usx.book: { }
+  bible.usx.chapter: { }
+  bible.usx.verse: { }
+  common.temporary: { }
+
+models:
+  phi3:medium-128k:
+    type: ollama-llm
+    name: phi3:medium-128k
+    configuration:
+      vectorSize: 5120
+      contextWindow: 120000
+  phi3:mini:
+    type: ollama-llm
+    name: phi3:mini
+    configuration:
+      vectorSize: 3072
+      contextWindow: 8000
+
+storageSystems:
+  metadata.search.index:
+    type: search
+    configuration:
+      indexName: metadata
+      type: meilisearch
+  bible.chapter.vector.index:
+    type: vector
+    configuration:
+      indexName: biblechapters
+      type: qdrant
+      vectorSize: 3072
+      model: phi3:mini
+  bible.verse.vector.index:
+    type: vector
+    configuration:
+      indexName: bibleverses
+      type: qdrant
+      vectorSize: 3072
+      model: phi3:mini
+  bible.verse.label.vector.index:
+    type: vector
+    configuration:
+      indexName: bibleverselabels
+      type: qdrant
+      vectorSize: 3072
+      model: phi3:mini
+
+workflows:
+  states:
+    pending:
+      name: Pending
+      type: pending
+    processing:
+      name: Processing
+      description: Initial Processing after Metadata Creation
+      type: processing
+      workflow: metadata.process
+    draft:
+      name: Draft
+      type: draft
+    pending-approval:
+      name: Pending Approval
+      type: approval
+    approved:
+      name: Approved
+      type: approved
+    published:
+      name: Published
+      type: published
+    failure:
+      name: Failure
+      type: failure
+  transitions:
+    - from: pending
+      to: processing
+      description: Content is ready, begin processing
+    - from: processing
+      to: draft
+      description: Content has been processed, now in draft mode
+    - from: processing
+      to: failure
+      description: Processing failed
+    - from: failure
+      to: processing
+      description: Re-processing after failure
+    - from: draft
+      to: processing
+      description: Re-processing draft
+    - from: draft
+      to: published
+      description: Publish a draft
+  activities:
+    # ai activities
+    ai.prompt:
+      description: Take the input from the supplementary data and pass it to the provided model using the provided prompt.  The output will be based on the output from the model.
+      inputs:
+        supplementaryId: supplementary
+      outputs:
+        supplementaryId: supplementary
+      configuration:
+        prompt: verse.labeller
+        model: phi3:mini
+    ai.embeddings.text:
+      description: Generate embeddings from the supplied supplementary data using the supplied model.  Store the embeddings in the specified storage system.
+      inputs:
+        supplementaryId: supplementary
+      configuration:
+        model: phi3:mini
+        storageSystem: ""
+    ai.embeddings.pending.from-table:
+      description: Generate pending embeddings (which is a proto structure) from the supplied supplementary data, which should be a markdown table.  The specified columns will be used to construct the pending embedding.
+      inputs:
+        supplementaryId: supplementary
+      outputs:
+        supplementaryId: supplementary
+      configuration:
+        model: phi3:mini
+        idColumn: Metadata ID
+        contentColumn: Labels
+    ai.embeddings.pending.index:
+      description: Generate embeddings from the supplied supplementary data (which is expected to be pending embeddings).
+      inputs:
+        supplementaryId: supplementary
+      configuration:
+        model: phi3:mini
+        storageSystem: ""
+    # metadata activities
+    metadata.text.extract:
+      outputs:
+        supplementaryId: supplementary
+    metadata.text.index: { }
+    metadata.supplementary.text.index:
+      inputs:
+        supplementaryId: supplementary
+    metadata.transition.complete: { }
+    metadata.transition.fail: { }
+    metadata.transition.to:
+      configuration:
+        state: ""
+        status: ""
+    metadata.delete: { }
+    # supplementary activities
+    supplementary.delete:
+      inputs:
+        supplementaryId: supplementary
+    # bible activities
+    bible.books.create:
+      configuration:
+        trait: bible.usx.book
+    bible.chapters.create:
+      configuration:
+        trait: bible.usx.chapter
+    bible.chapters.verses.create:
+      configuration:
+        trait: bible.usx.verse
+    bible.chapters.verses.table:
+      outputs:
+        supplementaryId: supplementary
+  workflows:
+    # metadata workflows
+    metadata.process:
+      activities:
+        traits.process:
+          childWorkflow: true
+      configuration:
+        finalStateId: draft
+    # trait workflows
+    traits.process: { }
+    # bible workflows
+    bible.usx:
+      activities:
+        bible.books.create: { }
+    ## bible book workflow
+    bible.usx.book:
+      activities:
+        bible.chapters.create: { }
+    ## bible chapter workflow
+    bible.usx.chapter:
+      activities:
+        bible.chapter.verses.create:
+          executionGroup: 1
+        bible.chapter.verses.table:
+          executionGroup: 1
+          outputs:
+            supplementaryId: chapter-verse-table
+        ai.prompt:
+          inputs:
+            supplementaryId: chapter-verse-table
+          outputs:
+            supplementaryId: chapter-verse-table-prompted
+          configuration:
+            prompt: verse.labeller
+            model: phi3:mini
+        ai.embeddings.pending.from-table:
+          executionGroup: 2
+          inputs:
+            supplementaryId: chapter-verse-table-prompted
+          outputs:
+            supplementaryId: chapter-verse-pending-embeddings
+          configuration:
+            idColumn: Metadata ID
+            contentColumn: Labels
+        ai.embeddings.pending.index:
+          executionGroup: 3
+          inputs:
+            supplementaryId: chapter-verse-pending-embeddings
+          configuration:
+            storageSystem: bible.verse.label.vector.index
+    ## bible verse workflow
+    bible.usx.verse:
+      activities:
+        metadata.text.index: { }
+
+prompts:
+  verse.labeller:
+    prompt: |
+      You are a Biblical theologian who is also an expert in felt needs.  Your job is to classify verses, annotating them with felt needs.  Examples of the felt needs are:
+      * salvation
+      * forgiveness
+      * assurance
+      * deliverance
+      * healing
+      * provision
+      * protection
+      * guidance
+      * wisdom
+      * comfort
+      * peace
+      * joy
+      * love
+      * belonging
+      * purpose
+      * restoration
+      * vindication
+      * hope
+      * strength
+      * patience
+      * faith
+      * mercy
+      * humility
+      * holiness
+      * worship
+      You to add a column to the markdown table called `tags`, and fill that column with a set of felt needs that best apply to the given verse.
+
+      {table}

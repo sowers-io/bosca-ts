@@ -45,14 +45,6 @@ class Workflows(_message.Message):
     workflows: _containers.RepeatedCompositeFieldContainer[Workflow]
     def __init__(self, workflows: _Optional[_Iterable[_Union[Workflow, _Mapping]]] = ...) -> None: ...
 
-class WorkflowActivityParameter(_message.Message):
-    __slots__ = ("name", "type")
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    TYPE_FIELD_NUMBER: _ClassVar[int]
-    name: str
-    type: WorkflowActivityParameterType
-    def __init__(self, name: _Optional[str] = ..., type: _Optional[_Union[WorkflowActivityParameterType, str]] = ...) -> None: ...
-
 class WorkflowActivity(_message.Message):
     __slots__ = ("id", "name", "description", "child_workflow", "child_workflow_queue", "configuration", "inputs", "outputs")
     class ConfigurationEntry(_message.Message):
@@ -67,15 +59,15 @@ class WorkflowActivity(_message.Message):
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
-        value: WorkflowActivityParameter
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WorkflowActivityParameter, _Mapping]] = ...) -> None: ...
+        value: WorkflowActivityParameterType
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WorkflowActivityParameterType, str]] = ...) -> None: ...
     class OutputsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
-        value: WorkflowActivityParameter
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WorkflowActivityParameter, _Mapping]] = ...) -> None: ...
+        value: WorkflowActivityParameterType
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WorkflowActivityParameterType, str]] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
@@ -90,9 +82,9 @@ class WorkflowActivity(_message.Message):
     child_workflow: bool
     child_workflow_queue: str
     configuration: _containers.ScalarMap[str, str]
-    inputs: _containers.MessageMap[str, WorkflowActivityParameter]
-    outputs: _containers.MessageMap[str, WorkflowActivityParameter]
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., description: _Optional[str] = ..., child_workflow: bool = ..., child_workflow_queue: _Optional[str] = ..., configuration: _Optional[_Mapping[str, str]] = ..., inputs: _Optional[_Mapping[str, WorkflowActivityParameter]] = ..., outputs: _Optional[_Mapping[str, WorkflowActivityParameter]] = ...) -> None: ...
+    inputs: _containers.ScalarMap[str, WorkflowActivityParameterType]
+    outputs: _containers.ScalarMap[str, WorkflowActivityParameterType]
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., description: _Optional[str] = ..., child_workflow: bool = ..., child_workflow_queue: _Optional[str] = ..., configuration: _Optional[_Mapping[str, str]] = ..., inputs: _Optional[_Mapping[str, WorkflowActivityParameterType]] = ..., outputs: _Optional[_Mapping[str, WorkflowActivityParameterType]] = ...) -> None: ...
 
 class Workflow(_message.Message):
     __slots__ = ("id", "name", "description", "queue", "configuration")
@@ -186,8 +178,22 @@ class CompleteTransitionWorkflowRequest(_message.Message):
     success: bool
     def __init__(self, metadata_id: _Optional[str] = ..., status: _Optional[str] = ..., success: bool = ...) -> None: ...
 
+class WorkflowActivityParameterValue(_message.Message):
+    __slots__ = ("single_value", "array_value")
+    SINGLE_VALUE_FIELD_NUMBER: _ClassVar[int]
+    ARRAY_VALUE_FIELD_NUMBER: _ClassVar[int]
+    single_value: str
+    array_value: WorkflowActivityParameterValues
+    def __init__(self, single_value: _Optional[str] = ..., array_value: _Optional[_Union[WorkflowActivityParameterValues, _Mapping]] = ...) -> None: ...
+
+class WorkflowActivityParameterValues(_message.Message):
+    __slots__ = ("values",)
+    VALUES_FIELD_NUMBER: _ClassVar[int]
+    values: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, values: _Optional[_Iterable[str]] = ...) -> None: ...
+
 class WorkflowActivityInstance(_message.Message):
-    __slots__ = ("id", "activity", "execution_group", "configuration", "inputs", "outputs")
+    __slots__ = ("id", "child_workflow", "child_workflow_queue", "execution_group", "configuration", "inputs", "outputs")
     class ConfigurationEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -210,18 +216,20 @@ class WorkflowActivityInstance(_message.Message):
         value: WorkflowActivityParameterValue
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WorkflowActivityParameterValue, _Mapping]] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
-    ACTIVITY_FIELD_NUMBER: _ClassVar[int]
+    CHILD_WORKFLOW_FIELD_NUMBER: _ClassVar[int]
+    CHILD_WORKFLOW_QUEUE_FIELD_NUMBER: _ClassVar[int]
     EXECUTION_GROUP_FIELD_NUMBER: _ClassVar[int]
     CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
-    id: int
-    activity: WorkflowActivity
+    id: str
+    child_workflow: bool
+    child_workflow_queue: str
     execution_group: int
     configuration: _containers.ScalarMap[str, str]
     inputs: _containers.MessageMap[str, WorkflowActivityParameterValue]
     outputs: _containers.MessageMap[str, WorkflowActivityParameterValue]
-    def __init__(self, id: _Optional[int] = ..., activity: _Optional[_Union[WorkflowActivity, _Mapping]] = ..., execution_group: _Optional[int] = ..., configuration: _Optional[_Mapping[str, str]] = ..., inputs: _Optional[_Mapping[str, WorkflowActivityParameterValue]] = ..., outputs: _Optional[_Mapping[str, WorkflowActivityParameterValue]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., child_workflow: bool = ..., child_workflow_queue: _Optional[str] = ..., execution_group: _Optional[int] = ..., configuration: _Optional[_Mapping[str, str]] = ..., inputs: _Optional[_Mapping[str, WorkflowActivityParameterValue]] = ..., outputs: _Optional[_Mapping[str, WorkflowActivityParameterValue]] = ...) -> None: ...
 
 class WorkflowInstance(_message.Message):
     __slots__ = ("trait_id", "workflow", "activities", "queue", "metadata", "context")
@@ -245,20 +253,6 @@ class WorkflowInstance(_message.Message):
     metadata: _metadata_pb2.Metadata
     context: _containers.ScalarMap[str, str]
     def __init__(self, trait_id: _Optional[str] = ..., workflow: _Optional[_Union[Workflow, _Mapping]] = ..., activities: _Optional[_Iterable[_Union[WorkflowActivityInstance, _Mapping]]] = ..., queue: _Optional[str] = ..., metadata: _Optional[_Union[_metadata_pb2.Metadata, _Mapping]] = ..., context: _Optional[_Mapping[str, str]] = ...) -> None: ...
-
-class WorkflowActivityParameterValue(_message.Message):
-    __slots__ = ("single_value", "array_value")
-    SINGLE_VALUE_FIELD_NUMBER: _ClassVar[int]
-    ARRAY_VALUE_FIELD_NUMBER: _ClassVar[int]
-    single_value: str
-    array_value: WorkflowActivityParameterValues
-    def __init__(self, single_value: _Optional[str] = ..., array_value: _Optional[_Union[WorkflowActivityParameterValues, _Mapping]] = ...) -> None: ...
-
-class WorkflowActivityParameterValues(_message.Message):
-    __slots__ = ("values",)
-    VALUES_FIELD_NUMBER: _ClassVar[int]
-    values: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, values: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class WorkflowActivityExecutionContext(_message.Message):
     __slots__ = ("workflow", "activity", "metadata", "context", "inputs")
@@ -287,28 +281,6 @@ class WorkflowActivityExecutionContext(_message.Message):
     context: _containers.MessageMap[str, WorkflowActivityParameterValue]
     inputs: _containers.MessageMap[str, WorkflowActivityParameterValue]
     def __init__(self, workflow: _Optional[_Union[WorkflowInstance, _Mapping]] = ..., activity: _Optional[_Union[WorkflowActivityInstance, _Mapping]] = ..., metadata: _Optional[_Union[_metadata_pb2.Metadata, _Mapping]] = ..., context: _Optional[_Mapping[str, WorkflowActivityParameterValue]] = ..., inputs: _Optional[_Mapping[str, WorkflowActivityParameterValue]] = ...) -> None: ...
-
-class WorkflowActivityResult(_message.Message):
-    __slots__ = ("context", "outputs")
-    class ContextEntry(_message.Message):
-        __slots__ = ("key", "value")
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: WorkflowActivityParameterValue
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WorkflowActivityParameterValue, _Mapping]] = ...) -> None: ...
-    class OutputsEntry(_message.Message):
-        __slots__ = ("key", "value")
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: WorkflowActivityParameterValue
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WorkflowActivityParameterValue, _Mapping]] = ...) -> None: ...
-    CONTEXT_FIELD_NUMBER: _ClassVar[int]
-    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
-    context: _containers.MessageMap[str, WorkflowActivityParameterValue]
-    outputs: _containers.MessageMap[str, WorkflowActivityParameterValue]
-    def __init__(self, context: _Optional[_Mapping[str, WorkflowActivityParameterValue]] = ..., outputs: _Optional[_Mapping[str, WorkflowActivityParameterValue]] = ...) -> None: ...
 
 class WorkflowActivityStorageSystem(_message.Message):
     __slots__ = ("storage_system", "configuration")

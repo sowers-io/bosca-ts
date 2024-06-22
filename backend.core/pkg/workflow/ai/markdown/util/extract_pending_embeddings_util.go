@@ -1,4 +1,4 @@
-package markdown
+package util
 
 import (
 	search "bosca.io/api/protobuf/bosca/ai"
@@ -8,7 +8,7 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 )
 
-func extractPendingEmbeddingsFromMarkdown(body []byte, idColumn, contentColumn string) ([]*search.PendingEmbedding, error) {
+func ExtractPendingEmbeddingsFromMarkdown(body []byte, idColumn, contentColumn string) ([]*search.PendingEmbedding, error) {
 	pending := make([]*search.PendingEmbedding, 0)
 	for _, node := range markdown.Parse(body, parser.New()).GetChildren() {
 		var table *ast.Table

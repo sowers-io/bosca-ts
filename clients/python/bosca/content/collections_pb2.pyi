@@ -36,7 +36,7 @@ class AddCollectionItemRequest(_message.Message):
     def __init__(self, collection_id: _Optional[str] = ..., child_collection_id: _Optional[str] = ..., child_metadata_id: _Optional[str] = ...) -> None: ...
 
 class Collection(_message.Message):
-    __slots__ = ("id", "name", "type", "category_ids", "tags", "attributes", "created", "modified")
+    __slots__ = ("id", "name", "type", "category_ids", "labels", "attributes", "created", "modified")
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -48,7 +48,7 @@ class Collection(_message.Message):
     NAME_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     CATEGORY_IDS_FIELD_NUMBER: _ClassVar[int]
-    TAGS_FIELD_NUMBER: _ClassVar[int]
+    LABELS_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     CREATED_FIELD_NUMBER: _ClassVar[int]
     MODIFIED_FIELD_NUMBER: _ClassVar[int]
@@ -56,11 +56,11 @@ class Collection(_message.Message):
     name: str
     type: CollectionType
     category_ids: _containers.RepeatedScalarFieldContainer[str]
-    tags: _containers.RepeatedScalarFieldContainer[str]
+    labels: _containers.RepeatedScalarFieldContainer[str]
     attributes: _containers.ScalarMap[str, str]
     created: _timestamp_pb2.Timestamp
     modified: _timestamp_pb2.Timestamp
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[CollectionType, str]] = ..., category_ids: _Optional[_Iterable[str]] = ..., tags: _Optional[_Iterable[str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., created: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., modified: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[CollectionType, str]] = ..., category_ids: _Optional[_Iterable[str]] = ..., labels: _Optional[_Iterable[str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., created: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., modified: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class CollectionItems(_message.Message):
     __slots__ = ("items",)

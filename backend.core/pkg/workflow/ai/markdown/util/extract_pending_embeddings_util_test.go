@@ -1,9 +1,9 @@
-package markdown
+package util
 
 import "testing"
 
 func TestFromTable(t *testing.T) {
-	values, err := extractPendingEmbeddingsFromMarkdown([]byte("|A|B|C|\n|---|---|---|\n|1|2|3\n|4|5|6|\n|7|8|9\n"), "A", "B")
+	values, err := ExtractPendingEmbeddingsFromMarkdown([]byte("|A|B|C|\n|---|---|---|\n|1|2|3\n|4|5|6|\n|7|8|9\n"), "A", "B")
 	if err != nil {
 		t.Error(err)
 	}

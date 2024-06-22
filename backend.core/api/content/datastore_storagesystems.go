@@ -50,6 +50,41 @@ func getStorageSystem(results *sql.Rows) (*model.StorageSystem, error) {
 	return i, nil
 }
 
+type WorkflowActivityStorageSystem struct {
+	Id            string
+	Configuration map[string]string
+}
+
+func (ds *DataStore) GetWorkflowActivityStorageSystems(ctx context.Context, traitId, workflowId, activityId string) ([]*model.WorkflowActivityStorageSystem, error) {
+	results, err := ds.db.QueryContext(ctx, "select storage_system_id, configuration from trait_workflow_activity_storage_systems where trait_id = $1 and workflow_id = $2 and activity_id = $3", traitId, workflowId, activityId)
+	if err != nil {
+		return nil, err
+	}
+	defer results.Close()
+	systems := make([]*model.WorkflowActivityStorageSystem, 0)
+	for results.Next() {
+		var id string
+		var configurationJson json.RawMessage
+		err = results.Scan(&id, &configurationJson)
+		if err != nil {
+			return nil, err
+		}
+		ss, err := ds.GetStorageSystem(ctx, id)
+		system := &model.WorkflowActivityStorageSystem{
+			StorageSystem: ss,
+		}
+		err = json.Unmarshal(configurationJson, &system.Configuration)
+		if err != nil {
+			return nil, err
+		}
+		if err != nil {
+			return nil, err
+		}
+		systems = append(systems, system)
+	}
+	return systems, nil
+}
+
 func (ds *DataStore) GetStorageSystems(ctx context.Context) ([]*model.StorageSystem, error) {
 	results, err := ds.db.QueryContext(ctx, "select id::varchar, name, description, type, configuration from storage_systems")
 	if err != nil {
@@ -79,17 +114,22 @@ func (ds *DataStore) GetStorageSystem(ctx context.Context, id string) (*model.St
 	return nil, nil
 }
 
-func (ds *DataStore) GetStorageSystemModels(ctx context.Context, id string) ([]*model.StorageSystemModel, error) {
-	results, err := ds.db.QueryContext(ctx, "select model_id::varchar, type from storage_system_models where system_id = $1::uuid", id)
+func (ds *DataStore) GetStorageSystemModels(ctx context.Context, systemId string) ([]*model.StorageSystemModel, error) {
+	results, err := ds.db.QueryContext(ctx, "select model_id::varchar, configuration from storage_system_models where system_id = $1::uuid", systemId)
 	if err != nil {
 		return nil, err
 	}
 	defer results.Close()
 	systems := make([]*model.StorageSystemModel, 0)
 	for results.Next() {
+		var configurationJson json.RawMessage
 		i := &model.StorageSystemModel{}
 		var modelId string
-		err = results.Scan(&modelId, &i.Type)
+		err = results.Scan(&modelId, &configurationJson)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(configurationJson, &i.Configuration)
 		if err != nil {
 			return nil, err
 		}

@@ -22,7 +22,7 @@ import os
 from temporalio.client import Client
 from temporalio.worker import Worker
 
-from workflows.add_to_vector_index.vectorize import vectorize
+from workflows.add_to_vector_index.vectorize import add_text_to_vector_index, add_pending_to_vector_index
 from workflows.add_to_vector_index.workflow import Workflow
 
 
@@ -36,8 +36,7 @@ async def main():
         worker = Worker(
             client,
             task_queue="vectors",
-            workflows=[Workflow],
-            activities=[vectorize],
+            activities=[add_text_to_vector_index, add_pending_to_vector_index],
             activity_executor=activity_executor,
             max_concurrent_activities=1
         )

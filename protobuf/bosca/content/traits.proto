@@ -38,5 +38,5 @@ message TraitWorkflowIdRequest {
 message TraitWorkflowActivityIdRequest {
   string trait_id = 1;
   string workflow_id = 2;
-  int64 activity_instance_id = 3;
+  string activity_id = 3;
 }

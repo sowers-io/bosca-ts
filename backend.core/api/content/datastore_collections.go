@@ -31,12 +31,13 @@ import (
 func (ds *DataStore) AddRootCollection(ctx context.Context) (bool, error) {
 	root, err := ds.GetCollection(ctx, RootCollectionId)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		slog.Error("failed to get workflow for root collection", slog.Any("error", err))
+		slog.Error("failed to get root collection", slog.Any("error", err))
 		return false, err
 	}
 	if root != nil {
 		return false, nil
 	}
+
 	id, err := uuid.Parse(RootCollectionId)
 	if err != nil {
 		return false, err
@@ -106,12 +107,12 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 	var created time.Time
 	var modified time.Time
 	var collectionType string
-	var tags []string
+	var labels []string
 	var attributes string
-	err := ds.db.QueryRowContext(ctx, "SELECT name, type, tags, attributes, created, modified FROM collections WHERE id = $1", id).Scan(
+	err := ds.db.QueryRowContext(ctx, "SELECT name, type, labels, attributes, created, modified FROM collections WHERE id = $1", id).Scan(
 		&collection.Name,
 		&collectionType,
-		m.SQLScanner(&tags),
+		m.SQLScanner(&labels),
 		&attributes,
 		&created,
 		&modified,
@@ -133,7 +134,7 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 	}
 
 	collection.Id = id
-	collection.Tags = tags
+	collection.Labels = labels
 	collection.Created = timestamppb.New(created)
 	collection.Modified = timestamppb.New(modified)
 	//collection.Attributes = attributes
@@ -141,15 +142,15 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 }
 
 func (ds *DataStore) AddCollection(ctx context.Context, collection *content.Collection) (string, error) {
-	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO collections (name, type, tags, attributes) VALUES ($1, $2, $3, ($4)::jsonb) returning id")
+	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO collections (name, type, labels, attributes) VALUES ($1, $2, $3, ($4)::jsonb) returning id")
 	if err != nil {
 		return "", err
 	}
 	defer stmt.Close()
 
-	tags := collection.Tags
-	if tags == nil {
-		tags = make([]string, 0)
+	labels := collection.Labels
+	if labels == nil {
+		labels = make([]string, 0)
 	}
 	attributes := collection.Attributes
 	if attributes == nil {
@@ -159,7 +160,7 @@ func (ds *DataStore) AddCollection(ctx context.Context, collection *content.Coll
 	result := stmt.QueryRowContext(ctx,
 		collection.Name,
 		collection.Type.String(),
-		tags,
+		labels,
 		attributes,
 	)
 	if result.Err() != nil {

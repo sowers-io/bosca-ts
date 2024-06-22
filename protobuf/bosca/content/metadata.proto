@@ -37,7 +37,7 @@ message Metadata {
 
   repeated string trait_ids = 11;
   repeated string category_ids = 12;
-  repeated string tags = 13;
+  repeated string labels = 13;
   map<string, string> attributes = 14;
 
   google.protobuf.Timestamp created = 20;
@@ -50,7 +50,7 @@ message Metadata {
 }
 
 message AddMetadataRequest {
-  string collection = 1;
+  optional string collection = 1;
   Metadata metadata = 2;
 }
 

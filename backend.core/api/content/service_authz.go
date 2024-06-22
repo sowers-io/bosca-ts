@@ -128,7 +128,7 @@ func (svc *authorizationService) GetMetadataDownloadUrl(ctx context.Context, req
 	return svc.service.GetMetadataDownloadUrl(ctx, request)
 }
 
-func (svc *authorizationService) AddMetadataRelationship(ctx context.Context, request *grpc.AddMetadataRelationshipRequest) (*protobuf.Empty, error) {
+func (svc *authorizationService) AddMetadataRelationship(ctx context.Context, request *grpc.MetadataRelationship) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.MetadataId1, grpc.PermissionAction_edit)
 	if err != nil {
 		return nil, err
@@ -144,10 +144,11 @@ func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.
 	if request.Metadata == nil {
 		return nil, errors.New("workflow is required")
 	}
-	if len(strings.Trim(request.Collection, " ")) == 0 {
-		request.Collection = RootCollectionId
+	collection := RootCollectionId
+	if request.Collection != nil {
+		collection = *request.Collection
 	}
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Collection, grpc.PermissionAction_edit)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, collection, grpc.PermissionAction_edit)
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +252,7 @@ func (svc *authorizationService) GetTraits(ctx context.Context, request *protobu
 	return svc.service.GetTraits(ctx, request)
 }
 
-func (svc *authorizationService) GetTraitWorkflowStorageSystems(ctx context.Context, request *grpc.TraitWorkflowStorageSystemRequest) (*grpc.StorageSystems, error) {
+func (svc *authorizationService) GetTraitWorkflowStorageSystems(ctx context.Context, request *grpc.TraitWorkflowActivityIdRequest) (*grpc.WorkflowActivityStorageSystems, error) {
 	// TODO: maybe a trait permission object?
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
 	if err != nil {

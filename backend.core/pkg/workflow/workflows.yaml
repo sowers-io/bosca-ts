@@ -110,7 +110,7 @@ workflows:
       configuration:
         model: phi3:mini
         storageSystem: ""
-    ai.embeddings.pending.from-table:
+    ai.embeddings.pending.from-markdown-table:
       description: Generate pending embeddings (which is a proto structure) from the supplied supplementary data, which should be a markdown table.  The specified columns will be used to construct the pending embedding.
       inputs:
         supplementaryId: supplementary
@@ -194,7 +194,7 @@ workflows:
           configuration:
             prompt: verse.labeller
             model: phi3:mini
-        ai.embeddings.pending.from-table:
+        ai.embeddings.pending.from-markdown-table:
           executionGroup: 2
           inputs:
             supplementaryId: chapter-verse-table-prompted

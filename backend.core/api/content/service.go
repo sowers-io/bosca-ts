@@ -27,8 +27,8 @@ import (
 type service struct {
 	grpc.UnimplementedContentServiceServer
 
-	ds *DataStore
-	os objectstore.ObjectStore
+	ds          *DataStore
+	objectStore objectstore.ObjectStore
 
 	serviceAccountId string
 	permissions      security.PermissionManager
@@ -41,7 +41,7 @@ func NewService(cfg *configuration.ServerConfiguration, dataStore *DataStore, se
 	go initializeService(cfg, dataStore)
 	return &service{
 		ds:               dataStore,
-		os:               objectStore,
+		objectStore:      objectStore,
 		serviceAccountId: serviceAccountId,
 		permissions:      permissions,
 		temporalClient:   temporalClient,

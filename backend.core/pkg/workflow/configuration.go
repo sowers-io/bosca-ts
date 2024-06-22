@@ -156,7 +156,7 @@ type ActivityConfiguration struct {
 	Configuration      map[string]string
 }
 
-func (cfg ActivityConfiguration) ToActivityInstance() *content.WorkflowActivityInstance {
+func (cfg *ActivityConfiguration) ToActivityInstance() *content.WorkflowActivityInstance {
 	inputs := make(map[string]*content.WorkflowActivityParameterValue)
 	outputs := make(map[string]*content.WorkflowActivityParameterValue)
 

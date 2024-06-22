@@ -2,23 +2,31 @@ package workflow
 
 import (
 	"bosca.io/api/protobuf/bosca/content"
+	_ "embed"
+	"gopkg.in/yaml.v3"
 )
 
-type Workflow struct {
-	ctx *content.WorkflowActivityExecutionContext
-}
+//go:embed workflows.yaml
+var b []byte
 
-func NewWorkflow(ctx *content.WorkflowActivityExecutionContext) *Workflow {
-	return &Workflow{
-		ctx: ctx,
+func GetEmbeddedConfiguration() *Configuration {
+	configuration := &Configuration{}
+	err := yaml.Unmarshal(b, &configuration)
+	if err != nil {
+		panic(err)
 	}
+	err = configuration.Validate()
+	if err != nil {
+		panic(err)
+	}
+	return configuration
 }
 
-func (w *Workflow) GetExecutionGroups() [][]*content.WorkflowActivityInstance {
-	executionGroups := make([][]*content.WorkflowActivityInstance, 0, len(w.ctx.Workflow.Activities))
+func GetExecutionGroups(activities []*content.WorkflowActivityInstance) [][]*content.WorkflowActivityInstance {
+	executionGroups := make([][]*content.WorkflowActivityInstance, 0, len(activities))
 	executionGroupIndex := int32(0)
 	executionGroup := make([]*content.WorkflowActivityInstance, 0, 1)
-	for _, activity := range w.ctx.Workflow.Activities {
+	for _, activity := range activities {
 		if activity.ExecutionGroup != executionGroupIndex {
 			executionGroups = append(executionGroups, executionGroup)
 			executionGroup = make([]*content.WorkflowActivityInstance, 0, 1)

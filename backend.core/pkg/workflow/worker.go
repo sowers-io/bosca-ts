@@ -34,7 +34,7 @@ func NewWorker(client client.Client, workflowIds []string, activityIds []string,
 	return w, nil
 }
 
-func ProcessWorkflow(ctx workflow.Context, executionContext *content.WorkflowActivityExecutionContext) error {
+func ProcessWorkflow(ctx workflow.Context, workflowInstance *content.WorkflowInstance) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second / 2,
 		BackoffCoefficient:     1.5,
@@ -47,8 +47,8 @@ func ProcessWorkflow(ctx workflow.Context, executionContext *content.WorkflowAct
 		RetryPolicy:         retryPolicy,
 	}
 	ctx = workflow.WithActivityOptions(ctx, options)
-	wf := NewWorkflow(executionContext)
-	executionGroup := wf.GetExecutionGroups()
+	executionGroup := GetExecutionGroups(workflowInstance.Activities)
+	workflowContext := make(map[string]*content.WorkflowActivityParameterValue)
 	for _, group := range executionGroup {
 		futures := make([]workflow.Future, len(group))
 		for i, instance := range group {
@@ -56,18 +56,16 @@ func ProcessWorkflow(ctx workflow.Context, executionContext *content.WorkflowAct
 			for k, input := range instance.Inputs {
 				inputs[k] = input
 			}
-			for k, input := range executionContext.Inputs {
-				inputs[k] = input
-			}
 			instanceExecutionContext := &content.WorkflowActivityExecutionContext{
-				Metadata: executionContext.Metadata,
-				Workflow: executionContext.Workflow,
-				Activity: instance,
-				Context:  executionContext.Context,
-				Inputs:   inputs,
+				WorkflowId: workflowInstance.Workflow.Id,
+				TraitId:    workflowInstance.TraitId,
+				Metadata:   workflowInstance.Metadata,
+				Activity:   instance,
+				Context:    workflowContext,
+				Inputs:     inputs,
 			}
 			if instance.ChildWorkflow {
-				childQueue := executionContext.Workflow.Queue
+				childQueue := "metadata"
 				if instance.ChildWorkflowQueue != nil {
 					childQueue = *instance.ChildWorkflowQueue
 				}
@@ -80,9 +78,15 @@ func ProcessWorkflow(ctx workflow.Context, executionContext *content.WorkflowAct
 			}
 		}
 		for _, future := range futures {
-			err := future.Get(ctx, nil)
+			updatedContext := make(map[string]*content.WorkflowActivityParameterValue)
+			err := future.Get(ctx, &updatedContext)
 			if err != nil {
 				return err
+			}
+			if updatedContext != nil {
+				for s, value := range updatedContext {
+					workflowContext[s] = value
+				}
 			}
 		}
 	}

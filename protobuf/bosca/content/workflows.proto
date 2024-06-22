@@ -132,12 +132,13 @@ message WorkflowInstance {
 }
 
 message WorkflowActivityExecutionContext {
-  WorkflowInstance workflow = 1;
-  WorkflowActivityInstance activity = 2;
-  Metadata metadata = 3;
-  map<string, WorkflowActivityParameterValue> context = 4;
-  /* inputs from previous activity */
-  map<string, WorkflowActivityParameterValue> inputs = 5;
+  string workflow_id = 1;
+  string trait_id = 2;
+  WorkflowActivityInstance activity = 3;
+  Metadata metadata = 4;
+  map<string, WorkflowActivityParameterValue> context = 5;
+  map<string, WorkflowActivityParameterValue> inputs = 6;
+  map<string, WorkflowActivityParameterValue> outputs = 7;
 }
 
 message WorkflowActivityStorageSystem {

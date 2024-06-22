@@ -31,15 +31,15 @@ from util.chat_context_factory import get_chat_context
 from util.download import download_file, upload_file
 
 
-@activity.defn(name="ExecuteTablePrompt")
-async def execute_table_prompt(execution_context: WorkflowActivityExecutionContext):
+@activity.defn(name="ai.prompt")
+async def execute_ai_prompt(execution_context: WorkflowActivityExecutionContext):
     logging.info('Starting to execute table prompt')
 
     storage_system: StorageSystem | None = None
 
     with new_channel() as channel:
         service = ContentServiceStub(channel=channel)
-        request = TraitWorkflowActivityIdRequest(trait_id=execution_context.workflow.trait_id, workflow_id=execution_context.workflow.workflow.id, activity_instance_id=execution_context.activity.id)
+        request = TraitWorkflowActivityIdRequest(trait_id=execution_context.trait_id, workflow_id=execution_context.workflow_id, activity_id=execution_context.activity.id)
 
         prompts = service.GetTraitWorkflowPrompts(request)
         for prompt in prompts.prompts:
@@ -65,7 +65,7 @@ async def execute_table_prompt(execution_context: WorkflowActivityExecutionConte
         service = ContentServiceStub(channel=channel)
         signed_url = service.AddMetadataSupplementary(AddSupplementaryRequest(
             id=execution_context.metadata.id,
-            name="ExecuteTablePrompt",
+            name="ai.prompt",
             type=execution_context.activity.outputs["supplementaryId"].single_value,
             content_length=len(response),
             content_type="text/markdown",

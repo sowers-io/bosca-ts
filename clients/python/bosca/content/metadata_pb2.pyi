@@ -8,7 +8,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Metadata(_message.Message):
-    __slots__ = ("default_id", "id", "name", "content_type", "source_id", "source_identifier", "language_tag", "content_length", "trait_ids", "category_ids", "tags", "attributes", "created", "modified", "workflow_state_id", "workflow_state_pending_id", "metadata")
+    __slots__ = ("default_id", "id", "name", "content_type", "source_id", "source_identifier", "language_tag", "content_length", "trait_ids", "category_ids", "labels", "attributes", "created", "modified", "workflow_state_id", "workflow_state_pending_id", "metadata")
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -26,7 +26,7 @@ class Metadata(_message.Message):
     CONTENT_LENGTH_FIELD_NUMBER: _ClassVar[int]
     TRAIT_IDS_FIELD_NUMBER: _ClassVar[int]
     CATEGORY_IDS_FIELD_NUMBER: _ClassVar[int]
-    TAGS_FIELD_NUMBER: _ClassVar[int]
+    LABELS_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     CREATED_FIELD_NUMBER: _ClassVar[int]
     MODIFIED_FIELD_NUMBER: _ClassVar[int]
@@ -43,14 +43,14 @@ class Metadata(_message.Message):
     content_length: int
     trait_ids: _containers.RepeatedScalarFieldContainer[str]
     category_ids: _containers.RepeatedScalarFieldContainer[str]
-    tags: _containers.RepeatedScalarFieldContainer[str]
+    labels: _containers.RepeatedScalarFieldContainer[str]
     attributes: _containers.ScalarMap[str, str]
     created: _timestamp_pb2.Timestamp
     modified: _timestamp_pb2.Timestamp
     workflow_state_id: str
     workflow_state_pending_id: str
     metadata: _struct_pb2.Struct
-    def __init__(self, default_id: _Optional[str] = ..., id: _Optional[str] = ..., name: _Optional[str] = ..., content_type: _Optional[str] = ..., source_id: _Optional[str] = ..., source_identifier: _Optional[str] = ..., language_tag: _Optional[str] = ..., content_length: _Optional[int] = ..., trait_ids: _Optional[_Iterable[str]] = ..., category_ids: _Optional[_Iterable[str]] = ..., tags: _Optional[_Iterable[str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., created: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., modified: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., workflow_state_id: _Optional[str] = ..., workflow_state_pending_id: _Optional[str] = ..., metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+    def __init__(self, default_id: _Optional[str] = ..., id: _Optional[str] = ..., name: _Optional[str] = ..., content_type: _Optional[str] = ..., source_id: _Optional[str] = ..., source_identifier: _Optional[str] = ..., language_tag: _Optional[str] = ..., content_length: _Optional[int] = ..., trait_ids: _Optional[_Iterable[str]] = ..., category_ids: _Optional[_Iterable[str]] = ..., labels: _Optional[_Iterable[str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., created: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., modified: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., workflow_state_id: _Optional[str] = ..., workflow_state_pending_id: _Optional[str] = ..., metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class AddMetadataRequest(_message.Message):
     __slots__ = ("collection", "metadata")

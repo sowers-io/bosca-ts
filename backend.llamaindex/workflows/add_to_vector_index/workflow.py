@@ -22,7 +22,7 @@ from temporalio import workflow
 from bosca.content.workflows_pb2 import WorkflowActivityExecutionContext
 
 with workflow.unsafe.imports_passed_through():
-    from workflows.add_to_vector_index.vectorize import vectorize
+    from workflows.add_to_vector_index.vectorize import add_text_to_vector_index
 
 
 @workflow.defn(name="AddToVectorIndex")
@@ -31,4 +31,4 @@ class Workflow:
     @workflow.run
     async def run(self, execution_context: WorkflowActivityExecutionContext) -> str:
         logging.info("Workflow started with id: %s", execution_context.metadata.id)
-        return await workflow.execute_activity(vectorize, execution_context, start_to_close_timeout=timedelta(minutes=5))
+        return await workflow.execute_activity(add_text_to_vector_index, execution_context, start_to_close_timeout=timedelta(minutes=5))

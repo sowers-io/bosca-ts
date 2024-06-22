@@ -120,13 +120,13 @@ service ContentService {
 
   rpc GetTraitWorkflowStorageSystems(TraitWorkflowActivityIdRequest) returns (WorkflowActivityStorageSystems) {
     option (google.api.http) = {
-      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_instance_id}/storagesystems"
+      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/storagesystems"
     };
   }
 
   rpc GetTraitWorkflowPrompts(TraitWorkflowActivityIdRequest) returns (WorkflowActivityPrompts) {
     option (google.api.http) = {
-      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_instance_id}/prompts"
+      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/prompts"
     };
   }
 

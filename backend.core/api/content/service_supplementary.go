@@ -25,17 +25,17 @@ import (
 
 func (svc *service) AddMetadataSupplementary(ctx context.Context, request *grpc.AddSupplementaryRequest) (*grpc.SignedUrl, error) {
 	id := request.Id + "." + request.Type
-	return svc.os.CreateUploadUrl(ctx, id, request.Name, request.ContentType, request.ContentLength, nil)
+	return svc.objectStore.CreateUploadUrl(ctx, id, request.Name, request.ContentType, request.ContentLength, nil)
 }
 
 func (svc *service) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *grpc.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
 	id := request.Id + "." + request.Type
-	return svc.os.CreateDownloadUrl(ctx, id)
+	return svc.objectStore.CreateDownloadUrl(ctx, id)
 }
 
 func (svc *service) DeleteMetadataSupplementary(ctx context.Context, request *grpc.SupplementaryIdRequest) (*protobuf.Empty, error) {
 	id := request.Id + "." + request.Type
-	err := svc.os.Delete(ctx, id)
+	err := svc.objectStore.Delete(ctx, id)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to delete supplementary file", slog.String("id", request.Id), slog.Any("error", err))
 		return nil, err

@@ -39,7 +39,7 @@ func (ds *DataStore) GetTraits(ctx context.Context) ([]*content.Trait, error) {
 		if err != nil {
 			return nil, err
 		}
-		trait.TraitWorkflowIds = traitWorkflowIds
+		trait.WorkflowIds = traitWorkflowIds
 		traits = append(traits, trait)
 	}
 	return traits, nil
@@ -64,9 +64,9 @@ func (ds *DataStore) GetTraitWorkflowIds(ctx context.Context, id string) ([]stri
 	return ids, nil
 }
 
-func (ds *DataStore) GetTraitWorkflowStorageSystemIds(ctx context.Context, traitId string, workflowId string) ([]string, error) {
-	query := "select storage_system_id from trait_workflow_storage_systems where trait_id = $1 and workflow_id = $2"
-	rows, err := ds.db.QueryContext(ctx, query, traitId, workflowId)
+func (ds *DataStore) GetTraitWorkflowActivityStorageSystemIds(ctx context.Context, traitId, workflowId, activityId string) ([]string, error) {
+	query := "select storage_system_id from trait_workflow_activity_storage_systems where trait_id = $1 and workflow_id = $2 and activity_id = $3"
+	rows, err := ds.db.QueryContext(ctx, query, traitId, workflowId, activityId)
 	if err != nil {
 		return nil, err
 	}

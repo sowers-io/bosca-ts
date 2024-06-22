@@ -32,11 +32,11 @@ class TraitWorkflowIdRequest(_message.Message):
     def __init__(self, trait_id: _Optional[str] = ..., workflow_id: _Optional[str] = ...) -> None: ...
 
 class TraitWorkflowActivityIdRequest(_message.Message):
-    __slots__ = ("trait_id", "workflow_id", "activity_instance_id")
+    __slots__ = ("trait_id", "workflow_id", "activity_id")
     TRAIT_ID_FIELD_NUMBER: _ClassVar[int]
     WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
-    ACTIVITY_INSTANCE_ID_FIELD_NUMBER: _ClassVar[int]
+    ACTIVITY_ID_FIELD_NUMBER: _ClassVar[int]
     trait_id: str
     workflow_id: str
-    activity_instance_id: int
-    def __init__(self, trait_id: _Optional[str] = ..., workflow_id: _Optional[str] = ..., activity_instance_id: _Optional[int] = ...) -> None: ...
+    activity_id: str
+    def __init__(self, trait_id: _Optional[str] = ..., workflow_id: _Optional[str] = ..., activity_id: _Optional[str] = ...) -> None: ...

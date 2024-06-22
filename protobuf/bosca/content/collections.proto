@@ -48,7 +48,7 @@ message Collection {
   CollectionType type = 5;
 
   repeated string category_ids = 12;
-  repeated string tags = 13;
+  repeated string labels = 13;
   map<string, string> attributes = 14;
 
   google.protobuf.Timestamp created = 20;

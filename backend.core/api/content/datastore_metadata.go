@@ -39,15 +39,15 @@ func (ds *DataStore) AddMetadataRelationship(ctx context.Context, metadataId1 st
 }
 
 func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata) (string, error) {
-	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO metadata (name, content_type, content_length, tags, attributes, source, language_tag) VALUES ($1, $2, $3, $4, ($5)::jsonb, $6, $7) returning id")
+	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO metadata (name, content_type, content_length, labels, attributes, source_id, source_identifier, language_tag) VALUES ($1, $2, $3, $4, ($5)::jsonb, $6, $7, $8) returning id")
 	if err != nil {
 		return "", err
 	}
 	defer stmt.Close()
 
-	tags := metadata.Tags
-	if tags == nil {
-		tags = make([]string, 0)
+	labels := metadata.Labels
+	if labels == nil {
+		labels = make([]string, 0)
 	}
 	attributes := metadata.Attributes
 	if attributes == nil {
@@ -63,9 +63,10 @@ func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata
 		metadata.Name,
 		metadata.ContentType,
 		metadata.ContentLength,
-		tags,
+		labels,
 		attributes,
-		metadata.Source,
+		metadata.SourceId,
+		metadata.SourceIdentifier,
 		metadata.LanguageTag,
 	)
 	if result.Err() != nil {
@@ -144,7 +145,7 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 	m := pgtype.NewMap()
 
 	queryString := &strings.Builder{}
-	queryString.WriteString("SELECT id, name, tags, attributes, content_type, content_length, created, modified, source, language_tag, workflow_state_id, workflow_state_pending_id FROM metadata WHERE id = $1")
+	queryString.WriteString("SELECT id, name, labels, attributes, content_type, content_length, created, modified, source_id, source_identifier, language_tag, workflow_state_id, workflow_state_pending_id FROM metadata WHERE id = $1")
 	if len(id) > 1 {
 		for i := 1; i < len(id); i++ {
 			queryString.WriteString(fmt.Sprintf(" OR id = $%d", i+1))
@@ -188,19 +189,20 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 		var metadata content.Metadata
 		var created time.Time
 		var modified time.Time
-		var tags []string
+		var labels []string
 		var attributesJson json.RawMessage
 
 		err = result.Scan(
 			&metadata.Id,
 			&metadata.Name,
-			m.SQLScanner(&tags),
+			m.SQLScanner(&labels),
 			&attributesJson,
 			&metadata.ContentType,
 			&metadata.ContentLength,
 			&created,
 			&modified,
-			&metadata.Source,
+			&metadata.SourceId,
+			&metadata.SourceIdentifier,
 			&metadata.LanguageTag,
 			&metadata.WorkflowStateId,
 			&metadata.WorkflowStatePendingId,
@@ -220,7 +222,7 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 
 		metadata.Created = timestamppb.New(created)
 		metadata.Modified = timestamppb.New(modified)
-		metadata.Tags = tags
+		metadata.Labels = labels
 
 		result, err := traitsQuery.QueryContext(ctx, metadata.Id)
 		if err != nil {

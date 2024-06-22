@@ -3,6 +3,7 @@ package markdown
 import (
 	search "bosca.io/api/protobuf/bosca/ai"
 	"bosca.io/api/protobuf/bosca/content"
+	"bosca.io/pkg/workflow/ai/markdown/util"
 	"bosca.io/pkg/workflow/common"
 	"bosca.io/pkg/workflow/registry"
 	"context"
@@ -12,7 +13,7 @@ import (
 )
 
 func init() {
-	registry.RegisterActivity("ai.embeddings.pending.from-table", createPendingEmbeddingsFromMarkdownTable)
+	registry.RegisterActivity("ai.embeddings.pending.from-markdown-table", createPendingEmbeddingsFromMarkdownTable)
 }
 
 func createPendingEmbeddingsFromMarkdownTable(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
@@ -31,7 +32,7 @@ func createPendingEmbeddingsFromMarkdownTable(ctx context.Context, executionCont
 	idColumn := executionContext.Inputs["idColumn"].GetSingleValue()
 	contentColumn := executionContext.Inputs["contentColumn"].GetSingleValue()
 
-	pending, err := extractPendingEmbeddingsFromMarkdown(bytes, idColumn, contentColumn)
+	pending, err := util.ExtractPendingEmbeddingsFromMarkdown(bytes, idColumn, contentColumn)
 	if err != nil {
 		return err
 	}

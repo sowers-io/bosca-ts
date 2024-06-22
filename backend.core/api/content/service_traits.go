@@ -21,23 +21,12 @@ import (
 	"context"
 )
 
-func (svc *service) GetTraitWorkflowStorageSystems(ctx context.Context, request *content.TraitWorkflowStorageSystemRequest) (*content.StorageSystems, error) {
-	systemIds, err := svc.ds.GetTraitWorkflowStorageSystemIds(ctx, request.TraitId, request.WorkflowId)
+func (svc *service) GetTraitWorkflowStorageSystems(ctx context.Context, request *content.TraitWorkflowActivityIdRequest) (*content.WorkflowActivityStorageSystems, error) {
+	systems, err := svc.ds.GetWorkflowActivityStorageSystems(ctx, request.TraitId, request.WorkflowId, request.ActivityId)
 	if err != nil {
 		return nil, err
 	}
-
-	systems := make([]*content.StorageSystem, len(systemIds))
-
-	for i, id := range systemIds {
-		system, err := svc.ds.GetStorageSystem(ctx, id)
-		if err != nil {
-			return nil, err
-		}
-		systems[i] = system
-	}
-
-	return &content.StorageSystems{
+	return &content.WorkflowActivityStorageSystems{
 		Systems: systems,
 	}, nil
 }

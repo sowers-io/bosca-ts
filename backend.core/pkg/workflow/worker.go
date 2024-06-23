@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package workflow
 
 import (
@@ -10,6 +26,8 @@ import (
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
 	"go.temporal.io/sdk/workflow"
+	"slices"
+	"strings"
 	"time"
 
 	_ "bosca.io/pkg/workflow/ai/markdown"
@@ -22,19 +40,25 @@ import (
 func NewWorker(client client.Client, workflowIds []string, activityIds []string, queue string) (worker.Worker, error) {
 	w := worker.New(client, queue, worker.Options{})
 	for _, workflowId := range workflowIds {
-		w.RegisterWorkflowWithOptions(ProcessWorkflow, workflow.RegisterOptions{
-			Name: workflowId,
+		if workflowId == "" {
+			continue
+		}
+		w.RegisterWorkflowWithOptions(processWorkflow, workflow.RegisterOptions{
+			Name: strings.Trim(workflowId, " "),
 		})
 	}
 	for _, activityId := range activityIds {
-		w.RegisterActivityWithOptions(ProcessActivity, activity.RegisterOptions{
-			Name: activityId,
+		if activityId == "" {
+			continue
+		}
+		w.RegisterActivityWithOptions(processActivity, activity.RegisterOptions{
+			Name: strings.Trim(activityId, " "),
 		})
 	}
 	return w, nil
 }
 
-func ProcessWorkflow(ctx workflow.Context, workflowInstance *content.WorkflowInstance) error {
+func processWorkflow(ctx workflow.Context, executionContext *content.WorkflowActivityExecutionContext) error {
 	retryPolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second / 2,
 		BackoffCoefficient:     1.5,
@@ -47,7 +71,7 @@ func ProcessWorkflow(ctx workflow.Context, workflowInstance *content.WorkflowIns
 		RetryPolicy:         retryPolicy,
 	}
 	ctx = workflow.WithActivityOptions(ctx, options)
-	executionGroup := GetExecutionGroups(workflowInstance.Activities)
+	executionGroup := GetExecutionGroups(executionContext.Activities)
 	workflowContext := make(map[string]*content.WorkflowActivityParameterValue)
 	for _, group := range executionGroup {
 		futures := make([]workflow.Future, len(group))
@@ -57,15 +81,14 @@ func ProcessWorkflow(ctx workflow.Context, workflowInstance *content.WorkflowIns
 				inputs[k] = input
 			}
 			instanceExecutionContext := &content.WorkflowActivityExecutionContext{
-				WorkflowId: workflowInstance.Workflow.Id,
-				TraitId:    workflowInstance.TraitId,
-				Metadata:   workflowInstance.Metadata,
-				Activity:   instance,
-				Context:    workflowContext,
-				Inputs:     inputs,
+				WorkflowId:           executionContext.WorkflowId,
+				Metadata:             executionContext.Metadata,
+				Activities:           executionContext.Activities,
+				CurrentActivityIndex: int32(slices.Index(executionContext.Activities, instance)),
+				Context:              workflowContext,
 			}
 			if instance.ChildWorkflow {
-				childQueue := "metadata"
+				childQueue := "default"
 				if instance.ChildWorkflowQueue != nil {
 					childQueue = *instance.ChildWorkflowQueue
 				}
@@ -94,10 +117,11 @@ func ProcessWorkflow(ctx workflow.Context, workflowInstance *content.WorkflowIns
 	return nil
 }
 
-func ProcessActivity(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
-	activityFn := registry.GetActivity(executionContext.Activity.Id)
+func processActivity(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
+	a := executionContext.Activities[executionContext.CurrentActivityIndex]
+	activityFn := registry.GetActivity(a.Id)
 	if activityFn == nil {
-		return errors.New("TODO: " + executionContext.Activity.Id)
+		return errors.New("TODO: " + a.Id)
 	}
 	return activityFn(ctx, executionContext)
 }

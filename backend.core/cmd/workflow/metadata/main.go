@@ -27,7 +27,6 @@ import (
 
 func main() {
 	util2.InitializeLogging(nil)
-
 	client, err := util.NewAITemporalClient()
 	if err != nil {
 		slog.Error("error creating temporal client", slog.Any("error", err))

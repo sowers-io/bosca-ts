@@ -115,19 +115,19 @@ class ContentServiceStub(object):
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_traits__pb2.Trait.FromString,
                 _registered_method=True)
-        self.GetTraitWorkflowInstance = channel.unary_unary(
-                '/bosca.content.ContentService/GetTraitWorkflowInstance',
-                request_serializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowIdRequest.SerializeToString,
-                response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowInstance.FromString,
+        self.GetWorkflowActivityInstances = channel.unary_unary(
+                '/bosca.content.ContentService/GetWorkflowActivityInstances',
+                request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityInstances.FromString,
                 _registered_method=True)
-        self.GetTraitWorkflowStorageSystems = channel.unary_unary(
-                '/bosca.content.ContentService/GetTraitWorkflowStorageSystems',
-                request_serializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.SerializeToString,
+        self.GetWorkflowActivityStorageSystems = channel.unary_unary(
+                '/bosca.content.ContentService/GetWorkflowActivityStorageSystems',
+                request_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityIdRequest.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityStorageSystems.FromString,
                 _registered_method=True)
-        self.GetTraitWorkflowPrompts = channel.unary_unary(
-                '/bosca.content.ContentService/GetTraitWorkflowPrompts',
-                request_serializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.SerializeToString,
+        self.GetWorkflowActivityPrompts = channel.unary_unary(
+                '/bosca.content.ContentService/GetWorkflowActivityPrompts',
+                request_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityIdRequest.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityPrompts.FromString,
                 _registered_method=True)
         self.GetRootCollectionItems = channel.unary_unary(
@@ -348,19 +348,19 @@ class ContentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetTraitWorkflowInstance(self, request, context):
+    def GetWorkflowActivityInstances(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetTraitWorkflowStorageSystems(self, request, context):
+    def GetWorkflowActivityStorageSystems(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetTraitWorkflowPrompts(self, request, context):
+    def GetWorkflowActivityPrompts(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -596,19 +596,19 @@ def add_ContentServiceServicer_to_server(servicer, server):
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
                     response_serializer=bosca_dot_content_dot_traits__pb2.Trait.SerializeToString,
             ),
-            'GetTraitWorkflowInstance': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetTraitWorkflowInstance,
-                    request_deserializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowIdRequest.FromString,
-                    response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowInstance.SerializeToString,
+            'GetWorkflowActivityInstances': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetWorkflowActivityInstances,
+                    request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityInstances.SerializeToString,
             ),
-            'GetTraitWorkflowStorageSystems': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetTraitWorkflowStorageSystems,
-                    request_deserializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.FromString,
+            'GetWorkflowActivityStorageSystems': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetWorkflowActivityStorageSystems,
+                    request_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityIdRequest.FromString,
                     response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityStorageSystems.SerializeToString,
             ),
-            'GetTraitWorkflowPrompts': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetTraitWorkflowPrompts,
-                    request_deserializer=bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.FromString,
+            'GetWorkflowActivityPrompts': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetWorkflowActivityPrompts,
+                    request_deserializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityIdRequest.FromString,
                     response_serializer=bosca_dot_content_dot_workflows__pb2.WorkflowActivityPrompts.SerializeToString,
             ),
             'GetRootCollectionItems': grpc.unary_unary_rpc_method_handler(
@@ -1109,7 +1109,7 @@ class ContentService(object):
             _registered_method=True)
 
     @staticmethod
-    def GetTraitWorkflowInstance(request,
+    def GetWorkflowActivityInstances(request,
             target,
             options=(),
             channel_credentials=None,
@@ -1122,9 +1122,9 @@ class ContentService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/bosca.content.ContentService/GetTraitWorkflowInstance',
-            bosca_dot_content_dot_traits__pb2.TraitWorkflowIdRequest.SerializeToString,
-            bosca_dot_content_dot_workflows__pb2.WorkflowInstance.FromString,
+            '/bosca.content.ContentService/GetWorkflowActivityInstances',
+            bosca_dot_requests__pb2.IdRequest.SerializeToString,
+            bosca_dot_content_dot_workflows__pb2.WorkflowActivityInstances.FromString,
             options,
             channel_credentials,
             insecure,
@@ -1136,7 +1136,7 @@ class ContentService(object):
             _registered_method=True)
 
     @staticmethod
-    def GetTraitWorkflowStorageSystems(request,
+    def GetWorkflowActivityStorageSystems(request,
             target,
             options=(),
             channel_credentials=None,
@@ -1149,8 +1149,8 @@ class ContentService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/bosca.content.ContentService/GetTraitWorkflowStorageSystems',
-            bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.SerializeToString,
+            '/bosca.content.ContentService/GetWorkflowActivityStorageSystems',
+            bosca_dot_content_dot_workflows__pb2.WorkflowActivityIdRequest.SerializeToString,
             bosca_dot_content_dot_workflows__pb2.WorkflowActivityStorageSystems.FromString,
             options,
             channel_credentials,
@@ -1163,7 +1163,7 @@ class ContentService(object):
             _registered_method=True)
 
     @staticmethod
-    def GetTraitWorkflowPrompts(request,
+    def GetWorkflowActivityPrompts(request,
             target,
             options=(),
             channel_credentials=None,
@@ -1176,8 +1176,8 @@ class ContentService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/bosca.content.ContentService/GetTraitWorkflowPrompts',
-            bosca_dot_content_dot_traits__pb2.TraitWorkflowActivityIdRequest.SerializeToString,
+            '/bosca.content.ContentService/GetWorkflowActivityPrompts',
+            bosca_dot_content_dot_workflows__pb2.WorkflowActivityIdRequest.SerializeToString,
             bosca_dot_content_dot_workflows__pb2.WorkflowActivityPrompts.FromString,
             options,
             channel_credentials,

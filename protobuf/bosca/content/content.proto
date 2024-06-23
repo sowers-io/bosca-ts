@@ -112,21 +112,21 @@ service ContentService {
     };
   }
 
-  rpc GetTraitWorkflowInstance(TraitWorkflowIdRequest) returns (WorkflowInstance) {
+  rpc GetWorkflowActivityInstances(bosca.IdRequest) returns (WorkflowActivityInstances) {
     option (google.api.http) = {
-      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}"
+      get: "/v1/content/workflows/{id}/activities/instances"
     };
   }
 
-  rpc GetTraitWorkflowStorageSystems(TraitWorkflowActivityIdRequest) returns (WorkflowActivityStorageSystems) {
+  rpc GetWorkflowActivityStorageSystems(WorkflowActivityIdRequest) returns (WorkflowActivityStorageSystems) {
     option (google.api.http) = {
-      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/storagesystems"
+      get: "/v1/content/workflows/{workflow_id}/activities/{activity_id}/storagesystems"
     };
   }
 
-  rpc GetTraitWorkflowPrompts(TraitWorkflowActivityIdRequest) returns (WorkflowActivityPrompts) {
+  rpc GetWorkflowActivityPrompts(WorkflowActivityIdRequest) returns (WorkflowActivityPrompts) {
     option (google.api.http) = {
-      get: "/v1/content/traits/{trait_id}/workflows/{workflow_id}/activities/{activity_id}/prompts"
+      get: "/v1/content/workflows/{workflow_id}/activities/{activity_id}/prompts"
     };
   }
 

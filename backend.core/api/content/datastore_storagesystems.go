@@ -21,6 +21,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"strings"
 )
 
 func getStorageSystem(results *sql.Rows) (*model.StorageSystem, error) {
@@ -55,8 +56,8 @@ type WorkflowActivityStorageSystem struct {
 	Configuration map[string]string
 }
 
-func (ds *DataStore) GetWorkflowActivityStorageSystems(ctx context.Context, traitId, workflowId, activityId string) ([]*model.WorkflowActivityStorageSystem, error) {
-	results, err := ds.db.QueryContext(ctx, "select storage_system_id, configuration from trait_workflow_activity_storage_systems where trait_id = $1 and workflow_id = $2 and activity_id = $3", traitId, workflowId, activityId)
+func (ds *DataStore) GetWorkflowActivityInstanceStorageSystems(ctx context.Context, instanceId int64) ([]*model.WorkflowActivityStorageSystem, error) {
+	results, err := ds.db.QueryContext(ctx, "select storage_system_id, configuration from workflow_activity_instance_storage_systems where instance_id = $1", instanceId)
 	if err != nil {
 		return nil, err
 	}
@@ -77,12 +78,33 @@ func (ds *DataStore) GetWorkflowActivityStorageSystems(ctx context.Context, trai
 		if err != nil {
 			return nil, err
 		}
+		system.Models, err = ds.GetStorageSystemModels(ctx, ss.Id)
 		if err != nil {
 			return nil, err
 		}
 		systems = append(systems, system)
 	}
 	return systems, nil
+}
+
+func (ds *DataStore) AddStorageSystem(ctx context.Context, system *model.StorageSystem) (string, error) {
+	config, err := json.Marshal(system.Configuration)
+	if err != nil {
+		return "", err
+	}
+	rows, err := ds.db.QueryContext(ctx, "INSERT INTO storage_systems (type, name, description, configuration) VALUES ($1, $2, $3, ($4)::jsonb) returning id::varchar",
+		strings.Replace(system.Type.String(), "_storage_system", "", 1), system.Name, system.Description, string(config),
+	)
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+	if rows.Next() {
+		var id string
+		err = rows.Scan(&id)
+		return id, err
+	}
+	return "", rows.Err()
 }
 
 func (ds *DataStore) GetStorageSystems(ctx context.Context) ([]*model.StorageSystem, error) {
@@ -112,6 +134,17 @@ func (ds *DataStore) GetStorageSystem(ctx context.Context, id string) (*model.St
 		return getStorageSystem(results)
 	}
 	return nil, nil
+}
+
+func (ds *DataStore) AddStorageSystemModel(ctx context.Context, systemId string, modelId string, configuration map[string]string) error {
+	config, err := json.Marshal(configuration)
+	if err != nil {
+		return err
+	}
+	_, err = ds.db.ExecContext(ctx, "INSERT INTO storage_system_models (system_id, model_id, configuration) VALUES ($1, $2, ($3)::jsonb)",
+		systemId, modelId, string(config),
+	)
+	return err
 }
 
 func (ds *DataStore) GetStorageSystemModels(ctx context.Context, systemId string) ([]*model.StorageSystemModel, error) {

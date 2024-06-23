@@ -43,6 +43,24 @@ func NewAuthorizationService(permissions security.PermissionManager, dataSource 
 	return svc
 }
 
+func (svc *authorizationService) GetSources(ctx context.Context, request *protobuf.Empty) (*grpc.Sources, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetSources(ctx, request)
+}
+
+func (svc *authorizationService) GetSource(ctx context.Context, request *protobuf.IdRequest) (*grpc.Source, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetSource(ctx, request)
+}
+
 func (svc *authorizationService) CheckPermission(ctx context.Context, request *grpc.PermissionCheckRequest) (*grpc.PermissionCheckResponse, error) {
 	err := svc.permissions.CheckWithSubjectIdError(ctx, request.SubjectType, request.Subject, request.ObjectType, request.Object, request.Action)
 	if err != nil {
@@ -252,15 +270,6 @@ func (svc *authorizationService) GetTraits(ctx context.Context, request *protobu
 	return svc.service.GetTraits(ctx, request)
 }
 
-func (svc *authorizationService) GetTraitWorkflowStorageSystems(ctx context.Context, request *grpc.TraitWorkflowActivityIdRequest) (*grpc.WorkflowActivityStorageSystems, error) {
-	// TODO: maybe a trait permission object?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetTraitWorkflowStorageSystems(ctx, request)
-}
-
 func (svc *authorizationService) GetModels(ctx context.Context, request *protobuf.Empty) (*grpc.Models, error) {
 	// TODO: permission type?
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
@@ -303,6 +312,42 @@ func (svc *authorizationService) GetWorkflows(ctx context.Context, request *prot
 		return nil, err
 	}
 	return svc.service.GetWorkflows(ctx, request)
+}
+
+func (svc *authorizationService) GetWorkflow(ctx context.Context, request *protobuf.IdRequest) (*grpc.Workflow, error) {
+	// TODO
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetWorkflow(ctx, request)
+}
+
+func (svc *authorizationService) GetWorkflowActivityInstances(ctx context.Context, request *protobuf.IdRequest) (*grpc.WorkflowActivityInstances, error) {
+	// TODO
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetWorkflowActivityInstances(ctx, request)
+}
+
+func (svc *authorizationService) GetWorkflowActivityStorageSystems(ctx context.Context, request *grpc.WorkflowActivityIdRequest) (*grpc.WorkflowActivityStorageSystems, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetWorkflowActivityStorageSystems(ctx, request)
+}
+
+func (svc *authorizationService) GetWorkflowActivityPrompts(ctx context.Context, request *grpc.WorkflowActivityIdRequest) (*grpc.WorkflowActivityPrompts, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetWorkflowActivityPrompts(ctx, request)
 }
 
 func (svc *authorizationService) GetWorkflowStates(ctx context.Context, request *protobuf.Empty) (*grpc.WorkflowStates, error) {

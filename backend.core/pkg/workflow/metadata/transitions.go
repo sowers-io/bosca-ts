@@ -33,7 +33,7 @@ func completeTransition(ctx context.Context, executionContext *content.WorkflowA
 	contentService := common.GetContentService(ctx)
 	_, err := contentService.CompleteTransitionWorkflow(common.GetServiceAuthorizedContext(ctx), &content.CompleteTransitionWorkflowRequest{
 		MetadataId: executionContext.Metadata.Id,
-		Status:     executionContext.Activity.Configuration["status"],
+		Status:     executionContext.Activities[executionContext.CurrentActivityIndex].Configuration["status"],
 		Success:    true,
 	})
 	return err
@@ -43,18 +43,19 @@ func failTransition(ctx context.Context, executionContext *content.WorkflowActiv
 	contentService := common.GetContentService(ctx)
 	_, err := contentService.CompleteTransitionWorkflow(common.GetServiceAuthorizedContext(ctx), &content.CompleteTransitionWorkflowRequest{
 		MetadataId: executionContext.Metadata.Id,
-		Status:     executionContext.Activity.Configuration["status"],
+		Status:     executionContext.Activities[executionContext.CurrentActivityIndex].Configuration["status"],
 		Success:    false,
 	})
 	return err
 }
 
 func transitionTo(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
+	activity := executionContext.Activities[executionContext.CurrentActivityIndex]
 	contentService := common.GetContentService(ctx)
 	_, err := contentService.BeginTransitionWorkflow(common.GetServiceAuthorizedContext(ctx), &content.TransitionWorkflowRequest{
 		MetadataId: executionContext.Metadata.Id,
-		StateId:    executionContext.Activity.Configuration["state"],
-		Status:     executionContext.Activity.Configuration["status"],
+		StateId:    activity.Configuration["state"],
+		Status:     activity.Configuration["status"],
 	})
 	return err
 }

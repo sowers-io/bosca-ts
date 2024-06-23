@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package bible
 
 import (
@@ -19,17 +35,18 @@ func init() {
 }
 
 func createChapterVerseTable(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
+	activity := executionContext.Activities[executionContext.CurrentActivityIndex]
 	contentService := common.GetContentService(ctx)
 
-	relationships, err := contentService.GetMetadataRelationships(common.GetServiceAuthorizedContext(ctx), &content.MetadataRelationshipIdRequest{
+	bibleRelationship, err := contentService.GetMetadataRelationships(common.GetServiceAuthorizedContext(ctx), &content.MetadataRelationshipIdRequest{
 		Id:           executionContext.Metadata.Id,
 		Relationship: "usx-bible",
 	})
 	if err != nil {
 		return err
 	}
-	if len(relationships.Relationships) != 1 {
-		return errors.New("expected only one relationship, got " + strconv.Itoa(len(relationships.Relationships)))
+	if len(bibleRelationship.Relationships) != 1 {
+		return errors.New("expected only one relationship, got " + strconv.Itoa(len(bibleRelationship.Relationships)))
 	}
 
 	metadataFile, err := common.DownloadTemporaryMetadataFile(ctx, executionContext.Metadata.Id)
@@ -46,7 +63,7 @@ func createChapterVerseTable(ctx context.Context, executionContext *content.Work
 
 	document := &ast.Document{}
 
-	relationships, err = contentService.GetMetadataRelationships(common.GetServiceAuthorizedContext(ctx), &content.MetadataRelationshipIdRequest{
+	verseRelationships, err := contentService.GetMetadataRelationships(common.GetServiceAuthorizedContext(ctx), &content.MetadataRelationshipIdRequest{
 		Id:           executionContext.Metadata.Id,
 		Relationship: "usx-verse",
 	})
@@ -54,13 +71,13 @@ func createChapterVerseTable(ctx context.Context, executionContext *content.Work
 		return err
 	}
 	verseIds := make(map[string]string)
-	for _, relationship := range relationships.Relationships {
+	for _, relationship := range verseRelationships.Relationships {
 		verseIds[relationship.Attributes["usfm"]] = relationship.MetadataId2
 	}
 
 	for _, book := range bundle.Books() {
 		for _, chapter := range book.Chapters {
-			if chapter.GetUsfm() != executionContext.Metadata.Name {
+			if chapter.GetUsfm() != executionContext.Metadata.Attributes["usfm"] {
 				continue
 			}
 
@@ -110,6 +127,6 @@ func createChapterVerseTable(ctx context.Context, executionContext *content.Work
 	}
 
 	output := string(markdown.Render(document, md.NewRenderer()))
-	supplementaryId := executionContext.Activity.Outputs["supplementaryId"]
+	supplementaryId := activity.Outputs["supplementaryId"]
 	return common.SetSupplementaryContent(ctx, executionContext, supplementaryId, "text/markdown", []byte(output))
 }

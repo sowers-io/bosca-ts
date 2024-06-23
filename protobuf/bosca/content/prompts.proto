@@ -20,9 +20,10 @@ option go_package = "bosca.io/api/protobuf/bosca/content";
 package bosca.content;
 
 message Prompt {
-  string name = 1;
-  string description = 2;
-  string prompt = 3;
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string prompt = 4;
 }
 
 message Prompts {

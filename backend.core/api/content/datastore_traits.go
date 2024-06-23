@@ -21,6 +21,27 @@ import (
 	"context"
 )
 
+func (ds *DataStore) AddTrait(ctx context.Context, trait *content.Trait) error {
+	_, err := ds.db.ExecContext(ctx, "INSERT INTO traits (id, name, description) VALUES ($1, $2, $3)",
+		trait.Id, trait.Name, trait.Description,
+	)
+	if err != nil {
+		return err
+	}
+	stmtInput, err := ds.db.PrepareContext(ctx, "INSERT INTO trait_workflows (trait_id, workflow_id) VALUES ($1, $2)")
+	if err != nil {
+		return err
+	}
+	defer stmtInput.Close()
+	for _, workflowId := range trait.WorkflowIds {
+		_, err = stmtInput.ExecContext(ctx, trait.Id, workflowId)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (ds *DataStore) GetTraits(ctx context.Context) ([]*content.Trait, error) {
 	query := "select id, name, description from traits"
 	rows, err := ds.db.QueryContext(ctx, query)
@@ -64,9 +85,9 @@ func (ds *DataStore) GetTraitWorkflowIds(ctx context.Context, id string) ([]stri
 	return ids, nil
 }
 
-func (ds *DataStore) GetTraitWorkflowActivityStorageSystemIds(ctx context.Context, traitId, workflowId, activityId string) ([]string, error) {
-	query := "select storage_system_id from trait_workflow_activity_storage_systems where trait_id = $1 and workflow_id = $2 and activity_id = $3"
-	rows, err := ds.db.QueryContext(ctx, query, traitId, workflowId, activityId)
+func (ds *DataStore) GetWorkflowActivityStorageSystemIds(ctx context.Context, workflowId, activityId string) ([]string, error) {
+	query := "select storage_system_id from workflow_activity_storage_systems where workflow_id = $1 and activity_id = $2"
+	rows, err := ds.db.QueryContext(ctx, query, workflowId, activityId)
 	if err != nil {
 		return nil, err
 	}

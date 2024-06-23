@@ -20,6 +20,7 @@ option go_package = "bosca.io/api/protobuf/bosca/content";
 import "bosca/content/metadata.proto";
 import "bosca/content/prompts.proto";
 import "bosca/content/storage_systems.proto";
+import "bosca/content/model.proto";
 
 package bosca.content;
 
@@ -113,36 +114,44 @@ message WorkflowActivityParameterValues {
 }
 
 message WorkflowActivityInstance {
-  string id = 1;
-  bool child_workflow = 2;
-  optional string child_workflow_queue = 3;
-  int32 execution_group = 4;
-  map<string, string> configuration = 5;
-  map<string, WorkflowActivityParameterValue> inputs = 7;
-  map<string, WorkflowActivityParameterValue> outputs = 8;
+  int64 instance_id = 1;
+  string id = 2;
+  bool child_workflow = 3;
+  optional string child_workflow_queue = 4;
+  int32 execution_group = 5;
+  repeated WorkflowActivityPrompt prompts = 6;
+  repeated WorkflowActivityStorageSystem storage_systems = 7;
+  repeated WorkflowActivityModel models = 8;
+  map<string, string> configuration = 9;
+  map<string, WorkflowActivityParameterValue> inputs = 10;
+  map<string, WorkflowActivityParameterValue> outputs = 11;
 }
 
-message WorkflowInstance {
-  string trait_id = 1;
-  Workflow workflow = 2;
-  repeated WorkflowActivityInstance activities = 3;
-  string queue = 4;
-  Metadata metadata = 5;
-  map<string, string> context = 6;
+message WorkflowActivityInstances {
+  repeated WorkflowActivityInstance instances = 1;
+}
+
+message WorkflowActivityIdRequest {
+  string workflow_id = 1;
+  string activity_id = 2;
 }
 
 message WorkflowActivityExecutionContext {
   string workflow_id = 1;
-  string trait_id = 2;
-  WorkflowActivityInstance activity = 3;
+  repeated WorkflowActivityInstance activities = 2;
+  int32 current_activity_index = 3;
   Metadata metadata = 4;
   map<string, WorkflowActivityParameterValue> context = 5;
-  map<string, WorkflowActivityParameterValue> inputs = 6;
-  map<string, WorkflowActivityParameterValue> outputs = 7;
 }
 
 message WorkflowActivityStorageSystem {
   StorageSystem storage_system = 1;
+  repeated StorageSystemModel models = 2;
+  map<string, string> configuration = 3;
+}
+
+message WorkflowActivityModel {
+  bosca.content.Model model = 1;
   map<string, string> configuration = 2;
 }
 
@@ -156,5 +165,5 @@ message WorkflowActivityPrompt {
 }
 
 message WorkflowActivityPrompts {
-  WorkflowActivityPrompt prompts = 1;
+  repeated WorkflowActivityPrompt prompts = 1;
 }

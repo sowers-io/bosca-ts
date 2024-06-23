@@ -145,31 +145,33 @@ create table trait_workflows
     foreign key (workflow_id) references workflows (id)
 );
 
-create table trait_workflow_activity_storage_systems
+create table workflow_activity_instance_storage_systems
 (
-    trait_id          varchar not null,
-    workflow_id       varchar not null,
-    activity_id       varchar not null,
-    storage_system_id uuid    not null,
-    configuration     jsonb   not null default '{}'::jsonb,
-    primary key (trait_id, workflow_id, activity_id, storage_system_id),
-    foreign key (trait_id) references traits (id),
-    foreign key (workflow_id) references workflows (id),
-    foreign key (activity_id) references workflow_activities (id),
+    instance_id       bigint not null,
+    storage_system_id uuid   not null,
+    configuration     jsonb  not null default '{}'::jsonb,
+    primary key (instance_id, storage_system_id),
+    foreign key (instance_id) references workflow_activity_instances (id),
     foreign key (storage_system_id) references storage_systems (id)
 );
 
-create table trait_workflow_activity_prompts
+create table workflow_activity_instance_models
 (
-    trait_id      varchar not null,
-    workflow_id   varchar not null,
-    activity_id   varchar not null,
-    prompt_id     uuid    not null,
-    configuration jsonb   not null default '{}'::jsonb,
-    primary key (trait_id, workflow_id, prompt_id),
-    foreign key (trait_id) references traits (id),
-    foreign key (workflow_id) references workflows (id),
-    foreign key (activity_id) references workflow_activities (id),
+    instance_id   bigint not null,
+    model_id      uuid   not null,
+    configuration jsonb  not null default '{}'::jsonb,
+    primary key (instance_id, model_id),
+    foreign key (instance_id) references workflow_activity_instances (id),
+    foreign key (model_id) references models (id)
+);
+
+create table workflow_activity_instance_prompts
+(
+    instance_id   bigint not null,
+    prompt_id     uuid   not null,
+    configuration jsonb  not null default '{}'::jsonb,
+    primary key (instance_id, prompt_id),
+    foreign key (instance_id) references workflow_activity_instances (id),
     foreign key (prompt_id) references prompts (id)
 );
 
@@ -404,13 +406,10 @@ drop table if exists workflow_states cascade;
 drop type if exists workflow_state_type cascade;
 drop table if exists models cascade;
 drop table if exists trait_workflows cascade;
-drop table if exists workflow_trait_storage_systems cascade;
 drop table if exists storage_systems cascade;
 drop table if exists storage_system_models cascade;
 drop type storage_system_type;
 drop table prompts cascade;
-drop table trait_workflow_activity_prompts cascade;
-drop table trait_workflow_activity_storage_systems cascade;
 drop table sources cascade;
 drop table workflow_activities cascade;
 drop table workflow_activity_instances cascade;
@@ -420,4 +419,7 @@ drop table workflow_activity_inputs cascade;
 drop table workflow_activity_outputs cascade;
 drop table workflow_activity_instance_inputs cascade;
 drop table workflow_activity_instance_outputs cascade;
+drop table workflow_activity_instance_storage_systems cascade;
+drop table workflow_activity_instance_prompts cascade;
+drop table workflow_activity_instance_models cascade;
 -- +goose StatementEnd

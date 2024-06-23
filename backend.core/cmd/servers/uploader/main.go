@@ -121,7 +121,9 @@ func main() {
 
 	source, err := contentClient.GetSource(context.Background(), &bosca.IdRequest{
 		Id: "uploader",
-	})
+	}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+		HeaderValue: "Token " + cfg.Security.ServiceAccountToken,
+	}})
 	if err != nil {
 		slog.Error("failed to get source: ", slog.Any("error", err))
 		os.Exit(1)
@@ -209,7 +211,7 @@ func main() {
 				SourceIdentifier: &hook.Upload.ID,
 			}
 			_, err := contentClient.AddMetadata(context.Background(), &content.AddMetadataRequest{
-				Collection: collection,
+				Collection: &collection,
 				Metadata:   metadata,
 			}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
 				HeaderValue: "Token " + cfg.Security.ServiceAccountToken,

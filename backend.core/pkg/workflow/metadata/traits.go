@@ -35,20 +35,31 @@ func ProcessTraits(ctx workflow.Context, executionContext *content.WorkflowActiv
 				return err
 			}
 			for _, workflowId := range trait.WorkflowIds {
-				workflowInstance, err := contentService.GetTraitWorkflowInstance(
+				wf, err := contentService.GetWorkflow(serviceCtx, &bosca.IdRequest{
+					Id: workflowId,
+				})
+				if err != nil {
+					return err
+				}
+				instances, err := contentService.GetWorkflowActivityInstances(
 					serviceCtx,
-					&content.TraitWorkflowIdRequest{
-						TraitId:    traitId,
-						WorkflowId: workflowId,
+					&bosca.IdRequest{
+						Id: workflowId,
 					},
 				)
 				if err != nil {
 					return err
 				}
+				childExecutionContext := &content.WorkflowActivityExecutionContext{
+					WorkflowId: workflowId,
+					Metadata:   executionContext.Metadata,
+					Context:    executionContext.Context,
+					Activities: instances.Instances,
+				}
 				traitWorkflowCtx := workflow.WithChildOptions(ctx, workflow.ChildWorkflowOptions{
-					TaskQueue: workflowInstance.Queue,
+					TaskQueue: wf.Queue,
 				})
-				err = workflow.ExecuteChildWorkflow(traitWorkflowCtx, workflowId, workflowInstance).Get(ctx, nil)
+				err = workflow.ExecuteChildWorkflow(traitWorkflowCtx, workflowId, childExecutionContext).Get(ctx, nil)
 				if err != nil {
 					return err
 				}

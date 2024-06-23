@@ -90,6 +90,6 @@ func extractToSupplementaryText(ctx context.Context, executionContext *content.W
 	defer os.Remove(file.Name())
 	_, err = io.Copy(file, response.Body)
 	_, _ = file.Seek(0, 0)
-	supplementaryId := executionContext.Activity.Outputs["supplementaryId"]
+	supplementaryId := executionContext.Activities[executionContext.CurrentActivityIndex].Outputs["supplementaryId"]
 	return common.SetSupplementaryContentFile(ctx, executionContext, supplementaryId, "text/plain", file)
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package markdown
 
 import (
@@ -17,7 +33,8 @@ func init() {
 }
 
 func createPendingEmbeddingsFromMarkdownTable(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
-	inputSupplementaryId := executionContext.Inputs["supplementaryId"]
+	activity := executionContext.Activities[executionContext.CurrentActivityIndex]
+	inputSupplementaryId := activity.Inputs["supplementaryId"]
 	file, err := common.DownloadTemporarySupplementaryFile(ctx, executionContext.Metadata.Id, inputSupplementaryId)
 	if err != nil {
 		return err
@@ -29,8 +46,8 @@ func createPendingEmbeddingsFromMarkdownTable(ctx context.Context, executionCont
 		return err
 	}
 
-	idColumn := executionContext.Inputs["idColumn"].GetSingleValue()
-	contentColumn := executionContext.Inputs["contentColumn"].GetSingleValue()
+	idColumn := activity.Inputs["idColumn"].GetSingleValue()
+	contentColumn := activity.Inputs["contentColumn"].GetSingleValue()
 
 	pending, err := util.ExtractPendingEmbeddingsFromMarkdown(bytes, idColumn, contentColumn)
 	if err != nil {
@@ -46,6 +63,6 @@ func createPendingEmbeddingsFromMarkdownTable(ctx context.Context, executionCont
 		return err
 	}
 
-	outputSupplementaryId := executionContext.Activity.Outputs["supplementaryId"]
+	outputSupplementaryId := activity.Outputs["supplementaryId"]
 	return common.SetSupplementaryContent(ctx, executionContext, outputSupplementaryId, "application/protobuf", data)
 }

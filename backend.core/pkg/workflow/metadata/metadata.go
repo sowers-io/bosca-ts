@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package content
+package metadata
 
 import (
 	"bosca.io/api/protobuf/bosca/content"
-	"context"
+	"go.temporal.io/sdk/workflow"
 )
 
-func (svc *service) GetTraitWorkflowStorageSystems(ctx context.Context, request *content.TraitWorkflowActivityIdRequest) (*content.WorkflowActivityStorageSystems, error) {
-	systems, err := svc.ds.GetWorkflowActivityStorageSystems(ctx, request.TraitId, request.WorkflowId, request.ActivityId)
-	if err != nil {
-		return nil, err
-	}
-	return &content.WorkflowActivityStorageSystems{
-		Systems: systems,
-	}, nil
+func ProcessMetadata(ctx workflow.Context, executionContext *content.WorkflowActivityExecutionContext) error {
+
+	return nil
 }

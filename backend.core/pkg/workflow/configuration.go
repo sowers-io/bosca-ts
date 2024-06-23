@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package workflow
 
 import (
@@ -32,6 +48,15 @@ func (c *Configuration) Validate() error {
 	}
 	activities := c.Workflows.Activities
 	for aid, activity := range activities {
+		if activity.Inputs == nil {
+			activity.Inputs = make(map[string]interface{})
+		}
+		if activity.Outputs == nil {
+			activity.Outputs = make(map[string]interface{})
+		}
+		if activity.Configuration == nil {
+			activity.Configuration = make(map[string]string)
+		}
 		for iid, input := range activity.Inputs {
 			if input != "supplementary" && input != "context" {
 				return errors.New(fmt.Sprintf("invalid input type '%s' for input '%s' at activity '%s'", input, iid, aid))
@@ -48,53 +73,47 @@ func (c *Configuration) Validate() error {
 		if w.Configuration == nil {
 			w.Configuration = make(map[string]string)
 		}
-		for aid, activity := range w.Activities {
-			if activity.ChildWorkflow {
-				if _, ok := workflows[aid]; !ok {
-					return errors.New(fmt.Sprintf("child workflow '%s' in workflow '%s' does not exist", aid, wid))
-				}
+		for aid, activityInstance := range w.Activities {
+			if activity, ok := activities[aid]; !ok {
+				return errors.New(fmt.Sprintf("workflow '%s' activities '%s' does not exist", wid, aid))
 			} else {
-				if def, ok := activities[aid]; !ok {
-					return errors.New(fmt.Sprintf("workflow '%s' activities '%s' does not exist", wid, aid))
-				} else {
-					if activity.Inputs == nil {
-						activity.Inputs = make(map[string]interface{})
+				if activityInstance.Inputs == nil {
+					activityInstance.Inputs = make(map[string]interface{})
+				}
+				if activityInstance.Outputs == nil {
+					activityInstance.Outputs = make(map[string]interface{})
+				}
+				if activityInstance.Configuration == nil {
+					activityInstance.Configuration = make(map[string]string)
+				}
+				for iid, input := range activity.Inputs {
+					if _, ok := activityInstance.Inputs[iid]; !ok {
+						activityInstance.Inputs[iid] = input
 					}
-					if activity.Outputs == nil {
-						activity.Outputs = make(map[string]interface{})
+				}
+				for oid, input := range activity.Outputs {
+					if _, ok := activityInstance.Outputs[oid]; !ok {
+						activityInstance.Outputs[oid] = input
 					}
-					if activity.Configuration == nil {
-						activity.Configuration = make(map[string]string)
+				}
+				for cid, cfg := range activity.Configuration {
+					if _, ok := activityInstance.Configuration[cid]; !ok {
+						activityInstance.Configuration[cid] = cfg
 					}
-					for iid, input := range def.Inputs {
-						if _, ok := activity.Inputs[iid]; !ok {
-							activity.Inputs[iid] = input
-						}
+				}
+				for iid, _ := range activity.Inputs {
+					if _, ok := activityInstance.Inputs[iid]; !ok {
+						return errors.New(fmt.Sprintf("workflow '%s' activities '%s' has invalid input '%s'", wid, aid, iid))
 					}
-					for oid, input := range def.Outputs {
-						if _, ok := activity.Outputs[oid]; !ok {
-							activity.Outputs[oid] = input
-						}
+				}
+				for oid, _ := range activityInstance.Outputs {
+					if _, ok := activity.Outputs[oid]; !ok {
+						return errors.New(fmt.Sprintf("workflow '%s' activities '%s' has invalid output '%s'", wid, aid, oid))
 					}
-					for cid, cfg := range def.Configuration {
-						if _, ok := activity.Configuration[cid]; !ok {
-							activity.Configuration[cid] = cfg
-						}
-					}
-					for iid, _ := range activity.Inputs {
-						if _, ok := def.Inputs[iid]; !ok {
-							return errors.New(fmt.Sprintf("workflow '%s' activities '%s' has invalid input '%s'", wid, aid, iid))
-						}
-					}
-					for oid, _ := range activity.Outputs {
-						if _, ok := def.Outputs[oid]; !ok {
-							return errors.New(fmt.Sprintf("workflow '%s' activities '%s' has invalid output '%s'", wid, aid, oid))
-						}
-					}
-					for cfg, _ := range activity.Configuration {
-						if _, ok := def.Configuration[cfg]; !ok {
-							return errors.New(fmt.Sprintf("workflow '%s' activities '%s' has invalid configuration '%s'", wid, aid, cfg))
-						}
+				}
+				for cfg, _ := range activityInstance.Configuration {
+					if _, ok := activity.Configuration[cfg]; !ok {
+						return errors.New(fmt.Sprintf("workflow '%s' activities '%s' has invalid configuration '%s'", wid, aid, cfg))
 					}
 				}
 			}
@@ -104,6 +123,9 @@ func (c *Configuration) Validate() error {
 }
 
 type TraitConfiguration struct {
+	Name        string
+	Description string
+	WorkflowIds []string `yaml:"workflowIds"`
 }
 
 type ModelConfiguration struct {
@@ -113,19 +135,31 @@ type ModelConfiguration struct {
 }
 
 type PromptConfiguration struct {
-	Prompt string
+	Name        string
+	Description string
+	Prompt      string
+}
+
+type StorageSystemModel struct {
+	Configuration map[string]string
 }
 
 type StorageSystemConfiguration struct {
+	Name          string
 	Type          string
+	Description   string
+	Models        map[string]StorageSystemModel
 	Configuration map[string]string
 }
 
 type StateConfiguration struct {
-	Name        string
-	Description string
-	Type        string
-	Workflow    string
+	Name          string
+	Description   string
+	Type          string
+	Workflow      string
+	EntryWorkflow string
+	ExitWorkflow  string
+	Configuration map[string]string
 }
 
 type TransitionConfiguration struct {
@@ -135,8 +169,11 @@ type TransitionConfiguration struct {
 }
 
 type WorkflowConfiguration struct {
-	Activities    map[string]ActivityConfiguration `yaml:"activities"`
-	Configuration map[string]string                `yaml:"configuration"`
+	Name          string
+	Description   string
+	Queue         string
+	Activities    map[string]ActivityInstanceConfiguration `yaml:"activities"`
+	Configuration map[string]string                        `yaml:"configuration"`
 }
 
 type WorkflowsConfiguration struct {
@@ -146,7 +183,20 @@ type WorkflowsConfiguration struct {
 	Workflows   map[string]WorkflowConfiguration `yaml:"workflows"`
 }
 
+type ActivityConfigurationStorageSystem struct {
+	Configuration map[string]string
+}
+
+type ActivityConfigurationPrompt struct {
+	Configuration map[string]string
+}
+
+type ActivityConfigurationModel struct {
+	Configuration map[string]string
+}
+
 type ActivityConfiguration struct {
+	Name               string
 	Description        string
 	ExecutionGroup     int32  `yaml:"executionGroup"`
 	ChildWorkflow      bool   `yaml:"childWorkflow"`
@@ -154,6 +204,16 @@ type ActivityConfiguration struct {
 	Inputs             map[string]interface{}
 	Outputs            map[string]interface{}
 	Configuration      map[string]string
+}
+
+type ActivityInstanceConfiguration struct {
+	ExecutionGroup int32 `yaml:"executionGroup"`
+	Configuration  map[string]string
+	Models         map[string]ActivityConfigurationModel         `yaml:"models"`
+	Prompts        map[string]ActivityConfigurationPrompt        `yaml:"prompts"`
+	StorageSystems map[string]ActivityConfigurationStorageSystem `yaml:"storageSystems"`
+	Inputs         map[string]interface{}
+	Outputs        map[string]interface{}
 }
 
 func (cfg *ActivityConfiguration) ToActivityInstance() *content.WorkflowActivityInstance {

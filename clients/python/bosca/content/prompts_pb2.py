@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x62osca/content/prompts.proto\x12\rbosca.content\";\n\x06Prompt\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x0e\n\x06prompt\x18\x03 \x01(\t\"1\n\x07Prompts\x12&\n\x07prompts\x18\x01 \x01(\x0b\x32\x15.bosca.content.PromptB%Z#bosca.io/api/protobuf/bosca/contentb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x62osca/content/prompts.proto\x12\rbosca.content\"G\n\x06Prompt\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x0e\n\x06prompt\x18\x04 \x01(\t\"1\n\x07Prompts\x12&\n\x07prompts\x18\x01 \x01(\x0b\x32\x15.bosca.content.PromptB%Z#bosca.io/api/protobuf/bosca/contentb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,7 +23,7 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z#bosca.io/api/protobuf/bosca/content'
   _globals['_PROMPT']._serialized_start=46
-  _globals['_PROMPT']._serialized_end=105
-  _globals['_PROMPTS']._serialized_start=107
-  _globals['_PROMPTS']._serialized_end=156
+  _globals['_PROMPT']._serialized_end=117
+  _globals['_PROMPTS']._serialized_start=119
+  _globals['_PROMPTS']._serialized_end=168
 # @@protoc_insertion_point(module_scope)

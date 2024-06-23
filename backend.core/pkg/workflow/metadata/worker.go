@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package main
+package metadata
 
 import (
-	util2 "bosca.io/pkg/util"
+	_ "bosca.io/pkg/workflow/ai/markdown"
+	_ "bosca.io/pkg/workflow/bible"
+	_ "bosca.io/pkg/workflow/common"
+	_ "bosca.io/pkg/workflow/registry"
+	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/worker"
+	"go.temporal.io/sdk/workflow"
 )
 
-func main() {
-	util2.InitializeLogging(nil)
-
-	//client, err := util.NewAITemporalClient()
-	//if err != nil {
-	//	slog.Error("error creating temporal client", slog.Any("error", err))
-	//	os.Exit(1)
-	//}
-	//err = bible.NewWorker(client).Run(worker.InterruptCh())
-	//if err != nil {
-	//	slog.Error("error starting worker", slog.Any("error", err))
-	//	os.Exit(1)
-	//}
+func NewWorker(client client.Client) worker.Worker {
+	w := worker.New(client, "metadata", worker.Options{})
+	w.RegisterWorkflowWithOptions(ProcessMetadata, workflow.RegisterOptions{
+		Name: "metadata.process",
+	})
+	w.RegisterWorkflowWithOptions(ProcessTraits, workflow.RegisterOptions{
+		Name: "traits.process",
+	})
+	return w
 }

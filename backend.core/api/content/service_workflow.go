@@ -36,6 +36,11 @@ func (svc *service) GetTraits(ctx context.Context, request *protobuf.Empty) (*gr
 	}, err
 }
 
+func (svc *service) GetWorkflow(ctx context.Context, request *protobuf.IdRequest) (*grpc.Workflow, error) {
+	workflow, err := svc.ds.GetWorkflow(ctx, request.Id)
+	return workflow, err
+}
+
 func (svc *service) GetWorkflows(ctx context.Context, request *protobuf.Empty) (*grpc.Workflows, error) {
 	workflows, err := svc.ds.GetWorkflows(ctx)
 	if err != nil {
@@ -43,6 +48,16 @@ func (svc *service) GetWorkflows(ctx context.Context, request *protobuf.Empty) (
 	}
 	return &grpc.Workflows{
 		Workflows: workflows,
+	}, err
+}
+
+func (svc *service) GetWorkflowActivityInstances(ctx context.Context, request *protobuf.IdRequest) (*grpc.WorkflowActivityInstances, error) {
+	instances, err := svc.ds.GetWorkflowActivityInstances(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &grpc.WorkflowActivityInstances{
+		Instances: instances,
 	}, err
 }
 
@@ -80,19 +95,28 @@ func (svc *service) executeEnterExitWorkflow(ctx context.Context, metadataId str
 	return nil
 }
 
-func (svc *service) executeWorkflow(ctx context.Context, metadataId string, workflowId string) error {
+func (svc *service) executeWorkflow(ctx context.Context, metadata *grpc.Metadata, workflowId string) error {
 	workflow, err := svc.ds.GetWorkflow(ctx, workflowId)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to get workflow", slog.String("id", metadataId), slog.String("workflowId", workflowId))
+		slog.ErrorContext(ctx, "failed to get workflow", slog.String("id", metadata.Id), slog.String("workflowId", workflowId))
 		return err
 	}
 	if workflow == nil {
-		slog.ErrorContext(ctx, "workflow not found", slog.String("id", metadataId), slog.String("workflowId", workflowId))
+		slog.ErrorContext(ctx, "workflow not found", slog.String("id", metadata.Id), slog.String("workflowId", workflowId))
 		return status.Error(codes.Internal, "workflow not found")
 	}
+	executionContext := &grpc.WorkflowActivityExecutionContext{
+		WorkflowId: workflowId,
+		Metadata:   metadata,
+	}
+	instances, err := svc.ds.GetWorkflowActivityInstances(ctx, workflowId)
+	if err != nil {
+		return err
+	}
+	executionContext.Activities = instances
 	_, err = svc.temporalClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
 		TaskQueue: workflow.Queue,
-	}, workflow.Id, metadataId)
+	}, workflow.Id, executionContext)
 	if err != nil {
 		return err
 	}
@@ -151,7 +175,7 @@ func (svc *service) transition(ctx context.Context, metadata *grpc.Metadata, nex
 		if err != nil {
 			return err
 		}
-		err = svc.executeWorkflow(ctx, metadata.Id, *nextState.WorkflowId)
+		err = svc.executeWorkflow(ctx, metadata, *nextState.WorkflowId)
 		if err != nil {
 			_ = svc.ds.TransitionMetadataWorkflowStateId(ctx, metadata, nextState, status, false, true)
 			return err

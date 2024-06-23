@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 
-package main
+package content
 
 import (
-	util2 "bosca.io/pkg/util"
-	"bosca.io/pkg/workflow/search"
-	"bosca.io/pkg/workflow/util"
-	"go.temporal.io/sdk/worker"
-	"log/slog"
-	"os"
+	"bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca/content"
+	"context"
 )
 
-func main() {
-	util2.InitializeLogging(nil)
+func (svc *service) GetSources(ctx context.Context, request *bosca.Empty) (*content.Sources, error) {
+	systems, err := svc.ds.GetSources(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &content.Sources{
+		Sources: systems,
+	}, nil
+}
 
-	client, err := util.NewAITemporalClient()
-	if err != nil {
-		slog.Error("error creating temporal client", slog.Any("error", err))
-		os.Exit(1)
-	}
-	err = search.NewWorker(client).Run(worker.InterruptCh())
-	if err != nil {
-		slog.Error("error starting worker", slog.Any("error", err))
-		os.Exit(1)
-	}
+func (svc *service) GetSource(ctx context.Context, request *bosca.IdRequest) (*content.Source, error) {
+	return svc.ds.GetSource(ctx, request.Id)
 }

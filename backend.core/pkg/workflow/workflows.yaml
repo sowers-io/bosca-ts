@@ -1,9 +1,14 @@
 traits:
   common.text: { }
-  bible.usx: { }
-  bible.usx.book: { }
-  bible.usx.chapter: { }
-  bible.usx.verse: { }
+  bible.usx:
+    workflowIds:
+      - bible.usx
+  bible.usx.chapter:
+    workflowIds:
+      - bible.usx.chapter
+  bible.usx.verse:
+    workflowIds:
+      - bible.usx.verse
   common.temporary: { }
 
 models:
@@ -28,25 +33,31 @@ storageSystems:
       type: meilisearch
   bible.chapter.vector.index:
     type: vector
+    models:
+      phi3:mini:
+        configuration: { }
     configuration:
       indexName: biblechapters
       type: qdrant
       vectorSize: 3072
-      model: phi3:mini
   bible.verse.vector.index:
     type: vector
+    models:
+      phi3:mini:
+        configuration: { }
     configuration:
       indexName: bibleverses
       type: qdrant
       vectorSize: 3072
-      model: phi3:mini
   bible.verse.label.vector.index:
     type: vector
+    models:
+      phi3:mini:
+        configuration: { }
     configuration:
       indexName: bibleverselabels
       type: qdrant
       vectorSize: 3072
-      model: phi3:mini
 
 workflows:
   states:
@@ -93,6 +104,9 @@ workflows:
       to: published
       description: Publish a draft
   activities:
+    traits.process:
+      childWorkflow: true
+      childWorkflowQueue: metadata
     # ai activities
     ai.prompt:
       description: Take the input from the supplementary data and pass it to the provided model using the provided prompt.  The output will be based on the output from the model.
@@ -100,16 +114,10 @@ workflows:
         supplementaryId: supplementary
       outputs:
         supplementaryId: supplementary
-      configuration:
-        prompt: verse.labeller
-        model: phi3:mini
     ai.embeddings.text:
       description: Generate embeddings from the supplied supplementary data using the supplied model.  Store the embeddings in the specified storage system.
       inputs:
         supplementaryId: supplementary
-      configuration:
-        model: phi3:mini
-        storageSystem: ""
     ai.embeddings.pending.from-markdown-table:
       description: Generate pending embeddings (which is a proto structure) from the supplied supplementary data, which should be a markdown table.  The specified columns will be used to construct the pending embedding.
       inputs:
@@ -117,16 +125,12 @@ workflows:
       outputs:
         supplementaryId: supplementary
       configuration:
-        model: phi3:mini
         idColumn: Metadata ID
         contentColumn: Labels
     ai.embeddings.pending.index:
       description: Generate embeddings from the supplied supplementary data (which is expected to be pending embeddings).
       inputs:
         supplementaryId: supplementary
-      configuration:
-        model: phi3:mini
-        storageSystem: ""
     # metadata activities
     metadata.text.extract:
       outputs:
@@ -147,36 +151,34 @@ workflows:
       inputs:
         supplementaryId: supplementary
     # bible activities
-    bible.books.create:
+    bible.process:
       configuration:
-        trait: bible.usx.book
+        trait: bible.usx
     bible.chapters.create:
       configuration:
         trait: bible.usx.chapter
-    bible.chapters.verses.create:
+    bible.chapter.verses.create:
       configuration:
         trait: bible.usx.verse
-    bible.chapters.verses.table:
+    bible.chapter.verses.table:
       outputs:
         supplementaryId: supplementary
   workflows:
     # metadata workflows
     metadata.process:
       activities:
-        traits.process:
-          childWorkflow: true
+        traits.process: { }
       configuration:
         finalStateId: draft
+      queue: metadata
     # trait workflows
-    traits.process: { }
+    traits.process:
+      queue: metadata
     # bible workflows
     bible.usx:
       activities:
-        bible.books.create: { }
-    ## bible book workflow
-    bible.usx.book:
-      activities:
-        bible.chapters.create: { }
+        bible.process: { }
+      queue: bible
     ## bible chapter workflow
     bible.usx.chapter:
       activities:
@@ -187,15 +189,18 @@ workflows:
           outputs:
             supplementaryId: chapter-verse-table
         ai.prompt:
+          prompts:
+            verse.labeller: { }
+          models:
+            phi3:mini: { }
           inputs:
             supplementaryId: chapter-verse-table
           outputs:
             supplementaryId: chapter-verse-table-prompted
-          configuration:
-            prompt: verse.labeller
-            model: phi3:mini
         ai.embeddings.pending.from-markdown-table:
           executionGroup: 2
+          models:
+            phi3:mini: { }
           inputs:
             supplementaryId: chapter-verse-table-prompted
           outputs:
@@ -207,12 +212,16 @@ workflows:
           executionGroup: 3
           inputs:
             supplementaryId: chapter-verse-pending-embeddings
-          configuration:
-            storageSystem: bible.verse.label.vector.index
+          models:
+            phi3:mini: { }
+          storageSystems:
+            bible.verse.label.vector.index: { }
+      queue: bible
     ## bible verse workflow
     bible.usx.verse:
       activities:
         metadata.text.index: { }
+      queue: bible
 
 prompts:
   verse.labeller:

@@ -31,6 +31,10 @@ type ChapterVerses struct {
 	Verses  []*Verse
 }
 
+func (u *USX) GetUsfm() string {
+	return u.BookIdentification.Code.ToString()
+}
+
 func (u *USX) FindChapterVerses() []*ChapterVerses {
 	chapters := make([]*ChapterVerses, 0)
 	for _, chapter := range u.Chapters {

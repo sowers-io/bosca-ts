@@ -308,7 +308,7 @@ services:
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233
-    image: temporalio/admin-tools:1.23.1
+    image: temporalio/admin-tools:1.24
     networks:
       - net1
     stdin_open: true
@@ -322,17 +322,17 @@ services:
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CORS_ORIGINS=http://localhost:3000
-    image: temporalio/ui:2.26.2
+    image: temporalio/ui:2.27.3
     networks:
       - net1
     ports:
       - 8085:8080
 
   temporal:
-    image: temporalio/auto-setup:1.23.1
+    image: temporalio/auto-setup:1.24.2
     restart: always
     environment:
-      - DB=postgres
+      - DB=postgres12_pgx
       - DB_PORT=5432
       - POSTGRES_USER=bosca
       - POSTGRES_PWD=bosca

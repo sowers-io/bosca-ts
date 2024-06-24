@@ -106,7 +106,8 @@ func SetContent(ctx context.Context, metadataId string, data []byte) error {
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK && response.StatusCode != http.StatusCreated && response.StatusCode != http.StatusAccepted && response.StatusCode != http.StatusNoContent {
-		return errors.New("failed to upload")
+		b, _ := io.ReadAll(response.Body)
+		return errors.New("failed to upload: " + string(b))
 	}
 	return nil
 }

@@ -34,11 +34,6 @@ var command = &cobra.Command{
 	Long:  "Bosca is an AI powered platform for creating and managing content. See more at bosca.io",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		util2.InitializeLogging(nil)
-		client, err := util.NewAITemporalClient()
-		if err != nil {
-			slog.Error("error creating temporal client", slog.Any("error", err))
-			os.Exit(1)
-		}
 
 		workflowIds := strings.Split(cmd.Flag("workflows").Value.String(), ",")
 
@@ -49,13 +44,19 @@ var command = &cobra.Command{
 		activityIds := strings.Split(cmd.Flag("activities").Value.String(), ",")
 
 		if len(activityIds) == 0 || activityIds[0] == "" {
-			return errors.New("missing activity ids")
+			slog.Warn("activities not assigned")
 		}
 
 		queue := cmd.Flag("queue").Value.String()
 
 		if queue == "" {
 			return errors.New("missing queue")
+		}
+
+		client, err := util.NewAITemporalClient()
+		if err != nil {
+			slog.Error("error creating temporal client", slog.Any("error", err))
+			os.Exit(1)
 		}
 
 		w, err := workflow.NewWorker(client, workflowIds, activityIds, queue)

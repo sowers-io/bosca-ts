@@ -55,36 +55,8 @@ func (svc *service) AddMetadataRelationship(ctx context.Context, request *grpc.M
 	return &protobuf.Empty{}, nil
 }
 
-func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*protobuf.IdResponse, error) {
-	userId, err := identity.GetAuthenticatedSubjectId(ctx)
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to get subject", slog.Any("request", request), slog.Any("error", err))
-		return nil, err
-	}
-	if request.Metadata.ContentLength <= 0 {
-		err := errors.New("content length must be greater than 0")
-		slog.ErrorContext(ctx, "content length requirement failed", slog.Any("request", request), slog.Any("error", err))
-		return nil, err
-	}
-	if strings.Trim(request.Metadata.Name, " ") == "" {
-		err := errors.New("name must not be empty")
-		slog.ErrorContext(ctx, "name requirement failed", slog.Any("request", request), slog.Any("error", err))
-		return nil, err
-	}
-	if request.Collection != nil {
-		if unique, err := svc.verifyUniqueName(ctx, *request.Collection, request.Metadata.Name); !unique || err != nil {
-			if err == nil {
-				return nil, errors.New("name must be unique")
-			}
-			return nil, err
-		}
-	}
-	id, err := svc.ds.AddMetadata(ctx, request.Metadata)
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to add workflow", slog.Any("request", request), slog.Any("error", err))
-		return nil, err
-	}
-	err = svc.permissions.CreateRelationships(ctx, grpc.PermissionObjectType_metadata_type, []*grpc.Permission{
+func (svc *service) newMetadataPermissions(userId, id string) []*grpc.Permission {
+	return []*grpc.Permission{
 		{
 			Id:          id,
 			Subject:     security.AdministratorGroup,
@@ -103,10 +75,33 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 			SubjectType: grpc.PermissionSubjectType_user,
 			Relation:    grpc.PermissionRelation_owners,
 		},
-	})
+	}
+}
+
+func (svc *service) addMetadata(ctx context.Context, userId string, request *grpc.AddMetadataRequest) (*protobuf.IdResponse, []*grpc.Permission, error) {
+	if strings.Trim(request.Metadata.Name, " ") == "" {
+		err := errors.New("name must not be empty")
+		slog.ErrorContext(ctx, "name requirement failed", slog.Any("request", request), slog.Any("error", err))
+		return nil, nil, err
+	}
+	if request.Collection != nil {
+		if unique, err := svc.verifyUniqueName(ctx, *request.Collection, request.Metadata.Name); !unique || err != nil {
+			if err == nil {
+				return nil, nil, errors.New("name must be unique")
+			}
+			return nil, nil, err
+		}
+	}
+	id, err := svc.ds.AddMetadata(ctx, request.Metadata)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to add workflow", slog.Any("request", request), slog.Any("error", err))
+		return nil, nil, err
+	}
+	permissions := svc.newMetadataPermissions(userId, id)
+	err = svc.permissions.CreateRelationships(ctx, grpc.PermissionObjectType_metadata_type, permissions)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to add workflow permissions", slog.String("id", id), slog.Any("error", err))
-		return nil, err
+		return nil, nil, err
 	}
 	if request.Collection != nil {
 		err = svc.ds.AddCollectionMetadataItems(ctx, *request.Collection, []string{id})
@@ -116,18 +111,58 @@ func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRe
 				col = *request.Collection
 			}
 			slog.ErrorContext(ctx, "failed to add to collection", slog.String("id", id), slog.String("collection", col), slog.Any("error", err))
-			return nil, err
+			return nil, nil, err
 		}
 	}
 	if request.Metadata.SourceIdentifier != nil && *request.Metadata.SourceIdentifier != "" {
 		_, err := svc.BeginTransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: id, StateId: WorkflowStateProcessing})
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to process workflow", slog.String("id", id), slog.Any("error", err))
-			return nil, err
+			return nil, nil, err
 		}
 	}
-	return &protobuf.IdResponse{
-		Id: id,
+	return &protobuf.IdResponse{Id: id}, permissions, nil
+}
+
+func (svc *service) AddMetadata(ctx context.Context, request *grpc.AddMetadataRequest) (*protobuf.IdResponse, error) {
+	userId, err := identity.GetAuthenticatedSubjectId(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get subject", slog.Any("request", request), slog.Any("error", err))
+		return nil, err
+	}
+	id, permissions, err := svc.addMetadata(ctx, userId, request)
+	if err != nil {
+		return nil, err
+	}
+	err = svc.permissions.WaitForPermissions(ctx, grpc.PermissionObjectType_metadata_type, permissions)
+	if err != nil {
+		return nil, err
+	}
+	return id, nil
+}
+
+func (svc *service) AddMetadatas(ctx context.Context, request *grpc.AddMetadatasRequest) (*protobuf.IdResponses, error) {
+	userId, err := identity.GetAuthenticatedSubjectId(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get subject", slog.Any("request", request), slog.Any("error", err))
+		return nil, err
+	}
+	ids := make([]string, len(request.Metadatas))
+	allPermissions := make([]*grpc.Permission, 0)
+	for i, md := range request.Metadatas {
+		id, permissions, err := svc.addMetadata(ctx, userId, md)
+		if err != nil {
+			return nil, err
+		}
+		allPermissions = append(allPermissions, permissions...)
+		ids[i] = id.Id
+	}
+	err = svc.permissions.WaitForPermissions(ctx, grpc.PermissionObjectType_metadata_type, allPermissions)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.IdResponses{
+		Id: ids,
 	}, nil
 }
 
@@ -165,10 +200,13 @@ func (svc *service) GetMetadataUploadUrl(ctx context.Context, request *protobuf.
 	if err != nil {
 		return nil, err
 	}
+	if metadata.ContentLength == nil || *metadata.ContentLength <= 0 {
+		return nil, errors.New("invalid content length")
+	}
 	if metadata.WorkflowStateId != WorkflowStatePending {
 		return nil, errors.New("invalid workflow state")
 	}
-	return svc.objectStore.CreateUploadUrl(ctx, metadata.Id, metadata.Name, metadata.ContentType, metadata.ContentLength, nil)
+	return svc.objectStore.CreateUploadUrl(ctx, metadata.Id, metadata.Name, metadata.ContentType, *metadata.ContentLength, nil)
 }
 
 func (svc *service) AddMetadataTrait(ctx context.Context, request *grpc.AddMetadataTraitRequest) (*grpc.Metadata, error) {

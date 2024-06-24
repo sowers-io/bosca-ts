@@ -60,6 +60,12 @@ class AddMetadataRequest(_message.Message):
     metadata: Metadata
     def __init__(self, collection: _Optional[str] = ..., metadata: _Optional[_Union[Metadata, _Mapping]] = ...) -> None: ...
 
+class AddMetadatasRequest(_message.Message):
+    __slots__ = ("metadatas",)
+    METADATAS_FIELD_NUMBER: _ClassVar[int]
+    metadatas: _containers.RepeatedCompositeFieldContainer[AddMetadataRequest]
+    def __init__(self, metadatas: _Optional[_Iterable[_Union[AddMetadataRequest, _Mapping]]] = ...) -> None: ...
+
 class Metadatas(_message.Message):
     __slots__ = ("metadata",)
     METADATA_FIELD_NUMBER: _ClassVar[int]

@@ -82,6 +82,13 @@ func (s *permissionManager) BulkCheck(ctx context.Context, objectType grpc.Permi
 		if pair.Permissionship == pb.CheckPermissionResponse_PERMISSIONSHIP_HAS_PERMISSION ||
 			pair.Permissionship == pb.CheckPermissionResponse_PERMISSIONSHIP_CONDITIONAL_PERMISSION {
 			ids = append(ids, resourceId[i])
+		} else if pair.Permissionship == pb.CheckPermissionResponse_PERMISSIONSHIP_NO_PERMISSION {
+			logAttrs := []any{
+				slog.String("objectId", resourceId[i]),
+				slog.String("subjectId", subjectId),
+				slog.String("action", s.getAction(action)),
+			}
+			slog.DebugContext(ctx, "permission check failed", logAttrs...)
 		}
 	}
 	return ids, nil
@@ -205,6 +212,33 @@ func (s *permissionManager) getAction(relation grpc.PermissionAction) string {
 	return ""
 }
 
+func (s *permissionManager) WaitForPermissions(ctx context.Context, objectType grpc.PermissionObjectType, permissions []*grpc.Permission) error {
+	for _, permission := range permissions {
+		for {
+			current, err := s.GetPermissions(ctx, objectType, permission.Id)
+			if err != nil {
+				return err
+			}
+			if current != nil {
+				match := false
+				for _, p := range current.Permissions {
+					if permission.Id == p.Id && permission.SubjectType == p.SubjectType && permission.Subject == p.Subject && permission.Relation == p.Relation {
+						match = true
+						break
+					}
+				}
+				if match {
+					break
+				} else {
+					slog.Debug("permission not found while creating relationships, trying again in 500ms")
+					time.Sleep(500 * time.Millisecond)
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func (s *permissionManager) CreateRelationships(ctx context.Context, objectType grpc.PermissionObjectType, permissions []*grpc.Permission) error {
 	updates := make([]*pb.RelationshipUpdate, 0)
 	for _, permission := range permissions {
@@ -238,35 +272,6 @@ func (s *permissionManager) CreateRelationships(ctx context.Context, objectType 
 		})
 	}
 	_, err := s.permissionsClient.WriteRelationships(ctx, &pb.WriteRelationshipsRequest{Updates: updates})
-
-	if err != nil {
-		return err
-	}
-
-	for _, permission := range permissions {
-		for {
-			current, err := s.GetPermissions(ctx, objectType, permission.Id)
-			if err != nil {
-				return err
-			}
-			if current != nil {
-				match := false
-				for _, p := range current.Permissions {
-					if permission.Id == p.Id && permission.SubjectType == p.SubjectType && permission.Subject == p.Subject && permission.Relation == p.Relation {
-						match = true
-						break
-					}
-				}
-				if match {
-					break
-				} else {
-					slog.Debug("permission not found while creating relationships, trying again in 500ms")
-					time.Sleep(500 * time.Millisecond)
-				}
-			}
-		}
-	}
-
 	return err
 }
 

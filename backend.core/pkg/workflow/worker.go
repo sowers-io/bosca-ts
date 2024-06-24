@@ -19,7 +19,6 @@ package workflow
 import (
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workflow/registry"
-	"context"
 	"errors"
 	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/client"
@@ -40,19 +39,29 @@ import (
 func NewWorker(client client.Client, workflowIds []string, activityIds []string, queue string) (worker.Worker, error) {
 	w := worker.New(client, queue, worker.Options{})
 	for _, workflowId := range workflowIds {
-		if workflowId == "" {
+		name := strings.Trim(workflowId, " ")
+		if name == "" {
 			continue
 		}
-		w.RegisterWorkflowWithOptions(processWorkflow, workflow.RegisterOptions{
-			Name: strings.Trim(workflowId, " "),
+		workflowFunc := registry.GetWorkflow(name)
+		if workflowFunc == nil {
+			workflowFunc = processWorkflow
+		}
+		w.RegisterWorkflowWithOptions(workflowFunc, workflow.RegisterOptions{
+			Name: name,
 		})
 	}
 	for _, activityId := range activityIds {
-		if activityId == "" {
+		name := strings.Trim(activityId, " ")
+		if name == "" {
 			continue
 		}
-		w.RegisterActivityWithOptions(processActivity, activity.RegisterOptions{
-			Name: strings.Trim(activityId, " "),
+		activityFn := registry.GetActivity(name)
+		if activityFn == nil {
+			return nil, errors.New("missing activity: " + name)
+		}
+		w.RegisterActivityWithOptions(activityFn, activity.RegisterOptions{
+			Name: name,
 		})
 	}
 	return w, nil
@@ -115,13 +124,4 @@ func processWorkflow(ctx workflow.Context, executionContext *content.WorkflowAct
 	}
 
 	return nil
-}
-
-func processActivity(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
-	a := executionContext.Activities[executionContext.CurrentActivityIndex]
-	activityFn := registry.GetActivity(a.Id)
-	if activityFn == nil {
-		return errors.New("TODO: " + a.Id)
-	}
-	return activityFn(ctx, executionContext)
 }

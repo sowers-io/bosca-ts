@@ -16,7 +16,7 @@ from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1c\x62osca/content/metadata.proto\x12\rbosca.content\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xe8\x04\n\x08Metadata\x12\x12\n\ndefault_id\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x14\n\x0c\x63ontent_type\x18\x04 \x01(\t\x12\x16\n\tsource_id\x18\x05 \x01(\tH\x00\x88\x01\x01\x12\x1e\n\x11source_identifier\x18\x06 \x01(\tH\x01\x88\x01\x01\x12\x14\n\x0clanguage_tag\x18\x07 \x01(\t\x12\x16\n\x0e\x63ontent_length\x18\x08 \x01(\x03\x12\x11\n\ttrait_ids\x18\x0b \x03(\t\x12\x14\n\x0c\x63\x61tegory_ids\x18\x0c \x03(\t\x12\x0e\n\x06labels\x18\r \x03(\t\x12;\n\nattributes\x18\x0e \x03(\x0b\x32\'.bosca.content.Metadata.AttributesEntry\x12+\n\x07\x63reated\x18\x14 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12,\n\x08modified\x18\x15 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x19\n\x11workflow_state_id\x18\x1f \x01(\t\x12&\n\x19workflow_state_pending_id\x18  \x01(\tH\x02\x88\x01\x01\x12)\n\x08metadata\x18! \x01(\x0b\x32\x17.google.protobuf.Struct\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\n_source_idB\x14\n\x12_source_identifierB\x1c\n\x1a_workflow_state_pending_id\"g\n\x12\x41\x64\x64MetadataRequest\x12\x17\n\ncollection\x18\x01 \x01(\tH\x00\x88\x01\x01\x12)\n\x08metadata\x18\x02 \x01(\x0b\x32\x17.bosca.content.MetadataB\r\n\x0b_collection\"6\n\tMetadatas\x12)\n\x08metadata\x18\x01 \x03(\x0b\x32\x17.bosca.content.Metadata\"A\n\x1dMetadataRelationshipIdRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x14\n\x0crelationship\x18\x02 \x01(\t\"\xd4\x01\n\x14MetadataRelationship\x12\x14\n\x0cmetadata_id1\x18\x01 \x01(\t\x12\x14\n\x0cmetadata_id2\x18\x02 \x01(\t\x12\x14\n\x0crelationship\x18\x03 \x01(\t\x12G\n\nattributes\x18\x04 \x03(\x0b\x32\x33.bosca.content.MetadataRelationship.AttributesEntry\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"S\n\x15MetadataRelationships\x12:\n\rrelationships\x18\x01 \x03(\x0b\x32#.bosca.content.MetadataRelationship\"@\n\x17\x41\x64\x64MetadataTraitRequest\x12\x13\n\x0bmetadata_id\x18\x01 \x01(\t\x12\x10\n\x08trait_id\x18\x02 \x01(\t\"o\n\x17\x41\x64\x64SupplementaryRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x14\n\x0c\x63ontent_type\x18\x04 \x01(\t\x12\x16\n\x0e\x63ontent_length\x18\x05 \x01(\x03\"2\n\x16SupplementaryIdRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\tB%Z#bosca.io/api/protobuf/bosca/contentb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1c\x62osca/content/metadata.proto\x12\rbosca.content\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x80\x05\n\x08Metadata\x12\x12\n\ndefault_id\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x14\n\x0c\x63ontent_type\x18\x04 \x01(\t\x12\x16\n\tsource_id\x18\x05 \x01(\tH\x00\x88\x01\x01\x12\x1e\n\x11source_identifier\x18\x06 \x01(\tH\x01\x88\x01\x01\x12\x14\n\x0clanguage_tag\x18\x07 \x01(\t\x12\x1b\n\x0e\x63ontent_length\x18\x08 \x01(\x03H\x02\x88\x01\x01\x12\x11\n\ttrait_ids\x18\x0b \x03(\t\x12\x14\n\x0c\x63\x61tegory_ids\x18\x0c \x03(\t\x12\x0e\n\x06labels\x18\r \x03(\t\x12;\n\nattributes\x18\x0e \x03(\x0b\x32\'.bosca.content.Metadata.AttributesEntry\x12+\n\x07\x63reated\x18\x14 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12,\n\x08modified\x18\x15 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x19\n\x11workflow_state_id\x18\x1f \x01(\t\x12&\n\x19workflow_state_pending_id\x18  \x01(\tH\x03\x88\x01\x01\x12)\n\x08metadata\x18! \x01(\x0b\x32\x17.google.protobuf.Struct\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\n_source_idB\x14\n\x12_source_identifierB\x11\n\x0f_content_lengthB\x1c\n\x1a_workflow_state_pending_id\"g\n\x12\x41\x64\x64MetadataRequest\x12\x17\n\ncollection\x18\x01 \x01(\tH\x00\x88\x01\x01\x12)\n\x08metadata\x18\x02 \x01(\x0b\x32\x17.bosca.content.MetadataB\r\n\x0b_collection\"K\n\x13\x41\x64\x64MetadatasRequest\x12\x34\n\tmetadatas\x18\x01 \x03(\x0b\x32!.bosca.content.AddMetadataRequest\"6\n\tMetadatas\x12)\n\x08metadata\x18\x01 \x03(\x0b\x32\x17.bosca.content.Metadata\"A\n\x1dMetadataRelationshipIdRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x14\n\x0crelationship\x18\x02 \x01(\t\"\xd4\x01\n\x14MetadataRelationship\x12\x14\n\x0cmetadata_id1\x18\x01 \x01(\t\x12\x14\n\x0cmetadata_id2\x18\x02 \x01(\t\x12\x14\n\x0crelationship\x18\x03 \x01(\t\x12G\n\nattributes\x18\x04 \x03(\x0b\x32\x33.bosca.content.MetadataRelationship.AttributesEntry\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"S\n\x15MetadataRelationships\x12:\n\rrelationships\x18\x01 \x03(\x0b\x32#.bosca.content.MetadataRelationship\"@\n\x17\x41\x64\x64MetadataTraitRequest\x12\x13\n\x0bmetadata_id\x18\x01 \x01(\t\x12\x10\n\x08trait_id\x18\x02 \x01(\t\"o\n\x17\x41\x64\x64SupplementaryRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x14\n\x0c\x63ontent_type\x18\x04 \x01(\t\x12\x16\n\x0e\x63ontent_length\x18\x05 \x01(\x03\"2\n\x16SupplementaryIdRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\tB%Z#bosca.io/api/protobuf/bosca/contentb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -29,25 +29,27 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_METADATARELATIONSHIP_ATTRIBUTESENTRY']._loaded_options = None
   _globals['_METADATARELATIONSHIP_ATTRIBUTESENTRY']._serialized_options = b'8\001'
   _globals['_METADATA']._serialized_start=111
-  _globals['_METADATA']._serialized_end=727
-  _globals['_METADATA_ATTRIBUTESENTRY']._serialized_start=612
-  _globals['_METADATA_ATTRIBUTESENTRY']._serialized_end=661
-  _globals['_ADDMETADATAREQUEST']._serialized_start=729
-  _globals['_ADDMETADATAREQUEST']._serialized_end=832
-  _globals['_METADATAS']._serialized_start=834
-  _globals['_METADATAS']._serialized_end=888
-  _globals['_METADATARELATIONSHIPIDREQUEST']._serialized_start=890
-  _globals['_METADATARELATIONSHIPIDREQUEST']._serialized_end=955
-  _globals['_METADATARELATIONSHIP']._serialized_start=958
-  _globals['_METADATARELATIONSHIP']._serialized_end=1170
-  _globals['_METADATARELATIONSHIP_ATTRIBUTESENTRY']._serialized_start=612
-  _globals['_METADATARELATIONSHIP_ATTRIBUTESENTRY']._serialized_end=661
-  _globals['_METADATARELATIONSHIPS']._serialized_start=1172
-  _globals['_METADATARELATIONSHIPS']._serialized_end=1255
-  _globals['_ADDMETADATATRAITREQUEST']._serialized_start=1257
-  _globals['_ADDMETADATATRAITREQUEST']._serialized_end=1321
-  _globals['_ADDSUPPLEMENTARYREQUEST']._serialized_start=1323
-  _globals['_ADDSUPPLEMENTARYREQUEST']._serialized_end=1434
-  _globals['_SUPPLEMENTARYIDREQUEST']._serialized_start=1436
-  _globals['_SUPPLEMENTARYIDREQUEST']._serialized_end=1486
+  _globals['_METADATA']._serialized_end=751
+  _globals['_METADATA_ATTRIBUTESENTRY']._serialized_start=617
+  _globals['_METADATA_ATTRIBUTESENTRY']._serialized_end=666
+  _globals['_ADDMETADATAREQUEST']._serialized_start=753
+  _globals['_ADDMETADATAREQUEST']._serialized_end=856
+  _globals['_ADDMETADATASREQUEST']._serialized_start=858
+  _globals['_ADDMETADATASREQUEST']._serialized_end=933
+  _globals['_METADATAS']._serialized_start=935
+  _globals['_METADATAS']._serialized_end=989
+  _globals['_METADATARELATIONSHIPIDREQUEST']._serialized_start=991
+  _globals['_METADATARELATIONSHIPIDREQUEST']._serialized_end=1056
+  _globals['_METADATARELATIONSHIP']._serialized_start=1059
+  _globals['_METADATARELATIONSHIP']._serialized_end=1271
+  _globals['_METADATARELATIONSHIP_ATTRIBUTESENTRY']._serialized_start=617
+  _globals['_METADATARELATIONSHIP_ATTRIBUTESENTRY']._serialized_end=666
+  _globals['_METADATARELATIONSHIPS']._serialized_start=1273
+  _globals['_METADATARELATIONSHIPS']._serialized_end=1356
+  _globals['_ADDMETADATATRAITREQUEST']._serialized_start=1358
+  _globals['_ADDMETADATATRAITREQUEST']._serialized_end=1422
+  _globals['_ADDSUPPLEMENTARYREQUEST']._serialized_start=1424
+  _globals['_ADDSUPPLEMENTARYREQUEST']._serialized_end=1535
+  _globals['_SUPPLEMENTARYIDREQUEST']._serialized_start=1537
+  _globals['_SUPPLEMENTARYIDREQUEST']._serialized_end=1587
 # @@protoc_insertion_point(module_scope)

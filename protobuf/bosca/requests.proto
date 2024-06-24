@@ -31,6 +31,10 @@ message IdResponse {
   string id = 1;
 }
 
+message IdResponses {
+  repeated string id = 1;
+}
+
 message Url {
   string url = 1;
 }

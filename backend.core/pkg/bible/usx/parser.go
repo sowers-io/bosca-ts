@@ -418,6 +418,9 @@ func (p *Parser) onChapter(element xml.StartElement) (bool, error) {
 			if element.Name.Local != "chapter" {
 				return false, errors.New("onChapter: unexpected state")
 			}
+			if chapter.Number == "" {
+				return true, nil
+			}
 			p.usx.Chapters = append(p.usx.Chapters, chapter)
 			return true, nil
 		}

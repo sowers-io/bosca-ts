@@ -26,16 +26,6 @@ import (
 	"log/slog"
 )
 
-func (svc *service) GetTraits(ctx context.Context, request *protobuf.Empty) (*grpc.Traits, error) {
-	traits, err := svc.ds.GetTraits(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &grpc.Traits{
-		Traits: traits,
-	}, err
-}
-
 func (svc *service) GetWorkflow(ctx context.Context, request *protobuf.IdRequest) (*grpc.Workflow, error) {
 	workflow, err := svc.ds.GetWorkflow(ctx, request.Id)
 	return workflow, err
@@ -105,15 +95,15 @@ func (svc *service) executeWorkflow(ctx context.Context, metadata *grpc.Metadata
 		slog.ErrorContext(ctx, "workflow not found", slog.String("id", metadata.Id), slog.String("workflowId", workflowId))
 		return status.Error(codes.Internal, "workflow not found")
 	}
-	executionContext := &grpc.WorkflowActivityExecutionContext{
-		WorkflowId: workflowId,
-		Metadata:   metadata,
-	}
 	instances, err := svc.ds.GetWorkflowActivityInstances(ctx, workflowId)
 	if err != nil {
 		return err
 	}
-	executionContext.Activities = instances
+	executionContext := &grpc.WorkflowActivityExecutionContext{
+		WorkflowId: workflowId,
+		Metadata:   metadata,
+		Activities: instances,
+	}
 	_, err = svc.temporalClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
 		TaskQueue: workflow.Queue,
 	}, workflow.Id, executionContext)

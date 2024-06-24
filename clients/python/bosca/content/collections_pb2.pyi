@@ -1,5 +1,6 @@
 from bosca.content import metadata_pb2 as _metadata_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -25,6 +26,12 @@ class AddCollectionRequest(_message.Message):
     collection: Collection
     def __init__(self, parent: _Optional[str] = ..., collection: _Optional[_Union[Collection, _Mapping]] = ...) -> None: ...
 
+class AddCollectionsRequest(_message.Message):
+    __slots__ = ("collections",)
+    COLLECTIONS_FIELD_NUMBER: _ClassVar[int]
+    collections: _containers.RepeatedCompositeFieldContainer[AddCollectionRequest]
+    def __init__(self, collections: _Optional[_Iterable[_Union[AddCollectionRequest, _Mapping]]] = ...) -> None: ...
+
 class AddCollectionItemRequest(_message.Message):
     __slots__ = ("collection_id", "child_collection_id", "child_metadata_id")
     COLLECTION_ID_FIELD_NUMBER: _ClassVar[int]
@@ -36,7 +43,7 @@ class AddCollectionItemRequest(_message.Message):
     def __init__(self, collection_id: _Optional[str] = ..., child_collection_id: _Optional[str] = ..., child_metadata_id: _Optional[str] = ...) -> None: ...
 
 class Collection(_message.Message):
-    __slots__ = ("id", "name", "type", "category_ids", "labels", "attributes", "created", "modified")
+    __slots__ = ("id", "name", "type", "category_ids", "labels", "attributes", "created", "modified", "metadata")
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -52,6 +59,7 @@ class Collection(_message.Message):
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     CREATED_FIELD_NUMBER: _ClassVar[int]
     MODIFIED_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     id: str
     name: str
     type: CollectionType
@@ -60,7 +68,8 @@ class Collection(_message.Message):
     attributes: _containers.ScalarMap[str, str]
     created: _timestamp_pb2.Timestamp
     modified: _timestamp_pb2.Timestamp
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[CollectionType, str]] = ..., category_ids: _Optional[_Iterable[str]] = ..., labels: _Optional[_Iterable[str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., created: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., modified: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    metadata: _struct_pb2.Struct
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[CollectionType, str]] = ..., category_ids: _Optional[_Iterable[str]] = ..., labels: _Optional[_Iterable[str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., created: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., modified: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class CollectionItems(_message.Message):
     __slots__ = ("items",)

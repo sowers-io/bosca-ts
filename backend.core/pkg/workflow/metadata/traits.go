@@ -20,10 +20,15 @@ import (
 	"bosca.io/api/protobuf/bosca"
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workflow/common"
+	"bosca.io/pkg/workflow/registry"
 	"go.temporal.io/sdk/workflow"
 )
 
-func ProcessTraits(ctx workflow.Context, executionContext *content.WorkflowActivityExecutionContext) error {
+func init() {
+	registry.RegisterWorkflow("traits.process", processTraitsWorkflow)
+}
+
+func processTraitsWorkflow(ctx workflow.Context, executionContext *content.WorkflowActivityExecutionContext) error {
 	if executionContext.Metadata.TraitIds != nil && len(executionContext.Metadata.TraitIds) > 0 {
 		contentService := common.GetWorkflowContentService(ctx)
 		serviceCtx := common.GetWorkflowServiceAuthorizedContext(ctx)

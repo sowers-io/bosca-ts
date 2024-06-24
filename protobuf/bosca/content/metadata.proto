@@ -33,7 +33,7 @@ message Metadata {
   optional string source_identifier = 6;
 
   string language_tag = 7;
-  int64 content_length = 8;
+  optional int64 content_length = 8;
 
   repeated string trait_ids = 11;
   repeated string category_ids = 12;
@@ -52,6 +52,10 @@ message Metadata {
 message AddMetadataRequest {
   optional string collection = 1;
   Metadata metadata = 2;
+}
+
+message AddMetadatasRequest {
+  repeated AddMetadataRequest metadatas = 1;
 }
 
 message Metadatas {

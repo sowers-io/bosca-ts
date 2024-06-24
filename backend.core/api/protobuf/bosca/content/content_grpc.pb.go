@@ -54,6 +54,7 @@ const (
 	ContentService_GetRootCollectionItems_FullMethodName              = "/bosca.content.ContentService/GetRootCollectionItems"
 	ContentService_GetCollectionItems_FullMethodName                  = "/bosca.content.ContentService/GetCollectionItems"
 	ContentService_AddCollection_FullMethodName                       = "/bosca.content.ContentService/AddCollection"
+	ContentService_AddCollections_FullMethodName                      = "/bosca.content.ContentService/AddCollections"
 	ContentService_GetCollection_FullMethodName                       = "/bosca.content.ContentService/GetCollection"
 	ContentService_DeleteCollection_FullMethodName                    = "/bosca.content.ContentService/DeleteCollection"
 	ContentService_GetCollectionPermissions_FullMethodName            = "/bosca.content.ContentService/GetCollectionPermissions"
@@ -63,6 +64,7 @@ const (
 	ContentService_GetMetadata_FullMethodName                         = "/bosca.content.ContentService/GetMetadata"
 	ContentService_GetMetadatas_FullMethodName                        = "/bosca.content.ContentService/GetMetadatas"
 	ContentService_AddMetadata_FullMethodName                         = "/bosca.content.ContentService/AddMetadata"
+	ContentService_AddMetadatas_FullMethodName                        = "/bosca.content.ContentService/AddMetadatas"
 	ContentService_AddMetadataTrait_FullMethodName                    = "/bosca.content.ContentService/AddMetadataTrait"
 	ContentService_DeleteMetadata_FullMethodName                      = "/bosca.content.ContentService/DeleteMetadata"
 	ContentService_GetMetadataUploadUrl_FullMethodName                = "/bosca.content.ContentService/GetMetadataUploadUrl"
@@ -103,6 +105,7 @@ type ContentServiceClient interface {
 	GetRootCollectionItems(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*CollectionItems, error)
 	GetCollectionItems(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*CollectionItems, error)
 	AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*bosca.IdResponse, error)
+	AddCollections(ctx context.Context, in *AddCollectionsRequest, opts ...grpc.CallOption) (*bosca.IdResponses, error)
 	GetCollection(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Collection, error)
 	DeleteCollection(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetCollectionPermissions(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
@@ -112,6 +115,7 @@ type ContentServiceClient interface {
 	GetMetadata(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Metadata, error)
 	GetMetadatas(ctx context.Context, in *bosca.IdsRequest, opts ...grpc.CallOption) (*Metadatas, error)
 	AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*bosca.IdResponse, error)
+	AddMetadatas(ctx context.Context, in *AddMetadatasRequest, opts ...grpc.CallOption) (*bosca.IdResponses, error)
 	AddMetadataTrait(ctx context.Context, in *AddMetadataTraitRequest, opts ...grpc.CallOption) (*Metadata, error)
 	DeleteMetadata(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetMetadataUploadUrl(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
@@ -327,6 +331,16 @@ func (c *contentServiceClient) AddCollection(ctx context.Context, in *AddCollect
 	return out, nil
 }
 
+func (c *contentServiceClient) AddCollections(ctx context.Context, in *AddCollectionsRequest, opts ...grpc.CallOption) (*bosca.IdResponses, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.IdResponses)
+	err := c.cc.Invoke(ctx, ContentService_AddCollections_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) GetCollection(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Collection, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Collection)
@@ -411,6 +425,16 @@ func (c *contentServiceClient) AddMetadata(ctx context.Context, in *AddMetadataR
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.IdResponse)
 	err := c.cc.Invoke(ctx, ContentService_AddMetadata_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) AddMetadatas(ctx context.Context, in *AddMetadatasRequest, opts ...grpc.CallOption) (*bosca.IdResponses, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.IdResponses)
+	err := c.cc.Invoke(ctx, ContentService_AddMetadatas_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -590,6 +614,7 @@ type ContentServiceServer interface {
 	GetRootCollectionItems(context.Context, *bosca.Empty) (*CollectionItems, error)
 	GetCollectionItems(context.Context, *bosca.IdRequest) (*CollectionItems, error)
 	AddCollection(context.Context, *AddCollectionRequest) (*bosca.IdResponse, error)
+	AddCollections(context.Context, *AddCollectionsRequest) (*bosca.IdResponses, error)
 	GetCollection(context.Context, *bosca.IdRequest) (*Collection, error)
 	DeleteCollection(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
 	GetCollectionPermissions(context.Context, *bosca.IdRequest) (*Permissions, error)
@@ -599,6 +624,7 @@ type ContentServiceServer interface {
 	GetMetadata(context.Context, *bosca.IdRequest) (*Metadata, error)
 	GetMetadatas(context.Context, *bosca.IdsRequest) (*Metadatas, error)
 	AddMetadata(context.Context, *AddMetadataRequest) (*bosca.IdResponse, error)
+	AddMetadatas(context.Context, *AddMetadatasRequest) (*bosca.IdResponses, error)
 	AddMetadataTrait(context.Context, *AddMetadataTraitRequest) (*Metadata, error)
 	DeleteMetadata(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
 	GetMetadataUploadUrl(context.Context, *bosca.IdRequest) (*SignedUrl, error)
@@ -678,6 +704,9 @@ func (UnimplementedContentServiceServer) GetCollectionItems(context.Context, *bo
 func (UnimplementedContentServiceServer) AddCollection(context.Context, *AddCollectionRequest) (*bosca.IdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollection not implemented")
 }
+func (UnimplementedContentServiceServer) AddCollections(context.Context, *AddCollectionsRequest) (*bosca.IdResponses, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCollections not implemented")
+}
 func (UnimplementedContentServiceServer) GetCollection(context.Context, *bosca.IdRequest) (*Collection, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollection not implemented")
 }
@@ -704,6 +733,9 @@ func (UnimplementedContentServiceServer) GetMetadatas(context.Context, *bosca.Id
 }
 func (UnimplementedContentServiceServer) AddMetadata(context.Context, *AddMetadataRequest) (*bosca.IdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadata not implemented")
+}
+func (UnimplementedContentServiceServer) AddMetadatas(context.Context, *AddMetadatasRequest) (*bosca.IdResponses, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMetadatas not implemented")
 }
 func (UnimplementedContentServiceServer) AddMetadataTrait(context.Context, *AddMetadataTraitRequest) (*Metadata, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataTrait not implemented")
@@ -1105,6 +1137,24 @@ func _ContentService_AddCollection_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_AddCollections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCollectionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).AddCollections(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_AddCollections_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).AddCollections(ctx, req.(*AddCollectionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_GetCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.IdRequest)
 	if err := dec(in); err != nil {
@@ -1263,6 +1313,24 @@ func _ContentService_AddMetadata_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).AddMetadata(ctx, req.(*AddMetadataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_AddMetadatas_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMetadatasRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).AddMetadatas(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_AddMetadatas_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).AddMetadatas(ctx, req.(*AddMetadatasRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1621,6 +1689,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_AddCollection_Handler,
 		},
 		{
+			MethodName: "AddCollections",
+			Handler:    _ContentService_AddCollections_Handler,
+		},
+		{
 			MethodName: "GetCollection",
 			Handler:    _ContentService_GetCollection_Handler,
 		},
@@ -1655,6 +1727,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddMetadata",
 			Handler:    _ContentService_AddMetadata_Handler,
+		},
+		{
+			MethodName: "AddMetadatas",
+			Handler:    _ContentService_AddMetadatas_Handler,
 		},
 		{
 			MethodName: "AddMetadataTrait",

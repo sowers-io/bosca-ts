@@ -17,13 +17,16 @@
 package bible
 
 import (
+	"bosca.io/api/protobuf/bosca"
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/bible/usx"
 	"bosca.io/pkg/workflow/common"
 	"bosca.io/pkg/workflow/registry"
 	"bytes"
 	"context"
+	"log/slog"
 	"os"
+	"time"
 )
 
 func init() {
@@ -33,6 +36,7 @@ func init() {
 func processBible(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
 	metadataFile, err := common.DownloadTemporaryMetadataFile(ctx, executionContext.Metadata.Id)
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to download file", slog.Any("error", err))
 		return err
 	}
 	defer metadataFile.Close()
@@ -40,125 +44,181 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 
 	bundle, err := usx.OpenBundle(metadataFile)
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to open bundle", slog.Any("error", err))
 		return err
 	}
 
 	svc := common.GetContentService(ctx)
+	ctx = common.GetServiceAuthorizedContext(ctx)
 
-	sourceId := "workflow"
-
-	addBookRequest := &content.AddMetadataRequest{
-		Metadata: &content.Metadata{
-			SourceId:    &sourceId,
-			TraitIds:    []string{"bible.usx.book"},
-			ContentType: "text/plain",
-			LanguageTag: bundle.Metadata().Language.Iso,
-		},
+	source, err := svc.GetSource(ctx, &bosca.IdRequest{
+		Id: "workflow",
+	})
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get source", slog.Any("error", err))
+		return err
 	}
 
-	addChapterRequest := &content.AddMetadataRequest{
-		Metadata: &content.Metadata{
-			SourceId:    &sourceId,
-			TraitIds:    []string{"bible.usx.chapter"},
-			ContentType: "text/plain",
-			LanguageTag: bundle.Metadata().Language.Iso,
-		},
+	addBookRequests := make([]*content.AddCollectionRequest, 0)
+	addChapterRequests := make(map[string][]*content.AddMetadataRequest)
+
+	contents := make(map[string]string)
+
+	var newBookRequest = func(book *usx.USX) {
+		request := &content.AddCollectionRequest{
+			Collection: &content.Collection{
+				Name: book.BookIdentification.Code.ToString(),
+				Type: content.CollectionType_standard,
+				Attributes: map[string]string{
+					"bible.book.usfm": book.GetUsfm(),
+					"bible.type":      "book",
+				},
+			},
+		}
+		addBookRequests = append(addBookRequests, request)
 	}
 
-	bookCollection, err := svc.AddCollection(ctx, &content.AddCollectionRequest{
+	var newChapterRequest = func(book *usx.USX, chapter *usx.Chapter) {
+		if chapter.GetUsfm() == "" {
+			return
+		}
+		text := &bytes.Buffer{}
+		for _, verse := range chapter.FindVerses() {
+			text.WriteString(verse.GetText())
+		}
+		contentLength := int64(len(text.String()))
+		request := &content.AddMetadataRequest{
+			Metadata: &content.Metadata{
+				Name:          chapter.GetUsfm(),
+				SourceId:      &source.Id,
+				TraitIds:      []string{"bible.usx.chapter"},
+				ContentType:   "text/plain",
+				ContentLength: &contentLength,
+				Attributes: map[string]string{
+					"bible.chapter.usfm": chapter.GetUsfm(),
+					"bible.book.usfm":    book.GetUsfm(),
+					"bible.type":         "chapter",
+				},
+				LanguageTag: bundle.Metadata().Language.Iso,
+			},
+		}
+		contents[chapter.GetUsfm()] = text.String()
+		if addChapterRequests[book.GetUsfm()] == nil {
+			addChapterRequests[book.GetUsfm()] = make([]*content.AddMetadataRequest, 0)
+		}
+		addChapterRequests[book.GetUsfm()] = append(addChapterRequests[book.GetUsfm()], request)
+	}
+
+	for _, book := range bundle.Books() {
+		newBookRequest(book)
+		for _, chapter := range book.Chapters {
+			if chapter.Number == "" {
+				continue
+			}
+			newChapterRequest(book, chapter)
+		}
+	}
+
+	bibleCollection, err := svc.AddCollection(ctx, &content.AddCollectionRequest{
 		Collection: &content.Collection{
-			Name: executionContext.Metadata.Name,
+			Name: bundle.Metadata().Identification.NameLocal,
 			Type: content.CollectionType_standard,
 			Attributes: map[string]string{
-				"description": "Bible Books",
+				"bible.type": "bible",
 			},
 		},
 	})
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to add bible collections", slog.Any("error", err))
+		return err
+	}
 
-	for _, book := range bundle.Books() {
-		addBookRequest.Metadata.Name = book.BookIdentification.Text
-		addBookRequest.Metadata.Attributes["bible.usfm"] = book.BookIdentification.Text
-		addBookRequest.Metadata.Attributes["bible.type"] = "book"
-		bookResponse, err := svc.AddMetadata(ctx, addBookRequest)
-		if err != nil {
-			return err
-		}
+	bookCollectionIds, err := svc.AddCollections(ctx, &content.AddCollectionsRequest{
+		Collections: addBookRequests,
+	})
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to add book collections", slog.Any("error", err))
+		return err
+	}
 
+	for _, bookId := range bookCollectionIds.Id {
 		_, err = svc.AddCollectionItem(ctx, &content.AddCollectionItemRequest{
-			CollectionId: bookCollection.Id,
-			ItemId: &content.AddCollectionItemRequest_ChildMetadataId{
-				ChildMetadataId: bookResponse.Id,
+			CollectionId: bibleCollection.Id,
+			ItemId: &content.AddCollectionItemRequest_ChildCollectionId{
+				ChildCollectionId: bookId,
 			},
 		})
 		if err != nil {
-			return nil
-		}
-
-		chapterCollection, err := svc.AddCollection(ctx, &content.AddCollectionRequest{
-			Collection: &content.Collection{
-				Name: book.BookChapterLabel.Text,
-				Type: content.CollectionType_standard,
-				Attributes: map[string]string{
-					"description": "Bible Chapters",
-					"bible.usfm":  book.BookIdentification.Text,
-				},
-			},
-		})
-		if err != nil {
+			slog.ErrorContext(ctx, "failed to add book to bible collection", slog.Any("error", err))
 			return err
 		}
+	}
 
-		for _, chapter := range book.Chapters {
-			text := &bytes.Buffer{}
-			for _, verse := range chapter.FindVerses() {
-				text.WriteString(verse.GetText())
-			}
-
-			addChapterRequest.Metadata.Name = chapter.GetUsfm()
-			addChapterRequest.Metadata.ContentLength = int64(text.Len())
-			addChapterRequest.Metadata.Attributes["bible.usfm"] = chapter.GetUsfm()
-			addChapterRequest.Metadata.Attributes["bible.type"] = "chapter"
-			addChapterRequest.Metadata.Attributes["bible.book.usfm"] = book.BookIdentification.Text
-			response, err := svc.AddMetadata(ctx, addChapterRequest)
-			if err != nil {
-				return err
-			}
-
-			err = common.SetContent(ctx, response.Id, []byte(text.String()))
-			if err != nil {
-				return err
-			}
-
-			_, err = svc.AddMetadataRelationship(ctx, &content.MetadataRelationship{
-				MetadataId1:  executionContext.Metadata.Id,
-				MetadataId2:  response.Id,
-				Relationship: "bible.usx.chapter",
-				Attributes:   map[string]string{"bible.book.usfm": book.BookIdentification.Text, "usfm": chapter.GetUsfm()},
-			})
-			if err != nil {
-				return nil
-			}
-
-			_, err = svc.AddMetadataRelationship(ctx, &content.MetadataRelationship{
-				MetadataId1:  response.Id,
-				MetadataId2:  executionContext.Metadata.Id,
-				Relationship: "bible.usx.bible",
-			})
-			if err != nil {
-				return nil
-			}
-
+	for ix, book := range bundle.Books() {
+		chapterIds, err := svc.AddMetadatas(ctx, &content.AddMetadatasRequest{
+			Metadatas: addChapterRequests[book.GetUsfm()],
+		})
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to add metadata", slog.Any("error", err))
+			return err
+		}
+		c := make(map[string]string)
+		for i, request := range addChapterRequests[book.GetUsfm()] {
+			c[chapterIds.Id[i]] = contents[request.Metadata.Attributes["bible.chapter.usfm"]]
+		}
+		err = addRelationships(ctx, executionContext.Metadata.Id, chapterIds.Id, c, svc)
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to add relationship", slog.Any("error", err))
+			return err
+		}
+		for _, chapterId := range chapterIds.Id {
 			_, err = svc.AddCollectionItem(ctx, &content.AddCollectionItemRequest{
-				CollectionId: chapterCollection.Id,
+				CollectionId: bookCollectionIds.Id[ix],
 				ItemId: &content.AddCollectionItemRequest_ChildMetadataId{
-					ChildMetadataId: response.Id,
+					ChildMetadataId: chapterId,
 				},
 			})
 			if err != nil {
-				return nil
+				slog.ErrorContext(ctx, "failed to add chapter to book", slog.Any("error", err))
+				return err
 			}
 		}
 	}
 
+	return nil
+}
+
+func addRelationships(ctx context.Context, bibleId string, ids []string, contents map[string]string, svc content.ContentServiceClient) error {
+	for _, id := range ids {
+		_, err := svc.AddMetadataRelationship(ctx, &content.MetadataRelationship{
+			MetadataId1:  bibleId,
+			MetadataId2:  id,
+			Relationship: "bible.usx.chapter",
+		})
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to add relationship", slog.Any("error", err))
+			return err
+		}
+		_, err = svc.AddMetadataRelationship(ctx, &content.MetadataRelationship{
+			MetadataId1:  id,
+			MetadataId2:  bibleId,
+			Relationship: "bible.usx.bible",
+		})
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to add relationship", slog.Any("error", err))
+			return err
+		}
+		for tries := 0; tries < 10; tries++ {
+			err = common.SetContent(ctx, id, []byte(contents[id]))
+			if err == nil {
+				break
+			}
+			time.Sleep(1 * time.Second)
+		}
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to add content", slog.Any("error", err))
+			return err
+		}
+	}
 	return nil
 }

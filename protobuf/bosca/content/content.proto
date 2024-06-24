@@ -149,6 +149,13 @@ service ContentService {
     };
   }
 
+  rpc AddCollections(AddCollectionsRequest) returns (bosca.IdResponses) {
+    option (google.api.http) = {
+      put: "/v1/content/collections"
+      body: "*"
+    };
+  }
+
   rpc GetCollection(IdRequest) returns (Collection) {
     option (google.api.http) = {
       get: "/v1/content/collections/{id}"
@@ -202,6 +209,13 @@ service ContentService {
   rpc AddMetadata(AddMetadataRequest) returns (IdResponse) {
     option (google.api.http) = {
       post: "/v1/content/metadata"
+      body: "*"
+    };
+  }
+
+  rpc AddMetadatas(AddMetadatasRequest) returns (IdResponses) {
+    option (google.api.http) = {
+      post: "/v1/content/metadatas"
       body: "*"
     };
   }

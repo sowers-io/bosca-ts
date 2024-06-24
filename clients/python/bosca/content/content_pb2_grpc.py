@@ -145,6 +145,11 @@ class ContentServiceStub(object):
                 request_serializer=bosca_dot_content_dot_collections__pb2.AddCollectionRequest.SerializeToString,
                 response_deserializer=bosca_dot_requests__pb2.IdResponse.FromString,
                 _registered_method=True)
+        self.AddCollections = channel.unary_unary(
+                '/bosca.content.ContentService/AddCollections',
+                request_serializer=bosca_dot_content_dot_collections__pb2.AddCollectionsRequest.SerializeToString,
+                response_deserializer=bosca_dot_requests__pb2.IdResponses.FromString,
+                _registered_method=True)
         self.GetCollection = channel.unary_unary(
                 '/bosca.content.ContentService/GetCollection',
                 request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
@@ -189,6 +194,11 @@ class ContentServiceStub(object):
                 '/bosca.content.ContentService/AddMetadata',
                 request_serializer=bosca_dot_content_dot_metadata__pb2.AddMetadataRequest.SerializeToString,
                 response_deserializer=bosca_dot_requests__pb2.IdResponse.FromString,
+                _registered_method=True)
+        self.AddMetadatas = channel.unary_unary(
+                '/bosca.content.ContentService/AddMetadatas',
+                request_serializer=bosca_dot_content_dot_metadata__pb2.AddMetadatasRequest.SerializeToString,
+                response_deserializer=bosca_dot_requests__pb2.IdResponses.FromString,
                 _registered_method=True)
         self.AddMetadataTrait = channel.unary_unary(
                 '/bosca.content.ContentService/AddMetadataTrait',
@@ -384,6 +394,12 @@ class ContentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def AddCollections(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetCollection(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -433,6 +449,12 @@ class ContentServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def AddMetadata(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AddMetadatas(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -626,6 +648,11 @@ def add_ContentServiceServicer_to_server(servicer, server):
                     request_deserializer=bosca_dot_content_dot_collections__pb2.AddCollectionRequest.FromString,
                     response_serializer=bosca_dot_requests__pb2.IdResponse.SerializeToString,
             ),
+            'AddCollections': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddCollections,
+                    request_deserializer=bosca_dot_content_dot_collections__pb2.AddCollectionsRequest.FromString,
+                    response_serializer=bosca_dot_requests__pb2.IdResponses.SerializeToString,
+            ),
             'GetCollection': grpc.unary_unary_rpc_method_handler(
                     servicer.GetCollection,
                     request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
@@ -670,6 +697,11 @@ def add_ContentServiceServicer_to_server(servicer, server):
                     servicer.AddMetadata,
                     request_deserializer=bosca_dot_content_dot_metadata__pb2.AddMetadataRequest.FromString,
                     response_serializer=bosca_dot_requests__pb2.IdResponse.SerializeToString,
+            ),
+            'AddMetadatas': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddMetadatas,
+                    request_deserializer=bosca_dot_content_dot_metadata__pb2.AddMetadatasRequest.FromString,
+                    response_serializer=bosca_dot_requests__pb2.IdResponses.SerializeToString,
             ),
             'AddMetadataTrait': grpc.unary_unary_rpc_method_handler(
                     servicer.AddMetadataTrait,
@@ -1271,6 +1303,33 @@ class ContentService(object):
             _registered_method=True)
 
     @staticmethod
+    def AddCollections(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/AddCollections',
+            bosca_dot_content_dot_collections__pb2.AddCollectionsRequest.SerializeToString,
+            bosca_dot_requests__pb2.IdResponses.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def GetCollection(request,
             target,
             options=(),
@@ -1503,6 +1562,33 @@ class ContentService(object):
             '/bosca.content.ContentService/AddMetadata',
             bosca_dot_content_dot_metadata__pb2.AddMetadataRequest.SerializeToString,
             bosca_dot_requests__pb2.IdResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AddMetadatas(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/AddMetadatas',
+            bosca_dot_content_dot_metadata__pb2.AddMetadatasRequest.SerializeToString,
+            bosca_dot_requests__pb2.IdResponses.FromString,
             options,
             channel_credentials,
             insecure,

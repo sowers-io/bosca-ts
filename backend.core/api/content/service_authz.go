@@ -22,6 +22,8 @@ import (
 	"bosca.io/pkg/security"
 	"context"
 	"errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"strings"
 )
 
@@ -107,6 +109,35 @@ func (svc *authorizationService) AddCollection(ctx context.Context, request *grp
 	return svc.service.AddCollection(ctx, request)
 }
 
+func (svc *authorizationService) AddCollections(ctx context.Context, request *grpc.AddCollectionsRequest) (*protobuf.IdResponses, error) {
+	parentIds := make([]string, 0)
+	for _, collection := range request.Collections {
+		if collection.Collection == nil {
+			return nil, errors.New("collection is required")
+		}
+		if len(strings.Trim(collection.Parent, " ")) == 0 {
+			collection.Parent = RootCollectionId
+		}
+		parentIds = append(parentIds, collection.Parent)
+	}
+	ids, err := svc.permissions.BulkCheck(ctx, grpc.PermissionObjectType_collection_type, parentIds, grpc.PermissionAction_edit)
+	if err != nil {
+		return nil, err
+	}
+	if len(ids) != len(parentIds) {
+		return nil, status.Errorf(codes.Unauthenticated, "permission check failed")
+	}
+	return svc.service.AddCollections(ctx, request)
+}
+
+func (svc *authorizationService) AddCollectionItem(ctx context.Context, request *grpc.AddCollectionItemRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.CollectionId, grpc.PermissionAction_edit)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.AddCollectionItem(ctx, request)
+}
+
 func (svc *authorizationService) DeleteCollection(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Id, grpc.PermissionAction_manage)
 	if err != nil {
@@ -171,6 +202,28 @@ func (svc *authorizationService) AddMetadata(ctx context.Context, request *grpc.
 		return nil, err
 	}
 	return svc.service.AddMetadata(ctx, request)
+}
+
+func (svc *authorizationService) AddMetadatas(ctx context.Context, request *grpc.AddMetadatasRequest) (*protobuf.IdResponses, error) {
+	collections := make([]string, len(request.Metadatas))
+	for i, metadata := range request.Metadatas {
+		if metadata.Metadata == nil {
+			return nil, errors.New("workflow is required")
+		}
+		collection := RootCollectionId
+		if metadata.Collection != nil {
+			collection = *metadata.Collection
+		}
+		collections[i] = collection
+	}
+	ids, err := svc.permissions.BulkCheck(ctx, grpc.PermissionObjectType_collection_type, collections, grpc.PermissionAction_edit)
+	if err != nil {
+		return nil, err
+	}
+	if len(ids) != len(request.Metadatas) {
+		return nil, status.Errorf(codes.Unauthenticated, "permission check failed")
+	}
+	return svc.service.AddMetadatas(ctx, request)
 }
 
 func (svc *authorizationService) DeleteMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
@@ -268,6 +321,15 @@ func (svc *authorizationService) GetTraits(ctx context.Context, request *protobu
 		return nil, err
 	}
 	return svc.service.GetTraits(ctx, request)
+}
+
+func (svc *authorizationService) GetTrait(ctx context.Context, request *protobuf.IdRequest) (*grpc.Trait, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetTrait(ctx, request)
 }
 
 func (svc *authorizationService) GetModels(ctx context.Context, request *protobuf.Empty) (*grpc.Models, error) {

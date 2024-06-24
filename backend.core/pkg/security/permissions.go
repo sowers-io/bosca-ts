@@ -29,5 +29,6 @@ type PermissionManager interface {
 	CheckWithSubjectIdError(ctx context.Context, subjectType content.PermissionSubjectType, subjectId string, objectType content.PermissionObjectType, resourceId string, action content.PermissionAction) error
 	CreateRelationships(ctx context.Context, objectType content.PermissionObjectType, permissions []*content.Permission) error
 	CreateRelationship(ctx context.Context, objectType content.PermissionObjectType, permission *content.Permission) error
+	WaitForPermissions(ctx context.Context, objectType content.PermissionObjectType, permissions []*content.Permission) error
 	GetPermissions(ctx context.Context, objectType content.PermissionObjectType, resourceId string) (*content.Permissions, error)
 }

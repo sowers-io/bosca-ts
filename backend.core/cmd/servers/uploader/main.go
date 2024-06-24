@@ -206,7 +206,7 @@ func main() {
 				Name:             hook.Upload.MetaData["name"],
 				ContentType:      hook.Upload.MetaData["filetype"],
 				TraitIds:         traits,
-				ContentLength:    hook.Upload.Size,
+				ContentLength:    &hook.Upload.Size,
 				SourceId:         &source.Id,
 				SourceIdentifier: &hook.Upload.ID,
 			}

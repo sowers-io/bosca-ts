@@ -23,6 +23,12 @@ class IdResponse(_message.Message):
     id: str
     def __init__(self, id: _Optional[str] = ...) -> None: ...
 
+class IdResponses(_message.Message):
+    __slots__ = ("id",)
+    ID_FIELD_NUMBER: _ClassVar[int]
+    id: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, id: _Optional[_Iterable[str]] = ...) -> None: ...
+
 class Url(_message.Message):
     __slots__ = ("url",)
     URL_FIELD_NUMBER: _ClassVar[int]

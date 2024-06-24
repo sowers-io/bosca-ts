@@ -19,12 +19,18 @@ package registry
 import (
 	"bosca.io/api/protobuf/bosca/content"
 	"context"
+	"go.temporal.io/sdk/workflow"
 )
 
 var activityRegistry = make(map[string]func(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error)
+var workflowRegistry = make(map[string]func(ctx workflow.Context, executionContext *content.WorkflowActivityExecutionContext) error)
 
 func GetActivity(name string) func(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
 	return activityRegistry[name]
+}
+
+func GetWorkflow(name string) func(ctx workflow.Context, executionContext *content.WorkflowActivityExecutionContext) error {
+	return workflowRegistry[name]
 }
 
 func RegisterActivity(name string, fn func(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error) {
@@ -32,4 +38,11 @@ func RegisterActivity(name string, fn func(ctx context.Context, executionContext
 		panic("duplicate activity name: " + name)
 	}
 	activityRegistry[name] = fn
+}
+
+func RegisterWorkflow(name string, fn func(ctx workflow.Context, executionContext *content.WorkflowActivityExecutionContext) error) {
+	if _, ok := workflowRegistry[name]; ok {
+		panic("duplicate workflow name: " + name)
+	}
+	workflowRegistry[name] = fn
 }

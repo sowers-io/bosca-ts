@@ -35,29 +35,8 @@ func (svc *service) GetCollection(ctx context.Context, request *protobuf.IdReque
 	return svc.ds.GetCollection(ctx, request.Id)
 }
 
-func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, error) {
-	userId, err := identity.GetAuthenticatedSubjectId(ctx)
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to get subject", slog.Any("request", request), slog.Any("error", err))
-		return nil, err
-	}
-	if strings.Trim(request.Collection.Name, " ") == "" {
-		err := errors.New("name must not be empty")
-		slog.ErrorContext(ctx, "name requirement failed", slog.Any("request", request), slog.Any("error", err))
-		return nil, err
-	}
-	if unique, err := svc.verifyUniqueName(ctx, request.Parent, request.Collection.Name); !unique || err != nil {
-		if err == nil {
-			return nil, errors.New("name must be unique")
-		}
-		return nil, err
-	}
-	id, err := svc.ds.AddCollection(ctx, request.Collection)
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to add collection", slog.Any("request", request), slog.Any("error", err))
-		return nil, err
-	}
-	err = svc.permissions.CreateRelationships(ctx, grpc.PermissionObjectType_collection_type, []*grpc.Permission{
+func (svc *service) newCollectionPermissions(userId, id string) []*grpc.Permission {
+	return []*grpc.Permission{
 		{
 			Id:          id,
 			Subject:     security.AdministratorGroup,
@@ -76,17 +55,80 @@ func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollecti
 			SubjectType: grpc.PermissionSubjectType_user,
 			Relation:    grpc.PermissionRelation_owners,
 		},
-	})
+	}
+}
+
+func (svc *service) addCollection(ctx context.Context, userId string, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, []*grpc.Permission, error) {
+	if strings.Trim(request.Collection.Name, " ") == "" {
+		err := errors.New("name must not be empty")
+		slog.ErrorContext(ctx, "name requirement failed", slog.Any("request", request), slog.Any("error", err))
+		return nil, nil, err
+	}
+	if unique, err := svc.verifyUniqueName(ctx, request.Parent, request.Collection.Name); !unique || err != nil {
+		if err == nil {
+			return nil, nil, errors.New("name must be unique")
+		}
+		return nil, nil, err
+	}
+	id, err := svc.ds.AddCollection(ctx, request.Collection)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to add collection", slog.Any("request", request), slog.Any("error", err))
+		return nil, nil, err
+	}
+	permissions := svc.newCollectionPermissions(userId, id)
+	err = svc.permissions.CreateRelationships(ctx, grpc.PermissionObjectType_collection_type, permissions)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to create relationships", slog.String("id", id), slog.Any("error", err))
-		return nil, err
+		return nil, nil, err
 	}
 	err = svc.ds.AddCollectionCollectionItems(ctx, request.Parent, []string{id})
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to add to parent", slog.String("id", id), slog.String("parent_id", request.Parent), slog.Any("error", err))
+		return nil, nil, err
+	}
+	return &protobuf.IdResponse{Id: id}, permissions, nil
+}
+
+func (svc *service) AddCollections(ctx context.Context, request *grpc.AddCollectionsRequest) (*protobuf.IdResponses, error) {
+	userId, err := identity.GetAuthenticatedSubjectId(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get subject", slog.Any("request", request), slog.Any("error", err))
 		return nil, err
 	}
-	return &protobuf.IdResponse{Id: id}, nil
+	ids := make([]string, len(request.Collections))
+	allPermissions := make([]*grpc.Permission, 0)
+	for i, collection := range request.Collections {
+		id, permissions, err := svc.addCollection(ctx, userId, collection)
+		if err != nil {
+			return nil, err
+		}
+		allPermissions = append(allPermissions, permissions...)
+		ids[i] = id.Id
+	}
+	err = svc.permissions.WaitForPermissions(ctx, grpc.PermissionObjectType_collection_type, allPermissions)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.IdResponses{
+		Id: ids,
+	}, nil
+}
+
+func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, error) {
+	userId, err := identity.GetAuthenticatedSubjectId(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get subject", slog.Any("request", request), slog.Any("error", err))
+		return nil, err
+	}
+	id, permissions, err := svc.addCollection(ctx, userId, request)
+	if err != nil {
+		return nil, err
+	}
+	err = svc.permissions.WaitForPermissions(ctx, grpc.PermissionObjectType_collection_type, permissions)
+	if err != nil {
+		return nil, err
+	}
+	return id, err
 }
 
 func (svc *service) AddCollectionItem(ctx context.Context, request *grpc.AddCollectionItemRequest) (*protobuf.Empty, error) {

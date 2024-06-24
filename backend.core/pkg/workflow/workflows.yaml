@@ -3,6 +3,7 @@ traits:
   bible.usx:
     workflowIds:
       - bible.usx
+  bible.usx.book: { }
   bible.usx.chapter:
     workflowIds:
       - bible.usx.chapter
@@ -168,8 +169,10 @@ workflows:
     metadata.process:
       activities:
         traits.process: { }
-      configuration:
-        finalStateId: draft
+        metadata.transition.to:
+          configuration:
+            state: draft
+            status:
       queue: metadata
     # trait workflows
     traits.process:

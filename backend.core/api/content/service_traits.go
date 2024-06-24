@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package metadata
+package content
 
 import (
-	_ "bosca.io/pkg/workflow/ai/markdown"
-	_ "bosca.io/pkg/workflow/bible"
-	_ "bosca.io/pkg/workflow/common"
-	_ "bosca.io/pkg/workflow/registry"
-	"go.temporal.io/sdk/client"
-	"go.temporal.io/sdk/worker"
-	"go.temporal.io/sdk/workflow"
+	"bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca/content"
+	"context"
 )
 
-func NewWorker(client client.Client) worker.Worker {
-	w := worker.New(client, "metadata", worker.Options{})
-	w.RegisterWorkflowWithOptions(ProcessMetadata, workflow.RegisterOptions{
-		Name: "metadata.process",
-	})
-	w.RegisterWorkflowWithOptions(ProcessTraits, workflow.RegisterOptions{
-		Name: "traits.process",
-	})
-	return w
+func (svc *service) GetTraits(ctx context.Context, request *bosca.Empty) (*content.Traits, error) {
+	traits, err := svc.ds.GetTraits(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &content.Traits{
+		Traits: traits,
+	}, err
+}
+
+func (svc *service) GetTrait(ctx context.Context, request *bosca.IdRequest) (*content.Trait, error) {
+	return svc.ds.GetTrait(ctx, request.Id)
 }

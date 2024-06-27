@@ -149,15 +149,23 @@ func (svc *service) AddMetadatas(ctx context.Context, request *grpc.AddMetadatas
 		slog.ErrorContext(ctx, "failed to get subject", slog.Any("request", request), slog.Any("error", err))
 		return nil, err
 	}
-	ids := make([]string, len(request.Metadatas))
+	ids := make([]*protobuf.IdResponsesId, len(request.Metadatas))
 	allPermissions := make([]*grpc.Permission, 0)
+	var firstError error
 	for i, md := range request.Metadatas {
-		id, permissions, err := svc.addMetadata(ctx, userId, md)
+		var id *protobuf.IdResponse
+		var permissions []*grpc.Permission
+		id, permissions, err = svc.addMetadata(ctx, userId, md)
+		var errMsg *string
 		if err != nil {
-			return nil, err
+			e := err.Error()
+			errMsg = &e
 		}
 		allPermissions = append(allPermissions, permissions...)
-		ids[i] = id.Id
+		ids[i] = &protobuf.IdResponsesId{
+			Id:    id.Id,
+			Error: errMsg,
+		}
 	}
 	err = svc.permissions.WaitForPermissions(ctx, grpc.PermissionObjectType_metadata_type, allPermissions)
 	if err != nil {
@@ -165,7 +173,7 @@ func (svc *service) AddMetadatas(ctx context.Context, request *grpc.AddMetadatas
 	}
 	return &protobuf.IdResponses{
 		Id: ids,
-	}, nil
+	}, firstError
 }
 
 func (svc *service) DeleteMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {

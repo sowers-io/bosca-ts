@@ -17,6 +17,7 @@
 package common
 
 import (
+	ai "bosca.io/api/protobuf/bosca/ai"
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/search"
@@ -30,21 +31,24 @@ import (
 const configurationKey = "configuration"
 const httpKey = "http"
 const contentServiceKey = "contentService"
+const aiServiceKey = "aiService"
 const searchClientKey = "searchClient"
 const qdrantClientKey = "qdrantClient"
 
 type contextPropagator struct {
 	cfg            *configuration.WorkerConfiguration
 	contentService content.ContentServiceClient
+	aiService      ai.AIServiceClient
 	httpClient     *http.Client
 	searchClient   search.StandardClient
 	qdrantClient   *qdrant.Client
 }
 
-func NewContextPropagator(cfg *configuration.WorkerConfiguration, httpClient *http.Client, contentService content.ContentServiceClient, searchClient search.StandardClient, qdrantClient *qdrant.Client) workflow.ContextPropagator {
+func NewContextPropagator(cfg *configuration.WorkerConfiguration, httpClient *http.Client, contentService content.ContentServiceClient, aiService ai.AIServiceClient, searchClient search.StandardClient, qdrantClient *qdrant.Client) workflow.ContextPropagator {
 	return &contextPropagator{
 		cfg:            cfg,
 		contentService: contentService,
+		aiService:      aiService,
 		httpClient:     httpClient,
 		searchClient:   searchClient,
 		qdrantClient:   qdrantClient,
@@ -59,6 +63,7 @@ func (c *contextPropagator) Extract(ctx context.Context, _ workflow.HeaderReader
 	ctx = context.WithValue(ctx, configurationKey, c.cfg)
 	ctx = context.WithValue(ctx, httpKey, c.httpClient)
 	ctx = context.WithValue(ctx, contentServiceKey, c.contentService)
+	ctx = context.WithValue(ctx, aiServiceKey, c.aiService)
 	ctx = context.WithValue(ctx, searchClientKey, c.searchClient)
 	ctx = context.WithValue(ctx, qdrantClientKey, c.qdrantClient)
 	return ctx, nil
@@ -72,6 +77,7 @@ func (c *contextPropagator) ExtractToWorkflow(ctx workflow.Context, writer workf
 	ctx = workflow.WithValue(ctx, configurationKey, c.cfg)
 	ctx = workflow.WithValue(ctx, httpKey, c.httpClient)
 	ctx = workflow.WithValue(ctx, contentServiceKey, c.contentService)
+	ctx = workflow.WithValue(ctx, aiServiceKey, c.aiService)
 	ctx = workflow.WithValue(ctx, searchClientKey, c.searchClient)
 	ctx = workflow.WithValue(ctx, qdrantClientKey, c.qdrantClient)
 	return ctx, nil
@@ -110,8 +116,16 @@ func GetContentService(context context.Context) content.ContentServiceClient {
 	return context.Value(contentServiceKey).(content.ContentServiceClient)
 }
 
+func GetAIService(context context.Context) ai.AIServiceClient {
+	return context.Value(aiServiceKey).(ai.AIServiceClient)
+}
+
 func GetWorkflowContentService(context workflow.Context) content.ContentServiceClient {
 	return context.Value(contentServiceKey).(content.ContentServiceClient)
+}
+
+func GetWorkflowAIService(context workflow.Context) ai.AIServiceClient {
+	return context.Value(aiServiceKey).(ai.AIServiceClient)
 }
 
 func GetSearchClient(context context.Context) search.StandardClient {

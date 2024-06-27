@@ -34,14 +34,16 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	AIService_Query_FullMethodName = "/bosca.ai.AIService/Query"
+	AIService_QueryStorage_FullMethodName = "/bosca.ai.AIService/QueryStorage"
+	AIService_QueryPrompt_FullMethodName  = "/bosca.ai.AIService/QueryPrompt"
 )
 
 // AIServiceClient is the client API for AIService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AIServiceClient interface {
-	Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error)
+	QueryStorage(ctx context.Context, in *QueryStorageRequest, opts ...grpc.CallOption) (*QueryResponse, error)
+	QueryPrompt(ctx context.Context, in *QueryPromptRequest, opts ...grpc.CallOption) (*QueryResponse, error)
 }
 
 type aIServiceClient struct {
@@ -52,10 +54,20 @@ func NewAIServiceClient(cc grpc.ClientConnInterface) AIServiceClient {
 	return &aIServiceClient{cc}
 }
 
-func (c *aIServiceClient) Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error) {
+func (c *aIServiceClient) QueryStorage(ctx context.Context, in *QueryStorageRequest, opts ...grpc.CallOption) (*QueryResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(QueryResponse)
-	err := c.cc.Invoke(ctx, AIService_Query_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, AIService_QueryStorage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aIServiceClient) QueryPrompt(ctx context.Context, in *QueryPromptRequest, opts ...grpc.CallOption) (*QueryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryResponse)
+	err := c.cc.Invoke(ctx, AIService_QueryPrompt_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +78,8 @@ func (c *aIServiceClient) Query(ctx context.Context, in *QueryRequest, opts ...g
 // All implementations must embed UnimplementedAIServiceServer
 // for forward compatibility
 type AIServiceServer interface {
-	Query(context.Context, *QueryRequest) (*QueryResponse, error)
+	QueryStorage(context.Context, *QueryStorageRequest) (*QueryResponse, error)
+	QueryPrompt(context.Context, *QueryPromptRequest) (*QueryResponse, error)
 	mustEmbedUnimplementedAIServiceServer()
 }
 
@@ -74,8 +87,11 @@ type AIServiceServer interface {
 type UnimplementedAIServiceServer struct {
 }
 
-func (UnimplementedAIServiceServer) Query(context.Context, *QueryRequest) (*QueryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Query not implemented")
+func (UnimplementedAIServiceServer) QueryStorage(context.Context, *QueryStorageRequest) (*QueryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryStorage not implemented")
+}
+func (UnimplementedAIServiceServer) QueryPrompt(context.Context, *QueryPromptRequest) (*QueryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryPrompt not implemented")
 }
 func (UnimplementedAIServiceServer) mustEmbedUnimplementedAIServiceServer() {}
 
@@ -90,20 +106,38 @@ func RegisterAIServiceServer(s grpc.ServiceRegistrar, srv AIServiceServer) {
 	s.RegisterService(&AIService_ServiceDesc, srv)
 }
 
-func _AIService_Query_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryRequest)
+func _AIService_QueryStorage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryStorageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AIServiceServer).Query(ctx, in)
+		return srv.(AIServiceServer).QueryStorage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AIService_Query_FullMethodName,
+		FullMethod: AIService_QueryStorage_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AIServiceServer).Query(ctx, req.(*QueryRequest))
+		return srv.(AIServiceServer).QueryStorage(ctx, req.(*QueryStorageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AIService_QueryPrompt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryPromptRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AIServiceServer).QueryPrompt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AIService_QueryPrompt_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AIServiceServer).QueryPrompt(ctx, req.(*QueryPromptRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -116,8 +150,12 @@ var AIService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AIServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Query",
-			Handler:    _AIService_Query_Handler,
+			MethodName: "QueryStorage",
+			Handler:    _AIService_QueryStorage_Handler,
+		},
+		{
+			MethodName: "QueryPrompt",
+			Handler:    _AIService_QueryPrompt_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

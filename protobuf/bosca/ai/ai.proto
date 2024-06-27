@@ -22,17 +22,30 @@ import "google/api/annotations.proto";
 package bosca.ai;
 
 service AIService {
-  rpc Query(QueryRequest) returns (QueryResponse) {
+  rpc QueryStorage(QueryStorageRequest) returns (QueryResponse) {
     option (google.api.http) = {
       post: "/v1/ai/query"
       body: "*"
     };
   }
+
+  rpc QueryPrompt(QueryPromptRequest) returns (QueryResponse) {
+    option (google.api.http) = {
+      post: "/v1/ai/prompt"
+      body: "*"
+    };
+  }
 }
 
-message QueryRequest {
+message QueryStorageRequest {
   string storage_system = 1;
   string query = 2;
+}
+
+message QueryPromptRequest {
+  string prompt_id = 1;
+  string model_id = 2;
+  map<string, string> arguments = 3;
 }
 
 message QueryResponse {

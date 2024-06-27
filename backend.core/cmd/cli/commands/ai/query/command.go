@@ -43,7 +43,7 @@ var Command = &cobra.Command{
 
 		cmd.Printf("Sending message: %s\n", args[0])
 
-		response, err := client.Query(ctx, &grpc.QueryRequest{
+		response, err := client.QueryStorage(ctx, &grpc.QueryStorageRequest{
 			Query:         args[0],
 			StorageSystem: cmd.Flag(flags.StorageSystemFlag).Value.String(),
 		})

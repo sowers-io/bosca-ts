@@ -18,21 +18,27 @@ import asyncio
 import logging
 import os
 
+from llama_index.core.base.llms.types import ChatMessage
+
 import bosca.ai.ai_pb2_grpc
 import grpc
 
-from bosca.ai.ai_pb2 import QueryRequest, QueryResponse
+from bosca.ai.ai_pb2 import QueryStorageRequest, QueryPromptRequest, QueryResponse
 from grpc_reflection.v1alpha import reflection
 from grpc.aio import ServicerContext
 
+from bosca.content.content_pb2_grpc import ContentServiceStub
+from bosca.requests_pb2 import IdRequest
+from services.channel import new_channel
+from util.chat_context import ChatContext
 from util.chat_context_factory import get_chat_context
 
 
 class AIService(bosca.ai.ai_pb2_grpc.AIServiceServicer):
 
-    async def Query(
+    async def QueryStorage(
             self,
-            request: QueryRequest,
+            request: QueryStorageRequest,
             context: ServicerContext,
     ) -> QueryResponse:
         ctx = await get_chat_context(request.storage_system)
@@ -43,6 +49,26 @@ class AIService(bosca.ai.ai_pb2_grpc.AIServiceServicer):
             verbose=True)
         response = engine.query(request.query)
         return QueryResponse(response=str(response.response))
+
+    async def QueryPrompt(
+            self,
+            request: QueryPromptRequest,
+            context: ServicerContext,
+    ) -> QueryResponse:
+        with new_channel() as channel:
+            service = ContentServiceStub(channel=channel)
+            prompt = service.GetPrompt(QueryPromptRequest(prompt_id=request.prompt_id))
+            model = service.GetModel(IdRequest(id=request.model_id))
+
+        prompt = prompt.format(*request.arguments.items())
+
+        ctx = ChatContext(model=model)
+        response = ctx.llm.chat(
+            messages=[
+                ChatMessage.from_str(prompt)
+            ]
+        )
+        return QueryResponse(response=str(response.message.content))
 
 
 async def serve() -> None:

@@ -5,6 +5,7 @@
     <parameters value="--workflows bible.usx,bible.usx.chapter --activities bible.process,bible.chapter.verses.table,bible.chapter.verses.create,ai.prompt --queue bible" />
     <envs>
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
+      <env name="BOSCA_AI_API_ADDRESS" value="localhost:5007" />
       <env name="BOSCA_CONTENT_CONNECTION_STRING" value="postgresql://bosca:bosca@localhost:5432/boscacontent" />
       <env name="BOSCA_PERMISSIONS_SHARED_TOKEN" value="bosca-spicedb" />
       <env name="BOSCA_PROFILES_CONNECTION_STRING" value="postgresql://bosca:bosca@localhost:5432/boscaprofiles" />

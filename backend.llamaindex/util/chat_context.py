@@ -28,7 +28,7 @@ from bosca.content.model_pb2 import Model
 
 class ChatContext(object):
 
-    def __init__(self, model: Model, storage_system: StorageSystem, service_context: ServiceContext | None = None):
+    def __init__(self, model: Model, storage_system: StorageSystem | None = None, service_context: ServiceContext | None = None):
         client_connection_parts = os.environ["BOSCA_QDRANT_API_ADDRESS"].split(":")
 
         self.llm = Ollama(
@@ -54,10 +54,13 @@ class ChatContext(object):
         Settings.callback_manager = self.llm.callback_manager
 
         self.service_context = service_context
-        self.vector_store = QdrantVectorStore(client=self.qdrant_vector_client,
-                                              collection_name=storage_system.configuration["indexName"],
-                                              parallel=2)
 
-        self.vector_store_index = VectorStoreIndex.from_vector_store(vector_store=self.vector_store,
-                                                                     embed_model=self.embeddings,
-                                                                     service_context=self.service_context)
+        if storage_system is not None:
+            self.vector_store = QdrantVectorStore(client=self.qdrant_vector_client,
+                                                  collection_name=storage_system.configuration["indexName"],
+                                                  parallel=2)
+
+        if self.vector_store is not None:
+            self.vector_store_index = VectorStoreIndex.from_vector_store(vector_store=self.vector_store,
+                                                                         embed_model=self.embeddings,
+                                                                         service_context=self.service_context)

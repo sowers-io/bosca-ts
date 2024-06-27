@@ -64,9 +64,21 @@ service ContentService {
     };
   }
 
+  rpc GetModel(bosca.IdRequest) returns (Model) {
+    option (google.api.http) = {
+      get: "/v1/content/models/{id}"
+    };
+  }
+
   rpc GetPrompts(bosca.Empty) returns (Prompts) {
     option (google.api.http) = {
       get: "/v1/content/prompts"
+    };
+  }
+
+  rpc GetPrompt(bosca.IdRequest) returns (Prompt) {
+    option (google.api.http) = {
+      get: "/v1/content/prompts/{id}"
     };
   }
 

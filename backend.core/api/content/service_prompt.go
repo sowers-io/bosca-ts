@@ -22,16 +22,6 @@ import (
 	"context"
 )
 
-func (svc *service) GetModels(ctx context.Context, request *bosca.Empty) (*content.Models, error) {
-	models, err := svc.ds.GetModels(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &content.Models{
-		Models: models,
-	}, nil
-}
-
-func (svc *service) GetModel(ctx context.Context, request *bosca.IdRequest) (*content.Model, error) {
-	return svc.ds.GetModel(ctx, request.Id)
+func (svc *service) GetPrompt(ctx context.Context, request *bosca.IdRequest) (*content.Prompt, error) {
+	return svc.ds.GetPrompt(ctx, request.Id)
 }

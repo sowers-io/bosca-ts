@@ -17,6 +17,7 @@
 package util
 
 import (
+	ai "bosca.io/api/protobuf/bosca/ai"
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
@@ -39,6 +40,12 @@ func NewAITemporalClient() (client.Client, error) {
 	}
 	contentService := content.NewContentServiceClient(connection)
 
+	connection, err = clients.NewClientConnection(cfg.ClientEndPoints.AIApiAddress)
+	if err != nil {
+		return nil, err
+	}
+	aiService := ai.NewAIServiceClient(connection)
+
 	searchClient, err := factory.NewSearch(cfg.Search)
 	if err != nil {
 		return nil, err
@@ -50,6 +57,6 @@ func NewAITemporalClient() (client.Client, error) {
 	}
 
 	httpClient := util.NewDefaultHttpClient()
-	propagator := common.NewContextPropagator(cfg, httpClient, contentService, searchClient, qdrantClient)
+	propagator := common.NewContextPropagator(cfg, httpClient, contentService, aiService, searchClient, qdrantClient)
 	return temporal.NewClientWithPropagator(ctx, cfg.ClientEndPoints, propagator)
 }

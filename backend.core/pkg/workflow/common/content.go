@@ -118,6 +118,18 @@ func SetContent(ctx context.Context, metadataId string, data []byte) error {
 	return nil
 }
 
+func GetSupplementaryContentString(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext, supplementaryId *content.WorkflowActivityParameterValue) (string, error) {
+	file, err := DownloadTemporarySupplementaryFile(ctx, executionContext.Metadata.Id, supplementaryId)
+	if err != nil {
+		return "", err
+	}
+	b, err := io.ReadAll(file)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
 func SetSupplementaryContent(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext, supplementaryId *content.WorkflowActivityParameterValue, contentType string, data []byte) error {
 	svc := GetContentService(ctx)
 	uploadSignedUrl, err := svc.AddMetadataSupplementary(GetServiceAuthorizedContext(ctx), &content.AddSupplementaryRequest{

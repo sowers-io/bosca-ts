@@ -29,6 +29,7 @@ import (
 	"strings"
 	"time"
 
+	_ "bosca.io/pkg/workflow/ai"
 	_ "bosca.io/pkg/workflow/ai/markdown"
 	_ "bosca.io/pkg/workflow/bible"
 	_ "bosca.io/pkg/workflow/common"

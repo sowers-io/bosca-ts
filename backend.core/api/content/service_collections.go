@@ -95,15 +95,26 @@ func (svc *service) AddCollections(ctx context.Context, request *grpc.AddCollect
 		slog.ErrorContext(ctx, "failed to get subject", slog.Any("request", request), slog.Any("error", err))
 		return nil, err
 	}
-	ids := make([]string, len(request.Collections))
+	ids := make([]*protobuf.IdResponsesId, len(request.Collections))
 	allPermissions := make([]*grpc.Permission, 0)
+	var firstError error
 	for i, collection := range request.Collections {
-		id, permissions, err := svc.addCollection(ctx, userId, collection)
-		if err != nil {
-			return nil, err
+		var id *protobuf.IdResponse
+		var permissions []*grpc.Permission
+		id, permissions, err = svc.addCollection(ctx, userId, collection)
+		if firstError == nil {
+			firstError = err
 		}
 		allPermissions = append(allPermissions, permissions...)
-		ids[i] = id.Id
+		var errMsg *string
+		if err != nil {
+			e := err.Error()
+			errMsg = &e
+		}
+		ids[i] = &protobuf.IdResponsesId{
+			Id:    id.Id,
+			Error: errMsg,
+		}
 	}
 	err = svc.permissions.WaitForPermissions(ctx, grpc.PermissionObjectType_collection_type, allPermissions)
 	if err != nil {
@@ -111,7 +122,7 @@ func (svc *service) AddCollections(ctx context.Context, request *grpc.AddCollect
 	}
 	return &protobuf.IdResponses{
 		Id: ids,
-	}, nil
+	}, firstError
 }
 
 func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, error) {

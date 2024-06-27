@@ -63,6 +63,24 @@ func (svc *authorizationService) GetSource(ctx context.Context, request *protobu
 	return svc.service.GetSource(ctx, request)
 }
 
+func (svc *authorizationService) GetPrompts(ctx context.Context, request *protobuf.Empty) (*grpc.Prompts, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetPrompts(ctx, request)
+}
+
+func (svc *authorizationService) GetPrompt(ctx context.Context, request *protobuf.IdRequest) (*grpc.Prompt, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetPrompt(ctx, request)
+}
+
 func (svc *authorizationService) CheckPermission(ctx context.Context, request *grpc.PermissionCheckRequest) (*grpc.PermissionCheckResponse, error) {
 	err := svc.permissions.CheckWithSubjectIdError(ctx, request.SubjectType, request.Subject, request.ObjectType, request.Object, request.Action)
 	if err != nil {
@@ -339,6 +357,15 @@ func (svc *authorizationService) GetModels(ctx context.Context, request *protobu
 		return nil, err
 	}
 	return svc.service.GetModels(ctx, request)
+}
+
+func (svc *authorizationService) GetModel(ctx context.Context, request *protobuf.IdRequest) (*grpc.Model, error) {
+	// TODO: permission type?
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetModel(ctx, request)
 }
 
 func (svc *authorizationService) GetStorageSystems(ctx context.Context, request *protobuf.Empty) (*grpc.StorageSystems, error) {

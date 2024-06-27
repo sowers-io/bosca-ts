@@ -76,13 +76,11 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 	if err != nil && err.Error() != "rpc error: code = Unknown desc = name must be unique" {
 		slog.ErrorContext(ctx, "failed to add bible collections", slog.Any("error", err))
 		return err
-	} else if bibleCollection == nil {
-		bibleCollection = svc.GetCollection(ctx)
 	}
 
 	var newBookRequest = func(book *usx.USX) {
 		request := &content.AddCollectionRequest{
-			Parent:
+			Parent: bibleCollection.Id,
 			Collection: &content.Collection{
 				Name: book.BookIdentification.Code.ToString(),
 				Type: content.CollectionType_standard,
@@ -144,25 +142,14 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 		return err
 	}
 
-	if bookCollectionIds == nil {
-		bookCollectionIds = &bosca.IdResponses{}
-
-		for _, request := range addBookRequests {
-			svc.GetCollectionItems(ctx, &bosca.IdRequest{
-				Id: request.Parent,
-			})
-		}
-
-	}
-
 	for _, bookId := range bookCollectionIds.Id {
 		_, err = svc.AddCollectionItem(ctx, &content.AddCollectionItemRequest{
 			CollectionId: bibleCollection.Id,
 			ItemId: &content.AddCollectionItemRequest_ChildCollectionId{
-				ChildCollectionId: bookId,
+				ChildCollectionId: bookId.Id,
 			},
 		})
-		if err != nil {
+		if err != nil && err.Error() != "rpc error: code = Unknown desc = ERROR: duplicate key value violates unique constraint \"collection_collection_items_pkey\" (SQLSTATE 23505)" {
 			slog.ErrorContext(ctx, "failed to add book to bible collection", slog.Any("error", err))
 			return err
 		}
@@ -178,7 +165,7 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 		}
 		c := make(map[string]string)
 		for i, request := range addChapterRequests[book.GetUsfm()] {
-			c[chapterIds.Id[i]] = contents[request.Metadata.Attributes["bible.chapter.usfm"]]
+			c[chapterIds.Id[i].Id] = contents[request.Metadata.Attributes["bible.chapter.usfm"]]
 		}
 		for tries := 0; tries < 10; tries++ {
 			err = addRelationships(ctx, executionContext.Metadata.Id, chapterIds.Id, c, svc)
@@ -194,9 +181,9 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 		}
 		for _, chapterId := range chapterIds.Id {
 			_, err = svc.AddCollectionItem(ctx, &content.AddCollectionItemRequest{
-				CollectionId: bookCollectionIds.Id[ix],
+				CollectionId: bookCollectionIds.Id[ix].Id,
 				ItemId: &content.AddCollectionItemRequest_ChildMetadataId{
-					ChildMetadataId: chapterId,
+					ChildMetadataId: chapterId.Id,
 				},
 			})
 			if err != nil {
@@ -205,15 +192,14 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 			}
 		}
 	}
-
 	return nil
 }
 
-func addRelationships(ctx context.Context, bibleId string, ids []string, contents map[string]string, svc content.ContentServiceClient) error {
+func addRelationships(ctx context.Context, bibleId string, ids []*bosca.IdResponsesId, contents map[string]string, svc content.ContentServiceClient) error {
 	for _, id := range ids {
 		_, err := svc.AddMetadataRelationship(ctx, &content.MetadataRelationship{
 			MetadataId1:  bibleId,
-			MetadataId2:  id,
+			MetadataId2:  id.Id,
 			Relationship: "bible.usx.chapter",
 		})
 		if err != nil {
@@ -221,7 +207,7 @@ func addRelationships(ctx context.Context, bibleId string, ids []string, content
 			return err
 		}
 		_, err = svc.AddMetadataRelationship(ctx, &content.MetadataRelationship{
-			MetadataId1:  id,
+			MetadataId1:  id.Id,
 			MetadataId2:  bibleId,
 			Relationship: "bible.usx.bible",
 		})
@@ -230,7 +216,7 @@ func addRelationships(ctx context.Context, bibleId string, ids []string, content
 			return err
 		}
 		for tries := 0; tries < 10; tries++ {
-			err = common.SetContent(ctx, id, []byte(contents[id]))
+			err = common.SetContent(ctx, id.Id, []byte(contents[id.Id]))
 			if err == nil {
 				break
 			}

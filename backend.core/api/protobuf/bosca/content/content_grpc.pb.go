@@ -40,7 +40,9 @@ const (
 	ContentService_GetWorkflows_FullMethodName                        = "/bosca.content.ContentService/GetWorkflows"
 	ContentService_GetWorkflow_FullMethodName                         = "/bosca.content.ContentService/GetWorkflow"
 	ContentService_GetModels_FullMethodName                           = "/bosca.content.ContentService/GetModels"
+	ContentService_GetModel_FullMethodName                            = "/bosca.content.ContentService/GetModel"
 	ContentService_GetPrompts_FullMethodName                          = "/bosca.content.ContentService/GetPrompts"
+	ContentService_GetPrompt_FullMethodName                           = "/bosca.content.ContentService/GetPrompt"
 	ContentService_GetStorageSystems_FullMethodName                   = "/bosca.content.ContentService/GetStorageSystems"
 	ContentService_GetStorageSystem_FullMethodName                    = "/bosca.content.ContentService/GetStorageSystem"
 	ContentService_GetStorageSystemModels_FullMethodName              = "/bosca.content.ContentService/GetStorageSystemModels"
@@ -91,7 +93,9 @@ type ContentServiceClient interface {
 	GetWorkflows(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Workflows, error)
 	GetWorkflow(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Workflow, error)
 	GetModels(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Models, error)
+	GetModel(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Model, error)
 	GetPrompts(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Prompts, error)
+	GetPrompt(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Prompt, error)
 	GetStorageSystems(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*StorageSystems, error)
 	GetStorageSystem(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystem, error)
 	GetStorageSystemModels(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*StorageSystemModels, error)
@@ -191,10 +195,30 @@ func (c *contentServiceClient) GetModels(ctx context.Context, in *bosca.Empty, o
 	return out, nil
 }
 
+func (c *contentServiceClient) GetModel(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Model, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Model)
+	err := c.cc.Invoke(ctx, ContentService_GetModel_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) GetPrompts(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*Prompts, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Prompts)
 	err := c.cc.Invoke(ctx, ContentService_GetPrompts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetPrompt(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Prompt, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Prompt)
+	err := c.cc.Invoke(ctx, ContentService_GetPrompt_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -600,7 +624,9 @@ type ContentServiceServer interface {
 	GetWorkflows(context.Context, *bosca.Empty) (*Workflows, error)
 	GetWorkflow(context.Context, *bosca.IdRequest) (*Workflow, error)
 	GetModels(context.Context, *bosca.Empty) (*Models, error)
+	GetModel(context.Context, *bosca.IdRequest) (*Model, error)
 	GetPrompts(context.Context, *bosca.Empty) (*Prompts, error)
+	GetPrompt(context.Context, *bosca.IdRequest) (*Prompt, error)
 	GetStorageSystems(context.Context, *bosca.Empty) (*StorageSystems, error)
 	GetStorageSystem(context.Context, *bosca.IdRequest) (*StorageSystem, error)
 	GetStorageSystemModels(context.Context, *bosca.IdRequest) (*StorageSystemModels, error)
@@ -662,8 +688,14 @@ func (UnimplementedContentServiceServer) GetWorkflow(context.Context, *bosca.IdR
 func (UnimplementedContentServiceServer) GetModels(context.Context, *bosca.Empty) (*Models, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetModels not implemented")
 }
+func (UnimplementedContentServiceServer) GetModel(context.Context, *bosca.IdRequest) (*Model, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetModel not implemented")
+}
 func (UnimplementedContentServiceServer) GetPrompts(context.Context, *bosca.Empty) (*Prompts, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPrompts not implemented")
+}
+func (UnimplementedContentServiceServer) GetPrompt(context.Context, *bosca.IdRequest) (*Prompt, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPrompt not implemented")
 }
 func (UnimplementedContentServiceServer) GetStorageSystems(context.Context, *bosca.Empty) (*StorageSystems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageSystems not implemented")
@@ -885,6 +917,24 @@ func _ContentService_GetModels_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_GetModel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetModel(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetModel_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetModel(ctx, req.(*bosca.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_GetPrompts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.Empty)
 	if err := dec(in); err != nil {
@@ -899,6 +949,24 @@ func _ContentService_GetPrompts_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).GetPrompts(ctx, req.(*bosca.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetPrompt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetPrompt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetPrompt_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetPrompt(ctx, req.(*bosca.IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1633,8 +1701,16 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_GetModels_Handler,
 		},
 		{
+			MethodName: "GetModel",
+			Handler:    _ContentService_GetModel_Handler,
+		},
+		{
 			MethodName: "GetPrompts",
 			Handler:    _ContentService_GetPrompts_Handler,
+		},
+		{
+			MethodName: "GetPrompt",
+			Handler:    _ContentService_GetPrompt_Handler,
 		},
 		{
 			MethodName: "GetStorageSystems",

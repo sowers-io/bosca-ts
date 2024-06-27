@@ -75,10 +75,20 @@ class ContentServiceStub(object):
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_model__pb2.Models.FromString,
                 _registered_method=True)
+        self.GetModel = channel.unary_unary(
+                '/bosca.content.ContentService/GetModel',
+                request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_model__pb2.Model.FromString,
+                _registered_method=True)
         self.GetPrompts = channel.unary_unary(
                 '/bosca.content.ContentService/GetPrompts',
                 request_serializer=bosca_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=bosca_dot_content_dot_prompts__pb2.Prompts.FromString,
+                _registered_method=True)
+        self.GetPrompt = channel.unary_unary(
+                '/bosca.content.ContentService/GetPrompt',
+                request_serializer=bosca_dot_requests__pb2.IdRequest.SerializeToString,
+                response_deserializer=bosca_dot_content_dot_prompts__pb2.Prompt.FromString,
                 _registered_method=True)
         self.GetStorageSystems = channel.unary_unary(
                 '/bosca.content.ContentService/GetStorageSystems',
@@ -310,7 +320,19 @@ class ContentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetModel(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetPrompts(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetPrompt(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -578,10 +600,20 @@ def add_ContentServiceServicer_to_server(servicer, server):
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                     response_serializer=bosca_dot_content_dot_model__pb2.Models.SerializeToString,
             ),
+            'GetModel': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetModel,
+                    request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_model__pb2.Model.SerializeToString,
+            ),
             'GetPrompts': grpc.unary_unary_rpc_method_handler(
                     servicer.GetPrompts,
                     request_deserializer=bosca_dot_empty__pb2.Empty.FromString,
                     response_serializer=bosca_dot_content_dot_prompts__pb2.Prompts.SerializeToString,
+            ),
+            'GetPrompt': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPrompt,
+                    request_deserializer=bosca_dot_requests__pb2.IdRequest.FromString,
+                    response_serializer=bosca_dot_content_dot_prompts__pb2.Prompt.SerializeToString,
             ),
             'GetStorageSystems': grpc.unary_unary_rpc_method_handler(
                     servicer.GetStorageSystems,
@@ -925,6 +957,33 @@ class ContentService(object):
             _registered_method=True)
 
     @staticmethod
+    def GetModel(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetModel',
+            bosca_dot_requests__pb2.IdRequest.SerializeToString,
+            bosca_dot_content_dot_model__pb2.Model.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def GetPrompts(request,
             target,
             options=(),
@@ -941,6 +1000,33 @@ class ContentService(object):
             '/bosca.content.ContentService/GetPrompts',
             bosca_dot_empty__pb2.Empty.SerializeToString,
             bosca_dot_content_dot_prompts__pb2.Prompts.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetPrompt(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.content.ContentService/GetPrompt',
+            bosca_dot_requests__pb2.IdRequest.SerializeToString,
+            bosca_dot_content_dot_prompts__pb2.Prompt.FromString,
             options,
             channel_credentials,
             insecure,

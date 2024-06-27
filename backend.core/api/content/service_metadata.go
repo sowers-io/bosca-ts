@@ -36,7 +36,7 @@ func (svc *service) verifyUniqueName(ctx context.Context, collectionId string, n
 	if err != nil {
 		return false, err
 	}
-	if slices.Contains(collectionNames, name) {
+	if slices.ContainsFunc(collectionNames, func(n IdName) bool { return n.Name == name }) {
 		return false, nil
 	}
 	metadataNames, err := svc.ds.GetCollectionMetadataItemNames(ctx, collectionId)

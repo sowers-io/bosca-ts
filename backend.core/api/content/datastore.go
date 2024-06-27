@@ -29,3 +29,8 @@ func NewDataStore(db *sql.DB) *DataStore {
 		db,
 	}
 }
+
+type IdName struct {
+	Id   string
+	Name string
+}

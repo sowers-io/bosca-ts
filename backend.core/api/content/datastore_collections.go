@@ -255,8 +255,8 @@ func (ds *DataStore) SetCollectionWorkflowStateId(ctx context.Context, id string
 	return err
 }
 
-func (ds *DataStore) GetCollectionCollectionItemNames(ctx context.Context, collectionId string) ([]string, error) {
-	stmt, err := ds.db.PrepareContext(ctx, "SELECT name FROM collections WHERE id in (SELECT child_id FROM collection_collection_items WHERE collection_id = $1)")
+func (ds *DataStore) GetCollectionCollectionItemNames(ctx context.Context, collectionId string) ([]IdName, error) {
+	stmt, err := ds.db.PrepareContext(ctx, "SELECT id, name FROM collections WHERE id in (SELECT child_id FROM collection_collection_items WHERE collection_id = $1)")
 	if err != nil {
 		return nil, err
 	}
@@ -266,14 +266,14 @@ func (ds *DataStore) GetCollectionCollectionItemNames(ctx context.Context, colle
 		return nil, err
 	}
 	defer rows.Close()
-	names := make([]string, 0)
-	var name string
+	names := make([]IdName, 0)
 	for rows.Next() {
-		err = rows.Scan(&name)
+		id := IdName{}
+		err = rows.Scan(&id.Id, &id.Name)
 		if err != nil {
 			return nil, err
 		}
-		names = append(names, name)
+		names = append(names, id)
 	}
 	return names, nil
 }

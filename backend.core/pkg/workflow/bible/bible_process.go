@@ -64,8 +64,25 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 
 	contents := make(map[string]string)
 
+	bibleCollection, err := svc.AddCollection(ctx, &content.AddCollectionRequest{
+		Collection: &content.Collection{
+			Name: bundle.Metadata().Identification.NameLocal,
+			Type: content.CollectionType_standard,
+			Attributes: map[string]string{
+				"bible.type": "bible",
+			},
+		},
+	})
+	if err != nil && err.Error() != "rpc error: code = Unknown desc = name must be unique" {
+		slog.ErrorContext(ctx, "failed to add bible collections", slog.Any("error", err))
+		return err
+	} else if bibleCollection == nil {
+		bibleCollection = svc.GetCollection(ctx)
+	}
+
 	var newBookRequest = func(book *usx.USX) {
 		request := &content.AddCollectionRequest{
+			Parent:
 			Collection: &content.Collection{
 				Name: book.BookIdentification.Code.ToString(),
 				Type: content.CollectionType_standard,
@@ -119,26 +136,23 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 		}
 	}
 
-	bibleCollection, err := svc.AddCollection(ctx, &content.AddCollectionRequest{
-		Collection: &content.Collection{
-			Name: bundle.Metadata().Identification.NameLocal,
-			Type: content.CollectionType_standard,
-			Attributes: map[string]string{
-				"bible.type": "bible",
-			},
-		},
-	})
-	if err != nil && err.Error() != "rpc error: code = Unknown desc = name must be unique" {
-		slog.ErrorContext(ctx, "failed to add bible collections", slog.Any("error", err))
-		return err
-	}
-
 	bookCollectionIds, err := svc.AddCollections(ctx, &content.AddCollectionsRequest{
 		Collections: addBookRequests,
 	})
 	if err != nil && err.Error() != "rpc error: code = Unknown desc = name must be unique" {
 		slog.ErrorContext(ctx, "failed to add book collections", slog.Any("error", err))
 		return err
+	}
+
+	if bookCollectionIds == nil {
+		bookCollectionIds = &bosca.IdResponses{}
+
+		for _, request := range addBookRequests {
+			svc.GetCollectionItems(ctx, &bosca.IdRequest{
+				Id: request.Parent,
+			})
+		}
+
 	}
 
 	for _, bookId := range bookCollectionIds.Id {

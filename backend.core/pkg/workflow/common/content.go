@@ -109,6 +109,12 @@ func SetContent(ctx context.Context, metadataId string, data []byte) error {
 		b, _ := io.ReadAll(response.Body)
 		return errors.New("failed to upload: " + string(b))
 	}
+	_, err = contentService.SetMetadataUploaded(GetServiceAuthorizedContext(ctx), &protobuf.IdRequest{
+		Id: metadataId,
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

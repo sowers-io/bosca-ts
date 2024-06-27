@@ -65,7 +65,21 @@ func getWorkflowActivityParameterValue(inputs *sql.Rows) (string, *content.Workf
 	if err != nil {
 		return "", nil, err
 	}
-	err = json.Unmarshal(value, &input)
+	data := make(map[string]interface{})
+	err = json.Unmarshal(value, &data)
+	if data["Value"].(map[string]interface{})["SingleValue"] != nil {
+		input.Value = &content.WorkflowActivityParameterValue_SingleValue{
+			SingleValue: data["Value"].(map[string]interface{})["SingleValue"].(string),
+		}
+	} else if data["Value"].(map[string]interface{})["ArrayValue"] != nil {
+		input.Value = &content.WorkflowActivityParameterValue_ArrayValue{
+			ArrayValue: &content.WorkflowActivityParameterValues{
+				Values: data["Value"].(map[string]interface{})["ArrayValue"].([]string),
+			},
+		}
+	} else {
+		err = errors.New("unexpected value")
+	}
 	if err != nil {
 		return name, nil, err
 	}
@@ -95,7 +109,7 @@ func (ds *DataStore) GetWorkflowActivityInstances(ctx context.Context, workflowI
 			return nil, err
 		}
 
-		inputs, err := ds.db.QueryContext(ctx, "select name, value::varchar from workflow_activity_instance_inputs where instance_id = $1", instance.InstanceId)
+		inputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_instance_inputs where instance_id = $1", instance.InstanceId)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +122,7 @@ func (ds *DataStore) GetWorkflowActivityInstances(ctx context.Context, workflowI
 			instance.Inputs[name] = input
 		}
 
-		outputs, err := ds.db.QueryContext(ctx, "select name, value::varchar from workflow_activity_instance_outputs where instance_id = $1", instance.InstanceId)
+		outputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_instance_outputs where instance_id = $1", instance.InstanceId)
 		if err != nil {
 			return nil, err
 		}

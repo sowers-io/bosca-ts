@@ -24,6 +24,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log/slog"
 	"slices"
 	"strings"
@@ -243,7 +245,7 @@ func (svc *service) GetMetadataDownloadUrl(ctx context.Context, request *protobu
 		return nil, err
 	}
 	if md == nil {
-		return nil, nil
+		return nil, status.Error(codes.NotFound, "metadata not found")
 	}
 	id := request.Id
 	if md.SourceIdentifier != nil && *md.SourceIdentifier != "" {

@@ -73,7 +73,7 @@ func processWorkflow(ctx workflow.Context, executionContext *content.WorkflowAct
 		BackoffCoefficient:     1.5,
 		MaximumInterval:        30 * time.Second,
 		MaximumAttempts:        500, // 0 is unlimited retries
-		NonRetryableErrorTypes: []string{"MissingMetadata"},
+		NonRetryableErrorTypes: []string{"MissingMetadata", "rpc error: code = NotFound desc = metadata not found"},
 	}
 	options := workflow.ActivityOptions{
 		StartToCloseTimeout: 10 * time.Minute,

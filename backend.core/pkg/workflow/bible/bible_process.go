@@ -128,7 +128,7 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 			},
 		},
 	})
-	if err != nil {
+	if err != nil && err.Error() != "rpc error: code = Unknown desc = name must be unique" {
 		slog.ErrorContext(ctx, "failed to add bible collections", slog.Any("error", err))
 		return err
 	}
@@ -136,7 +136,7 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 	bookCollectionIds, err := svc.AddCollections(ctx, &content.AddCollectionsRequest{
 		Collections: addBookRequests,
 	})
-	if err != nil {
+	if err != nil && err.Error() != "rpc error: code = Unknown desc = name must be unique" {
 		slog.ErrorContext(ctx, "failed to add book collections", slog.Any("error", err))
 		return err
 	}
@@ -166,7 +166,14 @@ func processBible(ctx context.Context, executionContext *content.WorkflowActivit
 		for i, request := range addChapterRequests[book.GetUsfm()] {
 			c[chapterIds.Id[i]] = contents[request.Metadata.Attributes["bible.chapter.usfm"]]
 		}
-		err = addRelationships(ctx, executionContext.Metadata.Id, chapterIds.Id, c, svc)
+		for tries := 0; tries < 10; tries++ {
+			err = addRelationships(ctx, executionContext.Metadata.Id, chapterIds.Id, c, svc)
+			if err == nil {
+				break
+			} else {
+				time.Sleep(1 * time.Second)
+			}
+		}
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to add relationship", slog.Any("error", err))
 			return err

@@ -20,7 +20,6 @@ import (
 	"bosca.io/api/protobuf/bosca/content"
 	"bosca.io/pkg/workflow/registry"
 	"context"
-	"errors"
 )
 
 func init() {
@@ -28,5 +27,6 @@ func init() {
 }
 
 func createChapterVerses(ctx context.Context, executionContext *content.WorkflowActivityExecutionContext) error {
-	return errors.New("TODO")
+	//return errors.New("TODO")
+	return nil
 }

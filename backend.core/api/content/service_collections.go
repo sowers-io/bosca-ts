@@ -27,7 +27,7 @@ import (
 	"strings"
 )
 
-func (svc *service) GetRootCollectionItems(ctx context.Context, request *protobuf.Empty) (*grpc.CollectionItems, error) {
+func (svc *service) GetRootCollectionItems(ctx context.Context, _ *protobuf.Empty) (*grpc.CollectionItems, error) {
 	return svc.GetCollectionItems(ctx, &protobuf.IdRequest{Id: RootCollectionId})
 }
 
@@ -64,11 +64,13 @@ func (svc *service) addCollection(ctx context.Context, userId string, request *g
 		slog.ErrorContext(ctx, "name requirement failed", slog.Any("request", request), slog.Any("error", err))
 		return nil, nil, err
 	}
-	if unique, err := svc.verifyUniqueName(ctx, request.Parent, request.Collection.Name); !unique || err != nil {
-		if err == nil {
-			return nil, nil, errors.New("name must be unique")
+	if request.Parent != "" {
+		if unique, err := svc.verifyUniqueName(ctx, request.Parent, request.Collection.Name); !unique || err != nil {
+			if err == nil {
+				return nil, nil, errors.New("name must be unique")
+			}
+			return nil, nil, err
 		}
-		return nil, nil, err
 	}
 	id, err := svc.ds.AddCollection(ctx, request.Collection)
 	if err != nil {
@@ -81,10 +83,12 @@ func (svc *service) addCollection(ctx context.Context, userId string, request *g
 		slog.ErrorContext(ctx, "failed to create relationships", slog.String("id", id), slog.Any("error", err))
 		return nil, nil, err
 	}
-	err = svc.ds.AddCollectionCollectionItems(ctx, request.Parent, []string{id})
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to add to parent", slog.String("id", id), slog.String("parent_id", request.Parent), slog.Any("error", err))
-		return nil, nil, err
+	if request.Parent != "" {
+		err = svc.ds.AddCollectionCollectionItems(ctx, request.Parent, []string{id})
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to add to parent", slog.String("id", id), slog.String("parent_id", request.Parent), slog.Any("error", err))
+			return nil, nil, err
+		}
 	}
 	return &protobuf.IdResponse{Id: id}, permissions, nil
 }
@@ -110,6 +114,9 @@ func (svc *service) AddCollections(ctx context.Context, request *grpc.AddCollect
 		if err != nil {
 			e := err.Error()
 			errMsg = &e
+			if id == nil {
+				id = &protobuf.IdResponse{}
+			}
 		}
 		ids[i] = &protobuf.IdResponsesId{
 			Id:    id.Id,

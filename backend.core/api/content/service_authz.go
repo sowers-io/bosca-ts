@@ -117,10 +117,14 @@ func (svc *authorizationService) AddCollection(ctx context.Context, request *grp
 	if request.Collection == nil {
 		return nil, errors.New("collection is required")
 	}
+	parentId := request.Parent
 	if len(strings.Trim(request.Parent, " ")) == 0 {
-		request.Parent = RootCollectionId
+		if request.Collection.Type == grpc.CollectionType_folder {
+			request.Parent = RootCollectionId
+		}
+		parentId = RootCollectionId
 	}
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Parent, grpc.PermissionAction_edit)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, parentId, grpc.PermissionAction_edit)
 	if err != nil {
 		return nil, err
 	}

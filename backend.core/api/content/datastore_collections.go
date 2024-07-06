@@ -20,6 +20,7 @@ import (
 	"bosca.io/api/protobuf/bosca/content"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -108,12 +109,12 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 	var modified time.Time
 	var collectionType string
 	var labels []string
-	var attributes string
+	var attributesJson json.RawMessage
 	err := ds.db.QueryRowContext(ctx, "SELECT name, type, labels, attributes, created, modified FROM collections WHERE id = $1", id).Scan(
 		&collection.Name,
 		&collectionType,
 		m.SQLScanner(&labels),
-		&attributes,
+		&attributesJson,
 		&created,
 		&modified,
 	)
@@ -133,11 +134,17 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 		collection.Type = content.CollectionType_standard
 	}
 
+	attributes := make(map[string]string)
+	err = json.Unmarshal(attributesJson, &attributes)
+	if err != nil {
+		return nil, err
+	}
+
 	collection.Id = id
 	collection.Labels = labels
 	collection.Created = timestamppb.New(created)
 	collection.Modified = timestamppb.New(modified)
-	//collection.Attributes = attributes
+	collection.Attributes = attributes
 	return &collection, nil
 }
 

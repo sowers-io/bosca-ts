@@ -160,6 +160,9 @@ func (svc *service) AddMetadatas(ctx context.Context, request *grpc.AddMetadatas
 		if err != nil {
 			e := err.Error()
 			errMsg = &e
+			if id == nil {
+				id = &protobuf.IdResponse{}
+			}
 		}
 		allPermissions = append(allPermissions, permissions...)
 		ids[i] = &protobuf.IdResponsesId{

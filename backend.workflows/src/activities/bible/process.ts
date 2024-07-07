@@ -12,20 +12,14 @@ import { ContentService } from '../../generated/protobuf/bosca/content/content_c
 import { AddMetadataRequest, AddMetadatasRequest, Metadata } from '../../generated/protobuf/bosca/content/metadata_pb'
 import { execute, toArrayBuffer } from '../../util/http'
 import { protoInt64 } from '@bufbuild/protobuf'
-import { SignedUrl } from '../../generated/protobuf/bosca/content/url_pb'
-
-export interface ProcessBibleDownloader {
-
-  download(executionContext: WorkflowActivityExecutionContext): Promise<string>
-
-  cleanup(file: string): Promise<void>
-}
+import { Downloader } from '../../util/downloader'
+import { getCollection, getMetadata, getMetadataUploadUrl } from '../../util/service'
 
 export class ProcessBibleActivity extends Activity {
 
-  private readonly downloader: ProcessBibleDownloader
+  private readonly downloader: Downloader
 
-  constructor(downloader: ProcessBibleDownloader) {
+  constructor(downloader: Downloader) {
     super()
     this.downloader = downloader
   }
@@ -34,7 +28,7 @@ export class ProcessBibleActivity extends Activity {
     return 'bible.process'
   }
 
-  async createBibleCollection(metadata: BibleMetadata): Promise<Collection> {
+  private async createBibleCollection(metadata: BibleMetadata): Promise<Collection> {
     const service = useServiceClient(ContentService)
     const addResponse = await service.addCollection(new AddCollectionRequest({
       collection: new Collection({
@@ -45,10 +39,10 @@ export class ProcessBibleActivity extends Activity {
         }
       })
     }))
-    return this.getCollection(new IdRequest({ id: addResponse.id }))
+    return getCollection(new IdRequest({ id: addResponse.id }))
   }
 
-  async createBookCollections(metadata: BibleMetadata, bible: Collection, books: Book[]): Promise<Collection[]> {
+  private async createBookCollections(metadata: BibleMetadata, bible: Collection, books: Book[]): Promise<Collection[]> {
     const service = useServiceClient(ContentService)
     const addCollectionRequests: AddCollectionRequest[] = []
     const addMetadatasRequests: AddMetadataRequest[] = []
@@ -97,7 +91,7 @@ export class ProcessBibleActivity extends Activity {
         throw new Error(addResponse.error)
       }
       const idRequest = new IdRequest({ id: addResponse.id })
-      const uploadUrl = await this.getMetadataUploadUrl(idRequest)
+      const uploadUrl = await getMetadataUploadUrl(idRequest)
       const uploadResponse = await execute(uploadUrl, buffers[bookIndex])
       if (!uploadResponse.ok) {
         throw new Error('failed to upload book: ' + books[bookIndex].usfm + ': ' + await uploadResponse.text())
@@ -117,50 +111,14 @@ export class ProcessBibleActivity extends Activity {
         throw new Error(addResponse.error)
       }
       // TODO: Add bulk getCollections
-      const collection = await this.getCollection(new IdRequest({ id: addResponse.id }))
+      const collection = await getCollection(new IdRequest({ id: addResponse.id }))
       collections.push(collection)
     }
 
     return collections
   }
 
-  async getCollection(id: IdRequest): Promise<Collection> {
-    try {
-      return await useServiceClient(ContentService).getCollection(id)
-    } catch (e: any) {
-      if (e.toString().indexOf('permission check failed') !== -1) {
-        await new Promise((resolve) => setTimeout(resolve, 5))
-        return await this.getCollection(id)
-      }
-      throw e
-    }
-  }
-
-  async getMetadata(id: IdRequest): Promise<Metadata> {
-    try {
-      return await useServiceClient(ContentService).getMetadata(id)
-    } catch (e: any) {
-      if (e.toString().indexOf('permission check failed') !== -1) {
-        await new Promise((resolve) => setTimeout(resolve, 5))
-        return await this.getMetadata(id)
-      }
-      throw e
-    }
-  }
-
-  async getMetadataUploadUrl(id: IdRequest): Promise<SignedUrl> {
-    try {
-      return await useServiceClient(ContentService).getMetadataUploadUrl(id)
-    } catch (e: any) {
-      if (e.toString().indexOf('permission check failed') !== -1) {
-        await new Promise((resolve) => setTimeout(resolve, 5))
-        return await this.getMetadataUploadUrl(id)
-      }
-      throw e
-    }
-  }
-
-  async createChapters(metadata: BibleMetadata, bookCollection: Collection, book: Book): Promise<Metadata[]> {
+  private async createChapters(metadata: BibleMetadata, bookCollection: Collection, book: Book): Promise<Metadata[]> {
     const service = useServiceClient(ContentService)
     const requests: AddMetadataRequest[] = []
     const buffers: ArrayBuffer[] = []
@@ -179,7 +137,7 @@ export class ProcessBibleActivity extends Activity {
             'bible.system.id': bookCollection.attributes['bible.system.id'],
             'bible.abbreviation': bookCollection.attributes['bible.abbreviation'],
             'bible.book.usfm': book.usfm,
-            'bible.usfm': chapter.usfm,
+            'bible.chapter.usfm': chapter.usfm,
             'bible.chapter.order': (order++).toString()
           }
         })
@@ -195,8 +153,8 @@ export class ProcessBibleActivity extends Activity {
         throw new Error(addResponse.error)
       }
       const idRequest = new IdRequest({ id: addResponse.id })
-      const metadata = await this.getMetadata(idRequest)
-      const uploadUrl = await this.getMetadataUploadUrl(idRequest)
+      const metadata = await getMetadata(idRequest)
+      const uploadUrl = await getMetadataUploadUrl(idRequest)
       const uploadResponse = await execute(uploadUrl, buffers[chapterIndex])
       if (!uploadResponse.ok) {
         throw new Error('failed to upload chapter: ' + book.chapters[chapterIndex].usfm + ': ' + await uploadResponse.text())
@@ -227,18 +185,3 @@ export class ProcessBibleActivity extends Activity {
     }
   }
 }
-
-// export const create = (client: PromiseClient<typeof ContentService>) => ({
-//   'bible.process': async (context: WorkflowActivityExecutionContext): Promise<void> => {
-//
-//   },
-//   'bible.chapters.create': async (context: WorkflowActivityExecutionContext): Promise<void> => {
-//
-//   },
-//   'bible.chapter.verses.create': async (context: WorkflowActivityExecutionContext): Promise<void> => {
-//
-//   },
-//   'bible.chapter.verses.table': async (context: WorkflowActivityExecutionContext): Promise<void> => {
-//
-//   }
-// })

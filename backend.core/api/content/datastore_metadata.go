@@ -137,13 +137,42 @@ func (ds *DataStore) AddMetadataTrait(ctx context.Context, id string, trait stri
 	return metadata, nil
 }
 
+func (ds *DataStore) FindMetdata(ctx context.Context, request *content.FindMetadataRequest) ([]*content.Metadata, error) {
+	if request.Attributes == nil {
+		return nil, errors.New("a request argument is required")
+	}
+	queryString := &strings.Builder{}
+	queryString.WriteString("SELECT id, name, labels, attributes, content_type, content_length, created, modified, source_id, source_identifier, language_tag, workflow_state_id, workflow_state_pending_id FROM metadata")
+	where := &strings.Builder{}
+	if request.Attributes != nil {
+		i := 1
+		for _ = range request.Attributes {
+			if where.Len() > 0 {
+				where.WriteString(" AND ")
+			}
+			where.WriteString(fmt.Sprintf("attributes->>$%d = $%d", i, i+1))
+			i += 2
+		}
+	}
+	queryString.WriteString(" WHERE ")
+	queryString.WriteString(where.String())
+	metadataQuery, err := ds.db.PrepareContext(ctx, queryString.String())
+	if err != nil {
+		return nil, err
+	}
+	defer metadataQuery.Close()
+	args := make([]any, 0, len(request.Attributes) * 2)
+	for i, v := range request.Attributes {
+		args = append(args, i)
+		args = append(args, v)
+	}
+	return ds.getMetadatas(ctx, metadataQuery, args)
+}
+
 func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.Metadata, error) {
 	if len(id) == 0 {
 		return nil, nil
 	}
-
-	m := pgtype.NewMap()
-
 	queryString := &strings.Builder{}
 	queryString.WriteString("SELECT id, name, labels, attributes, content_type, content_length, created, modified, source_id, source_identifier, language_tag, workflow_state_id, workflow_state_pending_id FROM metadata WHERE id = $1")
 	if len(id) > 1 {
@@ -156,19 +185,6 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 		return nil, err
 	}
 	defer metadataQuery.Close()
-
-	traitsQuery, err := ds.db.PrepareContext(ctx, "select trait_id from metadata_traits where metadata_id = $1")
-	if err != nil {
-		return nil, err
-	}
-	defer traitsQuery.Close()
-
-	categoriesQuery, err := ds.db.PrepareContext(ctx, "select category_id from metadata_categories where metadata_id = $1")
-	if err != nil {
-		return nil, err
-	}
-	defer categoriesQuery.Close()
-
 	args := make([]any, len(id))
 	for i, v := range id {
 		u, err := uuid.Parse(v)
@@ -177,21 +193,32 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 		}
 		args[i] = u
 	}
+	return ds.getMetadatas(ctx, metadataQuery, args)
+}
 
+func (ds *DataStore) getMetadatas(ctx context.Context, metadataQuery *sql.Stmt, args []any) ([]*content.Metadata, error) {
+	m := pgtype.NewMap()
 	result, err := metadataQuery.QueryContext(ctx, args...)
 	if err != nil {
 		return nil, err
 	}
-
+	traitsQuery, err := ds.db.PrepareContext(ctx, "select trait_id from metadata_traits where metadata_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer traitsQuery.Close()
+	categoriesQuery, err := ds.db.PrepareContext(ctx, "select category_id from metadata_categories where metadata_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer categoriesQuery.Close()
 	metadatas := make([]*content.Metadata, 0)
-
 	for result.Next() {
 		var metadata content.Metadata
 		var created time.Time
 		var modified time.Time
 		var labels []string
 		var attributesJson json.RawMessage
-
 		err = result.Scan(
 			&metadata.Id,
 			&metadata.Name,
@@ -207,23 +234,19 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 			&metadata.WorkflowStateId,
 			&metadata.WorkflowStatePendingId,
 		)
-
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return nil, nil
 			}
 			return nil, err
 		}
-
 		err = json.Unmarshal(attributesJson, &metadata.Attributes)
 		if err != nil {
 			return nil, err
 		}
-
 		metadata.Created = timestamppb.New(created)
 		metadata.Modified = timestamppb.New(modified)
 		metadata.Labels = labels
-
 		result, err := traitsQuery.QueryContext(ctx, metadata.Id)
 		if err != nil {
 			return nil, err
@@ -240,7 +263,6 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 		}
 		metadata.TraitIds = traits
 		result.Close()
-
 		result, err = categoriesQuery.QueryContext(ctx, metadata.Id)
 		if err != nil {
 			return nil, err
@@ -257,9 +279,7 @@ func (ds *DataStore) GetMetadatas(ctx context.Context, id []string) ([]*content.
 		}
 		metadata.CategoryIds = categories
 		result.Close()
-
 		metadatas = append(metadatas, &metadata)
 	}
-
 	return metadatas, nil
 }

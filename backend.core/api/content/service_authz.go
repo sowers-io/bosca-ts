@@ -176,6 +176,10 @@ func (svc *authorizationService) GetMetadata(ctx context.Context, request *proto
 	return svc.service.GetMetadata(ctx, request)
 }
 
+func (svc *authorizationService) FindMetadata(ctx context.Context, request *grpc.FindMetadataRequest) (*grpc.Metadatas, error) {
+	return svc.service.FindMetadata(ctx, request)
+}
+
 func (svc *authorizationService) GetMetadatas(ctx context.Context, request *protobuf.IdsRequest) (*grpc.Metadatas, error) {
 	return svc.service.GetMetadatas(ctx, request)
 }

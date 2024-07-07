@@ -29,7 +29,7 @@ import { StorageSystem, StorageSystemModels, StorageSystems } from "./storage_sy
 import { Trait, Traits } from "./traits_pb";
 import { AddCollectionItemRequest, AddCollectionRequest, AddCollectionsRequest, Collection, CollectionItems } from "./collections_pb";
 import { Permission, PermissionCheckRequest, PermissionCheckResponse, Permissions } from "./permissions_pb";
-import { AddMetadataRequest, AddMetadatasRequest, AddMetadataTraitRequest, AddSupplementaryRequest, Metadata, MetadataRelationship, MetadataRelationshipIdRequest, MetadataRelationships, Metadatas, SupplementaryIdRequest } from "./metadata_pb";
+import { AddMetadataRequest, AddMetadatasRequest, AddMetadataTraitRequest, AddSupplementaryRequest, FindMetadataRequest, Metadata, MetadataRelationship, MetadataRelationshipIdRequest, MetadataRelationships, Metadatas, SupplementaryIdRequest } from "./metadata_pb";
 import { SignedUrl } from "./url_pb";
 
 /**
@@ -288,6 +288,15 @@ export const ContentService = {
       name: "CheckPermission",
       I: PermissionCheckRequest,
       O: PermissionCheckResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.FindMetadata
+     */
+    findMetadata: {
+      name: "FindMetadata",
+      I: FindMetadataRequest,
+      O: Metadatas,
       kind: MethodKind.Unary,
     },
     /**

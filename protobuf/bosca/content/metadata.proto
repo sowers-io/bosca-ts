@@ -95,3 +95,7 @@ message SupplementaryIdRequest {
   string id = 1;
   string type = 2;
 }
+
+message FindMetadataRequest {
+  map<string, string> attributes = 1;
+}

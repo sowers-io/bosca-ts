@@ -250,6 +250,35 @@ func (svc *service) GetMetadatas(ctx context.Context, request *protobuf.IdsReque
 	return &grpc.Metadatas{Metadata: m}, nil
 }
 
+func (svc *service) FindMetadata(ctx context.Context, request *grpc.FindMetadataRequest) (*grpc.Metadatas, error) {
+	metadatas, err := svc.ds.FindMetdata(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]string, len(metadatas))
+	for i, metadata := range metadatas {
+		ids[i] = metadata.Id
+	}
+	ids, err = svc.permissions.BulkCheck(ctx, grpc.PermissionObjectType_metadata_type, ids, grpc.PermissionAction_view)
+	if err != nil {
+		return nil, err
+	}
+	if len(ids) == len(metadatas) {
+		return &grpc.Metadatas{Metadata: metadatas}, nil
+	}
+	idsMap := make(map[string]bool)
+	for _, id := range ids {
+		idsMap[id] = true
+	}
+	valid := make([]*grpc.Metadata, 0, len(metadatas))
+	for _, metadata := range metadatas {
+		if idsMap[metadata.Id] {
+			valid = append(valid, metadata)
+		}
+	}
+	return &grpc.Metadatas{Metadata: valid}, nil
+}
+
 func (svc *service) GetMetadataDownloadUrl(ctx context.Context, request *protobuf.IdRequest) (*grpc.SignedUrl, error) {
 	md, err := svc.ds.GetMetadata(ctx, request.Id)
 	if err != nil {

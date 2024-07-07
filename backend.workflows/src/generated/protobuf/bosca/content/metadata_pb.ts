@@ -553,3 +553,40 @@ export class SupplementaryIdRequest extends Message<SupplementaryIdRequest> {
   }
 }
 
+/**
+ * @generated from message bosca.content.FindMetadataRequest
+ */
+export class FindMetadataRequest extends Message<FindMetadataRequest> {
+  /**
+   * @generated from field: map<string, string> attributes = 1;
+   */
+  attributes: { [key: string]: string } = {};
+
+  constructor(data?: PartialMessage<FindMetadataRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.FindMetadataRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "attributes", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FindMetadataRequest {
+    return new FindMetadataRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FindMetadataRequest {
+    return new FindMetadataRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FindMetadataRequest {
+    return new FindMetadataRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FindMetadataRequest | PlainMessage<FindMetadataRequest> | undefined, b: FindMetadataRequest | PlainMessage<FindMetadataRequest> | undefined): boolean {
+    return proto3.util.equals(FindMetadataRequest, a, b);
+  }
+}
+

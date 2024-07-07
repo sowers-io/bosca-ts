@@ -206,6 +206,12 @@ service ContentService {
     };
   }
 
+  rpc FindMetadata(FindMetadataRequest) returns (Metadatas) {
+    option (google.api.http) = {
+      get: "/v1/content/find/metadata"
+    };
+  }
+
   rpc GetMetadata(bosca.IdRequest) returns (Metadata) {
     option (google.api.http) = {
       get: "/v1/content/metadata/{id}"

@@ -49,6 +49,20 @@ message Metadata {
   google.protobuf.Struct metadata = 33;
 }
 
+message MetadataSupplementaries {
+  repeated MetadataSupplementary supplementaries = 1;
+}
+
+message MetadataSupplementary {
+  string id = 1;
+  string metadata_id = 2;
+  string key = 3;
+  string name = 4;
+  string content_type = 5;
+  int64 content_length = 6;
+  repeated string trait_ids = 7;
+}
+
 message AddMetadataRequest {
   optional string collection = 1;
   Metadata metadata = 2;
@@ -75,7 +89,7 @@ message MetadataRelationship {
 }
 
 message MetadataRelationships {
-    repeated MetadataRelationship relationships = 1;
+  repeated MetadataRelationship relationships = 1;
 }
 
 message AddMetadataTraitRequest {
@@ -84,16 +98,13 @@ message AddMetadataTraitRequest {
 }
 
 message AddSupplementaryRequest {
-  string id = 1;
-  string type = 2;
-  string name = 3;
-  string content_type = 4;
-  int64 content_length = 5;
-}
-
-message SupplementaryIdRequest {
-  string id = 1;
-  string type = 2;
+  reserved 1;
+  string metadata_id = 2;
+  string key = 3;
+  string name = 4;
+  string content_type = 5;
+  int64 content_length = 6;
+  repeated string trait_ids = 7;
 }
 
 message FindMetadataRequest {

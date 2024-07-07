@@ -1609,7 +1609,7 @@ func local_request_ContentService_GetMetadataDownloadUrl_0(ctx context.Context, 
 }
 
 var (
-	filter_ContentService_AddMetadataSupplementary_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "type": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_ContentService_AddMetadataSupplementary_0 = &utilities.DoubleArray{Encoding: map[string]int{"metadata_id": 0, "key": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_ContentService_AddMetadataSupplementary_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1623,24 +1623,24 @@ func request_ContentService_AddMetadataSupplementary_0(ctx context.Context, mars
 		_   = err
 	)
 
-	val, ok = pathParams["id"]
+	val, ok = pathParams["metadata_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "metadata_id")
 	}
 
-	protoReq.Id, err = runtime.String(val)
+	protoReq.MetadataId, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "metadata_id", err)
 	}
 
-	val, ok = pathParams["type"]
+	val, ok = pathParams["key"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
 	}
 
-	protoReq.Type, err = runtime.String(val)
+	protoReq.Key, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -1666,24 +1666,24 @@ func local_request_ContentService_AddMetadataSupplementary_0(ctx context.Context
 		_   = err
 	)
 
-	val, ok = pathParams["id"]
+	val, ok = pathParams["metadata_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "metadata_id")
 	}
 
-	protoReq.Id, err = runtime.String(val)
+	protoReq.MetadataId, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "metadata_id", err)
 	}
 
-	val, ok = pathParams["type"]
+	val, ok = pathParams["key"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
 	}
 
-	protoReq.Type, err = runtime.String(val)
+	protoReq.Key, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -1698,8 +1698,8 @@ func local_request_ContentService_AddMetadataSupplementary_0(ctx context.Context
 
 }
 
-func request_ContentService_GetMetadataSupplementaryDownloadUrl_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SupplementaryIdRequest
+func request_ContentService_SetMetadataSupplementaryUploaded_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq bosca.SupplementaryIdRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1719,14 +1719,158 @@ func request_ContentService_GetMetadataSupplementaryDownloadUrl_0(ctx context.Co
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	val, ok = pathParams["type"]
+	val, ok = pathParams["key"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
 	}
 
-	protoReq.Type, err = runtime.String(val)
+	protoReq.Key, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
+	}
+
+	msg, err := client.SetMetadataSupplementaryUploaded(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_ContentService_SetMetadataSupplementaryUploaded_0(ctx context.Context, marshaler runtime.Marshaler, server ContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq bosca.SupplementaryIdRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	val, ok = pathParams["key"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
+	}
+
+	protoReq.Key, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
+	}
+
+	msg, err := server.SetMetadataSupplementaryUploaded(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_ContentService_GetMetadataSupplementaryUploadUrl_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq bosca.SupplementaryIdRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	val, ok = pathParams["key"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
+	}
+
+	protoReq.Key, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
+	}
+
+	msg, err := client.GetMetadataSupplementaryUploadUrl(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_ContentService_GetMetadataSupplementaryUploadUrl_0(ctx context.Context, marshaler runtime.Marshaler, server ContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq bosca.SupplementaryIdRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	val, ok = pathParams["key"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
+	}
+
+	protoReq.Key, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
+	}
+
+	msg, err := server.GetMetadataSupplementaryUploadUrl(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_ContentService_GetMetadataSupplementaryDownloadUrl_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq bosca.SupplementaryIdRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	val, ok = pathParams["key"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
+	}
+
+	protoReq.Key, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
 	}
 
 	msg, err := client.GetMetadataSupplementaryDownloadUrl(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1735,7 +1879,7 @@ func request_ContentService_GetMetadataSupplementaryDownloadUrl_0(ctx context.Co
 }
 
 func local_request_ContentService_GetMetadataSupplementaryDownloadUrl_0(ctx context.Context, marshaler runtime.Marshaler, server ContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SupplementaryIdRequest
+	var protoReq bosca.SupplementaryIdRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1755,14 +1899,14 @@ func local_request_ContentService_GetMetadataSupplementaryDownloadUrl_0(ctx cont
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	val, ok = pathParams["type"]
+	val, ok = pathParams["key"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
 	}
 
-	protoReq.Type, err = runtime.String(val)
+	protoReq.Key, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
 	}
 
 	msg, err := server.GetMetadataSupplementaryDownloadUrl(ctx, &protoReq)
@@ -1771,7 +1915,7 @@ func local_request_ContentService_GetMetadataSupplementaryDownloadUrl_0(ctx cont
 }
 
 func request_ContentService_DeleteMetadataSupplementary_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SupplementaryIdRequest
+	var protoReq bosca.SupplementaryIdRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1791,14 +1935,14 @@ func request_ContentService_DeleteMetadataSupplementary_0(ctx context.Context, m
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	val, ok = pathParams["type"]
+	val, ok = pathParams["key"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
 	}
 
-	protoReq.Type, err = runtime.String(val)
+	protoReq.Key, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
 	}
 
 	msg, err := client.DeleteMetadataSupplementary(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1807,7 +1951,7 @@ func request_ContentService_DeleteMetadataSupplementary_0(ctx context.Context, m
 }
 
 func local_request_ContentService_DeleteMetadataSupplementary_0(ctx context.Context, marshaler runtime.Marshaler, server ContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SupplementaryIdRequest
+	var protoReq bosca.SupplementaryIdRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1827,17 +1971,69 @@ func local_request_ContentService_DeleteMetadataSupplementary_0(ctx context.Cont
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	val, ok = pathParams["type"]
+	val, ok = pathParams["key"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key")
 	}
 
-	protoReq.Type, err = runtime.String(val)
+	protoReq.Key, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key", err)
 	}
 
 	msg, err := server.DeleteMetadataSupplementary(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_ContentService_GetMetadataSupplementaries_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq bosca.IdRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	msg, err := client.GetMetadataSupplementaries(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_ContentService_GetMetadataSupplementaries_0(ctx context.Context, marshaler runtime.Marshaler, server ContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq bosca.IdRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	msg, err := server.GetMetadataSupplementaries(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -3297,7 +3493,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 
 	})
 
-	mux.Handle("POST", pattern_ContentService_AddMetadataSupplementary_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ContentService_AddMetadataSupplementary_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -3305,7 +3501,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}/upload"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/supplementary/{key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3322,6 +3518,56 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 
 	})
 
+	mux.Handle("POST", pattern_ContentService_SetMetadataSupplementaryUploaded_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/SetMetadataSupplementaryUploaded", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary/{key}/uploaded"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_ContentService_SetMetadataSupplementaryUploaded_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_SetMetadataSupplementaryUploaded_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_ContentService_GetMetadataSupplementaryUploadUrl_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryUploadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary/{key}/url"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_ContentService_GetMetadataSupplementaryUploadUrl_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_GetMetadataSupplementaryUploadUrl_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_ContentService_GetMetadataSupplementaryDownloadUrl_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -3330,7 +3576,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}/download"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary/{key}/url"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3355,7 +3601,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary/{key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3369,6 +3615,31 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		}
 
 		forward_ContentService_DeleteMetadataSupplementary_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_ContentService_GetMetadataSupplementaries_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaries", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_ContentService_GetMetadataSupplementaries_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_GetMetadataSupplementaries_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -4427,13 +4698,13 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 
 	})
 
-	mux.Handle("POST", pattern_ContentService_AddMetadataSupplementary_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ContentService_AddMetadataSupplementary_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}/upload"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/AddMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/supplementary/{key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4449,13 +4720,57 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 
 	})
 
+	mux.Handle("POST", pattern_ContentService_SetMetadataSupplementaryUploaded_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/SetMetadataSupplementaryUploaded", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary/{key}/uploaded"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ContentService_SetMetadataSupplementaryUploaded_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_SetMetadataSupplementaryUploaded_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_ContentService_GetMetadataSupplementaryUploadUrl_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryUploadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary/{key}/url"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ContentService_GetMetadataSupplementaryUploadUrl_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_GetMetadataSupplementaryUploadUrl_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_ContentService_GetMetadataSupplementaryDownloadUrl_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}/download"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary/{key}/url"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4477,7 +4792,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/url/supplementary/{type}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/DeleteMetadataSupplementary", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary/{key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4490,6 +4805,28 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		}
 
 		forward_ContentService_DeleteMetadataSupplementary_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_ContentService_GetMetadataSupplementaries_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/GetMetadataSupplementaries", runtime.WithHTTPPathPattern("/v1/content/metadata/{id}/supplementary"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ContentService_GetMetadataSupplementaries_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_GetMetadataSupplementaries_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -4747,11 +5084,17 @@ var (
 
 	pattern_ContentService_GetMetadataDownloadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "url"}, ""))
 
-	pattern_ContentService_AddMetadataSupplementary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"v1", "content", "metadata", "id", "url", "supplementary", "type", "upload"}, ""))
+	pattern_ContentService_AddMetadataSupplementary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "metadata", "metadata_id", "supplementary", "key"}, ""))
 
-	pattern_ContentService_GetMetadataSupplementaryDownloadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"v1", "content", "metadata", "id", "url", "supplementary", "type", "download"}, ""))
+	pattern_ContentService_SetMetadataSupplementaryUploaded_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"v1", "content", "metadata", "id", "supplementary", "key", "uploaded"}, ""))
 
-	pattern_ContentService_DeleteMetadataSupplementary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"v1", "content", "metadata", "id", "url", "supplementary", "type"}, ""))
+	pattern_ContentService_GetMetadataSupplementaryUploadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"v1", "content", "metadata", "id", "supplementary", "key", "url"}, ""))
+
+	pattern_ContentService_GetMetadataSupplementaryDownloadUrl_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"v1", "content", "metadata", "id", "supplementary", "key", "url"}, ""))
+
+	pattern_ContentService_DeleteMetadataSupplementary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "metadata", "id", "supplementary", "key"}, ""))
+
+	pattern_ContentService_GetMetadataSupplementaries_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "supplementary"}, ""))
 
 	pattern_ContentService_SetMetadataUploaded_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "uploaded"}, ""))
 
@@ -4847,9 +5190,15 @@ var (
 
 	forward_ContentService_AddMetadataSupplementary_0 = runtime.ForwardResponseMessage
 
+	forward_ContentService_SetMetadataSupplementaryUploaded_0 = runtime.ForwardResponseMessage
+
+	forward_ContentService_GetMetadataSupplementaryUploadUrl_0 = runtime.ForwardResponseMessage
+
 	forward_ContentService_GetMetadataSupplementaryDownloadUrl_0 = runtime.ForwardResponseMessage
 
 	forward_ContentService_DeleteMetadataSupplementary_0 = runtime.ForwardResponseMessage
+
+	forward_ContentService_GetMetadataSupplementaries_0 = runtime.ForwardResponseMessage
 
 	forward_ContentService_SetMetadataUploaded_0 = runtime.ForwardResponseMessage
 

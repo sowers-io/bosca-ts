@@ -96,6 +96,49 @@ export class IdRequest extends Message<IdRequest> {
 }
 
 /**
+ * @generated from message bosca.SupplementaryIdRequest
+ */
+export class SupplementaryIdRequest extends Message<SupplementaryIdRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string key = 2;
+   */
+  key = "";
+
+  constructor(data?: PartialMessage<SupplementaryIdRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.SupplementaryIdRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SupplementaryIdRequest {
+    return new SupplementaryIdRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SupplementaryIdRequest {
+    return new SupplementaryIdRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SupplementaryIdRequest {
+    return new SupplementaryIdRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SupplementaryIdRequest | PlainMessage<SupplementaryIdRequest> | undefined, b: SupplementaryIdRequest | PlainMessage<SupplementaryIdRequest> | undefined): boolean {
+    return proto3.util.equals(SupplementaryIdRequest, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.IdResponse
  */
 export class IdResponse extends Message<IdResponse> {

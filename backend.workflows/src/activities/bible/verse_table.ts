@@ -12,6 +12,7 @@ import {
 } from '../../generated/protobuf/bosca/content/metadata_pb'
 import { execute, toArrayBuffer } from '../../util/http'
 import { protoInt64 } from '@bufbuild/protobuf'
+import { SupplementaryIdRequest } from '../../generated/protobuf/bosca/requests_pb'
 
 interface Verse {
   usfm: string
@@ -82,12 +83,16 @@ export class CreateVerseMarkdownTable extends Activity {
       const chapterMetadata = await this.findChapterMetadata(metadata, chapter)
       const markdown = this.buildVerseMarkdownTable(chapter)
       const buffer = toArrayBuffer(markdown)
-      const uploadUrl = await service.addMetadataSupplementary(new AddSupplementaryRequest({
-        id: chapterMetadata.id,
+      const supplementary = await service.addMetadataSupplementary(new AddSupplementaryRequest({
+        metadataId: chapterMetadata.id,
         name: 'Verse Markdown Table',
         contentLength: protoInt64.parse(buffer.byteLength),
         contentType: 'text/markdown',
-        type: 'verse-table-markdown'
+        key: 'verse-table-markdown'
+      }))
+      const uploadUrl = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({
+        id: chapterMetadata.id,
+        key: supplementary.key
       }))
       const uploadResponse = await execute(uploadUrl, buffer)
       if (!uploadResponse.ok) {

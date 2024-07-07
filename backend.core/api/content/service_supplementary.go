@@ -20,21 +20,26 @@ import (
 	protobuf "bosca.io/api/protobuf/bosca"
 	grpc "bosca.io/api/protobuf/bosca/content"
 	"context"
+	"errors"
 	"log/slog"
 )
 
-func (svc *service) AddMetadataSupplementary(ctx context.Context, request *grpc.AddSupplementaryRequest) (*grpc.SignedUrl, error) {
-	id := request.Id + "." + request.Type
-	return svc.objectStore.CreateUploadUrl(ctx, id, request.Name, request.ContentType, request.ContentLength, nil)
+func (svc *service) AddMetadataSupplementary(ctx context.Context, request *grpc.AddSupplementaryRequest) (*grpc.MetadataSupplementary, error) {
+	return nil, errors.New("TODO")
 }
 
-func (svc *service) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *grpc.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
-	id := request.Id + "." + request.Type
+func (svc *service) GetMetadataSupplementaryUploadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
+	id := request.Id + "." + request.Key
 	return svc.objectStore.CreateDownloadUrl(ctx, id)
 }
 
-func (svc *service) DeleteMetadataSupplementary(ctx context.Context, request *grpc.SupplementaryIdRequest) (*protobuf.Empty, error) {
-	id := request.Id + "." + request.Type
+func (svc *service) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
+	id := request.Id + "." + request.Key
+	return svc.objectStore.CreateDownloadUrl(ctx, id)
+}
+
+func (svc *service) DeleteMetadataSupplementary(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*protobuf.Empty, error) {
+	id := request.Id + "." + request.Key
 	err := svc.objectStore.Delete(ctx, id)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to delete supplementary file", slog.String("id", request.Id), slog.Any("error", err))

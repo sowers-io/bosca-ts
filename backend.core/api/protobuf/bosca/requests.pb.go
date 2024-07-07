@@ -129,6 +129,61 @@ func (x *IdRequest) GetId() string {
 	return ""
 }
 
+type SupplementaryIdRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id  string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+}
+
+func (x *SupplementaryIdRequest) Reset() {
+	*x = SupplementaryIdRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_bosca_requests_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SupplementaryIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SupplementaryIdRequest) ProtoMessage() {}
+
+func (x *SupplementaryIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bosca_requests_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SupplementaryIdRequest.ProtoReflect.Descriptor instead.
+func (*SupplementaryIdRequest) Descriptor() ([]byte, []int) {
+	return file_bosca_requests_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SupplementaryIdRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SupplementaryIdRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
 type IdResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -140,7 +195,7 @@ type IdResponse struct {
 func (x *IdResponse) Reset() {
 	*x = IdResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_requests_proto_msgTypes[2]
+		mi := &file_bosca_requests_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -153,7 +208,7 @@ func (x *IdResponse) String() string {
 func (*IdResponse) ProtoMessage() {}
 
 func (x *IdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_requests_proto_msgTypes[2]
+	mi := &file_bosca_requests_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -166,7 +221,7 @@ func (x *IdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IdResponse.ProtoReflect.Descriptor instead.
 func (*IdResponse) Descriptor() ([]byte, []int) {
-	return file_bosca_requests_proto_rawDescGZIP(), []int{2}
+	return file_bosca_requests_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *IdResponse) GetId() string {
@@ -188,7 +243,7 @@ type IdResponsesId struct {
 func (x *IdResponsesId) Reset() {
 	*x = IdResponsesId{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_requests_proto_msgTypes[3]
+		mi := &file_bosca_requests_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -201,7 +256,7 @@ func (x *IdResponsesId) String() string {
 func (*IdResponsesId) ProtoMessage() {}
 
 func (x *IdResponsesId) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_requests_proto_msgTypes[3]
+	mi := &file_bosca_requests_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -214,7 +269,7 @@ func (x *IdResponsesId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IdResponsesId.ProtoReflect.Descriptor instead.
 func (*IdResponsesId) Descriptor() ([]byte, []int) {
-	return file_bosca_requests_proto_rawDescGZIP(), []int{3}
+	return file_bosca_requests_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *IdResponsesId) GetId() string {
@@ -242,7 +297,7 @@ type IdResponses struct {
 func (x *IdResponses) Reset() {
 	*x = IdResponses{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_requests_proto_msgTypes[4]
+		mi := &file_bosca_requests_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -255,7 +310,7 @@ func (x *IdResponses) String() string {
 func (*IdResponses) ProtoMessage() {}
 
 func (x *IdResponses) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_requests_proto_msgTypes[4]
+	mi := &file_bosca_requests_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -268,7 +323,7 @@ func (x *IdResponses) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IdResponses.ProtoReflect.Descriptor instead.
 func (*IdResponses) Descriptor() ([]byte, []int) {
-	return file_bosca_requests_proto_rawDescGZIP(), []int{4}
+	return file_bosca_requests_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *IdResponses) GetId() []*IdResponsesId {
@@ -289,7 +344,7 @@ type Url struct {
 func (x *Url) Reset() {
 	*x = Url{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_requests_proto_msgTypes[5]
+		mi := &file_bosca_requests_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -302,7 +357,7 @@ func (x *Url) String() string {
 func (*Url) ProtoMessage() {}
 
 func (x *Url) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_requests_proto_msgTypes[5]
+	mi := &file_bosca_requests_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -315,7 +370,7 @@ func (x *Url) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Url.ProtoReflect.Descriptor instead.
 func (*Url) Descriptor() ([]byte, []int) {
-	return file_bosca_requests_proto_rawDescGZIP(), []int{5}
+	return file_bosca_requests_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Url) GetUrl() string {
@@ -336,7 +391,7 @@ type IdsRequest struct {
 func (x *IdsRequest) Reset() {
 	*x = IdsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_requests_proto_msgTypes[6]
+		mi := &file_bosca_requests_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -349,7 +404,7 @@ func (x *IdsRequest) String() string {
 func (*IdsRequest) ProtoMessage() {}
 
 func (x *IdsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_requests_proto_msgTypes[6]
+	mi := &file_bosca_requests_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -362,7 +417,7 @@ func (x *IdsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IdsRequest.ProtoReflect.Descriptor instead.
 func (*IdsRequest) Descriptor() ([]byte, []int) {
-	return file_bosca_requests_proto_rawDescGZIP(), []int{6}
+	return file_bosca_requests_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *IdsRequest) GetId() []string {
@@ -380,23 +435,26 @@ var file_bosca_requests_proto_rawDesc = []byte{
 	0x0c, 0x49, 0x6e, 0x74, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a,
 	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x22, 0x1b, 0x0a,
 	0x09, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x1c, 0x0a, 0x0a, 0x49, 0x64,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x44, 0x0a, 0x0d, 0x49, 0x64, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x73, 0x49, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x19, 0x0a, 0x05, 0x65, 0x72, 0x72,
-	0x6f, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f,
-	0x72, 0x88, 0x01, 0x01, 0x42, 0x08, 0x0a, 0x06, 0x5f, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x22, 0x33,
-	0x0a, 0x0b, 0x49, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x73, 0x12, 0x24, 0x0a,
-	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x62, 0x6f, 0x73, 0x63,
-	0x61, 0x2e, 0x49, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x73, 0x49, 0x64, 0x52,
-	0x02, 0x69, 0x64, 0x22, 0x17, 0x0a, 0x03, 0x55, 0x72, 0x6c, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x72,
-	0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x6c, 0x22, 0x1c, 0x0a, 0x0a,
-	0x49, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x42, 0x1d, 0x5a, 0x1b, 0x62, 0x6f,
-	0x73, 0x63, 0x61, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x62, 0x75, 0x66, 0x2f, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x3a, 0x0a, 0x16, 0x53, 0x75,
+	0x70, 0x70, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x72, 0x79, 0x49, 0x64, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x02, 0x69, 0x64, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x1c, 0x0a, 0x0a, 0x49, 0x64, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x02, 0x69, 0x64, 0x22, 0x44, 0x0a, 0x0d, 0x49, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x73, 0x49, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x19, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x88, 0x01, 0x01,
+	0x42, 0x08, 0x0a, 0x06, 0x5f, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x22, 0x33, 0x0a, 0x0b, 0x49, 0x64,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x73, 0x12, 0x24, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2e, 0x49, 0x64,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x73, 0x49, 0x64, 0x52, 0x02, 0x69, 0x64, 0x22,
+	0x17, 0x0a, 0x03, 0x55, 0x72, 0x6c, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x72, 0x6c, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x6c, 0x22, 0x1c, 0x0a, 0x0a, 0x49, 0x64, 0x73, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x42, 0x1d, 0x5a, 0x1b, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2e,
+	0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f,
+	0x62, 0x6f, 0x73, 0x63, 0x61, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -411,18 +469,19 @@ func file_bosca_requests_proto_rawDescGZIP() []byte {
 	return file_bosca_requests_proto_rawDescData
 }
 
-var file_bosca_requests_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_bosca_requests_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_bosca_requests_proto_goTypes = []any{
-	(*IntIdRequest)(nil),  // 0: bosca.IntIdRequest
-	(*IdRequest)(nil),     // 1: bosca.IdRequest
-	(*IdResponse)(nil),    // 2: bosca.IdResponse
-	(*IdResponsesId)(nil), // 3: bosca.IdResponsesId
-	(*IdResponses)(nil),   // 4: bosca.IdResponses
-	(*Url)(nil),           // 5: bosca.Url
-	(*IdsRequest)(nil),    // 6: bosca.IdsRequest
+	(*IntIdRequest)(nil),           // 0: bosca.IntIdRequest
+	(*IdRequest)(nil),              // 1: bosca.IdRequest
+	(*SupplementaryIdRequest)(nil), // 2: bosca.SupplementaryIdRequest
+	(*IdResponse)(nil),             // 3: bosca.IdResponse
+	(*IdResponsesId)(nil),          // 4: bosca.IdResponsesId
+	(*IdResponses)(nil),            // 5: bosca.IdResponses
+	(*Url)(nil),                    // 6: bosca.Url
+	(*IdsRequest)(nil),             // 7: bosca.IdsRequest
 }
 var file_bosca_requests_proto_depIdxs = []int32{
-	3, // 0: bosca.IdResponses.id:type_name -> bosca.IdResponsesId
+	4, // 0: bosca.IdResponses.id:type_name -> bosca.IdResponsesId
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -461,7 +520,7 @@ func file_bosca_requests_proto_init() {
 			}
 		}
 		file_bosca_requests_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*IdResponse); i {
+			switch v := v.(*SupplementaryIdRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -473,7 +532,7 @@ func file_bosca_requests_proto_init() {
 			}
 		}
 		file_bosca_requests_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*IdResponsesId); i {
+			switch v := v.(*IdResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -485,7 +544,7 @@ func file_bosca_requests_proto_init() {
 			}
 		}
 		file_bosca_requests_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*IdResponses); i {
+			switch v := v.(*IdResponsesId); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -497,7 +556,7 @@ func file_bosca_requests_proto_init() {
 			}
 		}
 		file_bosca_requests_proto_msgTypes[5].Exporter = func(v any, i int) any {
-			switch v := v.(*Url); i {
+			switch v := v.(*IdResponses); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -509,6 +568,18 @@ func file_bosca_requests_proto_init() {
 			}
 		}
 		file_bosca_requests_proto_msgTypes[6].Exporter = func(v any, i int) any {
+			switch v := v.(*Url); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_bosca_requests_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*IdsRequest); i {
 			case 0:
 				return &v.state
@@ -521,14 +592,14 @@ func file_bosca_requests_proto_init() {
 			}
 		}
 	}
-	file_bosca_requests_proto_msgTypes[3].OneofWrappers = []any{}
+	file_bosca_requests_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_bosca_requests_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

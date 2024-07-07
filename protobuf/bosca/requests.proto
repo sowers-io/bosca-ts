@@ -27,6 +27,11 @@ message IdRequest {
   string id = 1;
 }
 
+message SupplementaryIdRequest {
+  string id = 1;
+  string key = 2;
+}
+
 message IdResponse {
   string id = 1;
 }

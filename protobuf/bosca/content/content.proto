@@ -262,21 +262,39 @@ service ContentService {
     };
   }
 
-  rpc AddMetadataSupplementary(AddSupplementaryRequest) returns (SignedUrl) {
+  rpc AddMetadataSupplementary(AddSupplementaryRequest) returns (MetadataSupplementary) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/url/supplementary/{type}/upload"
+      put: "/v1/content/metadata/{metadata_id}/supplementary/{key}"
     };
   }
 
-  rpc GetMetadataSupplementaryDownloadUrl(SupplementaryIdRequest) returns (SignedUrl) {
+  rpc SetMetadataSupplementaryUploaded(bosca.SupplementaryIdRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      get: "/v1/content/metadata/{id}/url/supplementary/{type}/download"
+      post: "/v1/content/metadata/{id}/supplementary/{key}/uploaded"
     };
   }
 
-  rpc DeleteMetadataSupplementary(SupplementaryIdRequest) returns (bosca.Empty) {
+  rpc GetMetadataSupplementaryUploadUrl(bosca.SupplementaryIdRequest) returns (SignedUrl) {
     option (google.api.http) = {
-      delete: "/v1/content/metadata/{id}/url/supplementary/{type}"
+      post: "/v1/content/metadata/{id}/supplementary/{key}/url"
+    };
+  }
+
+  rpc GetMetadataSupplementaryDownloadUrl(bosca.SupplementaryIdRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/supplementary/{key}/url"
+    };
+  }
+
+  rpc DeleteMetadataSupplementary(bosca.SupplementaryIdRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/metadata/{id}/supplementary/{key}"
+    };
+  }
+
+  rpc GetMetadataSupplementaries(bosca.IdRequest) returns (MetadataSupplementaries) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/supplementary"
     };
   }
 

@@ -155,6 +155,116 @@ export class Metadata extends Message<Metadata> {
 }
 
 /**
+ * @generated from message bosca.content.MetadataSupplementaries
+ */
+export class MetadataSupplementaries extends Message<MetadataSupplementaries> {
+  /**
+   * @generated from field: repeated bosca.content.MetadataSupplementary supplementaries = 1;
+   */
+  supplementaries: MetadataSupplementary[] = [];
+
+  constructor(data?: PartialMessage<MetadataSupplementaries>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.MetadataSupplementaries";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "supplementaries", kind: "message", T: MetadataSupplementary, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MetadataSupplementaries {
+    return new MetadataSupplementaries().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MetadataSupplementaries {
+    return new MetadataSupplementaries().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MetadataSupplementaries {
+    return new MetadataSupplementaries().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MetadataSupplementaries | PlainMessage<MetadataSupplementaries> | undefined, b: MetadataSupplementaries | PlainMessage<MetadataSupplementaries> | undefined): boolean {
+    return proto3.util.equals(MetadataSupplementaries, a, b);
+  }
+}
+
+/**
+ * @generated from message bosca.content.MetadataSupplementary
+ */
+export class MetadataSupplementary extends Message<MetadataSupplementary> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string metadata_id = 2;
+   */
+  metadataId = "";
+
+  /**
+   * @generated from field: string key = 3;
+   */
+  key = "";
+
+  /**
+   * @generated from field: string name = 4;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string content_type = 5;
+   */
+  contentType = "";
+
+  /**
+   * @generated from field: int64 content_length = 6;
+   */
+  contentLength = protoInt64.zero;
+
+  /**
+   * @generated from field: repeated string trait_ids = 7;
+   */
+  traitIds: string[] = [];
+
+  constructor(data?: PartialMessage<MetadataSupplementary>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.MetadataSupplementary";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "content_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "content_length", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 7, name: "trait_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MetadataSupplementary {
+    return new MetadataSupplementary().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MetadataSupplementary {
+    return new MetadataSupplementary().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MetadataSupplementary {
+    return new MetadataSupplementary().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MetadataSupplementary | PlainMessage<MetadataSupplementary> | undefined, b: MetadataSupplementary | PlainMessage<MetadataSupplementary> | undefined): boolean {
+    return proto3.util.equals(MetadataSupplementary, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.content.AddMetadataRequest
  */
 export class AddMetadataRequest extends Message<AddMetadataRequest> {
@@ -454,29 +564,34 @@ export class AddMetadataTraitRequest extends Message<AddMetadataTraitRequest> {
  */
 export class AddSupplementaryRequest extends Message<AddSupplementaryRequest> {
   /**
-   * @generated from field: string id = 1;
+   * @generated from field: string metadata_id = 2;
    */
-  id = "";
+  metadataId = "";
 
   /**
-   * @generated from field: string type = 2;
+   * @generated from field: string key = 3;
    */
-  type = "";
+  key = "";
 
   /**
-   * @generated from field: string name = 3;
+   * @generated from field: string name = 4;
    */
   name = "";
 
   /**
-   * @generated from field: string content_type = 4;
+   * @generated from field: string content_type = 5;
    */
   contentType = "";
 
   /**
-   * @generated from field: int64 content_length = 5;
+   * @generated from field: int64 content_length = 6;
    */
   contentLength = protoInt64.zero;
+
+  /**
+   * @generated from field: repeated string trait_ids = 7;
+   */
+  traitIds: string[] = [];
 
   constructor(data?: PartialMessage<AddSupplementaryRequest>) {
     super();
@@ -486,11 +601,12 @@ export class AddSupplementaryRequest extends Message<AddSupplementaryRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "bosca.content.AddSupplementaryRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "content_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "content_length", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "content_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "content_length", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 7, name: "trait_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddSupplementaryRequest {
@@ -507,49 +623,6 @@ export class AddSupplementaryRequest extends Message<AddSupplementaryRequest> {
 
   static equals(a: AddSupplementaryRequest | PlainMessage<AddSupplementaryRequest> | undefined, b: AddSupplementaryRequest | PlainMessage<AddSupplementaryRequest> | undefined): boolean {
     return proto3.util.equals(AddSupplementaryRequest, a, b);
-  }
-}
-
-/**
- * @generated from message bosca.content.SupplementaryIdRequest
- */
-export class SupplementaryIdRequest extends Message<SupplementaryIdRequest> {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id = "";
-
-  /**
-   * @generated from field: string type = 2;
-   */
-  type = "";
-
-  constructor(data?: PartialMessage<SupplementaryIdRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "bosca.content.SupplementaryIdRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SupplementaryIdRequest {
-    return new SupplementaryIdRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SupplementaryIdRequest {
-    return new SupplementaryIdRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SupplementaryIdRequest {
-    return new SupplementaryIdRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: SupplementaryIdRequest | PlainMessage<SupplementaryIdRequest> | undefined, b: SupplementaryIdRequest | PlainMessage<SupplementaryIdRequest> | undefined): boolean {
-    return proto3.util.equals(SupplementaryIdRequest, a, b);
   }
 }
 

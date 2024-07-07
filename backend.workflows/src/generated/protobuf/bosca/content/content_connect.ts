@@ -21,7 +21,7 @@
 import { Empty } from "../empty_pb";
 import { Source, Sources } from "./sources_pb";
 import { MethodKind } from "@bufbuild/protobuf";
-import { IdRequest, IdResponse, IdResponses, IdsRequest } from "../requests_pb";
+import { IdRequest, IdResponse, IdResponses, IdsRequest, SupplementaryIdRequest } from "../requests_pb";
 import { CompleteTransitionWorkflowRequest, TransitionWorkflowRequest, Workflow, WorkflowActivityIdRequest, WorkflowActivityInstances, WorkflowActivityPrompts, WorkflowActivityStorageSystems, Workflows, WorkflowState, WorkflowStates } from "./workflows_pb";
 import { Model, Models } from "./model_pb";
 import { Prompt, Prompts } from "./prompts_pb";
@@ -29,7 +29,7 @@ import { StorageSystem, StorageSystemModels, StorageSystems } from "./storage_sy
 import { Trait, Traits } from "./traits_pb";
 import { AddCollectionItemRequest, AddCollectionRequest, AddCollectionsRequest, Collection, CollectionItems } from "./collections_pb";
 import { Permission, PermissionCheckRequest, PermissionCheckResponse, Permissions } from "./permissions_pb";
-import { AddMetadataRequest, AddMetadatasRequest, AddMetadataTraitRequest, AddSupplementaryRequest, FindMetadataRequest, Metadata, MetadataRelationship, MetadataRelationshipIdRequest, MetadataRelationships, Metadatas, SupplementaryIdRequest } from "./metadata_pb";
+import { AddMetadataRequest, AddMetadatasRequest, AddMetadataTraitRequest, AddSupplementaryRequest, FindMetadataRequest, Metadata, MetadataRelationship, MetadataRelationshipIdRequest, MetadataRelationships, Metadatas, MetadataSupplementaries, MetadataSupplementary } from "./metadata_pb";
 import { SignedUrl } from "./url_pb";
 
 /**
@@ -377,6 +377,24 @@ export const ContentService = {
     addMetadataSupplementary: {
       name: "AddMetadataSupplementary",
       I: AddSupplementaryRequest,
+      O: MetadataSupplementary,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.SetMetadataSupplementaryUploaded
+     */
+    setMetadataSupplementaryUploaded: {
+      name: "SetMetadataSupplementaryUploaded",
+      I: SupplementaryIdRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.GetMetadataSupplementaryUploadUrl
+     */
+    getMetadataSupplementaryUploadUrl: {
+      name: "GetMetadataSupplementaryUploadUrl",
+      I: SupplementaryIdRequest,
       O: SignedUrl,
       kind: MethodKind.Unary,
     },
@@ -396,6 +414,15 @@ export const ContentService = {
       name: "DeleteMetadataSupplementary",
       I: SupplementaryIdRequest,
       O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.GetMetadataSupplementaries
+     */
+    getMetadataSupplementaries: {
+      name: "GetMetadataSupplementaries",
+      I: IdRequest,
+      O: MetadataSupplementaries,
       kind: MethodKind.Unary,
     },
     /**

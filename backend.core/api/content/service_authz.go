@@ -260,7 +260,15 @@ func (svc *authorizationService) DeleteMetadata(ctx context.Context, request *pr
 	return svc.service.DeleteMetadata(ctx, request)
 }
 
-func (svc *authorizationService) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *grpc.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
+func (svc *authorizationService) GetMetadataSupplementaryUploadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetMetadataSupplementaryUploadUrl(ctx, request)
+}
+
+func (svc *authorizationService) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
@@ -268,20 +276,36 @@ func (svc *authorizationService) GetMetadataSupplementaryDownloadUrl(ctx context
 	return svc.service.GetMetadataSupplementaryDownloadUrl(ctx, request)
 }
 
-func (svc *authorizationService) AddMetadataSupplementary(ctx context.Context, request *grpc.AddSupplementaryRequest) (*grpc.SignedUrl, error) {
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
+func (svc *authorizationService) AddMetadataSupplementary(ctx context.Context, request *grpc.AddSupplementaryRequest) (*grpc.MetadataSupplementary, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.MetadataId, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
 	return svc.service.AddMetadataSupplementary(ctx, request)
 }
 
-func (svc *authorizationService) DeleteMetadataSupplementary(ctx context.Context, request *grpc.SupplementaryIdRequest) (*protobuf.Empty, error) {
+func (svc *authorizationService) DeleteMetadataSupplementary(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
 	return svc.service.DeleteMetadataSupplementary(ctx, request)
+}
+
+func (svc *authorizationService) SetMetadataSupplementaryUploaded(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.SetMetadataSupplementaryUploaded(ctx, request)
+}
+
+func (svc *authorizationService) GetMetadataSupplementaries(ctx context.Context, request *protobuf.IdRequest) (*grpc.MetadataSupplementaries, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetMetadataSupplementaries(ctx, request)
 }
 
 func (svc *authorizationService) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {

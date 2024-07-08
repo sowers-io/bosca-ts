@@ -61,6 +61,8 @@ message MetadataSupplementary {
   string content_type = 5;
   int64 content_length = 6;
   repeated string trait_ids = 7;
+  optional string source_id = 8;
+  optional string source_identifier = 9;
 }
 
 message AddMetadataRequest {
@@ -105,6 +107,8 @@ message AddSupplementaryRequest {
   string content_type = 5;
   int64 content_length = 6;
   repeated string trait_ids = 7;
+  optional string source_id = 8;
+  optional string source_identifier = 9;
 }
 
 message FindMetadataRequest {

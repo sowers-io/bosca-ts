@@ -14,120 +14,6 @@
 
 -- +goose Up
 -- +goose StatementBegin
-create table models
-(
-    id            uuid    not null default gen_random_uuid(),
-    type          varchar not null,
-    name          varchar not null,
-    description   varchar not null,
-    configuration jsonb   not null,
-    primary key (id)
-);
-
-create table prompts
-(
-    id          uuid    not null default gen_random_uuid(),
-    name        varchar not null,
-    description varchar not null,
-    prompt      text    not null,
-    primary key (id)
-);
-
-create type storage_system_type as enum ('vector', 'search', 'supplementary');
-
-create table storage_systems
-(
-    id            uuid                not null default gen_random_uuid(),
-    name          varchar             not null,
-    description   varchar             not null,
-    type          storage_system_type not null,
-    configuration jsonb               not null,
-    primary key (id)
-);
-
-create table storage_system_models
-(
-    system_id     uuid  not null,
-    model_id      uuid  not null,
-    configuration jsonb not null default '{
-      "type": "default"
-    }'::jsonb,
-    primary key (system_id, model_id),
-    foreign key (system_id) references storage_systems (id),
-    foreign key (model_id) references models (id)
-);
-
-create table workflows
-(
-    id            varchar not null, -- This is the identifier of the temporal workflow
-    name          varchar not null,
-    description   varchar not null,
-    queue         varchar not null,
-    configuration jsonb   not null default '{}',
-    primary key (id)
-);
-
-create table workflow_activities
-(
-    id                   varchar not null,
-    name                 varchar not null,
-    description          varchar not null,
-    child_workflow       boolean not null default false,
-    child_workflow_queue varchar,
-    configuration        jsonb   not null default '{}',
-    primary key (id)
-);
-
-create type workflow_activity_parameter_type as enum ('context', 'supplementary', 'supplementary_array');
-
-create table workflow_activity_inputs
-(
-    activity_id varchar                          not null,
-    name        varchar                          not null,
-    type        workflow_activity_parameter_type not null,
-    primary key (activity_id, name),
-    foreign key (activity_id) references workflow_activities (id) on delete cascade
-);
-
-create table workflow_activity_outputs
-(
-    activity_id varchar                          not null,
-    name        varchar                          not null,
-    type        workflow_activity_parameter_type not null,
-    primary key (activity_id, name),
-    foreign key (activity_id) references workflow_activities (id) on delete cascade
-);
-
-create table workflow_activity_instances
-(
-    id              bigserial not null,
-    workflow_id     varchar   not null,
-    activity_id     varchar   not null,
-    execution_group int       not null,
-    configuration   jsonb     not null default '{}',
-    primary key (id)
-);
-
-create table workflow_activity_instance_inputs
-(
-    instance_id bigint  not null,
-    name        varchar not null,
-    value       jsonb   not null,
-    primary key (instance_id, name),
-    foreign key (instance_id) references workflow_activity_instances
-);
-
-create table workflow_activity_instance_outputs
-(
-    instance_id bigint  not null,
-    name        varchar not null,
-    value       jsonb   not null,
-    primary key (instance_id, name),
-    foreign key (instance_id) references workflow_activity_instances
-);
-
-create index ix_workflow_activity_instances_ix on workflow_activity_instances (workflow_id);
-
 create table traits
 (
     id          varchar not null,
@@ -141,38 +27,7 @@ create table trait_workflows
     trait_id    varchar not null,
     workflow_id varchar not null,
     primary key (trait_id, workflow_id),
-    foreign key (trait_id) references traits (id),
-    foreign key (workflow_id) references workflows (id)
-);
-
-create table workflow_activity_instance_storage_systems
-(
-    instance_id       bigint not null,
-    storage_system_id uuid   not null,
-    configuration     jsonb  not null default '{}'::jsonb,
-    primary key (instance_id, storage_system_id),
-    foreign key (instance_id) references workflow_activity_instances (id),
-    foreign key (storage_system_id) references storage_systems (id)
-);
-
-create table workflow_activity_instance_models
-(
-    instance_id   bigint not null,
-    model_id      uuid   not null,
-    configuration jsonb  not null default '{}'::jsonb,
-    primary key (instance_id, model_id),
-    foreign key (instance_id) references workflow_activity_instances (id),
-    foreign key (model_id) references models (id)
-);
-
-create table workflow_activity_instance_prompts
-(
-    instance_id   bigint not null,
-    prompt_id     uuid   not null,
-    configuration jsonb  not null default '{}'::jsonb,
-    primary key (instance_id, prompt_id),
-    foreign key (instance_id) references workflow_activity_instances (id),
-    foreign key (prompt_id) references prompts (id)
+    foreign key (trait_id) references traits (id)
 );
 
 create table categories
@@ -180,33 +35,6 @@ create table categories
     id   uuid    not null default gen_random_uuid(),
     name varchar not null,
     primary key (id)
-);
-
-create type workflow_state_type as enum ('processing', 'draft', 'pending', 'approval', 'approved', 'published', 'failure');
-
-create table workflow_states
-(
-    id                varchar             not null,
-    name              varchar             not null,
-    description       varchar             not null,
-    type              workflow_state_type not null,
-    configuration     jsonb               not null default '{}',
-    workflow_id       varchar,
-    exit_workflow_id  varchar, -- workflow that must return true before exiting
-    entry_workflow_id varchar, -- workflow that must return true before entering
-    primary key (id),
-    foreign key (workflow_id) references workflows (id),
-    foreign key (exit_workflow_id) references workflows (id)
-);
-
-create table workflow_state_transitions
-(
-    from_state_id varchar not null,
-    to_state_id   varchar not null,
-    description   varchar not null,
-    primary key (from_state_id, to_state_id),
-    foreign key (from_state_id) references workflow_states (id),
-    foreign key (to_state_id) references workflow_states (id)
 );
 
 create type collection_type as enum ('root', 'standard', 'folder', 'queue');
@@ -223,9 +51,7 @@ create table collections
     enabled                   boolean          default true,
     workflow_state_id         varchar not null default 'pending',
     workflow_state_pending_id varchar,
-    primary key (id),
-    foreign key (workflow_state_id) references workflow_states (id),
-    foreign key (workflow_state_pending_id) references workflow_states (id)
+    primary key (id)
 );
 
 create table collection_collection_items
@@ -291,22 +117,24 @@ create table metadata
     delete_workflow_id        varchar,
     primary key (id),
     foreign key (parent_id) references metadata (id) on delete cascade,
-    foreign key (workflow_state_id) references workflow_states (id),
-    foreign key (workflow_state_pending_id) references workflow_states (id),
-    foreign key (source_id) references sources (id),
-    foreign key (delete_workflow_id) references workflows (id)
+    foreign key (source_id) references sources (id)
 );
 
 create table metadata_supplementary
 (
-    metadata_id uuid      not null,
-    key         varchar   not null,
-    name        varchar   not null,
-    traits      varchar[] not null default '{}',
-    created     timestamp not null default now(),
-    modified    timestamp not null default now(),
-    uploaded    timestamp,
-    primary key (metadata_id, key)
+    metadata_id       uuid      not null,
+    key               varchar   not null,
+    name              varchar   not null,
+    traits            varchar[] not null default '{}',
+    created           timestamp not null default now(),
+    modified          timestamp not null default now(),
+    source_id         uuid,
+    source_identifier varchar,
+    uploaded          timestamp,
+    primary key (metadata_id, key),
+    foreign key (metadata_id) references metadata (id) on delete cascade,
+    foreign key (source_id) references sources (id),
+    unique (metadata_id, key)
 );
 
 create table metadata_workflow_transition_history
@@ -321,9 +149,7 @@ create table metadata_workflow_transition_history
     complete      boolean   not null default false,
     created       timestamp          default now(),
     primary key (id),
-    foreign key (metadata_id) references metadata (id) on delete cascade,
-    foreign key (to_state_id) references workflow_states (id),
-    foreign key (from_state_id) references workflow_states (id)
+    foreign key (metadata_id) references metadata (id) on delete cascade
 );
 
 create table collection_workflow_transition_history
@@ -338,9 +164,7 @@ create table collection_workflow_transition_history
     complete      boolean   not null default false,
     created       timestamp          default now(),
     primary key (id),
-    foreign key (metadata_id) references metadata (id) on delete cascade,
-    foreign key (to_state_id) references workflow_states (id),
-    foreign key (from_state_id) references workflow_states (id)
+    foreign key (metadata_id) references metadata (id) on delete cascade
 );
 
 create table collection_metadata_items
@@ -384,8 +208,6 @@ create table metadata_categories
 
 -- +goose Down
 -- +goose StatementBegin
-drop table if exists workflows cascade;
-drop table if exists workflow_state_transitions cascade;
 drop table if exists collection_traits cascade;
 drop table if exists collection_categories cascade;
 drop table if exists collections cascade;
@@ -402,25 +224,7 @@ drop type if exists metadata_type cascade;
 drop table if exists traits cascade;
 drop table if exists categories cascade;
 drop type if exists metadata_status cascade;
-drop type if exists metadata_status cascade;
-drop table if exists workflow_states cascade;
-drop type if exists workflow_state_type cascade;
-drop table if exists models cascade;
 drop table if exists trait_workflows cascade;
-drop table if exists storage_systems cascade;
-drop table if exists storage_system_models cascade;
-drop type storage_system_type;
-drop table prompts cascade;
 drop table sources cascade;
-drop table workflow_activities cascade;
-drop table workflow_activity_instances cascade;
-drop type workflow_activity_parameter_type cascade;
 drop table metadata_supplementary cascade;
-drop table workflow_activity_inputs cascade;
-drop table workflow_activity_outputs cascade;
-drop table workflow_activity_instance_inputs cascade;
-drop table workflow_activity_instance_outputs cascade;
-drop table workflow_activity_instance_storage_systems cascade;
-drop table workflow_activity_instance_prompts cascade;
-drop table workflow_activity_instance_models cascade;
 -- +goose StatementEnd

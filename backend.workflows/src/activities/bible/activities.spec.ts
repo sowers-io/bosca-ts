@@ -1,16 +1,12 @@
-import { Workflow } from '../../workflow/workflow'
-import {
-  WorkflowActivityExecutionContext,
-  WorkflowActivityInstance
-} from '../../generated/protobuf/bosca/content/workflows_pb'
-import { Metadata } from '../../generated/protobuf/bosca/content/metadata_pb'
 import { Downloader, FileName } from '../../util/downloader'
 import { ProcessBibleActivity } from './process'
 import { CreateVerseMarkdownTable } from './verse_table'
+import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/execution_context_pb'
+import { WorkflowActivity } from '../../generated/protobuf/bosca/workflow/activities_pb'
 
 class DummyDownloader implements Downloader {
 
-  async download(executionContext: WorkflowActivityExecutionContext): Promise<FileName> {
+  async download(activity: WorkflowActivityJob): Promise<FileName> {
     return '../example-data/asv.zip'
   }
 
@@ -21,27 +17,25 @@ class DummyDownloader implements Downloader {
 test('process bible activity', async () => {
   const downloader = new DummyDownloader()
   const activity = new ProcessBibleActivity(downloader)
-  const executionContext = new WorkflowActivityExecutionContext()
-  executionContext.metadata = new Metadata({ id: 'asdf' })
-  executionContext.activities = [
-    new WorkflowActivityInstance({ id: activity.id })
-  ]
-
-  const workflow = new Workflow()
-  workflow.register(activity)
-  await workflow.execute(executionContext)
+  const activityJob = new WorkflowActivityJob({
+    workflowId: 'wid',
+    metadataId: 'mid',
+    activity: new WorkflowActivity({
+      activityId: activity.id
+    })
+  })
+  await activity.execute(activityJob)
 }, 1200000)
 
 test('create verse tables', async () => {
   const downloader = new DummyDownloader()
   const activity = new CreateVerseMarkdownTable(downloader)
-  const executionContext = new WorkflowActivityExecutionContext()
-  executionContext.metadata = new Metadata({ id: 'asdf' })
-  executionContext.activities = [
-    new WorkflowActivityInstance({ id: activity.id })
-  ]
-
-  const workflow = new Workflow()
-  workflow.register(activity)
-  await workflow.execute(executionContext)
+  const activityJob = new WorkflowActivityJob({
+    workflowId: 'wid',
+    metadataId: 'mid',
+    activity: new WorkflowActivity({
+      activityId: activity.id
+    })
+  })
+  await activity.execute(activityJob)
 }, 1200000)

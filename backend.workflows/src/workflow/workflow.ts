@@ -1,27 +1,53 @@
-import { WorkflowActivityExecutionContext } from '../generated/protobuf/bosca/content/workflows_pb'
+import { useServiceClient } from '../util/util'
+import { WorkflowService } from '../generated/protobuf/bosca/workflow/service_connect'
+import {
+  WorkflowActivityJob,
+  WorkflowActivityJobRequest
+} from '../generated/protobuf/bosca/workflow/execution_context_pb'
 
 export abstract class Activity {
 
   abstract get id(): string
-
-  abstract execute(executionContext: WorkflowActivityExecutionContext): Promise<void>
+  abstract execute(activity: WorkflowActivityJob): Promise<void>
 }
+
+type ActivityRegistry = { [activityId: string]: Activity }
+type ActivityQueueRegistry = { [queue: string]: ActivityRegistry }
 
 export class Workflow {
 
-  private activities: { [id: string]: Activity } = {}
+  private registry: ActivityQueueRegistry = {}
 
-  register(activity: Activity) {
-    this.activities[activity.id] = activity
+  register(queue: string, activity: Activity) {
+    let activities = this.registry[queue]
+    if (!activities) {
+      activities = {}
+      this.registry[queue] = activities
+    }
+    activities[activity.id] = activity
   }
 
-  async execute(executionContext: WorkflowActivityExecutionContext) {
-    while (executionContext.currentActivityIndex < executionContext.activities.length) {
-      const activityDefinition = executionContext.activities[executionContext.currentActivityIndex]
-      executionContext.currentActivityIndex++
-
-      const activity = this.activities[activityDefinition.id]
-      await activity.execute(executionContext)
+  async listen(queue: string, activityIds: string[]): Promise<void> {
+    const service = useServiceClient(WorkflowService)
+    const listenRequest = new WorkflowActivityJobRequest({
+      queue: queue,
+      activityId: activityIds
+    })
+    for await (const activityJob of service.getWorkflowActivityJobs(listenRequest)) {
+      const activity = this.registry[queue][activityJob.activity!.activityId]
+      await activity.execute(activityJob)
     }
+  }
+
+  async execute() {
+    const listeners: Promise<void>[] = []
+    for (const queue in this.registry) {
+      const activityIds: string[] = []
+      for (const activityId in this.registry[queue]) {
+        activityIds.push(activityId)
+      }
+      listeners.push(this.listen(queue, activityIds))
+    }
+    await Promise.any(listeners)
   }
 }

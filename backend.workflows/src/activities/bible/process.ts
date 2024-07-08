@@ -1,4 +1,3 @@
-import { WorkflowActivityExecutionContext } from '../../generated/protobuf/bosca/content/workflows_pb'
 import { Activity } from '../../workflow/workflow'
 import { USXProcessor, BibleMetadata, Book } from '@bosca/bible'
 import {
@@ -14,6 +13,7 @@ import { execute, toArrayBuffer } from '../../util/http'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { Downloader } from '../../util/downloader'
 import { getCollection, getMetadata, getMetadataUploadUrl } from '../../util/service'
+import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/execution_context_pb'
 
 export class ProcessBibleActivity extends Activity {
 
@@ -42,7 +42,7 @@ export class ProcessBibleActivity extends Activity {
     return getCollection(new IdRequest({ id: addResponse.id }))
   }
 
-  private async createBookCollections(metadata: BibleMetadata, bible: Collection, books: Book[]): Promise<Collection[]> {
+  private async createBookCollections(workflowId: string, metadata: BibleMetadata, bible: Collection, books: Book[]): Promise<Collection[]> {
     const service = useServiceClient(ContentService)
     const addCollectionRequests: AddCollectionRequest[] = []
     const addMetadatasRequests: AddMetadataRequest[] = []
@@ -73,7 +73,9 @@ export class ProcessBibleActivity extends Activity {
           contentType: 'bible/usx-book',
           languageTag: metadata.language.iso,
           contentLength: protoInt64.parse(buffer.byteLength),
-          attributes: attributes
+          attributes: attributes,
+          sourceId: 'workflow',
+          sourceIdentifier: workflowId
         })
       }))
       order++
@@ -118,7 +120,7 @@ export class ProcessBibleActivity extends Activity {
     return collections
   }
 
-  private async createChapters(metadata: BibleMetadata, bookCollection: Collection, book: Book): Promise<Metadata[]> {
+  private async createChapters(workflowId: string, metadata: BibleMetadata, bookCollection: Collection, book: Book): Promise<Metadata[]> {
     const service = useServiceClient(ContentService)
     const requests: AddMetadataRequest[] = []
     const buffers: ArrayBuffer[] = []
@@ -139,7 +141,9 @@ export class ProcessBibleActivity extends Activity {
             'bible.book.usfm': book.usfm,
             'bible.chapter.usfm': chapter.usfm,
             'bible.chapter.order': (order++).toString()
-          }
+          },
+          sourceId: 'workflow',
+          sourceIdentifier: workflowId
         })
       }))
     }
@@ -165,19 +169,19 @@ export class ProcessBibleActivity extends Activity {
     return metadatas
   }
 
-  async execute(executionContext: WorkflowActivityExecutionContext) {
-    const file = await this.downloader.download(executionContext)
+  async execute(activity: WorkflowActivityJob) {
+    const file = await this.downloader.download(activity)
     try {
       const processor = new USXProcessor()
       await processor.process(file)
       const bibleCollection = await this.createBibleCollection(processor.metadata)
-      const bookCollections = await this.createBookCollections(processor.metadata, bibleCollection, processor.books)
+      const bookCollections = await this.createBookCollections(activity.workflowId, processor.metadata, bibleCollection, processor.books)
 
       for (let bookIndex = 0; bookIndex < processor.books.length; bookIndex++) {
         const book = processor.books[bookIndex]
         const collection = bookCollections[bookIndex]
 
-        await this.createChapters(processor.metadata, collection, book)
+        await this.createChapters(activity.workflowId, processor.metadata, collection, book)
       }
 
     } finally {

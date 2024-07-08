@@ -11,7 +11,7 @@
       <env name="BOSCA_S3_SECRET_ACCESS_KEY" value="eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm" />
       <env name="BOSCA_SESSION_ENDPOINT" value="http://localhost:4433/sessions/whoami" />
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
-      <env name="SERVICE_ACCOUNT_TOKEN" value="sat" />
+      <env name="BOSCA_SERVICE_ACCOUNT_TOKEN" value="sat" />
     </envs>
     <kind value="PACKAGE" />
     <package value="bosca.io/cmd/servers/uploader" />

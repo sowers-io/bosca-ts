@@ -1,0 +1,140 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+syntax = "proto3";
+
+option go_package = "bosca.io/api/protobuf/bosca/workflow";
+
+import "google/api/annotations.proto";
+import "bosca/workflow/workflows.proto";
+import "bosca/workflow/models.proto";
+import "bosca/workflow/prompts.proto";
+import "bosca/workflow/storage_systems.proto";
+import "bosca/workflow/transitions.proto";
+import "bosca/workflow/activities.proto";
+import "bosca/workflow/execution_context.proto";
+import "bosca/empty.proto";
+import "bosca/requests.proto";
+
+package bosca.workflow;
+
+service WorkflowService {
+
+  rpc GetModels(bosca.Empty) returns (Models) {
+    option (google.api.http) = {
+      get: "/v1/workflow/models"
+    };
+  }
+
+  rpc GetModel(bosca.IdRequest) returns (Model) {
+    option (google.api.http) = {
+      get: "/v1/workflow/models/{id}"
+    };
+  }
+
+  rpc GetPrompts(bosca.Empty) returns (Prompts) {
+    option (google.api.http) = {
+      get: "/v1/workflow/prompts"
+    };
+  }
+
+  rpc GetPrompt(bosca.IdRequest) returns (Prompt) {
+    option (google.api.http) = {
+      get: "/v1/workflow/prompts/{id}"
+    };
+  }
+
+  rpc GetStorageSystems(bosca.Empty) returns (StorageSystems) {
+    option (google.api.http) = {
+      get: "/v1/workflow/storagesystems"
+    };
+  }
+
+  rpc GetStorageSystem(bosca.IdRequest) returns (StorageSystem) {
+    option (google.api.http) = {
+      get: "/v1/workflow/storagesystems/{id}"
+    };
+  }
+
+  rpc GetStorageSystemModels(bosca.IdRequest) returns (StorageSystemModels) {
+    option (google.api.http) = {
+      get: "/v1/workflow/storagesystems/{id}/models"
+    };
+  }
+
+  rpc GetWorkflows(bosca.Empty) returns (Workflows) {
+    option (google.api.http) = {
+      get: "/v1/workflow/workflows"
+    };
+  }
+
+  rpc GetWorkflow(bosca.IdRequest) returns (Workflow) {
+    option (google.api.http) = {
+      get: "/v1/workflow/workflows/{id}"
+    };
+  }
+
+  rpc GetWorkflowState(bosca.IdRequest) returns (WorkflowState) {
+    option (google.api.http) = {
+      get: "/v1/workflow/workflow/states/{id}"
+    };
+  }
+
+  rpc GetWorkflowStates(bosca.Empty) returns (WorkflowStates) {
+    option (google.api.http) = {
+      get: "/v1/workflow/states"
+    };
+  }
+
+  rpc GetWorkflowActivities(bosca.IdRequest) returns (WorkflowActivities) {
+    option (google.api.http) = {
+      get: "/v1/workflow/workflows/{id}/activities"
+    };
+  }
+
+  rpc GetWorkflowActivityStorageSystems(WorkflowActivityIdRequest) returns (WorkflowActivityStorageSystems) {
+    option (google.api.http) = {
+      get: "/v1/workflow/workflows/{workflow_id}/activities/{activity_id}/storagesystems"
+    };
+  }
+
+  rpc GetWorkflowActivityPrompts(WorkflowActivityIdRequest) returns (WorkflowActivityPrompts) {
+    option (google.api.http) = {
+      get: "/v1/workflow/workflows/{workflow_id}/activities/{activity_id}/prompts"
+    };
+  }
+
+  rpc BeginTransitionWorkflow (BeginTransitionWorkflowRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/workflow/metadata/{metadata_id}/workflow/{state_id}"
+      body: "*"
+    };
+  }
+
+  rpc CompleteTransitionWorkflow (CompleteTransitionWorkflowRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/workflow/metadata/{metadata_id}/workflow/transition/complete"
+      body: "*"
+    };
+  }
+
+  rpc GetWorkflowActivityJobs(WorkflowActivityJobRequest) returns (stream WorkflowActivityJob) {
+    option (google.api.http) = {
+      post: "/v1/workflow/queue/{queue}/activities"
+      body: "*"
+    };
+  }
+}
+

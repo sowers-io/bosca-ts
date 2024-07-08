@@ -17,7 +17,7 @@
 package workflow
 
 import (
-	"bosca.io/api/protobuf/bosca/content"
+	"bosca.io/api/protobuf/bosca/workflow"
 	"errors"
 	"fmt"
 )
@@ -196,14 +196,13 @@ type ActivityConfigurationModel struct {
 }
 
 type ActivityConfiguration struct {
-	Name               string
-	Description        string
-	ExecutionGroup     int32  `yaml:"executionGroup"`
-	ChildWorkflow      bool   `yaml:"childWorkflow"`
-	ChildWorkflowQueue string `yaml:"childWorkflowQueue"`
-	Inputs             map[string]interface{}
-	Outputs            map[string]interface{}
-	Configuration      map[string]string
+	Name            string
+	Description     string
+	ExecutionGroup  int32   `yaml:"executionGroup"`
+	ChildWorkflowId *string `yaml:"childWorkflowId"`
+	Inputs          map[string]interface{}
+	Outputs         map[string]interface{}
+	Configuration   map[string]string
 }
 
 type ActivityInstanceConfiguration struct {
@@ -216,21 +215,21 @@ type ActivityInstanceConfiguration struct {
 	Outputs        map[string]interface{}
 }
 
-func (cfg *ActivityConfiguration) ToActivityInstance() *content.WorkflowActivityInstance {
-	inputs := make(map[string]*content.WorkflowActivityParameterValue)
-	outputs := make(map[string]*content.WorkflowActivityParameterValue)
+func (cfg *ActivityConfiguration) ToActivityInstance() *workflow.WorkflowActivity {
+	inputs := make(map[string]*workflow.WorkflowActivityParameterValue)
+	outputs := make(map[string]*workflow.WorkflowActivityParameterValue)
 
 	for key, input := range cfg.Inputs {
 		if val, ok := input.(string); ok {
-			inputs[key] = &content.WorkflowActivityParameterValue{
-				Value: &content.WorkflowActivityParameterValue_SingleValue{
+			inputs[key] = &workflow.WorkflowActivityParameterValue{
+				Value: &workflow.WorkflowActivityParameterValue_SingleValue{
 					SingleValue: val,
 				},
 			}
 		} else if val, ok := input.([]string); ok {
-			inputs[key] = &content.WorkflowActivityParameterValue{
-				Value: &content.WorkflowActivityParameterValue_ArrayValue{
-					ArrayValue: &content.WorkflowActivityParameterValues{
+			inputs[key] = &workflow.WorkflowActivityParameterValue{
+				Value: &workflow.WorkflowActivityParameterValue_ArrayValue{
+					ArrayValue: &workflow.WorkflowActivityParameterValues{
 						Values: val,
 					},
 				},
@@ -239,15 +238,15 @@ func (cfg *ActivityConfiguration) ToActivityInstance() *content.WorkflowActivity
 	}
 	for key, input := range cfg.Outputs {
 		if val, ok := input.(string); ok {
-			outputs[key] = &content.WorkflowActivityParameterValue{
-				Value: &content.WorkflowActivityParameterValue_SingleValue{
+			outputs[key] = &workflow.WorkflowActivityParameterValue{
+				Value: &workflow.WorkflowActivityParameterValue_SingleValue{
 					SingleValue: val,
 				},
 			}
 		} else if val, ok := input.([]string); ok {
-			outputs[key] = &content.WorkflowActivityParameterValue{
-				Value: &content.WorkflowActivityParameterValue_ArrayValue{
-					ArrayValue: &content.WorkflowActivityParameterValues{
+			outputs[key] = &workflow.WorkflowActivityParameterValue{
+				Value: &workflow.WorkflowActivityParameterValue_ArrayValue{
+					ArrayValue: &workflow.WorkflowActivityParameterValues{
 						Values: val,
 					},
 				},
@@ -255,7 +254,7 @@ func (cfg *ActivityConfiguration) ToActivityInstance() *content.WorkflowActivity
 		}
 	}
 
-	return &content.WorkflowActivityInstance{
+	return &workflow.WorkflowActivity{
 		ExecutionGroup: cfg.ExecutionGroup,
 		Configuration:  cfg.Configuration,
 		Inputs:         inputs,

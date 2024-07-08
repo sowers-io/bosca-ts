@@ -1,10 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Dev" type="CompoundRunConfigurationType">
-    <toRun name="Bible Workflow Worker" type="GoApplicationRunConfiguration" />
     <toRun name="Content Service" type="GoApplicationRunConfiguration" />
-    <toRun name="Metadata Workflow Worker" type="GoApplicationRunConfiguration" />
     <toRun name="Uploader Service" type="GoApplicationRunConfiguration" />
-    <toRun name="AI gRPC" type="PythonConfigurationType" />
+    <toRun name="Workflow Service" type="GoApplicationRunConfiguration" />
     <method v="2" />
   </configuration>
 </component>

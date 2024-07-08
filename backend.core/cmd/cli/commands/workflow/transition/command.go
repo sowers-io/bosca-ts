@@ -17,7 +17,7 @@
 package transition
 
 import (
-	grpc "bosca.io/api/protobuf/bosca/content"
+	grpc "bosca.io/api/protobuf/bosca/workflow"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
 	"context"
@@ -29,7 +29,7 @@ var Command = &cobra.Command{
 	Short: "Transition workflow to a new state",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := cli.NewContentClient(cmd)
+		client, err := cli.NewWorkflowClient(cmd)
 		if err != nil {
 			return err
 		}
@@ -39,7 +39,7 @@ var Command = &cobra.Command{
 			return err
 		}
 
-		_, err = client.BeginTransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{
+		_, err = client.BeginTransitionWorkflow(ctx, &grpc.BeginTransitionWorkflowRequest{
 			MetadataId: args[0],
 			StateId:    args[1],
 			Retry:      cmd.Flag(flags.RetryFlag).Value.String() == "true",

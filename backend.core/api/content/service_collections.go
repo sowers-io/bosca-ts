@@ -19,6 +19,7 @@ package content
 import (
 	protobuf "bosca.io/api/protobuf/bosca"
 	grpc "bosca.io/api/protobuf/bosca/content"
+	"bosca.io/api/workflow"
 	"bosca.io/pkg/security"
 	"bosca.io/pkg/security/identity"
 	"context"
@@ -208,10 +209,10 @@ func (svc *service) GetCollectionItems(ctx context.Context, request *protobuf.Id
 	for _, item := range metadataItemIds {
 		meta, err := svc.ds.GetMetadata(ctx, item)
 		if err != nil {
-			slog.ErrorContext(ctx, "failed to get workflow", slog.String("id", request.Id), slog.String("item", item), slog.Any("error", err))
+			slog.ErrorContext(ctx, "failed to get metadata", slog.String("id", request.Id), slog.String("item", item), slog.Any("error", err))
 			return nil, err
 		}
-		if meta.WorkflowStateId != WorkflowStatePublished {
+		if meta.WorkflowStateId != workflow.StatePublished {
 			err = svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, item, grpc.PermissionAction_edit)
 			if err != nil {
 				slog.InfoContext(ctx, "edit permission check failed, not returning workflow", slog.String("id", request.Id), slog.String("item", item), slog.Any("error", err))

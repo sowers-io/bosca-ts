@@ -97,8 +97,8 @@ type SearchConfiguration struct {
 }
 
 type ClientEndpoints struct {
-	TemporalApiAddress      string `envconfig:"TEMPORAL_API_ADDRESS"`
 	ContentApiAddress       string `envconfig:"CONTENT_API_ADDRESS"`
+	WorkflowApiAddress      string `envconfig:"WORKFLOW_API_ADDRESS"`
 	AIApiAddress            string `envconfig:"AI_API_ADDRESS"`
 	ProfilesApiAddress      string `envconfig:"PROFILES_API_ADDRESS"`
 	SecurityApiAddress      string `envconfig:"SECURITY_API_ADDRESS"`

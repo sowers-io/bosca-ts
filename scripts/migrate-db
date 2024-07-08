@@ -4,4 +4,4 @@ set -e
 
 cd database/$1
 
-goose postgres "database=boscacontent host=localhost user=bosca password=bosca" $2
+goose postgres "database=bosca$1 host=localhost user=bosca password=bosca" $2

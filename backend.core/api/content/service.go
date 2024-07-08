@@ -18,10 +18,9 @@ package content
 
 import (
 	grpc "bosca.io/api/protobuf/bosca/content"
-	"bosca.io/pkg/configuration"
+	grpcWorkflow "bosca.io/api/protobuf/bosca/workflow"
 	"bosca.io/pkg/objectstore"
 	"bosca.io/pkg/security"
-	"go.temporal.io/sdk/client"
 )
 
 type service struct {
@@ -30,20 +29,23 @@ type service struct {
 	ds          *DataStore
 	objectStore objectstore.ObjectStore
 
-	serviceAccountId string
-	permissions      security.PermissionManager
-	temporalClient   client.Client
+	serviceAccountId    string
+	serviceAccountToken string
+	permissions         security.PermissionManager
+
+	workflowClient grpcWorkflow.WorkflowServiceClient
 }
 
 const RootCollectionId = "00000000-0000-0000-0000-000000000000"
 
-func NewService(cfg *configuration.ServerConfiguration, dataStore *DataStore, serviceAccountId string, objectStore objectstore.ObjectStore, permissions security.PermissionManager, temporalClient client.Client) grpc.ContentServiceServer {
-	go initializeService(cfg, dataStore)
+func NewService(dataStore *DataStore, serviceAccountId, serviceAccountToken string, objectStore objectstore.ObjectStore, permissions security.PermissionManager, workflowClient grpcWorkflow.WorkflowServiceClient) grpc.ContentServiceServer {
+	go initializeService(dataStore)
 	return &service{
-		ds:               dataStore,
-		objectStore:      objectStore,
-		serviceAccountId: serviceAccountId,
-		permissions:      permissions,
-		temporalClient:   temporalClient,
+		ds:                  dataStore,
+		objectStore:         objectStore,
+		serviceAccountId:    serviceAccountId,
+		serviceAccountToken: serviceAccountToken,
+		permissions:         permissions,
+		workflowClient:      workflowClient,
 	}
 }

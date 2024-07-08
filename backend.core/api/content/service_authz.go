@@ -63,24 +63,6 @@ func (svc *authorizationService) GetSource(ctx context.Context, request *protobu
 	return svc.service.GetSource(ctx, request)
 }
 
-func (svc *authorizationService) GetPrompts(ctx context.Context, request *protobuf.Empty) (*grpc.Prompts, error) {
-	// TODO: maybe a trait permission object?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetPrompts(ctx, request)
-}
-
-func (svc *authorizationService) GetPrompt(ctx context.Context, request *protobuf.IdRequest) (*grpc.Prompt, error) {
-	// TODO: maybe a trait permission object?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetPrompt(ctx, request)
-}
-
 func (svc *authorizationService) CheckPermission(ctx context.Context, request *grpc.PermissionCheckRequest) (*grpc.PermissionCheckResponse, error) {
 	err := svc.permissions.CheckWithSubjectIdError(ctx, request.SubjectType, request.Subject, request.ObjectType, request.Object, request.Action)
 	if err != nil {
@@ -382,115 +364,18 @@ func (svc *authorizationService) GetTrait(ctx context.Context, request *protobuf
 	return svc.service.GetTrait(ctx, request)
 }
 
-func (svc *authorizationService) GetModels(ctx context.Context, request *protobuf.Empty) (*grpc.Models, error) {
-	// TODO: permission type?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetModels(ctx, request)
-}
-
-func (svc *authorizationService) GetModel(ctx context.Context, request *protobuf.IdRequest) (*grpc.Model, error) {
-	// TODO: permission type?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetModel(ctx, request)
-}
-
-func (svc *authorizationService) GetStorageSystems(ctx context.Context, request *protobuf.Empty) (*grpc.StorageSystems, error) {
-	// TODO: permission type?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetStorageSystems(ctx, request)
-}
-
-func (svc *authorizationService) GetStorageSystem(ctx context.Context, request *protobuf.IdRequest) (*grpc.StorageSystem, error) {
-	// TODO: permission type?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetStorageSystem(ctx, request)
-}
-
-func (svc *authorizationService) GetStorageSystemModels(ctx context.Context, request *protobuf.IdRequest) (*grpc.StorageSystemModels, error) {
-	// TODO: permission type?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetStorageSystemModels(ctx, request)
-}
-
-func (svc *authorizationService) GetWorkflows(ctx context.Context, request *protobuf.Empty) (*grpc.Workflows, error) {
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetWorkflows(ctx, request)
-}
-
-func (svc *authorizationService) GetWorkflow(ctx context.Context, request *protobuf.IdRequest) (*grpc.Workflow, error) {
-	// TODO
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetWorkflow(ctx, request)
-}
-
-func (svc *authorizationService) GetWorkflowActivityInstances(ctx context.Context, request *protobuf.IdRequest) (*grpc.WorkflowActivityInstances, error) {
-	// TODO
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetWorkflowActivityInstances(ctx, request)
-}
-
-func (svc *authorizationService) GetWorkflowActivityStorageSystems(ctx context.Context, request *grpc.WorkflowActivityIdRequest) (*grpc.WorkflowActivityStorageSystems, error) {
-	// TODO: maybe a trait permission object?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetWorkflowActivityStorageSystems(ctx, request)
-}
-
-func (svc *authorizationService) GetWorkflowActivityPrompts(ctx context.Context, request *grpc.WorkflowActivityIdRequest) (*grpc.WorkflowActivityPrompts, error) {
-	// TODO: maybe a trait permission object?
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetWorkflowActivityPrompts(ctx, request)
-}
-
-func (svc *authorizationService) GetWorkflowStates(ctx context.Context, request *protobuf.Empty) (*grpc.WorkflowStates, error) {
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_workflow_state_type, "all", grpc.PermissionAction_list)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.GetWorkflowStates(ctx, request)
-}
-
-func (svc *authorizationService) BeginTransitionWorkflow(ctx context.Context, request *grpc.TransitionWorkflowRequest) (*protobuf.Empty, error) {
+func (svc *authorizationService) SetWorkflowState(ctx context.Context, request *grpc.SetWorkflowStateRequest) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.MetadataId, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
-	return svc.service.BeginTransitionWorkflow(ctx, request)
+	return svc.service.SetWorkflowState(ctx, request)
 }
 
-func (svc *authorizationService) CompleteTransitionWorkflow(ctx context.Context, request *grpc.CompleteTransitionWorkflowRequest) (*protobuf.Empty, error) {
+func (svc *authorizationService) SetWorkflowStateComplete(ctx context.Context, request *grpc.SetWorkflowStateRequest) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.MetadataId, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err
 	}
-	return svc.service.CompleteTransitionWorkflow(ctx, request)
+	return svc.service.SetWorkflowStateComplete(ctx, request)
 }

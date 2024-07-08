@@ -18,6 +18,7 @@ package content
 
 import (
 	"bosca.io/api/protobuf/bosca/content"
+	"bosca.io/api/workflow"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -126,7 +127,7 @@ func (ds *DataStore) AddMetadataTrait(ctx context.Context, id string, trait stri
 	if err != nil {
 		return nil, err
 	}
-	if metadata.WorkflowStateId != WorkflowStateDraft {
+	if metadata.WorkflowStateId != workflow.StateDraft {
 		return nil, errors.New("not in a draft state")
 	}
 	_, err = ds.db.ExecContext(ctx, "insert into metadata_traits (metadata_id, trait_id) values ($1, $2)", id, trait)

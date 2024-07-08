@@ -1,5 +1,4 @@
 import { Activity } from '../../workflow/workflow'
-import { WorkflowActivityExecutionContext } from '../../generated/protobuf/bosca/content/workflows_pb'
 import { markdownTable } from 'markdown-table'
 import { BibleMetadata, Book, Chapter, UsxItem, USXProcessor } from '@bosca/bible/lib'
 import { Downloader } from '../../util/downloader'
@@ -12,7 +11,8 @@ import {
 } from '../../generated/protobuf/bosca/content/metadata_pb'
 import { execute, toArrayBuffer } from '../../util/http'
 import { protoInt64 } from '@bufbuild/protobuf'
-import { SupplementaryIdRequest } from '../../generated/protobuf/bosca/requests_pb'
+import { IdRequest, SupplementaryIdRequest } from '../../generated/protobuf/bosca/requests_pb'
+import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/execution_context_pb'
 
 interface Verse {
   usfm: string
@@ -76,8 +76,9 @@ export class CreateVerseMarkdownTable extends Activity {
     return chapterMetadatas.metadata[0]
   }
 
-  private async createVerseTable(metadata: BibleMetadata, book: Book) {
+  private async createVerseTable(workflowId: string, metadata: BibleMetadata, book: Book) {
     const service = useServiceClient(ContentService)
+    const source = await service.getSource(new IdRequest({id: 'workflow'}))
     for (const chapter of book.chapters) {
       console.log('generating table for ' + chapter.usfm)
       const chapterMetadata = await this.findChapterMetadata(metadata, chapter)
@@ -88,7 +89,9 @@ export class CreateVerseMarkdownTable extends Activity {
         name: 'Verse Markdown Table',
         contentLength: protoInt64.parse(buffer.byteLength),
         contentType: 'text/markdown',
-        key: 'verse-table-markdown'
+        key: 'verse-table-markdown',
+        sourceId: source.id,
+        sourceIdentifier: workflowId
       }))
       const uploadUrl = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({
         id: chapterMetadata.id,
@@ -101,13 +104,13 @@ export class CreateVerseMarkdownTable extends Activity {
     }
   }
 
-  async execute(executionContext: WorkflowActivityExecutionContext): Promise<void> {
-    const file = await this.downloader.download(executionContext)
+  async execute(activity: WorkflowActivityJob): Promise<void> {
+    const file = await this.downloader.download(activity)
     try {
       const processor = new USXProcessor()
       await processor.process(file)
       for (const book of processor.books) {
-        await this.createVerseTable(processor.metadata, book)
+        await this.createVerseTable(activity.workflowId, processor.metadata, book)
       }
     } finally {
       await this.downloader.cleanup(file)

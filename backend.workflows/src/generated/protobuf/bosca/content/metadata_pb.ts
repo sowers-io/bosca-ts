@@ -230,6 +230,16 @@ export class MetadataSupplementary extends Message<MetadataSupplementary> {
    */
   traitIds: string[] = [];
 
+  /**
+   * @generated from field: optional string source_id = 8;
+   */
+  sourceId?: string;
+
+  /**
+   * @generated from field: optional string source_identifier = 9;
+   */
+  sourceIdentifier?: string;
+
   constructor(data?: PartialMessage<MetadataSupplementary>) {
     super();
     proto3.util.initPartial(data, this);
@@ -245,6 +255,8 @@ export class MetadataSupplementary extends Message<MetadataSupplementary> {
     { no: 5, name: "content_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "content_length", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 7, name: "trait_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 8, name: "source_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 9, name: "source_identifier", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MetadataSupplementary {
@@ -593,6 +605,16 @@ export class AddSupplementaryRequest extends Message<AddSupplementaryRequest> {
    */
   traitIds: string[] = [];
 
+  /**
+   * @generated from field: optional string source_id = 8;
+   */
+  sourceId?: string;
+
+  /**
+   * @generated from field: optional string source_identifier = 9;
+   */
+  sourceIdentifier?: string;
+
   constructor(data?: PartialMessage<AddSupplementaryRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -607,6 +629,8 @@ export class AddSupplementaryRequest extends Message<AddSupplementaryRequest> {
     { no: 5, name: "content_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "content_length", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 7, name: "trait_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 8, name: "source_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 9, name: "source_identifier", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddSupplementaryRequest {

@@ -1,0 +1,268 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+syntax = "proto3";
+
+option go_package = "bosca.io/api/protobuf/bosca/content";
+
+import "google/api/annotations.proto";
+import "bosca/content/collections.proto";
+import "bosca/content/metadata.proto";
+import "bosca/content/traits.proto";
+import "bosca/content/permissions.proto";
+import "bosca/content/url.proto";
+import "bosca/content/sources.proto";
+import "bosca/content/workflows.proto";
+import "bosca/empty.proto";
+import "bosca/requests.proto";
+
+package bosca.content;
+
+service ContentService {
+  rpc GetSources(bosca.Empty) returns (Sources) {
+    option (google.api.http) = {
+      get: "/v1/content/sources"
+    };
+  }
+
+  rpc GetSource(bosca.IdRequest) returns (Source) {
+    option (google.api.http) = {
+      get: "/v1/content/sources/{id}"
+    };
+  }
+
+  rpc GetTraits(bosca.Empty) returns (Traits) {
+    option (google.api.http) = {
+      get: "/v1/content/traits"
+    };
+  }
+
+  rpc GetTrait(bosca.IdRequest) returns (Trait) {
+    option (google.api.http) = {
+      get: "/v1/content/traits/{id}"
+    };
+  }
+
+  rpc GetRootCollectionItems(bosca.Empty) returns (CollectionItems) {
+    option (google.api.http) = {
+      get: "/v1/content/collections"
+    };
+  }
+
+  rpc GetCollectionItems(bosca.IdRequest) returns (CollectionItems) {
+    option (google.api.http) = {
+      get: "/v1/content/collections/{id}/items"
+    };
+  }
+
+  rpc AddCollection(AddCollectionRequest) returns (bosca.IdResponse) {
+    option (google.api.http) = {
+      post: "/v1/content/collections"
+      body: "*"
+    };
+  }
+
+  rpc AddCollections(AddCollectionsRequest) returns (bosca.IdResponses) {
+    option (google.api.http) = {
+      put: "/v1/content/collections"
+      body: "*"
+    };
+  }
+
+  rpc GetCollection(IdRequest) returns (Collection) {
+    option (google.api.http) = {
+      get: "/v1/content/collections/{id}"
+    };
+  }
+
+  rpc DeleteCollection(bosca.IdRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/collections/{id}"
+    };
+  }
+
+  rpc GetCollectionPermissions(bosca.IdRequest) returns (Permissions) {
+    option (google.api.http) = {
+      get: "/v1/content/collections/{id}/permissions"
+    };
+  }
+
+  rpc AddCollectionPermission(Permission) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/collections/{id}/permissions"
+      body: "*"
+    };
+  }
+
+  rpc AddCollectionItem(AddCollectionItemRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/collections/{collection_id}/item"
+      body: "*"
+    };
+  }
+
+  rpc CheckPermission(PermissionCheckRequest) returns (PermissionCheckResponse) {
+    option (google.api.http) = {
+      get: "/v1/content/permission/check"
+    };
+  }
+
+  rpc FindMetadata(FindMetadataRequest) returns (Metadatas) {
+    option (google.api.http) = {
+      get: "/v1/content/find/metadata"
+    };
+  }
+
+  rpc GetMetadata(bosca.IdRequest) returns (Metadata) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}"
+    };
+  }
+
+  rpc GetMetadatas(bosca.IdsRequest) returns (Metadatas) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata"
+    };
+  }
+
+  rpc AddMetadata(AddMetadataRequest) returns (IdResponse) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata"
+      body: "*"
+    };
+  }
+
+  rpc AddMetadatas(AddMetadatasRequest) returns (IdResponses) {
+    option (google.api.http) = {
+      post: "/v1/content/metadatas"
+      body: "*"
+    };
+  }
+
+  rpc AddMetadataTrait(AddMetadataTraitRequest) returns (Metadata) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{metadata_id}/traits/{trait_id}"
+    };
+  }
+
+  rpc DeleteMetadata(bosca.IdRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/metadata/{id}"
+    };
+  }
+
+  rpc GetMetadataUploadUrl(bosca.IdRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/url"
+    };
+  }
+
+  rpc GetMetadataDownloadUrl(bosca.IdRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/url"
+    };
+  }
+
+  rpc AddMetadataSupplementary(AddSupplementaryRequest) returns (MetadataSupplementary) {
+    option (google.api.http) = {
+      put: "/v1/content/metadata/{metadata_id}/supplementary/{key}"
+    };
+  }
+
+  rpc SetMetadataSupplementaryUploaded(bosca.SupplementaryIdRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/supplementary/{key}/uploaded"
+    };
+  }
+
+  rpc GetMetadataSupplementaryUploadUrl(bosca.SupplementaryIdRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/supplementary/{key}/url"
+    };
+  }
+
+  rpc GetMetadataSupplementaryDownloadUrl(bosca.SupplementaryIdRequest) returns (SignedUrl) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/supplementary/{key}/url"
+    };
+  }
+
+  rpc DeleteMetadataSupplementary(bosca.SupplementaryIdRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/metadata/{id}/supplementary/{key}"
+    };
+  }
+
+  rpc GetMetadataSupplementaries(bosca.IdRequest) returns (MetadataSupplementaries) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/supplementary"
+    };
+  }
+
+  rpc SetMetadataUploaded(bosca.IdRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/uploaded"
+    };
+  }
+
+  rpc GetMetadataPermissions(bosca.IdRequest) returns (Permissions) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/permissions"
+    };
+  }
+
+  rpc AddMetadataPermissions(Permissions) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/permissions"
+      body: "*"
+    };
+  }
+
+  rpc AddMetadataPermission(Permission) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/permission"
+      body: "*"
+    };
+  }
+
+  rpc SetWorkflowState (bosca.content.SetWorkflowStateRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{metadata_id}/workflow/{state_id}"
+      body: "*"
+    };
+  }
+
+  rpc SetWorkflowStateComplete (bosca.content.SetWorkflowStateRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{metadata_id}/workflow/{state_id}/complete"
+      body: "*"
+    };
+  }
+
+  rpc AddMetadataRelationship(MetadataRelationship) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{metadata_id1}/relationship/{metadata_id2}"
+      body: "*"
+    };
+  }
+
+  rpc GetMetadataRelationships(MetadataRelationshipIdRequest) returns (MetadataRelationships) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/relationships/{relationship}"
+      body: "*"
+    };
+  }
+}
+

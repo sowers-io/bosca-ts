@@ -1,3 +1,4 @@
+#file: noinspection YAMLSchemaValidation
 traits:
   common.text: { }
   bible.usx:
@@ -168,14 +169,18 @@ workflows:
     # metadata workflows
     metadata.process:
       activities:
-        traits.process: { }
+        traits.process:
+          executionGroup: 1
         metadata.transition.to:
+          executionGroup: 2
           configuration:
             state: draft
             status:
       queue: metadata
     # trait workflows
     traits.process:
+      activities:
+        traits.process: { }
       queue: metadata
     # bible workflows
     bible.usx:
@@ -192,6 +197,7 @@ workflows:
           outputs:
             supplementaryId: chapter-verse-table
         ai.prompt:
+          executionGroup: 2
           prompts:
             verse.labeller: { }
           models:
@@ -201,7 +207,7 @@ workflows:
           outputs:
             supplementaryId: chapter-verse-table-prompted
         ai.embeddings.pending.from-markdown-table:
-          executionGroup: 2
+          executionGroup: 3
           models:
             phi3:mini: { }
           inputs:
@@ -212,7 +218,7 @@ workflows:
             idColumn: Metadata ID
             contentColumn: Labels
         ai.embeddings.pending.index:
-          executionGroup: 3
+          executionGroup: 4
           inputs:
             supplementaryId: chapter-verse-pending-embeddings
           models:

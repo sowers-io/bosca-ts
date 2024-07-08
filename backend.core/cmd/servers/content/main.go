@@ -19,12 +19,13 @@ package main
 import (
 	"bosca.io/api/content"
 	protocontent "bosca.io/api/protobuf/bosca/content"
+	"bosca.io/api/protobuf/bosca/workflow"
+	"bosca.io/pkg/clients"
 	"bosca.io/pkg/configuration"
 	"bosca.io/pkg/datastore"
 	"bosca.io/pkg/objectstore/factory"
 	"bosca.io/pkg/security/spicedb"
 	"bosca.io/pkg/server"
-	"bosca.io/pkg/temporal"
 	"bosca.io/pkg/util"
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -54,13 +55,14 @@ func main() {
 	ds := content.NewDataStore(stdlib.OpenDBFromPool(pool))
 	permissions := spicedb.NewPermissionManager(spicedb.NewSpiceDBClient(cfg))
 
-	temporalClient, err := temporal.NewClient(context.Background(), cfg.ClientEndPoints)
+	workflowConnection, err := clients.NewClientConnection(cfg.ClientEndPoints.WorkflowApiAddress)
 	if err != nil {
-		slog.Error("failed to create temporal client", slog.Any("error", err))
+		slog.Error("failed to get content connection", slog.Any("error", err))
 		os.Exit(1)
 	}
+	workflowClient := workflow.NewWorkflowServiceClient(workflowConnection)
 
-	svc := content.NewAuthorizationService(permissions, ds, content.NewService(cfg, ds, cfg.Security.ServiceAccountId, objectStore, permissions, temporalClient))
+	svc := content.NewAuthorizationService(permissions, ds, content.NewService(ds, cfg.Security.ServiceAccountId, cfg.Security.ServiceAccountToken, objectStore, permissions, workflowClient))
 	err = server.StartServer(cfg, func(ctx context.Context, grpcSvr *grpc.Server, restSvr *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
 		protocontent.RegisterContentServiceServer(grpcSvr, svc)
 		err := protocontent.RegisterContentServiceHandlerFromEndpoint(ctx, restSvr, endpoint, opts)

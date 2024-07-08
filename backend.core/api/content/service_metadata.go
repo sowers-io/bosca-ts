@@ -17,13 +17,17 @@
 package content
 
 import (
+	"bosca.io/api/graphql/common"
 	protobuf "bosca.io/api/protobuf/bosca"
 	grpc "bosca.io/api/protobuf/bosca/content"
+	workflow2 "bosca.io/api/protobuf/bosca/workflow"
+	"bosca.io/api/workflow"
 	"bosca.io/pkg/security"
 	"bosca.io/pkg/security/identity"
 	"context"
 	"errors"
 	"fmt"
+	opts "google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log/slog"
@@ -117,7 +121,9 @@ func (svc *service) addMetadata(ctx context.Context, userId string, request *grp
 		}
 	}
 	if request.Metadata.SourceIdentifier != nil && *request.Metadata.SourceIdentifier != "" {
-		_, err := svc.BeginTransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: id, StateId: WorkflowStateProcessing})
+		_, err := svc.workflowClient.BeginTransitionWorkflow(ctx, &workflow2.BeginTransitionWorkflowRequest{MetadataId: id, StateId: workflow.StateProcessing}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+			HeaderValue: "Token " + svc.serviceAccountToken,
+		}})
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to process workflow", slog.String("id", id), slog.Any("error", err))
 			return nil, nil, err
@@ -216,7 +222,7 @@ func (svc *service) GetMetadataUploadUrl(ctx context.Context, request *protobuf.
 	if metadata.ContentLength == nil || *metadata.ContentLength <= 0 {
 		return nil, errors.New("invalid content length")
 	}
-	if metadata.WorkflowStateId != WorkflowStatePending {
+	if metadata.WorkflowStateId != workflow.StatePending {
 		return nil, errors.New("invalid workflow state")
 	}
 	return svc.objectStore.CreateUploadUrl(ctx, metadata.Id, metadata.Name, metadata.ContentType, *metadata.ContentLength, nil)
@@ -227,7 +233,9 @@ func (svc *service) AddMetadataTrait(ctx context.Context, request *grpc.AddMetad
 	if err != nil {
 		return nil, err
 	}
-	_, err = svc.BeginTransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: request.MetadataId, Status: fmt.Sprintf("adding trait: %s", request.TraitId), StateId: WorkflowStateProcessing})
+	_, err = svc.workflowClient.BeginTransitionWorkflow(ctx, &workflow2.BeginTransitionWorkflowRequest{MetadataId: request.MetadataId, Status: fmt.Sprintf("adding trait: %s", request.TraitId), StateId: workflow.StateProcessing}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+		HeaderValue: "Token " + svc.serviceAccountToken,
+	}})
 	if err != nil {
 		return nil, err
 	}
@@ -295,5 +303,7 @@ func (svc *service) GetMetadataDownloadUrl(ctx context.Context, request *protobu
 }
 
 func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	return svc.BeginTransitionWorkflow(ctx, &grpc.TransitionWorkflowRequest{MetadataId: request.Id, StateId: WorkflowStateProcessing})
+	return svc.workflowClient.BeginTransitionWorkflow(ctx, &workflow2.BeginTransitionWorkflowRequest{MetadataId: request.Id, StateId: workflow.StateProcessing}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+		HeaderValue: "Token " + svc.serviceAccountToken,
+	}})
 }

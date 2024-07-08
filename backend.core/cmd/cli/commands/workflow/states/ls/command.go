@@ -32,7 +32,7 @@ var Command = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var err error
 
-		client, err := cli.NewContentClient(cmd)
+		client, err := cli.NewWorkflowClient(cmd)
 		if err != nil {
 			return err
 		}

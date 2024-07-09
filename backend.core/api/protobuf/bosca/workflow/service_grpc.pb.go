@@ -51,7 +51,9 @@ const (
 	WorkflowService_GetWorkflowActivityPrompts_FullMethodName        = "/bosca.workflow.WorkflowService/GetWorkflowActivityPrompts"
 	WorkflowService_BeginTransitionWorkflow_FullMethodName           = "/bosca.workflow.WorkflowService/BeginTransitionWorkflow"
 	WorkflowService_CompleteTransitionWorkflow_FullMethodName        = "/bosca.workflow.WorkflowService/CompleteTransitionWorkflow"
+	WorkflowService_ExecuteWorkflow_FullMethodName                   = "/bosca.workflow.WorkflowService/ExecuteWorkflow"
 	WorkflowService_GetWorkflowActivityJobs_FullMethodName           = "/bosca.workflow.WorkflowService/GetWorkflowActivityJobs"
+	WorkflowService_SetWorkflowActivityJobStatus_FullMethodName      = "/bosca.workflow.WorkflowService/SetWorkflowActivityJobStatus"
 )
 
 // WorkflowServiceClient is the client API for WorkflowService service.
@@ -74,7 +76,9 @@ type WorkflowServiceClient interface {
 	GetWorkflowActivityPrompts(ctx context.Context, in *WorkflowActivityIdRequest, opts ...grpc.CallOption) (*WorkflowActivityPrompts, error)
 	BeginTransitionWorkflow(ctx context.Context, in *BeginTransitionWorkflowRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	CompleteTransitionWorkflow(ctx context.Context, in *CompleteTransitionWorkflowRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	ExecuteWorkflow(ctx context.Context, in *WorkflowExecutionRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetWorkflowActivityJobs(ctx context.Context, in *WorkflowActivityJobRequest, opts ...grpc.CallOption) (WorkflowService_GetWorkflowActivityJobsClient, error)
+	SetWorkflowActivityJobStatus(ctx context.Context, in *WorkflowActivityJobStatus, opts ...grpc.CallOption) (*bosca.Empty, error)
 }
 
 type workflowServiceClient struct {
@@ -245,6 +249,16 @@ func (c *workflowServiceClient) CompleteTransitionWorkflow(ctx context.Context, 
 	return out, nil
 }
 
+func (c *workflowServiceClient) ExecuteWorkflow(ctx context.Context, in *WorkflowExecutionRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, WorkflowService_ExecuteWorkflow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workflowServiceClient) GetWorkflowActivityJobs(ctx context.Context, in *WorkflowActivityJobRequest, opts ...grpc.CallOption) (WorkflowService_GetWorkflowActivityJobsClient, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &WorkflowService_ServiceDesc.Streams[0], WorkflowService_GetWorkflowActivityJobs_FullMethodName, cOpts...)
@@ -278,6 +292,16 @@ func (x *workflowServiceGetWorkflowActivityJobsClient) Recv() (*WorkflowActivity
 	return m, nil
 }
 
+func (c *workflowServiceClient) SetWorkflowActivityJobStatus(ctx context.Context, in *WorkflowActivityJobStatus, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, WorkflowService_SetWorkflowActivityJobStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkflowServiceServer is the server API for WorkflowService service.
 // All implementations must embed UnimplementedWorkflowServiceServer
 // for forward compatibility
@@ -298,7 +322,9 @@ type WorkflowServiceServer interface {
 	GetWorkflowActivityPrompts(context.Context, *WorkflowActivityIdRequest) (*WorkflowActivityPrompts, error)
 	BeginTransitionWorkflow(context.Context, *BeginTransitionWorkflowRequest) (*bosca.Empty, error)
 	CompleteTransitionWorkflow(context.Context, *CompleteTransitionWorkflowRequest) (*bosca.Empty, error)
+	ExecuteWorkflow(context.Context, *WorkflowExecutionRequest) (*bosca.Empty, error)
 	GetWorkflowActivityJobs(*WorkflowActivityJobRequest, WorkflowService_GetWorkflowActivityJobsServer) error
+	SetWorkflowActivityJobStatus(context.Context, *WorkflowActivityJobStatus) (*bosca.Empty, error)
 	mustEmbedUnimplementedWorkflowServiceServer()
 }
 
@@ -354,8 +380,14 @@ func (UnimplementedWorkflowServiceServer) BeginTransitionWorkflow(context.Contex
 func (UnimplementedWorkflowServiceServer) CompleteTransitionWorkflow(context.Context, *CompleteTransitionWorkflowRequest) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CompleteTransitionWorkflow not implemented")
 }
+func (UnimplementedWorkflowServiceServer) ExecuteWorkflow(context.Context, *WorkflowExecutionRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExecuteWorkflow not implemented")
+}
 func (UnimplementedWorkflowServiceServer) GetWorkflowActivityJobs(*WorkflowActivityJobRequest, WorkflowService_GetWorkflowActivityJobsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetWorkflowActivityJobs not implemented")
+}
+func (UnimplementedWorkflowServiceServer) SetWorkflowActivityJobStatus(context.Context, *WorkflowActivityJobStatus) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetWorkflowActivityJobStatus not implemented")
 }
 func (UnimplementedWorkflowServiceServer) mustEmbedUnimplementedWorkflowServiceServer() {}
 
@@ -658,6 +690,24 @@ func _WorkflowService_CompleteTransitionWorkflow_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkflowService_ExecuteWorkflow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorkflowExecutionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).ExecuteWorkflow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_ExecuteWorkflow_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).ExecuteWorkflow(ctx, req.(*WorkflowExecutionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkflowService_GetWorkflowActivityJobs_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(WorkflowActivityJobRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -677,6 +727,24 @@ type workflowServiceGetWorkflowActivityJobsServer struct {
 
 func (x *workflowServiceGetWorkflowActivityJobsServer) Send(m *WorkflowActivityJob) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func _WorkflowService_SetWorkflowActivityJobStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorkflowActivityJobStatus)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).SetWorkflowActivityJobStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_SetWorkflowActivityJobStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).SetWorkflowActivityJobStatus(ctx, req.(*WorkflowActivityJobStatus))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 // WorkflowService_ServiceDesc is the grpc.ServiceDesc for WorkflowService service.
@@ -749,6 +817,14 @@ var WorkflowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CompleteTransitionWorkflow",
 			Handler:    _WorkflowService_CompleteTransitionWorkflow_Handler,
+		},
+		{
+			MethodName: "ExecuteWorkflow",
+			Handler:    _WorkflowService_ExecuteWorkflow_Handler,
+		},
+		{
+			MethodName: "SetWorkflowActivityJobStatus",
+			Handler:    _WorkflowService_SetWorkflowActivityJobStatus_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

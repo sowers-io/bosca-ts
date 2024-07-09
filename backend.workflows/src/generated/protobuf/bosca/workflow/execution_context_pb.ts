@@ -19,8 +19,63 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
+import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 import { WorkflowActivity, WorkflowActivityModel, WorkflowActivityPrompt, WorkflowActivityStorageSystem } from "./activities_pb";
+
+/**
+ * @generated from message bosca.workflow.WorkflowExecutionRequest
+ */
+export class WorkflowExecutionRequest extends Message<WorkflowExecutionRequest> {
+  /**
+   * @generated from field: string workflow_id = 1;
+   */
+  workflowId = "";
+
+  /**
+   * @generated from field: string metadata_id = 2;
+   */
+  metadataId = "";
+
+  /**
+   * @generated from field: bool wait_for_completion = 3;
+   */
+  waitForCompletion = false;
+
+  /**
+   * @generated from field: map<string, string> context = 4;
+   */
+  context: { [key: string]: string } = {};
+
+  constructor(data?: PartialMessage<WorkflowExecutionRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.workflow.WorkflowExecutionRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "wait_for_completion", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionRequest {
+    return new WorkflowExecutionRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowExecutionRequest {
+    return new WorkflowExecutionRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowExecutionRequest {
+    return new WorkflowExecutionRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkflowExecutionRequest | PlainMessage<WorkflowExecutionRequest> | undefined, b: WorkflowExecutionRequest | PlainMessage<WorkflowExecutionRequest> | undefined): boolean {
+    return proto3.util.equals(WorkflowExecutionRequest, a, b);
+  }
+}
 
 /**
  * @generated from message bosca.workflow.WorkflowExecutionContext
@@ -37,9 +92,9 @@ export class WorkflowExecutionContext extends Message<WorkflowExecutionContext> 
   executionId = "";
 
   /**
-   * @generated from field: repeated bosca.workflow.WorkflowActivityJob jobs = 3;
+   * @generated from field: repeated bosca.workflow.WorkflowActivity activities = 3;
    */
-  jobs: WorkflowActivityJob[] = [];
+  activities: WorkflowActivity[] = [];
 
   /**
    * @generated from field: int32 current_execution_group = 4;
@@ -51,6 +106,11 @@ export class WorkflowExecutionContext extends Message<WorkflowExecutionContext> 
    */
   metadataId = "";
 
+  /**
+   * @generated from field: map<string, string> context = 6;
+   */
+  context: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<WorkflowExecutionContext>) {
     super();
     proto3.util.initPartial(data, this);
@@ -61,9 +121,10 @@ export class WorkflowExecutionContext extends Message<WorkflowExecutionContext> 
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "execution_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "jobs", kind: "message", T: WorkflowActivityJob, repeated: true },
+    { no: 3, name: "activities", kind: "message", T: WorkflowActivity, repeated: true },
     { no: 4, name: "current_execution_group", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionContext {
@@ -88,34 +149,64 @@ export class WorkflowExecutionContext extends Message<WorkflowExecutionContext> 
  */
 export class WorkflowActivityJob extends Message<WorkflowActivityJob> {
   /**
-   * @generated from field: string workflow_id = 1;
+   * @generated from field: string job_id = 1;
+   */
+  jobId = "";
+
+  /**
+   * @generated from field: string execution_id = 2;
+   */
+  executionId = "";
+
+  /**
+   * @generated from field: string workflow_id = 3;
    */
   workflowId = "";
 
   /**
-   * @generated from field: string metadata_id = 2;
+   * @generated from field: string metadata_id = 4;
    */
   metadataId = "";
 
   /**
-   * @generated from field: bosca.workflow.WorkflowActivity activity = 3;
+   * @generated from field: bosca.workflow.WorkflowActivity activity = 5;
    */
   activity?: WorkflowActivity;
 
   /**
-   * @generated from field: repeated bosca.workflow.WorkflowActivityPrompt prompts = 4;
+   * @generated from field: repeated bosca.workflow.WorkflowActivityPrompt prompts = 6;
    */
   prompts: WorkflowActivityPrompt[] = [];
 
   /**
-   * @generated from field: repeated bosca.workflow.WorkflowActivityStorageSystem storage_systems = 5;
+   * @generated from field: repeated bosca.workflow.WorkflowActivityStorageSystem storage_systems = 7;
    */
   storageSystems: WorkflowActivityStorageSystem[] = [];
 
   /**
-   * @generated from field: repeated bosca.workflow.WorkflowActivityModel models = 6;
+   * @generated from field: repeated bosca.workflow.WorkflowActivityModel models = 8;
    */
   models: WorkflowActivityModel[] = [];
+
+  /**
+   * @generated from field: map<string, string> context = 9;
+   */
+  context: { [key: string]: string } = {};
+
+  /**
+   * @generated from field: bool complete = 10;
+   */
+  complete = false;
+
+  /**
+   * @generated from field: bool success = 11;
+   */
+  success = false;
+
+  /**
+   * @generated from field: optional string error = 12;
+   */
+  error?: string;
 
   constructor(data?: PartialMessage<WorkflowActivityJob>) {
     super();
@@ -125,12 +216,18 @@ export class WorkflowActivityJob extends Message<WorkflowActivityJob> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "bosca.workflow.WorkflowActivityJob";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "activity", kind: "message", T: WorkflowActivity },
-    { no: 4, name: "prompts", kind: "message", T: WorkflowActivityPrompt, repeated: true },
-    { no: 5, name: "storage_systems", kind: "message", T: WorkflowActivityStorageSystem, repeated: true },
-    { no: 6, name: "models", kind: "message", T: WorkflowActivityModel, repeated: true },
+    { no: 1, name: "job_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "execution_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "activity", kind: "message", T: WorkflowActivity },
+    { no: 6, name: "prompts", kind: "message", T: WorkflowActivityPrompt, repeated: true },
+    { no: 7, name: "storage_systems", kind: "message", T: WorkflowActivityStorageSystem, repeated: true },
+    { no: 8, name: "models", kind: "message", T: WorkflowActivityModel, repeated: true },
+    { no: 9, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 10, name: "complete", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 11, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 12, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowActivityJob {
@@ -190,6 +287,67 @@ export class WorkflowActivityJobRequest extends Message<WorkflowActivityJobReque
 
   static equals(a: WorkflowActivityJobRequest | PlainMessage<WorkflowActivityJobRequest> | undefined, b: WorkflowActivityJobRequest | PlainMessage<WorkflowActivityJobRequest> | undefined): boolean {
     return proto3.util.equals(WorkflowActivityJobRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message bosca.workflow.WorkflowActivityJobStatus
+ */
+export class WorkflowActivityJobStatus extends Message<WorkflowActivityJobStatus> {
+  /**
+   * @generated from field: string execution_id = 1;
+   */
+  executionId = "";
+
+  /**
+   * @generated from field: int64 workflow_activity_id = 2;
+   */
+  workflowActivityId = protoInt64.zero;
+
+  /**
+   * @generated from field: bool complete = 3;
+   */
+  complete = false;
+
+  /**
+   * @generated from field: bool success = 4;
+   */
+  success = false;
+
+  /**
+   * @generated from field: optional string error = 5;
+   */
+  error?: string;
+
+  constructor(data?: PartialMessage<WorkflowActivityJobStatus>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.workflow.WorkflowActivityJobStatus";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "execution_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "workflow_activity_id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 3, name: "complete", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowActivityJobStatus {
+    return new WorkflowActivityJobStatus().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowActivityJobStatus {
+    return new WorkflowActivityJobStatus().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowActivityJobStatus {
+    return new WorkflowActivityJobStatus().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkflowActivityJobStatus | PlainMessage<WorkflowActivityJobStatus> | undefined, b: WorkflowActivityJobStatus | PlainMessage<WorkflowActivityJobStatus> | undefined): boolean {
+    return proto3.util.equals(WorkflowActivityJobStatus, a, b);
   }
 }
 

@@ -3,6 +3,7 @@
     <toRun name="Content Service" type="GoApplicationRunConfiguration" />
     <toRun name="Uploader Service" type="GoApplicationRunConfiguration" />
     <toRun name="Workflow Service" type="GoApplicationRunConfiguration" />
+    <toRun name="Workflow Workers" type="js.build_tools.npm" />
     <method v="2" />
   </configuration>
 </component>

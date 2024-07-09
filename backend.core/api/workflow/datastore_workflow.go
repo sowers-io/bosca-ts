@@ -86,136 +86,142 @@ func getWorkflowActivityParameterValue(inputs *sql.Rows) (string, *workflow.Work
 	return name, input, nil
 }
 
+func (ds *DataStore) getWorkflowActivity(ctx context.Context, rows *sql.Rows) (*workflow.WorkflowActivity, error) {
+	activity := &workflow.WorkflowActivity{
+		Inputs:  make(map[string]*workflow.WorkflowActivityParameterValue),
+		Outputs: make(map[string]*workflow.WorkflowActivityParameterValue),
+	}
+
+	var configuration json.RawMessage
+	err := rows.Scan(&activity.WorkflowActivityId, &activity.ActivityId, &activity.ChildWorkflowId, &activity.ExecutionGroup, &configuration, &activity.Queue)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(configuration, &activity.Configuration)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: prepared statements
+	inputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_inputs where activity_id = $1", activity.WorkflowActivityId)
+	if err != nil {
+		return nil, err
+	}
+	for inputs.Next() {
+		name, input, err := getWorkflowActivityParameterValue(inputs)
+		if err != nil {
+			inputs.Close()
+			return nil, err
+		}
+		activity.Inputs[name] = input
+	}
+	inputs.Close()
+
+	outputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_outputs where activity_id = $1", activity.WorkflowActivityId)
+	if err != nil {
+		return nil, err
+	}
+	for outputs.Next() {
+		name, output, err := getWorkflowActivityParameterValue(outputs)
+		if err != nil {
+			outputs.Close()
+			return nil, err
+		}
+		activity.Outputs[name] = output
+	}
+	outputs.Close()
+	return activity, nil
+}
+
+func (ds *DataStore) GetWorkflowActivity(ctx context.Context, id int64) (*workflow.WorkflowActivity, error) {
+	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration, w.queue FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) inner join workflows w on (wa.workflow_id = w.id) WHERE wa.id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	if rows.Next() {
+		return ds.getWorkflowActivity(ctx, rows)
+	}
+	return nil, nil
+}
+
 func (ds *DataStore) GetWorkflowActivities(ctx context.Context, workflowId string) ([]*workflow.WorkflowActivity, error) {
-	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) WHERE workflow_id = $1", workflowId)
+	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration, w.queue FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) inner join workflows w on (wa.workflow_id = w.id) WHERE workflow_id = $1", workflowId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	activities := make([]*workflow.WorkflowActivity, 0)
 	for rows.Next() {
-		activity := &workflow.WorkflowActivity{
-			Inputs:  make(map[string]*workflow.WorkflowActivityParameterValue),
-			Outputs: make(map[string]*workflow.WorkflowActivityParameterValue),
-		}
-
-		var configuration json.RawMessage
-		err = rows.Scan(&activity.WorkflowActivityId, &activity.ActivityId, &activity.ChildWorkflowId, &activity.ExecutionGroup, &configuration)
+		activity, err := ds.getWorkflowActivity(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
-		err = json.Unmarshal(configuration, &activity.Configuration)
-		if err != nil {
-			return nil, err
-		}
-
-		inputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_inputs where activity_id = $1", activity.ActivityId)
-		if err != nil {
-			return nil, err
-		}
-		for inputs.Next() {
-			name, input, err := getWorkflowActivityParameterValue(inputs)
-			if err != nil {
-				inputs.Close()
-				return nil, err
-			}
-			activity.Inputs[name] = input
-		}
-		inputs.Close()
-
-		outputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_outputs where activity_id = $1", activity.ActivityId)
-		if err != nil {
-			return nil, err
-		}
-		for outputs.Next() {
-			name, output, err := getWorkflowActivityParameterValue(outputs)
-			if err != nil {
-				outputs.Close()
-				return nil, err
-			}
-			activity.Outputs[name] = output
-		}
-		outputs.Close()
-
 		activities = append(activities, activity)
 	}
 	return activities, nil
 }
 
-func (ds *DataStore) GetWorkflowActivityJobs(ctx context.Context, workflowId string) ([]*workflow.WorkflowActivityJob, error) {
-	wf, err := ds.GetWorkflow(ctx, workflowId)
+func (ds *DataStore) getNewWorkflowActivityJobFromRow(ctx context.Context, rows *sql.Rows, queue string) (*workflow.WorkflowActivityJob, error) {
+	job := &workflow.WorkflowActivityJob{}
+	activity := &workflow.WorkflowActivity{
+		Inputs:  make(map[string]*workflow.WorkflowActivityParameterValue),
+		Outputs: make(map[string]*workflow.WorkflowActivityParameterValue),
+		Queue:   queue,
+	}
+	job.Activity = activity
+
+	var configuration json.RawMessage
+	err := rows.Scan(&activity.WorkflowActivityId, &activity.ActivityId, &activity.ChildWorkflowId, &activity.ExecutionGroup, &configuration)
 	if err != nil {
 		return nil, err
 	}
-	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) WHERE workflow_id = $1 order by wa.execution_group asc", workflowId)
+	err = json.Unmarshal(configuration, &activity.Configuration)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	jobs := make([]*workflow.WorkflowActivityJob, 0)
-	for rows.Next() {
-		job := &workflow.WorkflowActivityJob{}
-		activity := &workflow.WorkflowActivity{
-			Inputs:  make(map[string]*workflow.WorkflowActivityParameterValue),
-			Outputs: make(map[string]*workflow.WorkflowActivityParameterValue),
-			Queue:   wf.Queue,
-		}
-		job.Activity = activity
 
-		var configuration json.RawMessage
-		err = rows.Scan(&activity.WorkflowActivityId, &activity.ActivityId, &activity.ChildWorkflowId, &activity.ExecutionGroup, &configuration)
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(configuration, &activity.Configuration)
-		if err != nil {
-			return nil, err
-		}
-
-		inputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_inputs where activity_id = $1", activity.WorkflowActivityId)
-		if err != nil {
-			return nil, err
-		}
-		for inputs.Next() {
-			name, input, err := getWorkflowActivityParameterValue(inputs)
-			if err != nil {
-				inputs.Close()
-				return nil, err
-			}
-			activity.Inputs[name] = input
-		}
-		inputs.Close()
-
-		outputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_outputs where activity_id = $1", activity.WorkflowActivityId)
-		if err != nil {
-			return nil, err
-		}
-		for outputs.Next() {
-			name, output, err := getWorkflowActivityParameterValue(outputs)
-			if err != nil {
-				outputs.Close()
-				return nil, err
-			}
-			activity.Outputs[name] = output
-		}
-		outputs.Close()
-
-		job.Prompts, err = ds.GetWorkflowActivityPrompts(ctx, activity.WorkflowActivityId)
-		if err != nil {
-			return nil, err
-		}
-		job.StorageSystems, err = ds.GetWorkflowActivityStorageSystems(ctx, activity.WorkflowActivityId)
-		if err != nil {
-			return nil, err
-		}
-		job.Models, err = ds.GetWorkflowActivityModels(ctx, activity.WorkflowActivityId)
-		if err != nil {
-			return nil, err
-		}
-
-		jobs = append(jobs, job)
+	inputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_inputs where activity_id = $1", activity.WorkflowActivityId)
+	if err != nil {
+		return nil, err
 	}
-	return jobs, nil
+	for inputs.Next() {
+		name, input, err := getWorkflowActivityParameterValue(inputs)
+		if err != nil {
+			inputs.Close()
+			return nil, err
+		}
+		activity.Inputs[name] = input
+	}
+	inputs.Close()
+
+	outputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_outputs where activity_id = $1", activity.WorkflowActivityId)
+	if err != nil {
+		return nil, err
+	}
+	for outputs.Next() {
+		name, output, err := getWorkflowActivityParameterValue(outputs)
+		if err != nil {
+			outputs.Close()
+			return nil, err
+		}
+		activity.Outputs[name] = output
+	}
+	outputs.Close()
+
+	job.Prompts, err = ds.GetWorkflowActivityPrompts(ctx, activity.WorkflowActivityId)
+	if err != nil {
+		return nil, err
+	}
+	job.StorageSystems, err = ds.GetWorkflowActivityStorageSystems(ctx, activity.WorkflowActivityId)
+	if err != nil {
+		return nil, err
+	}
+	job.Models, err = ds.GetWorkflowActivityModels(ctx, activity.WorkflowActivityId)
+	if err != nil {
+		return nil, err
+	}
+	return job, nil
 }
 
 func (ds *DataStore) GetWorkflows(ctx context.Context) ([]*workflow.Workflow, error) {
@@ -481,40 +487,74 @@ func (ds *DataStore) AddWorkflowExecution(ctx context.Context, txn *sql.Tx, work
 	return "", errors.New("adding execution failed")
 }
 
+func (ds *DataStore) IsWorkflowExecutionGroupComplete(ctx context.Context, txn *sql.Tx, executionId string) (bool, error) {
+	result, err := txn.QueryContext(ctx, "select case when failed is not null then null else completed end from workflow_execution_jobs where workflow_execution_id = $1::uuid", executionId)
+	if err != nil {
+		return false, err
+	}
+	defer result.Close()
+	for result.Next() {
+		completed := false
+		err = result.Scan(&completed)
+		if err != nil {
+			return false, err
+		}
+		if !completed {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func (ds *DataStore) SetWorkflowExecutionJobStatus(ctx context.Context, queue, executionId, jobId string, success bool, complete bool, errorStr *string) error {
+	if complete {
+		if success {
+			_, err := ds.db.ExecContext(ctx, "update workflow_execution_jobs set failed = null, completed = now(), error = null where id = $1::uuid", jobId)
+			if err != nil {
+				return err
+			}
+			return nil
+		} else {
+			_, err := ds.db.ExecContext(ctx, "update workflow_execution_jobs set failed = now(), completed = now(), error = $1 where id = $1::uuid", errorStr, jobId)
+			if err != nil {
+				return err
+			}
+			_, err = ds.db.ExecContext(ctx, "update workflow_executions set completed = now(), failed = now(), error = $1 where id = $1::uuid", errorStr, executionId)
+			if err != nil {
+				return err
+			}
+			if errorStr != nil {
+				err = errors.New(*errorStr)
+			}
+			return ds.NotifyExecutionFailed(ctx, []string{queue}, executionId, err)
+		}
+	} else if !success {
+		_, err := ds.db.ExecContext(ctx, "update workflow_execution_jobs set failed = now(), completed = null, error = $1, worker_id = null where id = $1::uuid", errorStr, jobId)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return nil
+}
+
 func (ds *DataStore) AddWorkflowExecutionJob(ctx context.Context, txn *sql.Tx, executionContext *workflow.WorkflowExecutionContext, activity *workflow.WorkflowActivity) error {
 	scheduled := time.Now()
-	_, err := txn.QueryContext(ctx, "insert into workflow_execution_jobs (workflow_execution_id, workflow_activity_id, activity_id, queue, scheduled) values ($1::uuid, $2, $3, $4, $5)", executionContext.ExecutionId, activity.WorkflowActivityId, activity.ActivityId, activity.Queue, scheduled)
+	executionContextContext, err := json.Marshal(executionContext.Context)
+	if err != nil {
+		return err
+	}
+	_, err = txn.QueryContext(ctx, "insert into workflow_execution_jobs (workflow_execution_id, workflow_activity_id, activity_id, queue, scheduled, context) values ($1::uuid, $2, $3, $4, $5, $6::jsonb)", executionContext.ExecutionId, activity.WorkflowActivityId, activity.ActivityId, activity.Queue, scheduled, executionContextContext)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ds *DataStore) CreateWorkflowExecutionGroups(executionContext *workflow.WorkflowExecutionContext) [][]*workflow.WorkflowActivity {
-	executionGroups := make([][]*workflow.WorkflowActivity, 0, len(executionContext.Jobs))
-	executionGroupIndex := int32(0)
-	executionGroup := make([]*workflow.WorkflowActivity, 0, 1)
-	for _, job := range executionContext.Jobs {
-		activity := job.Activity
-		if activity.ExecutionGroup != executionGroupIndex {
-			executionGroupIndex = activity.ExecutionGroup
-			if len(executionGroup) > 0 {
-				executionGroups = append(executionGroups, executionGroup)
-				executionGroup = make([]*workflow.WorkflowActivity, 0, 1)
-			}
-		}
-		executionGroup = append(executionGroup, activity)
-	}
-	if len(executionGroup) > 0 {
-		executionGroups = append(executionGroups, executionGroup)
-	}
-	return executionGroups
-}
-
-func (ds *DataStore) ExecuteWorkflow(ctx context.Context, txn *sql.Tx, executionId string) error {
-	result, err := txn.QueryContext(ctx, "select context from workflow_executions where id = $1::uuid", executionId)
+func (ds *DataStore) GetWorkflowExecutionContextForUpdate(ctx context.Context, txn *sql.Tx, executionId string) (*workflow.WorkflowExecutionContext, error) {
+	result, err := txn.QueryContext(ctx, "select context from workflow_executions where id = $1::uuid for update", executionId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var executionContextJson json.RawMessage
@@ -522,47 +562,57 @@ func (ds *DataStore) ExecuteWorkflow(ctx context.Context, txn *sql.Tx, execution
 		err = result.Scan(&executionContextJson)
 		if err != nil {
 			result.Close()
-			return err
+			return nil, err
 		}
 	} else {
 		result.Close()
-		return errors.New("missing execution workflow")
+		return nil, errors.New("missing execution workflow")
 	}
 	result.Close()
 
 	executionContext := &workflow.WorkflowExecutionContext{}
 	err = json.Unmarshal(executionContextJson, &executionContext)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	executionContext.ExecutionId = executionId
+	return executionContext, nil
+}
 
-	groups := ds.CreateWorkflowExecutionGroups(executionContext)
+func (ds *DataStore) QueueNextWorkflowJobs(ctx context.Context, txn *sql.Tx, executionContext *workflow.WorkflowExecutionContext) (bool, []string, error) {
+	groups := calculateWorkflowExecutionGroups(executionContext)
 	executionContext.CurrentExecutionGroup++
 
-	executionContextJson, err = json.Marshal(executionContext)
-	if err != nil {
-		return err
-	}
-
 	if int(executionContext.CurrentExecutionGroup) >= len(groups) {
-		_, err = txn.ExecContext(ctx, "update workflow_executions set context = $1::jsonb, completed = now() where id = $2", executionContextJson, executionId)
+		_, err := txn.ExecContext(ctx, "update workflow_executions set completed = now() where id = $1", executionContext.ExecutionId)
 		if err != nil {
-			return err
+			return false, nil, err
 		}
+		return true, nil, nil
 	} else {
-		_, err = txn.ExecContext(ctx, "update workflow_executions set context = $1::jsonb where id = $2::uuid", executionContextJson, executionId)
+		executionContextJson, err := json.Marshal(executionContext)
 		if err != nil {
-			return err
+			return false, nil, err
+		}
+
+		_, err = txn.ExecContext(ctx, "update workflow_executions set context = $1::jsonb where id = $2::uuid", executionContextJson, executionContext.ExecutionId)
+		if err != nil {
+			return false, nil, err
 		}
 
 		activities := groups[executionContext.CurrentExecutionGroup]
-		for _, activity := range activities {
-			err = ds.AddWorkflowExecutionJob(ctx, txn, executionContext, activity)
-			if err != nil {
-				return err
+		queues := make([]string, 0)
+		if len(activities) == 0 {
+			return false, nil, errors.New("empty activities in execution group")
+		} else {
+			for _, activity := range activities {
+				err = ds.AddWorkflowExecutionJob(ctx, txn, executionContext, activity)
+				if err != nil {
+					return false, nil, err
+				}
+				queues = append(queues, activity.Queue)
 			}
 		}
+		return false, queues, nil
 	}
-	return nil
 }

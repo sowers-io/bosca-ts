@@ -1,9 +1,8 @@
-import { Activity } from '../../workflow/workflow'
-import { markdownTable } from 'markdown-table'
+import { Activity } from '../activity'
 import { BibleMetadata, Book, Chapter, UsxItem, USXProcessor } from '@bosca/bible/lib'
 import { Downloader } from '../../util/downloader'
 import { useServiceClient } from '../../util/util'
-import { ContentService } from '../../generated/protobuf/bosca/content/content_connect'
+import { ContentService } from '../../generated/protobuf/bosca/content/service_connect'
 import {
   AddSupplementaryRequest,
   FindMetadataRequest,
@@ -34,7 +33,7 @@ export class CreateVerseMarkdownTable extends Activity {
     return 'bible.verse.markdown.table'
   }
 
-  private buildVerseMarkdownTable(chapter: Chapter) {
+  private async buildVerseMarkdownTable(chapter: Chapter) {
     const table = [
       ['USFM', 'Verse']
     ]
@@ -60,6 +59,7 @@ export class CreateVerseMarkdownTable extends Activity {
         verse.items.map((item) => item.toString().trim().replace('\r|\n', '')).join(' ')
       ])
     }
+    const { markdownTable } = await import('markdown-table');
     return markdownTable(table)
   }
 
@@ -82,7 +82,7 @@ export class CreateVerseMarkdownTable extends Activity {
     for (const chapter of book.chapters) {
       console.log('generating table for ' + chapter.usfm)
       const chapterMetadata = await this.findChapterMetadata(metadata, chapter)
-      const markdown = this.buildVerseMarkdownTable(chapter)
+      const markdown = await this.buildVerseMarkdownTable(chapter)
       const buffer = toArrayBuffer(markdown)
       const supplementary = await service.addMetadataSupplementary(new AddSupplementaryRequest({
         metadataId: chapterMetadata.id,

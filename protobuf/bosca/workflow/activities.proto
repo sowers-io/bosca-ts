@@ -86,7 +86,7 @@ message WorkflowActivity {
 }
 
 message WorkflowActivities {
-    repeated WorkflowActivity activities = 1;
+  repeated WorkflowActivity activities = 1;
 }
 
 message WorkflowActivityIdRequest {

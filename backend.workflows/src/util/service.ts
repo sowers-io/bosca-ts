@@ -1,7 +1,7 @@
 import { IdRequest } from '../generated/protobuf/bosca/requests_pb'
 import { Collection } from '../generated/protobuf/bosca/content/collections_pb'
 import { useServiceClient } from './util'
-import { ContentService } from '../generated/protobuf/bosca/content/content_connect'
+import { ContentService } from '../generated/protobuf/bosca/content/service_connect'
 import { Metadata } from '../generated/protobuf/bosca/content/metadata_pb'
 import { SignedUrl } from '../generated/protobuf/bosca/content/url_pb'
 

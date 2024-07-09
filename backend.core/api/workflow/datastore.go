@@ -19,15 +19,22 @@ package workflow
 import (
 	"context"
 	"database/sql"
+	"sync"
 )
 
 type DataStore struct {
 	db *sql.DB
+
+	executionChannels     map[string]chan error
+	queueChannels         map[string]chan string
+	executionChannelMutex sync.Mutex
 }
 
 func NewDataStore(db *sql.DB) *DataStore {
 	return &DataStore{
-		db,
+		db:                db,
+		executionChannels: make(map[string]chan error),
+		queueChannels:     make(map[string]chan string),
 	}
 }
 

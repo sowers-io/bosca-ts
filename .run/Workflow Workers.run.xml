@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Workflow Workers" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/backend.workflows/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="start" />
+    </scripts>
+    <node-interpreter value="project" />
+    <envs>
+      <env name="ACTIVITIES" value="metadata.traits.process:metadata,bible.process:bible" />
+      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
+      <env name="BOSCA_WORKFLOW_API_ADDRESS" value="localhost:5011" />
+      <env name="BOSCA_SERVICE_ACCOUNT_TOKEN" value="sat" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

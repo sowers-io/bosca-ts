@@ -183,6 +183,8 @@ create table workflow_executions
     metadata_id uuid      not null,
     context     jsonb     not null,
     completed   timestamp,
+    failed      timestamp,
+    error       varchar,
     primary key (id),
     foreign key (workflow_id) references workflows (id)
 );
@@ -208,6 +210,8 @@ create table workflow_execution_jobs
     scheduled             timestamp not null,
     tries                 int                default 0,
     worker_id             uuid,
+    context               jsonb,
+    error                 varchar,
     primary key (id),
     foreign key (workflow_execution_id) references workflow_executions (id),
     foreign key (worker_id) references workflow_workers (id) on delete cascade,
@@ -226,6 +230,72 @@ create table workflow_execution_job_history
     primary key (id),
     foreign key (job_id) references workflow_execution_jobs (id)
 );
+
+create or replace function listen(queue text) returns void AS
+$$
+begin
+    execute format('LISTEN %I;', queue);
+end;
+$$ language plpgsql;
+
+create or replace function listen_all() returns void AS
+$$
+declare
+    queue varchar;
+begin
+    for queue in select queue from workflows
+        loop
+            execute format('LISTEN %I;', queue);
+        end loop;
+end;
+$$ language plpgsql;
+
+create or replace function unlisten(queue text) returns void AS
+$$
+begin
+    execute format('UNLISTEN %I;', queue);
+end;
+$$ language plpgsql;
+
+create or replace function unlisten_all() returns void AS
+$$
+declare
+    queue varchar;
+begin
+    for queue in select queue from workflows
+        loop
+            execute format('UNLISTEN %I;', queue);
+        end loop;
+end;
+$$ language plpgsql;
+
+create or replace function claim_next_job(in_worker_id uuid, in_queue varchar, in_activity_ids varchar[]) returns workflow_execution_jobs as
+$$
+declare
+    job workflow_execution_jobs;
+begin
+
+    update workflow_execution_jobs
+    set worker_id = in_worker_id,
+        started   = now(),
+        tries     = tries + 1
+    where id = (select id
+                from workflow_execution_jobs
+                where queue = in_queue
+                  and activity_id = any (in_activity_ids)
+                order by scheduled for update skip locked
+                limit 1)
+    returning * into job;
+
+    if job is not null then
+        insert into workflow_execution_job_history (job_id, message)
+        values (job.id, 'assigned to worker ' || in_worker_id);
+    end if;
+
+    return job;
+end;
+$$ language plpgsql;
+
 -- +goose StatementEnd
 
 -- +goose Down
@@ -253,4 +323,9 @@ drop table workflow_executions cascade;
 drop table workflow_execution_jobs cascade;
 drop table workflow_execution_job_history cascade;
 drop table workflow_workers cascade;
+drop function if exists claim_next_job(in_worker_id uuid, in_queue varchar, in_activity_ids varchar[]);
+drop function if exists listen_all();
+drop function if exists listen(queue text);
+drop function if exists unlisten_all();
+drop function if exists unlisten(queue text);
 -- +goose StatementEnd

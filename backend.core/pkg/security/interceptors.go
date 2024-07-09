@@ -95,7 +95,7 @@ func (m *interceptors) streamInterceptor(srv interface{}, stream grpc.ServerStre
 	wrappedStream := middleware.WrapServerStream(stream)
 	md := m.injectSubjectId(wrappedStream.Context())
 	if md != nil {
-		wrappedStream.WrappedContext = metadata.NewOutgoingContext(wrappedStream.Context(), md)
+		wrappedStream.WrappedContext = metadata.NewIncomingContext(wrappedStream.Context(), md)
 	}
 	return handler(srv, wrappedStream)
 }

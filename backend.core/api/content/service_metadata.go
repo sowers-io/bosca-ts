@@ -125,7 +125,7 @@ func (svc *service) addMetadata(ctx context.Context, userId string, request *grp
 			HeaderValue: "Token " + svc.serviceAccountToken,
 		}})
 		if err != nil {
-			slog.ErrorContext(ctx, "failed to process workflow", slog.String("id", id), slog.Any("error", err))
+			slog.ErrorContext(ctx, "failed to begin transition workflow", slog.String("id", id), slog.Any("error", err))
 			return nil, nil, err
 		}
 	}

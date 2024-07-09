@@ -106,9 +106,7 @@ workflows:
       to: published
       description: Publish a draft
   activities:
-    traits.process:
-      childWorkflow: true
-      childWorkflowQueue: metadata
+    metadata.traits.process: { }
     # ai activities
     ai.prompt:
       description: Take the input from the supplementary data and pass it to the provided model using the provided prompt.  The output will be based on the output from the model.
@@ -169,18 +167,13 @@ workflows:
     # metadata workflows
     metadata.process:
       activities:
-        traits.process:
+        metadata.traits.process:
           executionGroup: 1
         metadata.transition.to:
           executionGroup: 2
           configuration:
             state: draft
             status:
-      queue: metadata
-    # trait workflows
-    traits.process:
-      activities:
-        traits.process: { }
       queue: metadata
     # bible workflows
     bible.usx:

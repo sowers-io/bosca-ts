@@ -23,6 +23,13 @@ export function useServiceClient<T extends ServiceType>(service: T): PromiseClie
         interceptors: [serviceAuthorization]
       })
       break
+    case 'bosca.workflow.WorkflowService':
+      transport = createGrpcTransport({
+        baseUrl: 'http://' + process.env.BOSCA_WORKFLOW_API_ADDRESS,
+        httpVersion: '2',
+        interceptors: [serviceAuthorization]
+      })
+      break
     default:
       throw new Error('unsupported transport: ' + service.typeName)
   }

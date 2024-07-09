@@ -130,9 +130,23 @@ service WorkflowService {
     };
   }
 
+  rpc ExecuteWorkflow (WorkflowExecutionRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/workflow/metadata/{metadata_id}/workflow/execute"
+      body: "*"
+    };
+  }
+
   rpc GetWorkflowActivityJobs(WorkflowActivityJobRequest) returns (stream WorkflowActivityJob) {
     option (google.api.http) = {
       post: "/v1/workflow/queue/{queue}/activities"
+      body: "*"
+    };
+  }
+
+  rpc SetWorkflowActivityJobStatus(WorkflowActivityJobStatus) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v1/workflow/executions/{execution_id}/activities/{workflow_activity_id}/status"
       body: "*"
     };
   }

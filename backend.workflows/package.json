@@ -6,11 +6,9 @@
     "build": "tsc --build",
     "build.watch": "tsc --build --watch",
     "lint": "eslint .",
-    "start": "ts-node src/worker.ts",
-    "start.watch": "nodemon src/worker.ts",
-    "workflow": "ts-node src/client.ts"
+    "start": "ts-node src/main.ts",
+    "start.watch": "nodemon src/main.ts"
   },
-  "type": "module",
   "nodemonConfig": {
     "execMap": {
       "ts": "ts-node"
@@ -26,6 +24,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect-node": "^1.4.0",
+    "commander": "^12.1.0",
     "markdown-table": "^3.0.3"
   },
   "devDependencies": {

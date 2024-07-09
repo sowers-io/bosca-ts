@@ -218,7 +218,11 @@ func main() {
 			}})
 			if err != nil {
 				slog.Error("unable to set metadata uploaded: ", slog.Any("error", err))
-				response.StatusCode = 500
+				if err.Error() == "rpc error: code = Unknown desc = name must be unique" {
+					response.StatusCode = 409
+				} else {
+					response.StatusCode = 500
+				}
 				return response, err
 			}
 			return

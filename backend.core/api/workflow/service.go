@@ -26,6 +26,8 @@ import (
 	"bosca.io/pkg/security"
 	"context"
 	opts "google.golang.org/grpc"
+	"log/slog"
+	"time"
 )
 
 type service struct {
@@ -54,9 +56,25 @@ func NewService(cfg *configuration.ServerConfiguration, dataStore *DataStore, se
 }
 
 func (svc *service) getMetadata(ctx context.Context, metadataId string) (*content.Metadata, error) {
-	return svc.contentClient.GetMetadata(ctx, &bosca.IdRequest{Id: metadataId}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
-		HeaderValue: "Token " + svc.serviceAccountToken,
-	}})
+	var md *content.Metadata
+	var err error
+	// permissions can be laggy when first created
+	for tries := 0; tries < 10; tries++ {
+		md, err = svc.contentClient.GetMetadata(ctx, &bosca.IdRequest{Id: metadataId}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+			HeaderValue: "Token " + svc.serviceAccountToken,
+		}})
+		if err != nil {
+			if err.Error() == "rpc error: code = Unauthenticated desc = permission check failed" {
+				time.Sleep(3 * time.Second)
+			} else {
+				slog.ErrorContext(ctx, "failed to get metadata", slog.String("id", metadataId), slog.Any("error", err))
+				return nil, err
+			}
+		} else if md != nil {
+			break
+		}
+	}
+	return md, err
 }
 
 func (svc *service) setBeginMetadataWorkflowState(ctx context.Context, metadata *content.Metadata, toState *grpc.WorkflowState, status string) error {

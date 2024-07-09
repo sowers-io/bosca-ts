@@ -18,4 +18,6 @@ plugins:
     opt: paths=source_relative
   - local: protoc-gen-grpc-gateway
     out: backend.core/api/protobuf
-    opt: paths=source_relative
+    opt:
+      - paths=source_relative
+      - repeated_path_param_separator=ssv

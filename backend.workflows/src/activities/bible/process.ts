@@ -1,4 +1,3 @@
-import { Activity } from '../../workflow/workflow'
 import { USXProcessor, BibleMetadata, Book } from '@bosca/bible'
 import {
   AddCollectionRequest,
@@ -7,13 +6,14 @@ import {
 } from '../../generated/protobuf/bosca/content/collections_pb'
 import { IdRequest } from '../../generated/protobuf/bosca/requests_pb'
 import { useServiceClient } from '../../util/util'
-import { ContentService } from '../../generated/protobuf/bosca/content/content_connect'
+import { ContentService } from '../../generated/protobuf/bosca/content/service_connect'
 import { AddMetadataRequest, AddMetadatasRequest, Metadata } from '../../generated/protobuf/bosca/content/metadata_pb'
 import { execute, toArrayBuffer } from '../../util/http'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { Downloader } from '../../util/downloader'
 import { getCollection, getMetadata, getMetadataUploadUrl } from '../../util/service'
 import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/execution_context_pb'
+import { Activity } from '../activity'
 
 export class ProcessBibleActivity extends Activity {
 

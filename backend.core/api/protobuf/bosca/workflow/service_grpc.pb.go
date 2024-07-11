@@ -52,6 +52,8 @@ const (
 	WorkflowService_BeginTransitionWorkflow_FullMethodName           = "/bosca.workflow.WorkflowService/BeginTransitionWorkflow"
 	WorkflowService_CompleteTransitionWorkflow_FullMethodName        = "/bosca.workflow.WorkflowService/CompleteTransitionWorkflow"
 	WorkflowService_ExecuteWorkflow_FullMethodName                   = "/bosca.workflow.WorkflowService/ExecuteWorkflow"
+	WorkflowService_GetWorkflowExecutionStatus_FullMethodName        = "/bosca.workflow.WorkflowService/GetWorkflowExecutionStatus"
+	WorkflowService_GetChildWorkflowExecutions_FullMethodName        = "/bosca.workflow.WorkflowService/GetChildWorkflowExecutions"
 	WorkflowService_GetWorkflowActivityJobs_FullMethodName           = "/bosca.workflow.WorkflowService/GetWorkflowActivityJobs"
 	WorkflowService_SetWorkflowActivityJobStatus_FullMethodName      = "/bosca.workflow.WorkflowService/SetWorkflowActivityJobStatus"
 )
@@ -76,7 +78,9 @@ type WorkflowServiceClient interface {
 	GetWorkflowActivityPrompts(ctx context.Context, in *WorkflowActivityIdRequest, opts ...grpc.CallOption) (*WorkflowActivityPrompts, error)
 	BeginTransitionWorkflow(ctx context.Context, in *BeginTransitionWorkflowRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	CompleteTransitionWorkflow(ctx context.Context, in *CompleteTransitionWorkflowRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
-	ExecuteWorkflow(ctx context.Context, in *WorkflowExecutionRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	ExecuteWorkflow(ctx context.Context, in *WorkflowExecutionRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponse, error)
+	GetWorkflowExecutionStatus(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponse, error)
+	GetChildWorkflowExecutions(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.IdsResponse, error)
 	GetWorkflowActivityJobs(ctx context.Context, in *WorkflowActivityJobRequest, opts ...grpc.CallOption) (WorkflowService_GetWorkflowActivityJobsClient, error)
 	SetWorkflowActivityJobStatus(ctx context.Context, in *WorkflowActivityJobStatus, opts ...grpc.CallOption) (*bosca.Empty, error)
 }
@@ -249,10 +253,30 @@ func (c *workflowServiceClient) CompleteTransitionWorkflow(ctx context.Context, 
 	return out, nil
 }
 
-func (c *workflowServiceClient) ExecuteWorkflow(ctx context.Context, in *WorkflowExecutionRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+func (c *workflowServiceClient) ExecuteWorkflow(ctx context.Context, in *WorkflowExecutionRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(bosca.Empty)
+	out := new(WorkflowExecutionResponse)
 	err := c.cc.Invoke(ctx, WorkflowService_ExecuteWorkflow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) GetWorkflowExecutionStatus(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowExecutionResponse)
+	err := c.cc.Invoke(ctx, WorkflowService_GetWorkflowExecutionStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) GetChildWorkflowExecutions(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.IdsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.IdsResponse)
+	err := c.cc.Invoke(ctx, WorkflowService_GetChildWorkflowExecutions_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +346,9 @@ type WorkflowServiceServer interface {
 	GetWorkflowActivityPrompts(context.Context, *WorkflowActivityIdRequest) (*WorkflowActivityPrompts, error)
 	BeginTransitionWorkflow(context.Context, *BeginTransitionWorkflowRequest) (*bosca.Empty, error)
 	CompleteTransitionWorkflow(context.Context, *CompleteTransitionWorkflowRequest) (*bosca.Empty, error)
-	ExecuteWorkflow(context.Context, *WorkflowExecutionRequest) (*bosca.Empty, error)
+	ExecuteWorkflow(context.Context, *WorkflowExecutionRequest) (*WorkflowExecutionResponse, error)
+	GetWorkflowExecutionStatus(context.Context, *bosca.IdRequest) (*WorkflowExecutionResponse, error)
+	GetChildWorkflowExecutions(context.Context, *bosca.IdRequest) (*bosca.IdsResponse, error)
 	GetWorkflowActivityJobs(*WorkflowActivityJobRequest, WorkflowService_GetWorkflowActivityJobsServer) error
 	SetWorkflowActivityJobStatus(context.Context, *WorkflowActivityJobStatus) (*bosca.Empty, error)
 	mustEmbedUnimplementedWorkflowServiceServer()
@@ -380,8 +406,14 @@ func (UnimplementedWorkflowServiceServer) BeginTransitionWorkflow(context.Contex
 func (UnimplementedWorkflowServiceServer) CompleteTransitionWorkflow(context.Context, *CompleteTransitionWorkflowRequest) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CompleteTransitionWorkflow not implemented")
 }
-func (UnimplementedWorkflowServiceServer) ExecuteWorkflow(context.Context, *WorkflowExecutionRequest) (*bosca.Empty, error) {
+func (UnimplementedWorkflowServiceServer) ExecuteWorkflow(context.Context, *WorkflowExecutionRequest) (*WorkflowExecutionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ExecuteWorkflow not implemented")
+}
+func (UnimplementedWorkflowServiceServer) GetWorkflowExecutionStatus(context.Context, *bosca.IdRequest) (*WorkflowExecutionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowExecutionStatus not implemented")
+}
+func (UnimplementedWorkflowServiceServer) GetChildWorkflowExecutions(context.Context, *bosca.IdRequest) (*bosca.IdsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChildWorkflowExecutions not implemented")
 }
 func (UnimplementedWorkflowServiceServer) GetWorkflowActivityJobs(*WorkflowActivityJobRequest, WorkflowService_GetWorkflowActivityJobsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetWorkflowActivityJobs not implemented")
@@ -708,6 +740,42 @@ func _WorkflowService_ExecuteWorkflow_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkflowService_GetWorkflowExecutionStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).GetWorkflowExecutionStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_GetWorkflowExecutionStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).GetWorkflowExecutionStatus(ctx, req.(*bosca.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_GetChildWorkflowExecutions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).GetChildWorkflowExecutions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_GetChildWorkflowExecutions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).GetChildWorkflowExecutions(ctx, req.(*bosca.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkflowService_GetWorkflowActivityJobs_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(WorkflowActivityJobRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -821,6 +889,14 @@ var WorkflowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ExecuteWorkflow",
 			Handler:    _WorkflowService_ExecuteWorkflow_Handler,
+		},
+		{
+			MethodName: "GetWorkflowExecutionStatus",
+			Handler:    _WorkflowService_GetWorkflowExecutionStatus_Handler,
+		},
+		{
+			MethodName: "GetChildWorkflowExecutions",
+			Handler:    _WorkflowService_GetChildWorkflowExecutions_Handler,
 		},
 		{
 			MethodName: "SetWorkflowActivityJobStatus",

@@ -29,17 +29,20 @@ export class WorkflowExecutor {
       const activity = this.registry[queue][activityJob.activity!.activityId]
       try {
         await activity.execute(activityJob)
-        await this.updateJobStatus(activityJob, true, true)
+        await this.updateJobStatus(activityJob, queue, true, true)
+        console.log('job finished', activityJob)
       } catch (e) {
-        await this.updateJobStatus(activityJob, true, false, e)
+        console.error('failed to execute activity', activityJob, e)
+        await this.updateJobStatus(activityJob, queue, false, false, e)
       }
     }
   }
 
-  async updateJobStatus(activityJob: WorkflowActivityJob, complete: boolean, success: boolean, error?: any): Promise<void> {
+  async updateJobStatus(activityJob: WorkflowActivityJob, queue: string, complete: boolean, success: boolean, error?: any): Promise<void> {
     // TODO: keep trying to update the status, in case of network failures
     const service = useServiceClient(WorkflowService)
     await service.setWorkflowActivityJobStatus(new WorkflowActivityJobStatus({
+      jobId: activityJob.jobId,
       executionId: activityJob.executionId,
       workflowActivityId: activityJob.activity?.workflowActivityId,
       complete: complete,

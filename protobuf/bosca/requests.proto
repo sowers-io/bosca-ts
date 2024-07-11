@@ -36,6 +36,10 @@ message IdResponse {
   string id = 1;
 }
 
+message IdsResponse {
+  repeated string ids = 1;
+}
+
 message IdResponsesId {
   string id = 1;
   optional string error = 2;

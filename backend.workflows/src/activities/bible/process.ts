@@ -49,6 +49,8 @@ export class ProcessBibleActivity extends Activity {
     const buffers: ArrayBuffer[] = []
     let order = 0
 
+    const source = await service.getSource(new IdRequest({id: 'workflow'}))
+
     // build bulk requests
     for (const book of books) {
       const attributes = {
@@ -74,11 +76,27 @@ export class ProcessBibleActivity extends Activity {
           languageTag: metadata.language.iso,
           contentLength: protoInt64.parse(buffer.byteLength),
           attributes: attributes,
-          sourceId: 'workflow',
+          sourceId: source.id,
           sourceIdentifier: workflowId
         })
       }))
       order++
+    }
+
+    // create collections
+    const addCollectionResponses = await service.addCollections(new AddCollectionsRequest({
+      collections: addCollectionRequests
+    }))
+
+    // fetch created collections
+    const collections: Collection[] = []
+    for (const addResponse of addCollectionResponses.id) {
+      if (addResponse.error) {
+        throw new Error(addResponse.error)
+      }
+      // TODO: Add bulk getCollections
+      const collection = await getCollection(new IdRequest({ id: addResponse.id }))
+      collections.push(collection)
     }
 
     // create metadata
@@ -101,22 +119,6 @@ export class ProcessBibleActivity extends Activity {
       await service.setMetadataUploaded(idRequest)
     }
 
-    // create collections
-    const addCollectionResponses = await service.addCollections(new AddCollectionsRequest({
-      collections: addCollectionRequests
-    }))
-
-    // fetch created collections
-    const collections: Collection[] = []
-    for (const addResponse of addCollectionResponses.id) {
-      if (addResponse.error) {
-        throw new Error(addResponse.error)
-      }
-      // TODO: Add bulk getCollections
-      const collection = await getCollection(new IdRequest({ id: addResponse.id }))
-      collections.push(collection)
-    }
-
     return collections
   }
 
@@ -124,6 +126,8 @@ export class ProcessBibleActivity extends Activity {
     const service = useServiceClient(ContentService)
     const requests: AddMetadataRequest[] = []
     const buffers: ArrayBuffer[] = []
+    const source = await service.getSource(new IdRequest({id: 'workflow'}))
+
     let order = 0
     for (const chapter of book.chapters) {
       const buffer = toArrayBuffer(book.raw.substring(chapter.position.start, chapter.position.end))
@@ -142,7 +146,7 @@ export class ProcessBibleActivity extends Activity {
             'bible.chapter.usfm': chapter.usfm,
             'bible.chapter.order': (order++).toString()
           },
-          sourceId: 'workflow',
+          sourceId: source.id,
           sourceIdentifier: workflowId
         })
       }))
@@ -170,6 +174,7 @@ export class ProcessBibleActivity extends Activity {
   }
 
   async execute(activity: WorkflowActivityJob) {
+    console.log('executing process bible activity', activity)
     const file = await this.downloader.download(activity)
     try {
       const processor = new USXProcessor()
@@ -183,7 +188,6 @@ export class ProcessBibleActivity extends Activity {
 
         await this.createChapters(activity.workflowId, processor.metadata, collection, book)
       }
-
     } finally {
       await this.downloader.cleanup(file)
     }

@@ -156,7 +156,7 @@ services:
         condition: service_completed_successfully
 
   spicedb:
-    image: authzed/spicedb:v1.33.0
+    image: authzed/spicedb:v1.34.0
     command: "serve"
     restart: "always"
     ports:
@@ -194,7 +194,7 @@ services:
       - net1
 
   spicedb-migrate:
-    image: authzed/spicedb:v1.33.0
+    image: authzed/spicedb:v1.34.0
     command: "migrate head"
     restart: "on-failure"
     environment:

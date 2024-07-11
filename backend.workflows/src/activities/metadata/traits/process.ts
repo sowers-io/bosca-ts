@@ -15,8 +15,9 @@ export class ProcessTraitsActivity extends Activity {
     return 'metadata.traits.process'
   }
 
-  async execute(activity: WorkflowActivityJob): Promise<void> {
+  async execute(activity: WorkflowActivityJob) {
     const contentService = useServiceClient(ContentService)
+    const workflowService = useServiceClient(WorkflowService)
     const metadata = await contentService.getMetadata(new IdRequest({ id: activity.metadataId }))
     if (!metadata.traitIds || metadata.traitIds.length === 0) return
 
@@ -26,22 +27,17 @@ export class ProcessTraitsActivity extends Activity {
       traitsById[trait.id] = trait
     }
 
-    const workflowExecutions: Promise<any>[] = []
-    const workflowService = useServiceClient(WorkflowService)
     for (const traitId of metadata.traitIds) {
       const trait = traitsById[traitId]
       if (!trait.workflowIds || trait.workflowIds.length === 0) continue
 
       for (const workflowId of trait.workflowIds) {
-        const execution = workflowService.executeWorkflow(new WorkflowExecutionRequest({
+        await workflowService.executeWorkflow(new WorkflowExecutionRequest({
+          parentExecutionId: activity.executionId,
           workflowId: workflowId,
           metadataId: activity.metadataId,
-          waitForCompletion: true
         }))
-        workflowExecutions.push(execution)
       }
     }
-
-    await Promise.all(workflowExecutions)
   }
 }

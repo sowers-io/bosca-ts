@@ -130,10 +130,22 @@ service WorkflowService {
     };
   }
 
-  rpc ExecuteWorkflow (WorkflowExecutionRequest) returns (bosca.Empty) {
+  rpc ExecuteWorkflow (WorkflowExecutionRequest) returns (WorkflowExecutionResponse) {
     option (google.api.http) = {
       post: "/v1/workflow/metadata/{metadata_id}/workflow/execute"
       body: "*"
+    };
+  }
+
+  rpc GetWorkflowExecutionStatus(IdRequest) returns (WorkflowExecutionResponse) {
+    option (google.api.http) = {
+      get: "/v1/workflow/executions/{id}/status"
+    };
+  }
+
+  rpc GetChildWorkflowExecutions(IdRequest) returns (IdsResponse) {
+    option (google.api.http) = {
+      get: "/v1/workflow/executions/{id}/workflow/execute"
     };
   }
 

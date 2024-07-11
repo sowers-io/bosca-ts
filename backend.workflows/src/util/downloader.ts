@@ -8,6 +8,7 @@ import { IdRequest } from '../generated/protobuf/bosca/requests_pb'
 import { Readable } from 'node:stream'
 import { promisify } from 'node:util'
 import { ReadableStream } from 'node:stream/web'
+import { tmpdir } from 'node:os'
 
 export type FileName = string
 
@@ -26,7 +27,8 @@ export class DefaultDownloader implements Downloader {
 
   async download(activity: WorkflowActivityJob): Promise<FileName> {
     const service = useServiceClient(ContentService)
-    const directory = await mkdtemp(`${activity.metadataId}${sep}`)
+    const temporaryDirectory = tmpdir()
+    const directory = await mkdtemp(`${temporaryDirectory}${sep}`)
     const url = await service.getMetadataDownloadUrl(new IdRequest({ id: activity.metadataId }))
     const response = await execute(url)
     if (!response.ok) {

@@ -22,19 +22,29 @@ import "bosca/workflow/activities.proto";
 package bosca.workflow;
 
 message WorkflowExecutionRequest {
-  string workflow_id = 1;
-  string metadata_id = 2;
-  bool wait_for_completion = 3;
-  map<string, string> context = 4;
+  optional string parent_execution_id = 1;
+  string workflow_id = 2;
+  string metadata_id = 3;
+  bool wait_for_completion = 4;
+  map<string, string> context = 5;
+}
+
+message WorkflowExecutionResponse {
+  string execution_id = 1;
+  bool success = 2;
+  bool complete = 3;
+  optional string error = 4;
+  map<string, string> context = 5;
 }
 
 message WorkflowExecutionContext {
-  string workflow_id = 1;
-  string execution_id = 2;
-  repeated WorkflowActivity activities = 3;
-  int32 current_execution_group = 4;
-  string metadata_id = 5;
-  map<string, string> context = 6;
+  optional string parent_execution_id = 1;
+  string workflow_id = 2;
+  string execution_id = 3;
+  repeated WorkflowActivity activities = 4;
+  int32 current_execution_group = 5;
+  string metadata_id = 6;
+  map<string, string> context = 7;
 }
 
 message WorkflowActivityJob {
@@ -59,8 +69,9 @@ message WorkflowActivityJobRequest {
 
 message WorkflowActivityJobStatus {
   string execution_id = 1;
-  int64 workflow_activity_id = 2;
-  bool complete = 3;
-  bool success = 4;
-  optional string error = 5;
+  string job_id = 2;
+  int64 workflow_activity_id = 3;
+  bool complete = 4;
+  bool success = 5;
+  optional string error = 6;
 }

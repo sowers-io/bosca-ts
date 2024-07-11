@@ -22,6 +22,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"time"
 )
 
@@ -34,6 +35,24 @@ func (ds *DataStore) AddWorkflow(ctx context.Context, workflow *workflow.Workflo
 		workflow.Id, workflow.Name, workflow.Description, workflow.Queue, string(config),
 	)
 	return err
+}
+
+func (ds *DataStore) GetAllQueues(ctx context.Context) ([]string, error) {
+	rows, err := ds.db.QueryContext(ctx, "select distinct queue from workflows")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	queues := make([]string, 0)
+	for rows.Next() {
+		var queue string
+		err = rows.Scan(&queue)
+		if err != nil {
+			return nil, err
+		}
+		queues = append(queues, queue)
+	}
+	return queues, nil
 }
 
 func (ds *DataStore) GetWorkflow(ctx context.Context, id string) (*workflow.Workflow, error) {
@@ -146,7 +165,7 @@ func (ds *DataStore) GetWorkflowActivity(ctx context.Context, id int64) (*workfl
 }
 
 func (ds *DataStore) GetWorkflowActivities(ctx context.Context, workflowId string) ([]*workflow.WorkflowActivity, error) {
-	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration, w.queue FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) inner join workflows w on (wa.workflow_id = w.id) WHERE workflow_id = $1", workflowId)
+	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration, w.queue FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) inner join workflows w on (wa.workflow_id = w.id) where workflow_id = $1 order by wa.execution_group", workflowId)
 	if err != nil {
 		return nil, err
 	}
@@ -160,68 +179,6 @@ func (ds *DataStore) GetWorkflowActivities(ctx context.Context, workflowId strin
 		activities = append(activities, activity)
 	}
 	return activities, nil
-}
-
-func (ds *DataStore) getNewWorkflowActivityJobFromRow(ctx context.Context, rows *sql.Rows, queue string) (*workflow.WorkflowActivityJob, error) {
-	job := &workflow.WorkflowActivityJob{}
-	activity := &workflow.WorkflowActivity{
-		Inputs:  make(map[string]*workflow.WorkflowActivityParameterValue),
-		Outputs: make(map[string]*workflow.WorkflowActivityParameterValue),
-		Queue:   queue,
-	}
-	job.Activity = activity
-
-	var configuration json.RawMessage
-	err := rows.Scan(&activity.WorkflowActivityId, &activity.ActivityId, &activity.ChildWorkflowId, &activity.ExecutionGroup, &configuration)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(configuration, &activity.Configuration)
-	if err != nil {
-		return nil, err
-	}
-
-	inputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_inputs where activity_id = $1", activity.WorkflowActivityId)
-	if err != nil {
-		return nil, err
-	}
-	for inputs.Next() {
-		name, input, err := getWorkflowActivityParameterValue(inputs)
-		if err != nil {
-			inputs.Close()
-			return nil, err
-		}
-		activity.Inputs[name] = input
-	}
-	inputs.Close()
-
-	outputs, err := ds.db.QueryContext(ctx, "select name, value from workflow_activity_outputs where activity_id = $1", activity.WorkflowActivityId)
-	if err != nil {
-		return nil, err
-	}
-	for outputs.Next() {
-		name, output, err := getWorkflowActivityParameterValue(outputs)
-		if err != nil {
-			outputs.Close()
-			return nil, err
-		}
-		activity.Outputs[name] = output
-	}
-	outputs.Close()
-
-	job.Prompts, err = ds.GetWorkflowActivityPrompts(ctx, activity.WorkflowActivityId)
-	if err != nil {
-		return nil, err
-	}
-	job.StorageSystems, err = ds.GetWorkflowActivityStorageSystems(ctx, activity.WorkflowActivityId)
-	if err != nil {
-		return nil, err
-	}
-	job.Models, err = ds.GetWorkflowActivityModels(ctx, activity.WorkflowActivityId)
-	if err != nil {
-		return nil, err
-	}
-	return job, nil
 }
 
 func (ds *DataStore) GetWorkflows(ctx context.Context) ([]*workflow.Workflow, error) {
@@ -465,13 +422,13 @@ func (ds *DataStore) AddWorkflowActivity(ctx context.Context, workflowId string,
 	return workflowActivityId, nil
 }
 
-func (ds *DataStore) AddWorkflowExecution(ctx context.Context, txn *sql.Tx, workflowId string, metadataId string, executionContext *workflow.WorkflowExecutionContext) (string, error) {
+func (ds *DataStore) AddWorkflowExecution(ctx context.Context, txn *sql.Tx, parentExecutionId *string, workflowId string, metadataId string, executionContext *workflow.WorkflowExecutionContext) (string, error) {
 	executionContext.CurrentExecutionGroup = -1
 	executionContextJson, err := json.Marshal(executionContext)
 	if err != nil {
 		return "", err
 	}
-	result, err := txn.QueryContext(ctx, "insert into workflow_executions (workflow_id, metadata_id, context) values ($1, $2, ($3)::jsonb) returning id::varchar", workflowId, metadataId, executionContextJson)
+	result, err := txn.QueryContext(ctx, "insert into workflow_executions (parent_execution_id, workflow_id, metadata_id, context) values ($1, $2, $3, ($4)::jsonb) returning id::varchar", parentExecutionId, workflowId, metadataId, executionContextJson)
 	if err != nil {
 		return "", err
 	}
@@ -487,6 +444,25 @@ func (ds *DataStore) AddWorkflowExecution(ctx context.Context, txn *sql.Tx, work
 	return "", errors.New("adding execution failed")
 }
 
+func (ds *DataStore) AreChildWorkflowExecutionsComplete(ctx context.Context, txn *sql.Tx, executionId string) (bool, error) {
+	result, err := txn.QueryContext(ctx, "select case when failed is not null then null else completed end from workflow_executions where parent_execution_id = $1::uuid", executionId)
+	if err != nil {
+		return false, err
+	}
+	defer result.Close()
+	for result.Next() {
+		var completed *time.Time
+		err = result.Scan(&completed)
+		if err != nil {
+			return false, err
+		}
+		if completed == nil {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 func (ds *DataStore) IsWorkflowExecutionGroupComplete(ctx context.Context, txn *sql.Tx, executionId string) (bool, error) {
 	result, err := txn.QueryContext(ctx, "select case when failed is not null then null else completed end from workflow_execution_jobs where workflow_execution_id = $1::uuid", executionId)
 	if err != nil {
@@ -494,51 +470,49 @@ func (ds *DataStore) IsWorkflowExecutionGroupComplete(ctx context.Context, txn *
 	}
 	defer result.Close()
 	for result.Next() {
-		completed := false
+		var completed *time.Time
 		err = result.Scan(&completed)
 		if err != nil {
 			return false, err
 		}
-		if !completed {
+		if completed == nil {
 			return false, nil
 		}
 	}
 	return true, nil
 }
 
-func (ds *DataStore) SetWorkflowExecutionJobStatus(ctx context.Context, queue, executionId, jobId string, success bool, complete bool, errorStr *string) error {
+func (ds *DataStore) SetWorkflowExecutionJobStatus(ctx context.Context, txn *sql.Tx, executionId, jobId string, success bool, complete bool, errorStr *string) (bool, *string, error) {
 	if complete {
 		if success {
-			_, err := ds.db.ExecContext(ctx, "update workflow_execution_jobs set failed = null, completed = now(), error = null where id = $1::uuid", jobId)
+			_, err := txn.ExecContext(ctx, "update workflow_execution_jobs set failed = null, completed = now(), error = null, worker_id = null where id = $1::uuid", jobId)
 			if err != nil {
-				return err
+				return false, nil, err
 			}
-			return nil
+			return true, nil, nil
 		} else {
-			_, err := ds.db.ExecContext(ctx, "update workflow_execution_jobs set failed = now(), completed = now(), error = $1 where id = $1::uuid", errorStr, jobId)
+			_, err := txn.ExecContext(ctx, "update workflow_execution_jobs set failed = now(), completed = now(), error = $1, worker_id = null where id = $2::uuid", errorStr, jobId)
 			if err != nil {
-				return err
+				return false, nil, err
 			}
-			_, err = ds.db.ExecContext(ctx, "update workflow_executions set completed = now(), failed = now(), error = $1 where id = $1::uuid", errorStr, executionId)
+			_, err = txn.ExecContext(ctx, "update workflow_executions set completed = now(), failed = now(), error = $1 where id = $2::uuid", errorStr, executionId)
 			if err != nil {
-				return err
+				return false, nil, err
 			}
-			if errorStr != nil {
-				err = errors.New(*errorStr)
-			}
-			return ds.NotifyExecutionFailed(ctx, []string{queue}, executionId, err)
+			return false, errorStr, err
 		}
 	} else if !success {
-		_, err := ds.db.ExecContext(ctx, "update workflow_execution_jobs set failed = now(), completed = null, error = $1, worker_id = null where id = $1::uuid", errorStr, jobId)
+		_, err := txn.ExecContext(ctx, "update workflow_execution_jobs set failed = now(), completed = null, error = $1, worker_id = null where id = $2::uuid", errorStr, jobId)
 		if err != nil {
-			return err
+			return false, nil, err
 		}
-		return nil
+		return false, errorStr, err
 	}
-	return nil
+	return true, nil, nil
 }
 
 func (ds *DataStore) AddWorkflowExecutionJob(ctx context.Context, txn *sql.Tx, executionContext *workflow.WorkflowExecutionContext, activity *workflow.WorkflowActivity) error {
+	slog.InfoContext(ctx, "adding workflow execution job", slog.String("executionId", executionContext.ExecutionId), slog.String("workflowId", executionContext.WorkflowId), slog.Any("parentExecutionId", executionContext.ParentExecutionId), slog.String("activityId", activity.ActivityId))
 	scheduled := time.Now()
 	executionContextContext, err := json.Marshal(executionContext.Context)
 	if err != nil {
@@ -552,14 +526,15 @@ func (ds *DataStore) AddWorkflowExecutionJob(ctx context.Context, txn *sql.Tx, e
 }
 
 func (ds *DataStore) GetWorkflowExecutionContextForUpdate(ctx context.Context, txn *sql.Tx, executionId string) (*workflow.WorkflowExecutionContext, error) {
-	result, err := txn.QueryContext(ctx, "select context from workflow_executions where id = $1::uuid for update", executionId)
+	result, err := txn.QueryContext(ctx, "select parent_execution_id, context from workflow_executions where id = $1::uuid for update", executionId)
 	if err != nil {
 		return nil, err
 	}
 
+	var parentExecutionId *string
 	var executionContextJson json.RawMessage
 	if result.Next() {
-		err = result.Scan(&executionContextJson)
+		err = result.Scan(&parentExecutionId, &executionContextJson)
 		if err != nil {
 			result.Close()
 			return nil, err
@@ -575,14 +550,15 @@ func (ds *DataStore) GetWorkflowExecutionContextForUpdate(ctx context.Context, t
 	if err != nil {
 		return nil, err
 	}
+	executionContext.ParentExecutionId = parentExecutionId
 	executionContext.ExecutionId = executionId
 	return executionContext, nil
 }
 
 func (ds *DataStore) QueueNextWorkflowJobs(ctx context.Context, txn *sql.Tx, executionContext *workflow.WorkflowExecutionContext) (bool, []string, error) {
+	slog.InfoContext(ctx, "queuing next workflow job", slog.String("executionId", executionContext.ExecutionId), slog.String("workflowId", executionContext.WorkflowId), slog.Any("parentExecutionId", executionContext.ParentExecutionId))
 	groups := calculateWorkflowExecutionGroups(executionContext)
 	executionContext.CurrentExecutionGroup++
-
 	if int(executionContext.CurrentExecutionGroup) >= len(groups) {
 		_, err := txn.ExecContext(ctx, "update workflow_executions set completed = now() where id = $1", executionContext.ExecutionId)
 		if err != nil {

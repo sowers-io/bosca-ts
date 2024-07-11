@@ -21,13 +21,13 @@
 import { Empty } from "../empty_pb";
 import { Model, Models } from "./models_pb";
 import { MethodKind } from "@bufbuild/protobuf";
-import { IdRequest } from "../requests_pb";
+import { IdRequest, IdsResponse } from "../requests_pb";
 import { Prompt, Prompts } from "./prompts_pb";
 import { StorageSystem, StorageSystemModels, StorageSystems } from "./storage_systems_pb";
 import { Workflow, Workflows, WorkflowState, WorkflowStates } from "./workflows_pb";
 import { WorkflowActivities, WorkflowActivityIdRequest, WorkflowActivityPrompts, WorkflowActivityStorageSystems } from "./activities_pb";
 import { BeginTransitionWorkflowRequest, CompleteTransitionWorkflowRequest } from "./transitions_pb";
-import { WorkflowActivityJob, WorkflowActivityJobRequest, WorkflowActivityJobStatus, WorkflowExecutionRequest } from "./execution_context_pb";
+import { WorkflowActivityJob, WorkflowActivityJobRequest, WorkflowActivityJobStatus, WorkflowExecutionRequest, WorkflowExecutionResponse } from "./execution_context_pb";
 
 /**
  * @generated from service bosca.workflow.WorkflowService
@@ -185,7 +185,25 @@ export const WorkflowService = {
     executeWorkflow: {
       name: "ExecuteWorkflow",
       I: WorkflowExecutionRequest,
-      O: Empty,
+      O: WorkflowExecutionResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.workflow.WorkflowService.GetWorkflowExecutionStatus
+     */
+    getWorkflowExecutionStatus: {
+      name: "GetWorkflowExecutionStatus",
+      I: IdRequest,
+      O: WorkflowExecutionResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.workflow.WorkflowService.GetChildWorkflowExecutions
+     */
+    getChildWorkflowExecutions: {
+      name: "GetChildWorkflowExecutions",
+      I: IdRequest,
+      O: IdsResponse,
       kind: MethodKind.Unary,
     },
     /**

@@ -30,7 +30,7 @@ func (svc *service) verifyEnterTransitionExecution(ctx context.Context, metadata
 		return nil, err
 	}
 	if nextState.EntryWorkflowId != nil {
-		err = svc.executeWorkflow(ctx, metadata.Id, *nextState.EntryWorkflowId, nil, true)
+		_, err = svc.executeWorkflow(ctx, nil, metadata.Id, *nextState.EntryWorkflowId, nil, true)
 		if err != nil {
 			slog.ErrorContext(ctx, "next state transition failed", slog.String("id", metadata.Id), slog.String("currentState", metadata.WorkflowStateId), slog.String("newState", nextStateId), slog.Any("error", err))
 			return nil, err
@@ -46,7 +46,7 @@ func (svc *service) verifyExitTransitionExecution(ctx context.Context, metadata 
 		return err
 	}
 	if currentState.ExitWorkflowId != nil {
-		err = svc.executeWorkflow(ctx, metadata.Id, *currentState.ExitWorkflowId, nil, true)
+		_, err = svc.executeWorkflow(ctx, nil, metadata.Id, *currentState.ExitWorkflowId, nil, true)
 		if err != nil {
 			slog.ErrorContext(ctx, "current state transition failed", slog.String("id", metadata.Id), slog.String("currentState", metadata.WorkflowStateId), slog.String("newState", nextStateId), slog.Any("error", err))
 			return err
@@ -62,8 +62,8 @@ func (svc *service) transition(ctx context.Context, metadata *grpcContent.Metada
 		if err != nil {
 			return err
 		}
-		err = svc.executeWorkflow(ctx, metadata.Id, *nextState.WorkflowId, nil, waitForCompletion)
-		if err != nil {
+		response, err := svc.executeWorkflow(ctx, nil, metadata.Id, *nextState.WorkflowId, nil, waitForCompletion)
+		if err != nil || response.Error != nil {
 			_ = svc.setCompleteMetadataWorkflowState(ctx, metadata, status, false)
 			return err
 		}

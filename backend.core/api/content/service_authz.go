@@ -114,7 +114,7 @@ func (svc *authorizationService) AddCollection(ctx context.Context, request *grp
 }
 
 func (svc *authorizationService) AddCollections(ctx context.Context, request *grpc.AddCollectionsRequest) (*protobuf.IdResponses, error) {
-	parentIds := make([]string, 0)
+	parentIdsMap := make(map[string]bool)
 	for _, collection := range request.Collections {
 		if collection.Collection == nil {
 			return nil, errors.New("collection is required")
@@ -122,7 +122,11 @@ func (svc *authorizationService) AddCollections(ctx context.Context, request *gr
 		if len(strings.Trim(collection.Parent, " ")) == 0 {
 			collection.Parent = RootCollectionId
 		}
-		parentIds = append(parentIds, collection.Parent)
+		parentIdsMap[collection.Parent] = true
+	}
+	parentIds := make([]string, 0, len(parentIdsMap))
+	for parentId, _ := range parentIdsMap {
+		parentIds = append(parentIds, parentId)
 	}
 	ids, err := svc.permissions.BulkCheck(ctx, grpc.PermissionObjectType_collection_type, parentIds, grpc.PermissionAction_edit)
 	if err != nil {

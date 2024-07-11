@@ -69,10 +69,15 @@ func (s *permissionManager) BulkCheck(ctx context.Context, objectType grpc.Permi
 			Permission: s.getAction(action),
 		})
 	}
-
-	r, err := s.permissionsClient.CheckBulkPermissions(ctx, &pb.CheckBulkPermissionsRequest{
+	check := &pb.CheckBulkPermissionsRequest{
 		Items: items,
-	})
+	}
+	if subjectType == grpc.PermissionSubjectType_service_account {
+		check.Consistency = &pb.Consistency{
+			Requirement: &pb.Consistency_FullyConsistent{FullyConsistent: true},
+		}
+	}
+	r, err := s.permissionsClient.CheckBulkPermissions(ctx, check)
 	if err != nil {
 		return nil, err
 	}
@@ -133,6 +138,11 @@ func (s *permissionManager) CheckWithSubjectIdError(ctx context.Context, subject
 				ObjectId:   subjectId,
 			},
 		},
+	}
+	if subjectType == grpc.PermissionSubjectType_service_account {
+		check.Consistency = &pb.Consistency{
+			Requirement: &pb.Consistency_FullyConsistent{FullyConsistent: true},
+		}
 	}
 	r, err := s.permissionsClient.CheckPermission(ctx, check)
 	if err != nil {
@@ -284,6 +294,9 @@ func (s *permissionManager) GetPermissions(ctx context.Context, objectType grpc.
 		RelationshipFilter: &pb.RelationshipFilter{
 			ResourceType:       s.getObjectType(objectType),
 			OptionalResourceId: resourceId,
+		},
+		Consistency: &pb.Consistency{
+			Requirement: &pb.Consistency_FullyConsistent{FullyConsistent: true},
 		},
 	})
 	if err != nil {

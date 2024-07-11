@@ -2,6 +2,7 @@ package workflow
 
 import (
 	grpc "bosca.io/api/protobuf/bosca/workflow"
+	"log/slog"
 )
 
 func (svc *service) claimNextJob(svr grpc.WorkflowService_GetWorkflowActivityJobsServer, workerId string, request *grpc.WorkflowActivityJobRequest) error {
@@ -28,7 +29,7 @@ func (svc *service) claimNextJob(svr grpc.WorkflowService_GetWorkflowActivityJob
 }
 
 func (svc *service) GetWorkflowActivityJobs(request *grpc.WorkflowActivityJobRequest, svr grpc.WorkflowService_GetWorkflowActivityJobsServer) error {
-	workerId, err := svc.ds.RegisterWorker(svr.Context())
+	workerId, err := svc.ds.RegisterWorker(svr.Context(), request)
 	if err != nil {
 		return err
 	}
@@ -40,12 +41,11 @@ func (svc *service) GetWorkflowActivityJobs(request *grpc.WorkflowActivityJobReq
 		select {
 		case <-svr.Context().Done():
 			return svc.ds.UnregisterWorker(svr.Context(), workerId)
-		case queue := <-queueChannel:
-			if queue == request.Queue {
-				if err = svc.claimNextJob(svr, workerId, request); err != nil {
+		case notification := <-queueChannel:
+			slog.InfoContext(svr.Context(), "checking for new jobs", slog.String("queue", request.Queue), slog.String("executionId", notification.ExecutionId))
+			if err = svc.claimNextJob(svr, workerId, request); err != nil {
 					return err
 				}
-			}
 		}
 	}
 }

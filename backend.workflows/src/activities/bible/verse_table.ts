@@ -104,7 +104,7 @@ export class CreateVerseMarkdownTable extends Activity {
     }
   }
 
-  async execute(activity: WorkflowActivityJob): Promise<void> {
+  async execute(activity: WorkflowActivityJob) {
     const file = await this.downloader.download(activity)
     try {
       const processor = new USXProcessor()

@@ -177,22 +177,25 @@ create table workflow_state_transitions
 
 create table workflow_executions
 (
-    id          uuid               default gen_random_uuid(),
-    created     timestamp not null default now(),
-    workflow_id varchar   not null,
-    metadata_id uuid      not null,
-    context     jsonb     not null,
-    completed   timestamp,
-    failed      timestamp,
-    error       varchar,
+    id                  uuid               default gen_random_uuid(),
+    parent_execution_id uuid,
+    created             timestamp not null default now(),
+    workflow_id         varchar   not null,
+    metadata_id         uuid      not null,
+    context             jsonb     not null,
+    completed           timestamp,
+    failed              timestamp,
+    error               varchar,
     primary key (id),
-    foreign key (workflow_id) references workflows (id)
+    foreign key (workflow_id) references workflows (id),
+    foreign key (parent_execution_id) references workflow_executions (id) on delete cascade
 );
 
 create table workflow_workers
 (
-    id         uuid               default gen_random_uuid(),
-    registered timestamp not null default now(),
+    id            uuid               default gen_random_uuid(),
+    configuration jsonb     not null,
+    registered    timestamp not null default now(),
     primary key (id)
 );
 
@@ -209,12 +212,13 @@ create table workflow_execution_jobs
     completed             timestamp,
     scheduled             timestamp not null,
     tries                 int                default 0,
+    max_tries             int                default 1000,
     worker_id             uuid,
     context               jsonb,
     error                 varchar,
     primary key (id),
-    foreign key (workflow_execution_id) references workflow_executions (id),
-    foreign key (worker_id) references workflow_workers (id) on delete cascade,
+    foreign key (workflow_execution_id) references workflow_executions (id) on delete cascade,
+    foreign key (worker_id) references workflow_workers (id) on delete set null,
     foreign key (workflow_activity_id) references workflow_activities (id),
     foreign key (activity_id) references activities (id)
 );
@@ -238,34 +242,10 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function listen_all() returns void AS
-$$
-declare
-    queue varchar;
-begin
-    for queue in select queue from workflows
-        loop
-            execute format('LISTEN %I;', queue);
-        end loop;
-end;
-$$ language plpgsql;
-
 create or replace function unlisten(queue text) returns void AS
 $$
 begin
     execute format('UNLISTEN %I;', queue);
-end;
-$$ language plpgsql;
-
-create or replace function unlisten_all() returns void AS
-$$
-declare
-    queue varchar;
-begin
-    for queue in select queue from workflows
-        loop
-            execute format('UNLISTEN %I;', queue);
-        end loop;
 end;
 $$ language plpgsql;
 
@@ -283,6 +263,9 @@ begin
                 from workflow_execution_jobs
                 where queue = in_queue
                   and activity_id = any (in_activity_ids)
+                  and worker_id is null
+                  and completed is null
+                  and tries < max_tries
                 order by scheduled for update skip locked
                 limit 1)
     returning * into job;

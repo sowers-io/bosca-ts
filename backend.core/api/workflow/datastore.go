@@ -19,23 +19,49 @@ package workflow
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"log/slog"
 	"sync"
+	"time"
 )
 
 type DataStore struct {
 	db *sql.DB
 
-	executionChannels     map[string]chan error
-	queueChannels         map[string]chan string
+	executionChannels     map[string]chan *ExecutionNotification
+	queueChannels         map[string]chan *ExecutionNotification
 	executionChannelMutex sync.Mutex
 }
 
 func NewDataStore(db *sql.DB) *DataStore {
-	return &DataStore{
+	ds := &DataStore{
 		db:                db,
-		executionChannels: make(map[string]chan error),
-		queueChannels:     make(map[string]chan string),
+		executionChannels: make(map[string]chan *ExecutionNotification),
+		queueChannels:     make(map[string]chan *ExecutionNotification),
 	}
+	go func() {
+		ctx := context.Background()
+		for {
+			allQueues, err := ds.GetAllQueues(ctx)
+			if err != nil {
+				slog.Error("failed to get queues", slog.Any("error", err))
+			}
+
+			// warm up any connections
+			err = ds.NotifyJobAvailable(ctx, allQueues)
+			if err != nil {
+				slog.Error("failed to notify queues", slog.Any("error", err))
+			}
+
+			ctxTimeout, ctxCancel := context.WithTimeout(ctx, 30 * time.Second)
+			err = ds.ListenForCompletions(ctxTimeout)
+			if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+				slog.Error("failed to listen for completions", slog.Any("error", err))
+			}
+			ctxCancel()
+		}
+	}()
+	return ds
 }
 
 func (ds *DataStore) NewTransaction(ctx context.Context) (*sql.Tx, error) {

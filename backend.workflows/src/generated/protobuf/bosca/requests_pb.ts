@@ -176,6 +176,43 @@ export class IdResponse extends Message<IdResponse> {
 }
 
 /**
+ * @generated from message bosca.IdsResponse
+ */
+export class IdsResponse extends Message<IdsResponse> {
+  /**
+   * @generated from field: repeated string ids = 1;
+   */
+  ids: string[] = [];
+
+  constructor(data?: PartialMessage<IdsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.IdsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IdsResponse {
+    return new IdsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): IdsResponse {
+    return new IdsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): IdsResponse {
+    return new IdsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: IdsResponse | PlainMessage<IdsResponse> | undefined, b: IdsResponse | PlainMessage<IdsResponse> | undefined): boolean {
+    return proto3.util.equals(IdsResponse, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.IdResponsesId
  */
 export class IdResponsesId extends Message<IdResponsesId> {

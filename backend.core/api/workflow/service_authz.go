@@ -175,7 +175,7 @@ func (svc *authorizationService) CompleteTransitionWorkflow(ctx context.Context,
 	return svc.service.CompleteTransitionWorkflow(ctx, request)
 }
 
-func (svc *authorizationService) ExecuteWorkflow(ctx context.Context, request *grpc.WorkflowExecutionRequest) (*protobuf.Empty, error) {
+func (svc *authorizationService) ExecuteWorkflow(ctx context.Context, request *grpc.WorkflowExecutionRequest) (*grpc.WorkflowExecutionResponse, error) {
 	// TODO: maybe a trait permission object?
 	err := svc.permissions.CheckWithError(ctx, grpcContent.PermissionObjectType_workflow_state_type, "all", grpcContent.PermissionAction_list)
 	if err != nil {

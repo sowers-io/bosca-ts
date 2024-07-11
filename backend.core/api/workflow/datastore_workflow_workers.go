@@ -9,8 +9,12 @@ import (
 	"time"
 )
 
-func (ds *DataStore) RegisterWorker(ctx context.Context) (string, error) {
-	result, err := ds.db.QueryContext(ctx, "insert into workflow_workers (registered) values (now()) returning id::varchar")
+func (ds *DataStore) RegisterWorker(ctx context.Context, request *grpc.WorkflowActivityJobRequest) (string, error) {
+	cfg, err := json.Marshal(request)
+	if err != nil {
+		return "", err
+	}
+	result, err := ds.db.QueryContext(ctx, "insert into workflow_workers (registered, configuration) values (now(), $1::jsonb) returning id::varchar", cfg)
 	if err != nil {
 		return "", err
 	}

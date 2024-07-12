@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package ls
+package metadata
 
 import (
-	grpcRequests "bosca.io/api/protobuf/bosca"
-	"bosca.io/api/protobuf/bosca/content"
+	grpc "bosca.io/api/protobuf/bosca/content"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
 	"context"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 var Command = &cobra.Command{
-	Use:   "ls",
-	Short: "List all the workflow in the current collection.",
+	Use:   "metadata",
+	Short: "Find a metadata",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var err error
-
 		client, err := cli.NewContentClient(cmd)
 		if err != nil {
 			return err
@@ -42,44 +40,33 @@ var Command = &cobra.Command{
 			return err
 		}
 
-		var items *content.CollectionItems
+		attributes := make(map[string]string)
 
-		if len(args) == 0 {
-			items, err = client.GetRootCollectionItems(ctx, &grpcRequests.Empty{})
-		} else {
-			items, err = client.GetCollectionItems(ctx, &grpcRequests.IdRequest{
-				Id: args[0],
-			})
+		findArgs := cmd.Flag(flags.ArgsFlag).Value.String()
+
+		for _, arg := range strings.Split(findArgs, ",") {
+			kv := strings.Split(arg, "=")
+			attributes[kv[0]] = kv[1]
 		}
+
+		response, err := client.FindMetadata(ctx, &grpc.FindMetadataRequest{
+			Attributes: attributes,
+		})
 
 		if err != nil {
 			return err
 		}
 
 		tbl := table.NewWriter()
-		tbl.AppendHeader(table.Row{"ID", "Name", "Type", "State", "Language"})
+		tbl.AppendHeader(table.Row{"ID", "Name", "Type", "Attributes"})
 
-		for _, item := range items.Items {
-			collection := item.GetCollection()
-			if collection != nil {
-				tbl.AppendRow(table.Row{
-					collection.Id,
-					collection.Name,
-					"collection: " + collection.Type.String(),
-					"--",
-					"--",
-				})
-			}
-			metadata := item.GetMetadata()
-			if metadata != nil {
-				tbl.AppendRow(table.Row{
-					metadata.Id,
-					metadata.Name,
-					metadata.ContentType,
-					metadata.WorkflowStateId,
-					metadata.LanguageTag,
-				})
-			}
+		for _, collection := range response.Metadata {
+			tbl.AppendRow(table.Row{
+				collection.Id,
+				collection.Name,
+				collection.ContentType,
+				collection.Attributes,
+			})
 		}
 
 		cmd.Printf("%s", tbl.Render())
@@ -90,4 +77,5 @@ var Command = &cobra.Command{
 
 func init() {
 	Command.Flags().String(flags.EndpointFlag, "localhost:5013", "The endpoint to use.")
+	Command.Flags().String(flags.ArgsFlag, "", "The args")
 }

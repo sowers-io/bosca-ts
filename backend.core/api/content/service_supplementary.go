@@ -28,6 +28,10 @@ func (svc *service) AddMetadataSupplementary(ctx context.Context, request *grpc.
 	return nil, errors.New("TODO")
 }
 
+func (svc *service) SetMetadataSupplementaryReady(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*protobuf.Empty, error) {
+	return nil, errors.New("TODO")
+}
+
 func (svc *service) GetMetadataSupplementaryUploadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
 	id := request.Id + "." + request.Key
 	return svc.objectStore.CreateDownloadUrl(ctx, id)

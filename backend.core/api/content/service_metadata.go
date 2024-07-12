@@ -120,15 +120,6 @@ func (svc *service) addMetadata(ctx context.Context, userId string, request *grp
 			return nil, nil, err
 		}
 	}
-	if request.Metadata.SourceIdentifier != nil && *request.Metadata.SourceIdentifier != "" {
-		_, err := svc.workflowClient.BeginTransitionWorkflow(ctx, &workflow2.BeginTransitionWorkflowRequest{MetadataId: id, StateId: workflow.StateProcessing}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
-			HeaderValue: "Token " + svc.serviceAccountToken,
-		}})
-		if err != nil {
-			slog.ErrorContext(ctx, "failed to begin transition workflow", slog.String("id", id), slog.Any("error", err))
-			return nil, nil, err
-		}
-	}
 	return &protobuf.IdResponse{Id: id}, permissions, nil
 }
 
@@ -295,14 +286,14 @@ func (svc *service) GetMetadataDownloadUrl(ctx context.Context, request *protobu
 	if md == nil {
 		return nil, status.Error(codes.NotFound, "metadata not found")
 	}
-	id := request.Id
+	id := md.Id
 	if md.SourceIdentifier != nil && *md.SourceIdentifier != "" {
 		id = strings.Split(*md.SourceIdentifier, "+")[0]
 	}
 	return svc.objectStore.CreateDownloadUrl(ctx, id)
 }
 
-func (svc *service) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+func (svc *service) SetMetadataReady(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
 	return svc.workflowClient.BeginTransitionWorkflow(ctx, &workflow2.BeginTransitionWorkflowRequest{MetadataId: request.Id, StateId: workflow.StateProcessing}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
 		HeaderValue: "Token " + svc.serviceAccountToken,
 	}})

@@ -210,14 +210,28 @@ func main() {
 				SourceId:         &source.Id,
 				SourceIdentifier: &hook.Upload.ID,
 			}
-			_, err := contentClient.AddMetadata(context.Background(), &content.AddMetadataRequest{
+			newMetadata, err := contentClient.AddMetadata(context.Background(), &content.AddMetadataRequest{
 				Collection: &collection,
 				Metadata:   metadata,
 			}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
 				HeaderValue: "Token " + cfg.Security.ServiceAccountToken,
 			}})
 			if err != nil {
-				slog.Error("unable to set metadata uploaded: ", slog.Any("error", err))
+				slog.Error("unable to add metadata: ", slog.Any("error", err))
+				if err.Error() == "rpc error: code = Unknown desc = name must be unique" {
+					response.StatusCode = 409
+				} else {
+					response.StatusCode = 500
+				}
+				return response, err
+			}
+			_, err = contentClient.SetMetadataReady(context.Background(), &bosca.IdRequest{
+				Id: newMetadata.Id,
+			}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+				HeaderValue: "Token " + cfg.Security.ServiceAccountToken,
+			}})
+			if err != nil {
+				slog.Error("unable to set metadata ready: ", slog.Any("error", err))
 				if err.Error() == "rpc error: code = Unknown desc = name must be unique" {
 					response.StatusCode = 409
 				} else {

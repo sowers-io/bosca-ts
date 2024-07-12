@@ -60,12 +60,12 @@ const (
 	ContentService_GetMetadataUploadUrl_FullMethodName                = "/bosca.content.ContentService/GetMetadataUploadUrl"
 	ContentService_GetMetadataDownloadUrl_FullMethodName              = "/bosca.content.ContentService/GetMetadataDownloadUrl"
 	ContentService_AddMetadataSupplementary_FullMethodName            = "/bosca.content.ContentService/AddMetadataSupplementary"
-	ContentService_SetMetadataSupplementaryUploaded_FullMethodName    = "/bosca.content.ContentService/SetMetadataSupplementaryUploaded"
+	ContentService_SetMetadataSupplementaryReady_FullMethodName       = "/bosca.content.ContentService/SetMetadataSupplementaryReady"
 	ContentService_GetMetadataSupplementaryUploadUrl_FullMethodName   = "/bosca.content.ContentService/GetMetadataSupplementaryUploadUrl"
 	ContentService_GetMetadataSupplementaryDownloadUrl_FullMethodName = "/bosca.content.ContentService/GetMetadataSupplementaryDownloadUrl"
 	ContentService_DeleteMetadataSupplementary_FullMethodName         = "/bosca.content.ContentService/DeleteMetadataSupplementary"
 	ContentService_GetMetadataSupplementaries_FullMethodName          = "/bosca.content.ContentService/GetMetadataSupplementaries"
-	ContentService_SetMetadataUploaded_FullMethodName                 = "/bosca.content.ContentService/SetMetadataUploaded"
+	ContentService_SetMetadataReady_FullMethodName                    = "/bosca.content.ContentService/SetMetadataReady"
 	ContentService_GetMetadataPermissions_FullMethodName              = "/bosca.content.ContentService/GetMetadataPermissions"
 	ContentService_AddMetadataPermissions_FullMethodName              = "/bosca.content.ContentService/AddMetadataPermissions"
 	ContentService_AddMetadataPermission_FullMethodName               = "/bosca.content.ContentService/AddMetadataPermission"
@@ -104,12 +104,12 @@ type ContentServiceClient interface {
 	GetMetadataUploadUrl(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
 	GetMetadataDownloadUrl(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
 	AddMetadataSupplementary(ctx context.Context, in *AddSupplementaryRequest, opts ...grpc.CallOption) (*MetadataSupplementary, error)
-	SetMetadataSupplementaryUploaded(ctx context.Context, in *bosca.SupplementaryIdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	SetMetadataSupplementaryReady(ctx context.Context, in *bosca.SupplementaryIdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetMetadataSupplementaryUploadUrl(ctx context.Context, in *bosca.SupplementaryIdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
 	GetMetadataSupplementaryDownloadUrl(ctx context.Context, in *bosca.SupplementaryIdRequest, opts ...grpc.CallOption) (*SignedUrl, error)
 	DeleteMetadataSupplementary(ctx context.Context, in *bosca.SupplementaryIdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetMetadataSupplementaries(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*MetadataSupplementaries, error)
-	SetMetadataUploaded(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	SetMetadataReady(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetMetadataPermissions(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
 	AddMetadataPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
@@ -377,10 +377,10 @@ func (c *contentServiceClient) AddMetadataSupplementary(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *contentServiceClient) SetMetadataSupplementaryUploaded(ctx context.Context, in *bosca.SupplementaryIdRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+func (c *contentServiceClient) SetMetadataSupplementaryReady(ctx context.Context, in *bosca.SupplementaryIdRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.Empty)
-	err := c.cc.Invoke(ctx, ContentService_SetMetadataSupplementaryUploaded_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ContentService_SetMetadataSupplementaryReady_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -427,10 +427,10 @@ func (c *contentServiceClient) GetMetadataSupplementaries(ctx context.Context, i
 	return out, nil
 }
 
-func (c *contentServiceClient) SetMetadataUploaded(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+func (c *contentServiceClient) SetMetadataReady(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.Empty)
-	err := c.cc.Invoke(ctx, ContentService_SetMetadataUploaded_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ContentService_SetMetadataReady_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -536,12 +536,12 @@ type ContentServiceServer interface {
 	GetMetadataUploadUrl(context.Context, *bosca.IdRequest) (*SignedUrl, error)
 	GetMetadataDownloadUrl(context.Context, *bosca.IdRequest) (*SignedUrl, error)
 	AddMetadataSupplementary(context.Context, *AddSupplementaryRequest) (*MetadataSupplementary, error)
-	SetMetadataSupplementaryUploaded(context.Context, *bosca.SupplementaryIdRequest) (*bosca.Empty, error)
+	SetMetadataSupplementaryReady(context.Context, *bosca.SupplementaryIdRequest) (*bosca.Empty, error)
 	GetMetadataSupplementaryUploadUrl(context.Context, *bosca.SupplementaryIdRequest) (*SignedUrl, error)
 	GetMetadataSupplementaryDownloadUrl(context.Context, *bosca.SupplementaryIdRequest) (*SignedUrl, error)
 	DeleteMetadataSupplementary(context.Context, *bosca.SupplementaryIdRequest) (*bosca.Empty, error)
 	GetMetadataSupplementaries(context.Context, *bosca.IdRequest) (*MetadataSupplementaries, error)
-	SetMetadataUploaded(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
+	SetMetadataReady(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
 	GetMetadataPermissions(context.Context, *bosca.IdRequest) (*Permissions, error)
 	AddMetadataPermissions(context.Context, *Permissions) (*bosca.Empty, error)
 	AddMetadataPermission(context.Context, *Permission) (*bosca.Empty, error)
@@ -631,8 +631,8 @@ func (UnimplementedContentServiceServer) GetMetadataDownloadUrl(context.Context,
 func (UnimplementedContentServiceServer) AddMetadataSupplementary(context.Context, *AddSupplementaryRequest) (*MetadataSupplementary, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataSupplementary not implemented")
 }
-func (UnimplementedContentServiceServer) SetMetadataSupplementaryUploaded(context.Context, *bosca.SupplementaryIdRequest) (*bosca.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetMetadataSupplementaryUploaded not implemented")
+func (UnimplementedContentServiceServer) SetMetadataSupplementaryReady(context.Context, *bosca.SupplementaryIdRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetMetadataSupplementaryReady not implemented")
 }
 func (UnimplementedContentServiceServer) GetMetadataSupplementaryUploadUrl(context.Context, *bosca.SupplementaryIdRequest) (*SignedUrl, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataSupplementaryUploadUrl not implemented")
@@ -646,8 +646,8 @@ func (UnimplementedContentServiceServer) DeleteMetadataSupplementary(context.Con
 func (UnimplementedContentServiceServer) GetMetadataSupplementaries(context.Context, *bosca.IdRequest) (*MetadataSupplementaries, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataSupplementaries not implemented")
 }
-func (UnimplementedContentServiceServer) SetMetadataUploaded(context.Context, *bosca.IdRequest) (*bosca.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetMetadataUploaded not implemented")
+func (UnimplementedContentServiceServer) SetMetadataReady(context.Context, *bosca.IdRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetMetadataReady not implemented")
 }
 func (UnimplementedContentServiceServer) GetMetadataPermissions(context.Context, *bosca.IdRequest) (*Permissions, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataPermissions not implemented")
@@ -1133,20 +1133,20 @@ func _ContentService_AddMetadataSupplementary_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContentService_SetMetadataSupplementaryUploaded_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ContentService_SetMetadataSupplementaryReady_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.SupplementaryIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContentServiceServer).SetMetadataSupplementaryUploaded(ctx, in)
+		return srv.(ContentServiceServer).SetMetadataSupplementaryReady(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ContentService_SetMetadataSupplementaryUploaded_FullMethodName,
+		FullMethod: ContentService_SetMetadataSupplementaryReady_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).SetMetadataSupplementaryUploaded(ctx, req.(*bosca.SupplementaryIdRequest))
+		return srv.(ContentServiceServer).SetMetadataSupplementaryReady(ctx, req.(*bosca.SupplementaryIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1223,20 +1223,20 @@ func _ContentService_GetMetadataSupplementaries_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContentService_SetMetadataUploaded_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ContentService_SetMetadataReady_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.IdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContentServiceServer).SetMetadataUploaded(ctx, in)
+		return srv.(ContentServiceServer).SetMetadataReady(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ContentService_SetMetadataUploaded_FullMethodName,
+		FullMethod: ContentService_SetMetadataReady_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).SetMetadataUploaded(ctx, req.(*bosca.IdRequest))
+		return srv.(ContentServiceServer).SetMetadataReady(ctx, req.(*bosca.IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1475,8 +1475,8 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_AddMetadataSupplementary_Handler,
 		},
 		{
-			MethodName: "SetMetadataSupplementaryUploaded",
-			Handler:    _ContentService_SetMetadataSupplementaryUploaded_Handler,
+			MethodName: "SetMetadataSupplementaryReady",
+			Handler:    _ContentService_SetMetadataSupplementaryReady_Handler,
 		},
 		{
 			MethodName: "GetMetadataSupplementaryUploadUrl",
@@ -1495,8 +1495,8 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_GetMetadataSupplementaries_Handler,
 		},
 		{
-			MethodName: "SetMetadataUploaded",
-			Handler:    _ContentService_SetMetadataUploaded_Handler,
+			MethodName: "SetMetadataReady",
+			Handler:    _ContentService_SetMetadataReady_Handler,
 		},
 		{
 			MethodName: "GetMetadataPermissions",

@@ -82,14 +82,13 @@ func (svc *service) setBeginMetadataWorkflowState(ctx context.Context, metadata 
 		MetadataId: metadata.Id,
 		StateId:    toState.Id,
 		Status:     status,
-		Success:    true,
 	}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
 		HeaderValue: "Token " + svc.serviceAccountToken,
 	}})
 	return err
 }
 
-func (svc *service) setCompleteMetadataWorkflowState(ctx context.Context, metadata *content.Metadata, status string, success bool) error {
+func (svc *service) setCompleteMetadataWorkflowState(ctx context.Context, metadata *content.Metadata, status string) error {
 	_, err := svc.contentClient.SetWorkflowStateComplete(ctx, &content.SetWorkflowStateCompleteRequest{
 		MetadataId: metadata.Id,
 		Status:     status,

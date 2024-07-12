@@ -282,12 +282,12 @@ func (svc *authorizationService) DeleteMetadataSupplementary(ctx context.Context
 	return svc.service.DeleteMetadataSupplementary(ctx, request)
 }
 
-func (svc *authorizationService) SetMetadataSupplementaryUploaded(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*protobuf.Empty, error) {
+func (svc *authorizationService) SetMetadataSupplementaryReady(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
-	return svc.service.SetMetadataSupplementaryUploaded(ctx, request)
+	return svc.service.SetMetadataSupplementaryReady(ctx, request)
 }
 
 func (svc *authorizationService) GetMetadataSupplementaries(ctx context.Context, request *protobuf.IdRequest) (*grpc.MetadataSupplementaries, error) {
@@ -298,20 +298,12 @@ func (svc *authorizationService) GetMetadataSupplementaries(ctx context.Context,
 	return svc.service.GetMetadataSupplementaries(ctx, request)
 }
 
-func (svc *authorizationService) SetMetadataUploaded(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+func (svc *authorizationService) SetMetadataReady(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
 	if err != nil {
 		return nil, err
 	}
-	return svc.service.SetMetadataUploaded(ctx, request)
-}
-
-func (svc *authorizationService) ProcessMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_edit)
-	if err != nil {
-		return nil, err
-	}
-	return svc.service.SetMetadataUploaded(ctx, request)
+	return svc.service.SetMetadataReady(ctx, request)
 }
 
 func (svc *authorizationService) GetMetadataPermissions(ctx context.Context, request *protobuf.IdRequest) (*grpc.Permissions, error) {

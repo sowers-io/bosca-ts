@@ -261,10 +261,10 @@ export const ContentService = {
       kind: MethodKind.Unary,
     },
     /**
-     * @generated from rpc bosca.content.ContentService.SetMetadataSupplementaryUploaded
+     * @generated from rpc bosca.content.ContentService.SetMetadataSupplementaryReady
      */
-    setMetadataSupplementaryUploaded: {
-      name: "SetMetadataSupplementaryUploaded",
+    setMetadataSupplementaryReady: {
+      name: "SetMetadataSupplementaryReady",
       I: SupplementaryIdRequest,
       O: Empty,
       kind: MethodKind.Unary,
@@ -306,10 +306,10 @@ export const ContentService = {
       kind: MethodKind.Unary,
     },
     /**
-     * @generated from rpc bosca.content.ContentService.SetMetadataUploaded
+     * @generated from rpc bosca.content.ContentService.SetMetadataReady
      */
-    setMetadataUploaded: {
-      name: "SetMetadataUploaded",
+    setMetadataReady: {
+      name: "SetMetadataReady",
       I: IdRequest,
       O: Empty,
       kind: MethodKind.Unary,

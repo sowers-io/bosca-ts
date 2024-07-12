@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package util
+package find
 
 import (
-	"bosca.io/pkg/configuration"
-	"log/slog"
-	"os"
+	"bosca.io/cmd/cli/commands/find/collection"
+	"bosca.io/cmd/cli/commands/find/metadata"
+	"github.com/spf13/cobra"
 )
 
-func InitializeLogging(cfg configuration.Configuration) {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
-	}))
-	slog.SetLogLoggerLevel(slog.LevelDebug)
-	slog.SetDefault(logger)
+var Command = &cobra.Command{
+	Use:   "find",
+	Short: "Find a resource",
+}
+
+func init() {
+	Command.AddCommand(collection.Command, metadata.Command)
 }

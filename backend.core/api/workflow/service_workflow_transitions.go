@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package workflow
 
 import (
@@ -64,11 +80,10 @@ func (svc *service) transition(ctx context.Context, metadata *grpcContent.Metada
 		}
 		response, err := svc.executeWorkflow(ctx, nil, metadata.Id, *nextState.WorkflowId, nil, waitForCompletion)
 		if err != nil || response.Error != nil {
-			_ = svc.setCompleteMetadataWorkflowState(ctx, metadata, status, false)
 			return err
 		}
 	} else {
-		err = svc.setCompleteMetadataWorkflowState(ctx, metadata, status, true)
+		err = svc.setCompleteMetadataWorkflowState(ctx, metadata, status)
 		if err != nil {
 			return err
 		}
@@ -89,7 +104,7 @@ func (svc *service) BeginTransitionWorkflow(ctx context.Context, request *grpc.B
 
 	if metadata.WorkflowStateId == request.StateId {
 		slog.WarnContext(ctx, "workflow already in state", slog.String("id", request.MetadataId), slog.String("state", request.StateId))
-		_ = svc.setCompleteMetadataWorkflowState(ctx, metadata, "duplicate transition", false)
+		_ = svc.setCompleteMetadataWorkflowState(ctx, metadata, "duplicate transition")
 		return &protobuf.Empty{}, nil
 	}
 
@@ -127,7 +142,7 @@ func (svc *service) CompleteTransitionWorkflow(ctx context.Context, request *grp
 		return nil, status.Error(codes.FailedPrecondition, "workflow no pending state")
 	}
 
-	err = svc.setCompleteMetadataWorkflowState(ctx, metadata, request.Status, request.Success)
+	err = svc.setCompleteMetadataWorkflowState(ctx, metadata, request.Status)
 	if err != nil {
 		return nil, err
 	}

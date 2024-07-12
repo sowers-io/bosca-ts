@@ -187,9 +187,9 @@ service ContentService {
     };
   }
 
-  rpc SetMetadataSupplementaryUploaded(bosca.SupplementaryIdRequest) returns (bosca.Empty) {
+  rpc SetMetadataSupplementaryReady(bosca.SupplementaryIdRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/supplementary/{key}/uploaded"
+      post: "/v1/content/metadata/{id}/supplementary/{key}/ready"
     };
   }
 
@@ -217,9 +217,9 @@ service ContentService {
     };
   }
 
-  rpc SetMetadataUploaded(bosca.IdRequest) returns (Empty) {
+  rpc SetMetadataReady(bosca.IdRequest) returns (Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/uploaded"
+      post: "/v1/content/metadata/{id}/ready"
     };
   }
 

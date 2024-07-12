@@ -16,6 +16,7 @@
 
 package flags
 
+const ArgsFlag = "args"
 const EndpointFlag = "endpoint"
 const StorageSystemFlag = "storage-system"
 const ParentFlag = "parent"

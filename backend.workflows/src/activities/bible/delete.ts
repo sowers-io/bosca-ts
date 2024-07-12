@@ -20,7 +20,7 @@ import { useServiceClient } from '../../util/util'
 import { ContentService } from '../../generated/protobuf/bosca/content/service_connect'
 import { FindMetadataRequest } from '../../generated/protobuf/bosca/content/metadata_pb'
 import { IdRequest } from '../../generated/protobuf/bosca/requests_pb'
-import { USXProcessor } from '@bosca/bible/lib'
+import { USXProcessor } from '@bosca/bible'
 import { Downloader } from '../../util/downloader'
 
 export class DeleteBibleActivity extends Activity {

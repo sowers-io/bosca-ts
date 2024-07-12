@@ -49,6 +49,7 @@ const (
 	ContentService_AddCollectionPermission_FullMethodName             = "/bosca.content.ContentService/AddCollectionPermission"
 	ContentService_AddCollectionItem_FullMethodName                   = "/bosca.content.ContentService/AddCollectionItem"
 	ContentService_CheckPermission_FullMethodName                     = "/bosca.content.ContentService/CheckPermission"
+	ContentService_FindCollection_FullMethodName                      = "/bosca.content.ContentService/FindCollection"
 	ContentService_FindMetadata_FullMethodName                        = "/bosca.content.ContentService/FindMetadata"
 	ContentService_GetMetadata_FullMethodName                         = "/bosca.content.ContentService/GetMetadata"
 	ContentService_GetMetadatas_FullMethodName                        = "/bosca.content.ContentService/GetMetadatas"
@@ -92,6 +93,7 @@ type ContentServiceClient interface {
 	AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddCollectionItem(ctx context.Context, in *AddCollectionItemRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	CheckPermission(ctx context.Context, in *PermissionCheckRequest, opts ...grpc.CallOption) (*PermissionCheckResponse, error)
+	FindCollection(ctx context.Context, in *FindCollectionRequest, opts ...grpc.CallOption) (*Collections, error)
 	FindMetadata(ctx context.Context, in *FindMetadataRequest, opts ...grpc.CallOption) (*Metadatas, error)
 	GetMetadata(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Metadata, error)
 	GetMetadatas(ctx context.Context, in *bosca.IdsRequest, opts ...grpc.CallOption) (*Metadatas, error)
@@ -112,7 +114,7 @@ type ContentServiceClient interface {
 	AddMetadataPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
 	SetWorkflowState(ctx context.Context, in *SetWorkflowStateRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
-	SetWorkflowStateComplete(ctx context.Context, in *SetWorkflowStateRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	SetWorkflowStateComplete(ctx context.Context, in *SetWorkflowStateCompleteRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddMetadataRelationship(ctx context.Context, in *MetadataRelationship, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetMetadataRelationships(ctx context.Context, in *MetadataRelationshipIdRequest, opts ...grpc.CallOption) (*MetadataRelationships, error)
 }
@@ -259,6 +261,16 @@ func (c *contentServiceClient) CheckPermission(ctx context.Context, in *Permissi
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PermissionCheckResponse)
 	err := c.cc.Invoke(ctx, ContentService_CheckPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) FindCollection(ctx context.Context, in *FindCollectionRequest, opts ...grpc.CallOption) (*Collections, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Collections)
+	err := c.cc.Invoke(ctx, ContentService_FindCollection_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -465,7 +477,7 @@ func (c *contentServiceClient) SetWorkflowState(ctx context.Context, in *SetWork
 	return out, nil
 }
 
-func (c *contentServiceClient) SetWorkflowStateComplete(ctx context.Context, in *SetWorkflowStateRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+func (c *contentServiceClient) SetWorkflowStateComplete(ctx context.Context, in *SetWorkflowStateCompleteRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.Empty)
 	err := c.cc.Invoke(ctx, ContentService_SetWorkflowStateComplete_FullMethodName, in, out, cOpts...)
@@ -513,6 +525,7 @@ type ContentServiceServer interface {
 	AddCollectionPermission(context.Context, *Permission) (*bosca.Empty, error)
 	AddCollectionItem(context.Context, *AddCollectionItemRequest) (*bosca.Empty, error)
 	CheckPermission(context.Context, *PermissionCheckRequest) (*PermissionCheckResponse, error)
+	FindCollection(context.Context, *FindCollectionRequest) (*Collections, error)
 	FindMetadata(context.Context, *FindMetadataRequest) (*Metadatas, error)
 	GetMetadata(context.Context, *bosca.IdRequest) (*Metadata, error)
 	GetMetadatas(context.Context, *bosca.IdsRequest) (*Metadatas, error)
@@ -533,7 +546,7 @@ type ContentServiceServer interface {
 	AddMetadataPermissions(context.Context, *Permissions) (*bosca.Empty, error)
 	AddMetadataPermission(context.Context, *Permission) (*bosca.Empty, error)
 	SetWorkflowState(context.Context, *SetWorkflowStateRequest) (*bosca.Empty, error)
-	SetWorkflowStateComplete(context.Context, *SetWorkflowStateRequest) (*bosca.Empty, error)
+	SetWorkflowStateComplete(context.Context, *SetWorkflowStateCompleteRequest) (*bosca.Empty, error)
 	AddMetadataRelationship(context.Context, *MetadataRelationship) (*bosca.Empty, error)
 	GetMetadataRelationships(context.Context, *MetadataRelationshipIdRequest) (*MetadataRelationships, error)
 	mustEmbedUnimplementedContentServiceServer()
@@ -584,6 +597,9 @@ func (UnimplementedContentServiceServer) AddCollectionItem(context.Context, *Add
 }
 func (UnimplementedContentServiceServer) CheckPermission(context.Context, *PermissionCheckRequest) (*PermissionCheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPermission not implemented")
+}
+func (UnimplementedContentServiceServer) FindCollection(context.Context, *FindCollectionRequest) (*Collections, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindCollection not implemented")
 }
 func (UnimplementedContentServiceServer) FindMetadata(context.Context, *FindMetadataRequest) (*Metadatas, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindMetadata not implemented")
@@ -645,7 +661,7 @@ func (UnimplementedContentServiceServer) AddMetadataPermission(context.Context, 
 func (UnimplementedContentServiceServer) SetWorkflowState(context.Context, *SetWorkflowStateRequest) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetWorkflowState not implemented")
 }
-func (UnimplementedContentServiceServer) SetWorkflowStateComplete(context.Context, *SetWorkflowStateRequest) (*bosca.Empty, error) {
+func (UnimplementedContentServiceServer) SetWorkflowStateComplete(context.Context, *SetWorkflowStateCompleteRequest) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetWorkflowStateComplete not implemented")
 }
 func (UnimplementedContentServiceServer) AddMetadataRelationship(context.Context, *MetadataRelationship) (*bosca.Empty, error) {
@@ -915,6 +931,24 @@ func _ContentService_CheckPermission_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).CheckPermission(ctx, req.(*PermissionCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_FindCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindCollectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).FindCollection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_FindCollection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).FindCollection(ctx, req.(*FindCollectionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1280,7 +1314,7 @@ func _ContentService_SetWorkflowState_Handler(srv interface{}, ctx context.Conte
 }
 
 func _ContentService_SetWorkflowStateComplete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetWorkflowStateRequest)
+	in := new(SetWorkflowStateCompleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1292,7 +1326,7 @@ func _ContentService_SetWorkflowStateComplete_Handler(srv interface{}, ctx conte
 		FullMethod: ContentService_SetWorkflowStateComplete_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).SetWorkflowStateComplete(ctx, req.(*SetWorkflowStateRequest))
+		return srv.(ContentServiceServer).SetWorkflowStateComplete(ctx, req.(*SetWorkflowStateCompleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1395,6 +1429,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckPermission",
 			Handler:    _ContentService_CheckPermission_Handler,
+		},
+		{
+			MethodName: "FindCollection",
+			Handler:    _ContentService_FindCollection_Handler,
 		},
 		{
 			MethodName: "FindMetadata",

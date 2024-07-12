@@ -22,10 +22,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log/slog"
+	"strings"
 	"time"
 )
 
@@ -100,17 +102,24 @@ func (ds *DataStore) GetCollectionMetadataItemIds(ctx context.Context, collectio
 	return ids, nil
 }
 
-func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Collection, error) {
+func (ds *DataStore) getCollectionColumns() string {
+	return "id, name, type, labels, attributes, created, modified"
+}
+
+func (ds *DataStore) getCollection(row *sql.Rows) (*content.Collection, error) {
 	var collection content.Collection
 
 	m := pgtype.NewMap()
 
+	var id string
 	var created time.Time
 	var modified time.Time
 	var collectionType string
 	var labels []string
 	var attributesJson json.RawMessage
-	err := ds.db.QueryRowContext(ctx, "SELECT name, type, labels, attributes, created, modified FROM collections WHERE id = $1", id).Scan(
+
+	err := row.Scan(
+		&id,
 		&collection.Name,
 		&collectionType,
 		m.SQLScanner(&labels),
@@ -118,10 +127,8 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 		&created,
 		&modified,
 	)
+
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
-		}
 		return nil, err
 	}
 
@@ -146,6 +153,17 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 	collection.Modified = timestamppb.New(modified)
 	collection.Attributes = attributes
 	return &collection, nil
+}
+
+func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Collection, error) {
+	rows, err := ds.db.QueryContext(ctx, "SELECT "+ds.getCollectionColumns()+" FROM collections WHERE id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	if rows.Next() {
+		return ds.getCollection(rows)
+	}
+	return nil, nil
 }
 
 func (ds *DataStore) AddCollection(ctx context.Context, collection *content.Collection) (string, error) {
@@ -306,4 +324,48 @@ func (ds *DataStore) GetCollectionMetadataItemNames(ctx context.Context, collect
 		names = append(names, name)
 	}
 	return names, nil
+}
+
+func (ds *DataStore) FindCollection(ctx context.Context, request *content.FindCollectionRequest) ([]*content.Collection, error) {
+	if request.Attributes == nil {
+		return nil, errors.New("a request argument is required")
+	}
+
+	queryString := &strings.Builder{}
+	queryString.WriteString("SELECT " + ds.getCollectionColumns() + " FROM collections")
+	where := &strings.Builder{}
+	if request.Attributes != nil {
+		i := 1
+		for _ = range request.Attributes {
+			if where.Len() > 0 {
+				where.WriteString(" AND ")
+			}
+			where.WriteString(fmt.Sprintf("attributes->>$%d = $%d", i, i+1))
+			i += 2
+		}
+	}
+	queryString.WriteString(" WHERE ")
+	queryString.WriteString(where.String())
+
+	args := make([]any, 0, len(request.Attributes)*2)
+	for i, v := range request.Attributes {
+		args = append(args, i)
+		args = append(args, v)
+	}
+
+	rows, err := ds.db.QueryContext(ctx, queryString.String(), args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	collections := make([]*content.Collection, 0)
+	for rows.Next() {
+		collection, err := ds.getCollection(rows)
+		if err != nil {
+			return nil, err
+		}
+		collections = append(collections, collection)
+	}
+
+	return collections, nil
 }

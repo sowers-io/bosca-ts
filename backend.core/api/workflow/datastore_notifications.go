@@ -92,6 +92,7 @@ func (ds *DataStore) ListenForCompletions(ctx context.Context) error {
 				ds.OnExecutionFailed(ctx, executionNotification)
 			case ExecutionCompletion:
 				ds.OnExecutionCompletion(ctx, executionNotification)
+				ds.OnJobAvailable(ctx, notification.Channel, executionNotification)
 			case JobAvailable:
 				ds.OnJobAvailable(ctx, notification.Channel, executionNotification)
 			}

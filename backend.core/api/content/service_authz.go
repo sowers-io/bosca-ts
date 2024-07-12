@@ -146,6 +146,10 @@ func (svc *authorizationService) AddCollectionItem(ctx context.Context, request 
 	return svc.service.AddCollectionItem(ctx, request)
 }
 
+func (svc *authorizationService) FindCollection(ctx context.Context, request *grpc.FindCollectionRequest) (*grpc.Collections, error) {
+	return svc.service.FindCollection(ctx, request)
+}
+
 func (svc *authorizationService) DeleteCollection(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Id, grpc.PermissionAction_manage)
 	if err != nil {
@@ -376,7 +380,7 @@ func (svc *authorizationService) SetWorkflowState(ctx context.Context, request *
 	return svc.service.SetWorkflowState(ctx, request)
 }
 
-func (svc *authorizationService) SetWorkflowStateComplete(ctx context.Context, request *grpc.SetWorkflowStateRequest) (*protobuf.Empty, error) {
+func (svc *authorizationService) SetWorkflowStateComplete(ctx context.Context, request *grpc.SetWorkflowStateCompleteRequest) (*protobuf.Empty, error) {
 	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.MetadataId, grpc.PermissionAction_manage)
 	if err != nil {
 		return nil, err

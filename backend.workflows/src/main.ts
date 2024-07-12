@@ -4,13 +4,17 @@ import { DefaultDownloader } from './util/downloader'
 import { CreateVerseMarkdownTable } from './activities/bible/verse_table'
 import { Activity } from './activities/activity'
 import { ProcessTraitsActivity } from './activities/metadata/traits/process'
+import { DeleteBibleActivity } from './activities/bible/delete'
+import { TransitionToActivity } from './activities/metadata/transition_to'
 
 const downloader = new DefaultDownloader()
 
 const activities = [
   new ProcessTraitsActivity(),
   new ProcessBibleActivity(downloader),
-  new CreateVerseMarkdownTable(downloader)
+  new DeleteBibleActivity(downloader),
+  new CreateVerseMarkdownTable(downloader),
+  new TransitionToActivity()
 ]
 
 async function main() {

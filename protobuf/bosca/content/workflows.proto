@@ -23,5 +23,10 @@ message SetWorkflowStateRequest {
   string metadata_id = 1;
   string state_id = 2;
   string status = 3;
-  bool success = 4;
+  bool immediate = 4;
+}
+
+message SetWorkflowStateCompleteRequest {
+  string metadata_id = 1;
+  string status = 2;
 }

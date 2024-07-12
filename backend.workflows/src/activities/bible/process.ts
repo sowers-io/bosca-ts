@@ -2,12 +2,16 @@ import { USXProcessor, BibleMetadata, Book } from '@bosca/bible'
 import {
   AddCollectionRequest,
   AddCollectionsRequest,
-  Collection
+  Collection, FindCollectionRequest
 } from '../../generated/protobuf/bosca/content/collections_pb'
 import { IdRequest } from '../../generated/protobuf/bosca/requests_pb'
 import { useServiceClient } from '../../util/util'
 import { ContentService } from '../../generated/protobuf/bosca/content/service_connect'
-import { AddMetadataRequest, AddMetadatasRequest, Metadata } from '../../generated/protobuf/bosca/content/metadata_pb'
+import {
+  AddMetadataRequest,
+  AddMetadatasRequest,
+  Metadata
+} from '../../generated/protobuf/bosca/content/metadata_pb'
 import { execute, toArrayBuffer } from '../../util/http'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { Downloader } from '../../util/downloader'
@@ -29,13 +33,16 @@ export class ProcessBibleActivity extends Activity {
   }
 
   private async createBibleCollection(metadata: BibleMetadata): Promise<Collection> {
+    const version = await this.findNextVersion(metadata)
     const service = useServiceClient(ContentService)
     const addResponse = await service.addCollection(new AddCollectionRequest({
       collection: new Collection({
         name: metadata.identification.nameLocal,
         attributes: {
+          'bible.type': 'bible',
           'bible.system.id': metadata.identification.systemId.id,
-          'bible.abbreviation': metadata.identification.abbreviationLocal
+          'bible.abbreviation': metadata.identification.abbreviationLocal,
+          'bible.collection.version': version.toString()
         }
       })
     }))
@@ -49,11 +56,12 @@ export class ProcessBibleActivity extends Activity {
     const buffers: ArrayBuffer[] = []
     let order = 0
 
-    const source = await service.getSource(new IdRequest({id: 'workflow'}))
+    const source = await service.getSource(new IdRequest({ id: 'workflow' }))
 
     // build bulk requests
     for (const book of books) {
       const attributes = {
+        'bible.type': 'book',
         'bible.system.id': bible.attributes['bible.system.id'],
         'bible.abbreviation': bible.attributes['bible.abbreviation'],
         'bible.usfm': book.usfm,
@@ -126,7 +134,7 @@ export class ProcessBibleActivity extends Activity {
     const service = useServiceClient(ContentService)
     const requests: AddMetadataRequest[] = []
     const buffers: ArrayBuffer[] = []
-    const source = await service.getSource(new IdRequest({id: 'workflow'}))
+    const source = await service.getSource(new IdRequest({ id: 'workflow' }))
 
     let order = 0
     for (const chapter of book.chapters) {
@@ -140,6 +148,7 @@ export class ProcessBibleActivity extends Activity {
           contentLength: protoInt64.parse(buffer.byteLength),
           languageTag: metadata.language.iso,
           attributes: {
+            'bible.type': 'chapter',
             'bible.system.id': bookCollection.attributes['bible.system.id'],
             'bible.abbreviation': bookCollection.attributes['bible.abbreviation'],
             'bible.book.usfm': book.usfm,
@@ -151,6 +160,7 @@ export class ProcessBibleActivity extends Activity {
         })
       }))
     }
+
     const response = await service.addMetadatas(new AddMetadatasRequest({
       metadatas: requests
     }))
@@ -170,15 +180,30 @@ export class ProcessBibleActivity extends Activity {
       await service.setMetadataUploaded(idRequest)
       metadatas.push(metadata)
     }
+
     return metadatas
   }
 
+  private async findNextVersion(metadata: BibleMetadata): Promise<number> {
+    let version = 1
+    const collections = await useServiceClient(ContentService).findCollection(new FindCollectionRequest({
+      attributes: {
+        'bible.type': 'bible',
+        'bible.system.id': metadata.identification.systemId.id
+      }
+    }))
+    for (const collection of collections.collections) {
+      version = Math.max(parseInt(collection.attributes['bible.collection.version']), version)
+    }
+    return version
+  }
+
   async execute(activity: WorkflowActivityJob) {
-    console.log('executing process bible activity', activity)
     const file = await this.downloader.download(activity)
     try {
       const processor = new USXProcessor()
       await processor.process(file)
+
       const bibleCollection = await this.createBibleCollection(processor.metadata)
       const bookCollections = await this.createBookCollections(activity.workflowId, processor.metadata, bibleCollection, processor.books)
 

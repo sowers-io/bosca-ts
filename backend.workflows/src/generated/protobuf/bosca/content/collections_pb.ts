@@ -270,6 +270,43 @@ export class Collection extends Message<Collection> {
 }
 
 /**
+ * @generated from message bosca.content.Collections
+ */
+export class Collections extends Message<Collections> {
+  /**
+   * @generated from field: repeated bosca.content.Collection collections = 1;
+   */
+  collections: Collection[] = [];
+
+  constructor(data?: PartialMessage<Collections>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.Collections";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "collections", kind: "message", T: Collection, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Collections {
+    return new Collections().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Collections {
+    return new Collections().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Collections {
+    return new Collections().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Collections | PlainMessage<Collections> | undefined, b: Collections | PlainMessage<Collections> | undefined): boolean {
+    return proto3.util.equals(Collections, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.content.CollectionItems
  */
 export class CollectionItems extends Message<CollectionItems> {
@@ -353,6 +390,43 @@ export class CollectionItem extends Message<CollectionItem> {
 
   static equals(a: CollectionItem | PlainMessage<CollectionItem> | undefined, b: CollectionItem | PlainMessage<CollectionItem> | undefined): boolean {
     return proto3.util.equals(CollectionItem, a, b);
+  }
+}
+
+/**
+ * @generated from message bosca.content.FindCollectionRequest
+ */
+export class FindCollectionRequest extends Message<FindCollectionRequest> {
+  /**
+   * @generated from field: map<string, string> attributes = 1;
+   */
+  attributes: { [key: string]: string } = {};
+
+  constructor(data?: PartialMessage<FindCollectionRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.FindCollectionRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "attributes", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FindCollectionRequest {
+    return new FindCollectionRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FindCollectionRequest {
+    return new FindCollectionRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FindCollectionRequest {
+    return new FindCollectionRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FindCollectionRequest | PlainMessage<FindCollectionRequest> | undefined, b: FindCollectionRequest | PlainMessage<FindCollectionRequest> | undefined): boolean {
+    return proto3.util.equals(FindCollectionRequest, a, b);
   }
 }
 

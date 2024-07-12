@@ -27,19 +27,23 @@ func (svc *service) SetWorkflowState(ctx context.Context, request *content.SetWo
 	if err != nil {
 		return nil, err
 	}
-	err = svc.ds.SetMetadataWorkflowState(ctx, metadata, request.StateId, request.Status, true, false)
+	err = svc.ds.SetMetadataWorkflowState(ctx, metadata, request.StateId, request.Status, true, request.Immediate)
 	if err != nil {
 		return nil, err
 	}
 	return &bosca.Empty{}, nil
 }
 
-func (svc *service) SetWorkflowStateComplete(ctx context.Context, request *content.SetWorkflowStateRequest) (*bosca.Empty, error) {
+func (svc *service) SetWorkflowStateComplete(ctx context.Context, request *content.SetWorkflowStateCompleteRequest) (*bosca.Empty, error) {
 	metadata, err := svc.ds.GetMetadata(ctx, request.MetadataId)
 	if err != nil {
 		return nil, err
 	}
-	err = svc.ds.SetMetadataWorkflowState(ctx, metadata, metadata.WorkflowStateId, request.Status, request.Success, true)
+	state := metadata.WorkflowStateId
+	if metadata.WorkflowStatePendingId != nil {
+		state = *metadata.WorkflowStatePendingId
+	}
+	err = svc.ds.SetMetadataWorkflowState(ctx, metadata, state, request.Status, true, true)
 	if err != nil {
 		return nil, err
 	}

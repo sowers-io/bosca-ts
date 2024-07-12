@@ -607,6 +607,42 @@ func local_request_ContentService_CheckPermission_0(ctx context.Context, marshal
 }
 
 var (
+	filter_ContentService_FindCollection_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
+func request_ContentService_FindCollection_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq FindCollectionRequest
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ContentService_FindCollection_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.FindCollection(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_ContentService_FindCollection_0(ctx context.Context, marshaler runtime.Marshaler, server ContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq FindCollectionRequest
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ContentService_FindCollection_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.FindCollection(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
 	filter_ContentService_FindMetadata_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
@@ -1745,7 +1781,7 @@ func local_request_ContentService_SetWorkflowState_0(ctx context.Context, marsha
 }
 
 func request_ContentService_SetWorkflowStateComplete_0(ctx context.Context, marshaler runtime.Marshaler, client ContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SetWorkflowStateRequest
+	var protoReq SetWorkflowStateCompleteRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
@@ -1767,16 +1803,6 @@ func request_ContentService_SetWorkflowStateComplete_0(ctx context.Context, mars
 	protoReq.MetadataId, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "metadata_id", err)
-	}
-
-	val, ok = pathParams["state_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "state_id")
-	}
-
-	protoReq.StateId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "state_id", err)
 	}
 
 	msg, err := client.SetWorkflowStateComplete(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1785,7 +1811,7 @@ func request_ContentService_SetWorkflowStateComplete_0(ctx context.Context, mars
 }
 
 func local_request_ContentService_SetWorkflowStateComplete_0(ctx context.Context, marshaler runtime.Marshaler, server ContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SetWorkflowStateRequest
+	var protoReq SetWorkflowStateCompleteRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
@@ -1807,16 +1833,6 @@ func local_request_ContentService_SetWorkflowStateComplete_0(ctx context.Context
 	protoReq.MetadataId, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "metadata_id", err)
-	}
-
-	val, ok = pathParams["state_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "state_id")
-	}
-
-	protoReq.StateId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "state_id", err)
 	}
 
 	msg, err := server.SetWorkflowStateComplete(ctx, &protoReq)
@@ -2340,6 +2356,31 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 
 	})
 
+	mux.Handle("GET", pattern_ContentService_FindCollection_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/FindCollection", runtime.WithHTTPPathPattern("/v1/content/find/collection"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_ContentService_FindCollection_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_FindCollection_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_ContentService_FindMetadata_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2823,7 +2864,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/SetWorkflowState", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/{state_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/SetWorkflowState", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/state/{state_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2840,7 +2881,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 
 	})
 
-	mux.Handle("POST", pattern_ContentService_SetWorkflowStateComplete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ContentService_SetWorkflowStateComplete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -2848,7 +2889,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/SetWorkflowStateComplete", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/{state_id}/complete"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.content.ContentService/SetWorkflowStateComplete", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/state/complete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3261,6 +3302,28 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		}
 
 		forward_ContentService_CheckPermission_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_ContentService_FindCollection_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/FindCollection", runtime.WithHTTPPathPattern("/v1/content/find/collection"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ContentService_FindCollection_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContentService_FindCollection_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3688,7 +3751,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/SetWorkflowState", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/{state_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/SetWorkflowState", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/state/{state_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3704,13 +3767,13 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 
 	})
 
-	mux.Handle("POST", pattern_ContentService_SetWorkflowStateComplete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ContentService_SetWorkflowStateComplete_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/SetWorkflowStateComplete", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/{state_id}/complete"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.content.ContentService/SetWorkflowStateComplete", runtime.WithHTTPPathPattern("/v1/content/metadata/{metadata_id}/workflow/state/complete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -3802,6 +3865,8 @@ var (
 
 	pattern_ContentService_CheckPermission_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "content", "permission", "check"}, ""))
 
+	pattern_ContentService_FindCollection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "content", "find", "collection"}, ""))
+
 	pattern_ContentService_FindMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "content", "find", "metadata"}, ""))
 
 	pattern_ContentService_GetMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "content", "metadata", "id"}, ""))
@@ -3840,9 +3905,9 @@ var (
 
 	pattern_ContentService_AddMetadataPermission_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "content", "metadata", "id", "permission"}, ""))
 
-	pattern_ContentService_SetWorkflowState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "metadata", "metadata_id", "workflow", "state_id"}, ""))
+	pattern_ContentService_SetWorkflowState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"v1", "content", "metadata", "metadata_id", "workflow", "state", "state_id"}, ""))
 
-	pattern_ContentService_SetWorkflowStateComplete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"v1", "content", "metadata", "metadata_id", "workflow", "state_id", "complete"}, ""))
+	pattern_ContentService_SetWorkflowStateComplete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5, 2, 6}, []string{"v1", "content", "metadata", "metadata_id", "workflow", "state", "complete"}, ""))
 
 	pattern_ContentService_AddMetadataRelationship_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "content", "metadata", "metadata_id1", "relationship", "metadata_id2"}, ""))
 
@@ -3877,6 +3942,8 @@ var (
 	forward_ContentService_AddCollectionItem_0 = runtime.ForwardResponseMessage
 
 	forward_ContentService_CheckPermission_0 = runtime.ForwardResponseMessage
+
+	forward_ContentService_FindCollection_0 = runtime.ForwardResponseMessage
 
 	forward_ContentService_FindMetadata_0 = runtime.ForwardResponseMessage
 

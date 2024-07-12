@@ -235,3 +235,32 @@ func (svc *service) GetCollectionItems(ctx context.Context, request *protobuf.Id
 		Items: items,
 	}, nil
 }
+
+func (svc *service) FindCollection(ctx context.Context, request *grpc.FindCollectionRequest) (*grpc.Collections, error) {
+	collections, err := svc.ds.FindCollection(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]string, len(collections))
+	for i, metadata := range collections {
+		ids[i] = metadata.Id
+	}
+	ids, err = svc.permissions.BulkCheck(ctx, grpc.PermissionObjectType_collection_type, ids, grpc.PermissionAction_view)
+	if err != nil {
+		return nil, err
+	}
+	if len(ids) == len(collections) {
+		return &grpc.Collections{Collections: collections}, nil
+	}
+	idsMap := make(map[string]bool)
+	for _, id := range ids {
+		idsMap[id] = true
+	}
+	valid := make([]*grpc.Collection, 0, len(collections))
+	for _, metadata := range collections {
+		if idsMap[metadata.Id] {
+			valid = append(valid, metadata)
+		}
+	}
+	return &grpc.Collections{Collections: valid}, nil
+}

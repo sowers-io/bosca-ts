@@ -90,9 +90,8 @@ func (svc *service) setBeginMetadataWorkflowState(ctx context.Context, metadata 
 }
 
 func (svc *service) setCompleteMetadataWorkflowState(ctx context.Context, metadata *content.Metadata, status string, success bool) error {
-	_, err := svc.contentClient.SetWorkflowStateComplete(ctx, &content.SetWorkflowStateRequest{
+	_, err := svc.contentClient.SetWorkflowStateComplete(ctx, &content.SetWorkflowStateCompleteRequest{
 		MetadataId: metadata.Id,
-		Success:    success,
 		Status:     status,
 	}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
 		HeaderValue: "Token " + svc.serviceAccountToken,

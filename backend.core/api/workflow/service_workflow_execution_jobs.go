@@ -44,8 +44,8 @@ func (svc *service) GetWorkflowActivityJobs(request *grpc.WorkflowActivityJobReq
 		case notification := <-queueChannel:
 			slog.InfoContext(svr.Context(), "checking for new jobs", slog.String("queue", request.Queue), slog.String("executionId", notification.ExecutionId))
 			if err = svc.claimNextJob(svr, workerId, request); err != nil {
-					return err
-				}
+				return err
+			}
 		}
 	}
 }

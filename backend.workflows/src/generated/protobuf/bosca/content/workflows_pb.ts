@@ -41,9 +41,9 @@ export class SetWorkflowStateRequest extends Message<SetWorkflowStateRequest> {
   status = "";
 
   /**
-   * @generated from field: bool success = 4;
+   * @generated from field: bool immediate = 4;
    */
-  success = false;
+  immediate = false;
 
   constructor(data?: PartialMessage<SetWorkflowStateRequest>) {
     super();
@@ -56,7 +56,7 @@ export class SetWorkflowStateRequest extends Message<SetWorkflowStateRequest> {
     { no: 1, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "state_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "immediate", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetWorkflowStateRequest {
@@ -73,6 +73,49 @@ export class SetWorkflowStateRequest extends Message<SetWorkflowStateRequest> {
 
   static equals(a: SetWorkflowStateRequest | PlainMessage<SetWorkflowStateRequest> | undefined, b: SetWorkflowStateRequest | PlainMessage<SetWorkflowStateRequest> | undefined): boolean {
     return proto3.util.equals(SetWorkflowStateRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message bosca.content.SetWorkflowStateCompleteRequest
+ */
+export class SetWorkflowStateCompleteRequest extends Message<SetWorkflowStateCompleteRequest> {
+  /**
+   * @generated from field: string metadata_id = 1;
+   */
+  metadataId = "";
+
+  /**
+   * @generated from field: string status = 2;
+   */
+  status = "";
+
+  constructor(data?: PartialMessage<SetWorkflowStateCompleteRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.SetWorkflowStateCompleteRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetWorkflowStateCompleteRequest {
+    return new SetWorkflowStateCompleteRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetWorkflowStateCompleteRequest {
+    return new SetWorkflowStateCompleteRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetWorkflowStateCompleteRequest {
+    return new SetWorkflowStateCompleteRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetWorkflowStateCompleteRequest | PlainMessage<SetWorkflowStateCompleteRequest> | undefined, b: SetWorkflowStateCompleteRequest | PlainMessage<SetWorkflowStateCompleteRequest> | undefined): boolean {
+    return proto3.util.equals(SetWorkflowStateCompleteRequest, a, b);
   }
 }
 

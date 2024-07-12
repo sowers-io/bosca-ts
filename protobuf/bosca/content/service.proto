@@ -119,6 +119,12 @@ service ContentService {
     };
   }
 
+  rpc FindCollection(FindCollectionRequest) returns (Collections) {
+    option (google.api.http) = {
+      get: "/v1/content/find/collection"
+    };
+  }
+
   rpc FindMetadata(FindMetadataRequest) returns (Metadatas) {
     option (google.api.http) = {
       get: "/v1/content/find/metadata"
@@ -239,14 +245,14 @@ service ContentService {
 
   rpc SetWorkflowState (bosca.content.SetWorkflowStateRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{metadata_id}/workflow/{state_id}"
+      post: "/v1/content/metadata/{metadata_id}/workflow/state/{state_id}"
       body: "*"
     };
   }
 
-  rpc SetWorkflowStateComplete (bosca.content.SetWorkflowStateRequest) returns (bosca.Empty) {
+  rpc SetWorkflowStateComplete (bosca.content.SetWorkflowStateCompleteRequest) returns (bosca.Empty) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{metadata_id}/workflow/{state_id}/complete"
+      put: "/v1/content/metadata/{metadata_id}/workflow/state/complete"
       body: "*"
     };
   }

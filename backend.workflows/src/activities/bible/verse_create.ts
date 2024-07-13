@@ -20,7 +20,7 @@ import { Downloader } from '../../util/downloader'
 import { useServiceClient } from '../../util/util'
 import { ContentService } from '../../generated/protobuf/bosca/content/service_connect'
 import {
-  AddMetadataRequest,
+  AddMetadataRequest, AddMetadatasRequest,
   Metadata
 } from '../../generated/protobuf/bosca/content/metadata_pb'
 import { execute, toArrayBuffer } from '../../util/http'
@@ -28,7 +28,7 @@ import { protoInt64 } from '@bufbuild/protobuf'
 import { IdRequest } from '../../generated/protobuf/bosca/requests_pb'
 import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/execution_context_pb'
 import {
-  AddCollectionRequest,
+  AddCollectionRequest, AddCollectionsRequest,
   Collection,
   FindCollectionRequest
 } from '../../generated/protobuf/bosca/content/collections_pb'
@@ -63,11 +63,10 @@ export class CreateVerses extends Activity {
   private async createVerses(metadata: BibleMetadata, book: Book) {
     const service = useServiceClient(ContentService)
     const source = await service.getSource(new IdRequest({ id: 'workflow' }))
+    const addCollectionRequests: AddCollectionRequest[] = []
     for (const chapter of book.chapters) {
       const bookCollection = await this.findBookCollection(metadata, book)
-      const verses = chapter.getVerses(book)
-
-      const collection = await service.addCollection(new AddCollectionRequest({
+      addCollectionRequests.push(new AddCollectionRequest({
         parent: bookCollection.id,
         collection: new Collection({
           name: book.name.short + ' ' + chapter.number + ' Verses',
@@ -80,11 +79,23 @@ export class CreateVerses extends Activity {
           }
         })
       }))
+    }
 
-      let order = 0
-      for (const verse of verses) {
+    const collections = await service.addCollections(new AddCollectionsRequest({
+      collections: addCollectionRequests
+    }))
+
+    const addMetadataRequests: AddMetadataRequest[] = []
+    const buffers: ArrayBuffer[] = []
+    for (let i = 0; i < book.chapters.length; i++) {
+      const chapter = book.chapters[i]
+      const verses = chapter.getVerses(book)
+      const collection = collections.id[i]
+      for (let v = 0; v < verses.length; v++) {
+        const verse = verses[v]
         const buffer = toArrayBuffer(verse.raw)
-        const verseMetadata = await service.addMetadata(new AddMetadataRequest({
+        buffers.push(buffer)
+        addMetadataRequests.push(new AddMetadataRequest({
           collection: collection.id,
           metadata: new Metadata({
             name: book.name.short + ' ' + chapter.number + ':' + verse.verse,
@@ -100,18 +111,25 @@ export class CreateVerses extends Activity {
               'bible.book.usfm': book.usfm,
               'bible.chapter.usfm': chapter.usfm,
               'bible.verse.usfm': verse.usfm,
-              'bible.verse.order': (order++).toString()
+              'bible.verse.order': v.toString()
             }
           })
         }))
-        const uploadUrl = await service.getMetadataUploadUrl(new IdRequest({ id: verseMetadata.id }))
-        const uploadResponse = await execute(uploadUrl, buffer)
-        if (!uploadResponse.ok) {
-          throw new Error('failed to upload verse table: ' + book.usfm + ': ' + await uploadResponse.text())
-        }
-        await service.setMetadataReady(new IdRequest({ id: verseMetadata.id }))
-        order++
       }
+    }
+
+    const metadatas = await service.addMetadatas(new AddMetadatasRequest({
+      metadatas: addMetadataRequests
+    }))
+
+    for (let i = 0; i < metadatas.id.length; i++) {
+      const verseMetadata = metadatas.id[i]
+      const uploadUrl = await service.getMetadataUploadUrl(new IdRequest({ id: verseMetadata.id }))
+      const uploadResponse = await execute(uploadUrl, buffers[i])
+      if (!uploadResponse.ok) {
+        throw new Error('failed to upload verse: ' + await uploadResponse.text())
+      }
+      await service.setMetadataReady(new IdRequest({ id: verseMetadata.id }))
     }
   }
 

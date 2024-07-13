@@ -60,7 +60,7 @@ class BookProcessorContext extends UsxContext {
   private readonly chapters: Chapter[] = []
   private readonly items: UsxNode[] = []
   private readonly sections: BookSections[] = []
-  private readonly verseItems: UsxVerseItems[] = []
+  private verseItems: UsxVerseItems[] = []
 
   constructor(book: Book) {
     super()
@@ -146,10 +146,6 @@ class BookProcessorContext extends UsxContext {
       this.items.push(new UsxNode(node.factory, chapter, position))
     } else if (item instanceof VerseStart) {
       this.pushVerse(this.chapters[this.chapters.length - 1].usfm, item.number, new Position(item.position.start))
-    } else if (item instanceof VerseEnd) {
-      const verse = this.popVerse()
-      verse.postiion.end = item.position.end
-      this.verseItems.push(verse)
     }
     if (node.item instanceof UsxItemContainer) {
       node.item.addItem(item)
@@ -163,15 +159,22 @@ class BookProcessorContext extends UsxContext {
     const lastPosition = this.positions.pop()!
     lastPosition.end = position
     const node = this.items.pop()
-    if (node && node.item instanceof ChapterEnd) {
-      const chapterNode = this.items.pop()
-      if (!chapterNode) throw new Error('missing chapter node')
-      const chapter = chapterNode.item as Chapter
-      chapter.end = node.item
-      chapter.position.start = chapter.start.position.start
-      chapter.position.end = node.item.position.end
-      chapter.addVerseItems(this.verseItems.slice(0, this.verseItems.length))
-      this.book.chapters.push(chapter)
+    if (node) {
+      if (node.item instanceof VerseEnd) {
+        const verse = this.popVerse()
+        verse.position.end = position
+        this.verseItems.push(verse)
+      } else if (node.item instanceof ChapterEnd) {
+        const chapterNode = this.items.pop()
+        if (!chapterNode) throw new Error('missing chapter node')
+        const chapter = chapterNode.item as Chapter
+        chapter.end = node.item
+        chapter.position.start = chapter.start.position.start
+        chapter.position.end = node.item.position.end
+        chapter.addVerseItems(this.verseItems)
+        this.verseItems = []
+        this.book.chapters.push(chapter)
+      }
     }
   }
 }

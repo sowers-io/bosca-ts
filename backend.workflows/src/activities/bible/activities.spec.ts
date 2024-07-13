@@ -19,6 +19,7 @@ import { ProcessBibleActivity } from './process'
 import { CreateVerseMarkdownTable } from './verse_table'
 import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/execution_context_pb'
 import { WorkflowActivity } from '../../generated/protobuf/bosca/workflow/activities_pb'
+import { CreateVerses } from './verse_create'
 
 class DummyDownloader implements Downloader {
 
@@ -46,6 +47,19 @@ test('process bible activity', async () => {
 test('create verse tables', async () => {
   const downloader = new DummyDownloader()
   const activity = new CreateVerseMarkdownTable(downloader)
+  const activityJob = new WorkflowActivityJob({
+    workflowId: 'wid',
+    metadataId: 'mid',
+    activity: new WorkflowActivity({
+      activityId: activity.id
+    })
+  })
+  await activity.execute(activityJob)
+}, 1200000)
+
+test('create verses', async () => {
+  const downloader = new DummyDownloader()
+  const activity = new CreateVerses(downloader)
   const activityJob = new WorkflowActivityJob({
     workflowId: 'wid',
     metadataId: 'mid',

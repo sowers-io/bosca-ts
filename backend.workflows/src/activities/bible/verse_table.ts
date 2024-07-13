@@ -15,7 +15,7 @@
  */
 
 import { Activity } from '../activity'
-import { BibleMetadata, Book, Chapter, UsxItem, USXProcessor } from '@bosca/bible/lib'
+import { BibleMetadata, Book, USXProcessor } from '@bosca/bible/lib'
 import { Downloader } from '../../util/downloader'
 import { useServiceClient } from '../../util/util'
 import { ContentService } from '../../generated/protobuf/bosca/content/service_connect'
@@ -29,13 +29,6 @@ import { protoInt64 } from '@bufbuild/protobuf'
 import { IdRequest, SupplementaryIdRequest } from '../../generated/protobuf/bosca/requests_pb'
 import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/execution_context_pb'
 
-interface Verse {
-  usfm: string
-  chapter: number
-  verse: number
-  items: UsxItem[]
-}
-
 export class CreateVerseMarkdownTable extends Activity {
 
   private readonly downloader: Downloader
@@ -47,31 +40,6 @@ export class CreateVerseMarkdownTable extends Activity {
 
   get id(): string {
     return 'bible.book.verse.markdown.table'
-  }
-
-  private async buildVerseMarkdownTable(chapter: Chapter, table: string[][]) {
-    const verses: Verse[] = []
-    for (const verse in chapter.verseItems) {
-      const usfmSplit = verse.split('.')
-      let chapterNumber = parseInt(usfmSplit[1])
-      let verseNumber = parseInt(usfmSplit[2])
-      if (isNaN(chapterNumber)) chapterNumber = 0
-      if (isNaN(verseNumber)) verseNumber = 0
-      verses.push({ usfm: verse, chapter: chapterNumber, verse: verseNumber, items: chapter.verseItems[verse] })
-    }
-    verses.sort((a, b) => {
-      if (a.chapter > b.chapter) return 1
-      if (a.chapter < b.chapter) return -1
-      if (a.verse > b.verse) return 1
-      if (a.verse < b.verse) return -1
-      return 0
-    })
-    for (const verse of verses) {
-      table.push([
-        verse.usfm,
-        verse.items.map((item) => item.toString().trim().replace('\r|\n', '')).join(' ')
-      ])
-    }
   }
 
   private async findBookMetadata(metadata: BibleMetadata, book: Book): Promise<Metadata> {
@@ -88,17 +56,22 @@ export class CreateVerseMarkdownTable extends Activity {
     return chapterMetadatas.metadata[0]
   }
 
-  private async createVerseTable(metadata: BibleMetadata, book: Book) {
+  private async createVerseTable(metadata: BibleMetadata, book: Book, key: string) {
     const table = [
       ['USFM', 'Verse']
     ]
     const service = useServiceClient(ContentService)
-    const source = await service.getSource(new IdRequest({id: 'workflow'}))
+    const source = await service.getSource(new IdRequest({ id: 'workflow' }))
     const bookMetadata = await this.findBookMetadata(metadata, book)
     for (const chapter of book.chapters) {
-      await this.buildVerseMarkdownTable(chapter, table)
+      for (const verse of chapter.getVerses(book)) {
+        table.push([
+          verse.usfm,
+          verse.items.map((item) => item.toString().trim().replace('\r|\n', '')).join(' ')
+        ])
+      }
     }
-    const { markdownTable } = await import('markdown-table');
+    const { markdownTable } = await import('markdown-table')
     const markdown = markdownTable(table)
     const buffer = toArrayBuffer(markdown)
     const supplementary = await service.addMetadataSupplementary(new AddSupplementaryRequest({
@@ -117,16 +90,20 @@ export class CreateVerseMarkdownTable extends Activity {
     if (!uploadResponse.ok) {
       throw new Error('failed to upload verse table: ' + book.usfm + ': ' + await uploadResponse.text())
     }
-    await service.setMetadataSupplementaryReady(new SupplementaryIdRequest({id: bookMetadata.id, key: 'verse-table-markdown'}))
+    await service.setMetadataSupplementaryReady(new SupplementaryIdRequest({
+      id: bookMetadata.id,
+      key: key
+    }))
   }
 
   async execute(activity: WorkflowActivityJob) {
     const file = await this.downloader.download(activity)
     try {
+      const key = activity.activity!.outputs['supplementaryId']!.value.value as string
       const processor = new USXProcessor()
       await processor.process(file)
       for (const book of processor.books) {
-        await this.createVerseTable(processor.metadata, book)
+        await this.createVerseTable(processor.metadata, book, key)
       }
     } finally {
       await this.downloader.cleanup(file)

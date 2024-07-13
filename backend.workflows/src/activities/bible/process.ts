@@ -101,6 +101,7 @@ export class ProcessBibleActivity extends Activity {
           contentLength: protoInt64.parse(buffer.byteLength),
           attributes: attributes,
           sourceId: source.id,
+          traitIds: ['bible.usx.book'],
         })
       }))
       order++
@@ -171,7 +172,8 @@ export class ProcessBibleActivity extends Activity {
             'bible.book.order': bookCollection.attributes['bible.book.order'],
             'bible.chapter.order': (order++).toString()
           },
-          sourceId: source.id
+          sourceId: source.id,
+          traitIds: ['bible.usx.chapter']
         })
       }))
     }

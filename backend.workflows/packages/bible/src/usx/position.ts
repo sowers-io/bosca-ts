@@ -22,4 +22,9 @@ export class Position {
     this.start = start
     this.end = start
   }
+
+  expand(position: Position) {
+    this.start = Math.min(this.start, position.start)
+    this.end = Math.max(this.end, position.end)
+  }
 }

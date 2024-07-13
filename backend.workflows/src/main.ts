@@ -22,6 +22,7 @@ import { Activity } from './activities/activity'
 import { ProcessTraitsActivity } from './activities/metadata/traits/process'
 import { DeleteBibleActivity } from './activities/bible/delete'
 import { TransitionToActivity } from './activities/metadata/transition_to'
+import { CreateVerses } from './activities/bible/verse_create'
 
 const downloader = new DefaultDownloader()
 
@@ -30,6 +31,7 @@ const activities = [
   new ProcessBibleActivity(downloader),
   new DeleteBibleActivity(downloader),
   new CreateVerseMarkdownTable(downloader),
+  new CreateVerses(downloader),
   new TransitionToActivity()
 ]
 

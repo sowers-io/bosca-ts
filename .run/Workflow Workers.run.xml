@@ -7,7 +7,7 @@
     </scripts>
     <node-interpreter value="project" />
     <envs>
-      <env name="ACTIVITIES" value="metadata.traits.process:metadata,metadata.transition.to:metadata,bible.process:bible" />
+      <env name="ACTIVITIES" value="metadata.traits.process:metadata,metadata.transition.to:metadata,bible.process:bible,bible.chapter.verses.create:bible,bible.book.verse.markdown.table:bible" />
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
       <env name="BOSCA_SERVICE_ACCOUNT_TOKEN" value="sat" />
       <env name="BOSCA_WORKFLOW_API_ADDRESS" value="localhost:5011" />

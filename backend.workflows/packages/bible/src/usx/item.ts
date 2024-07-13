@@ -138,8 +138,8 @@ export abstract class UsxContext {
     return this.positions[this.positions.length - 1]
   }
 
-  pushVerse(bookChapterUsfm: string, verse: string, postiion: Position) {
-    this.verses.push(new UsxVerseItems(bookChapterUsfm + '.' + verse, verse, postiion))
+  pushVerse(bookChapterUsfm: string, verse: string, position: Position) {
+    this.verses.push(new UsxVerseItems(bookChapterUsfm + '.' + verse, verse, position))
   }
 
   popVerse(): UsxVerseItems {

@@ -14,23 +14,28 @@
  * limitations under the License.
  */
 
-import { ManifestName, PublicationContent } from '../metadata'
-import { Chapter } from './chapter'
+import {ManifestName, PublicationContent} from '../metadata'
+import {Chapter} from './chapter'
+import {Position} from "./position";
 
 export class Book {
 
-  readonly name: ManifestName
-  readonly content: PublicationContent
-  readonly chapters: Chapter[] = []
-  readonly raw: string
+    readonly name: ManifestName
+    readonly content: PublicationContent
+    readonly chapters: Chapter[] = []
+    readonly raw: string
 
-  constructor(name: ManifestName, content: PublicationContent, raw: string) {
-    this.name = name
-    this.content = content
-    this.raw = raw
-  }
+    constructor(name: ManifestName, content: PublicationContent, raw: string) {
+        this.name = name
+        this.content = content
+        this.raw = raw
+    }
 
-  get usfm(): string {
-    return this.content.usfm
-  }
+    get usfm(): string {
+        return this.content.usfm
+    }
+
+    getRawContent(position: Position): string {
+        return this.raw.substring(position.start, position.end)
+    }
 }

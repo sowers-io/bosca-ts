@@ -4,7 +4,9 @@ traits:
   bible.usx:
     workflowIds:
       - bible.usx
-  bible.usx.book: { }
+  bible.usx.book:
+    workflowIds:
+      - bible.usx.book
   bible.usx.chapter:
     workflowIds:
       - bible.usx.chapter
@@ -160,7 +162,7 @@ workflows:
     bible.chapter.verses.create:
       configuration:
         trait: bible.usx.verse
-    bible.chapter.verses.table:
+    bible.book.verse.markdown.table:
       outputs:
         supplementaryId: supplementary
   workflows:
@@ -181,14 +183,14 @@ workflows:
         bible.process: { }
       queue: bible
     ## bible chapter workflow
-    bible.usx.chapter:
+    bible.usx.book:
       activities:
-        bible.chapter.verses.create:
-          executionGroup: 1
-        bible.chapter.verses.table:
+        bible.book.verse.markdown.table:
           executionGroup: 1
           outputs:
             supplementaryId: chapter-verse-table
+        bible.chapter.verses.create:
+          executionGroup: 1
         ai.prompt:
           executionGroup: 2
           prompts:

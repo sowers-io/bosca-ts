@@ -20,31 +20,56 @@ import (
 	protobuf "bosca.io/api/protobuf/bosca"
 	grpc "bosca.io/api/protobuf/bosca/content"
 	"context"
-	"errors"
 	"log/slog"
 )
 
+func (svc *service) getSupplementaryId(metadataId, key string) string {
+	return metadataId + "." + key
+}
+
 func (svc *service) AddMetadataSupplementary(ctx context.Context, request *grpc.AddSupplementaryRequest) (*grpc.MetadataSupplementary, error) {
-	return nil, errors.New("TODO")
+	err := svc.ds.AddMetadataSupplementary(ctx, request.MetadataId, request.Key, request.Name, request.ContentType, request.ContentLength, request.TraitIds, request.SourceId, request.SourceIdentifier)
+	if err != nil {
+		return nil, err
+	}
+	return &grpc.MetadataSupplementary{
+		Id:               svc.getSupplementaryId(request.MetadataId, request.Key),
+		Key:              request.Key,
+		Name:             request.Name,
+		ContentType:      request.ContentType,
+		ContentLength:    request.ContentLength,
+		TraitIds:         request.TraitIds,
+		MetadataId:       request.MetadataId,
+		SourceIdentifier: request.SourceIdentifier,
+		SourceId:         request.SourceId,
+	}, err
 }
 
 func (svc *service) SetMetadataSupplementaryReady(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*protobuf.Empty, error) {
-	return nil, errors.New("TODO")
+	err := svc.ds.SetMetadataSupplementaryReady(ctx, request.Id, request.Key)
+	if err != nil {
+		return nil, err
+	}
+	return &protobuf.Empty{}, nil
 }
 
 func (svc *service) GetMetadataSupplementaryUploadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
-	id := request.Id + "." + request.Key
+	id := svc.getSupplementaryId(request.Id, request.Key)
 	return svc.objectStore.CreateDownloadUrl(ctx, id)
 }
 
 func (svc *service) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
-	id := request.Id + "." + request.Key
+	id := svc.getSupplementaryId(request.Id, request.Key)
 	return svc.objectStore.CreateDownloadUrl(ctx, id)
 }
 
 func (svc *service) DeleteMetadataSupplementary(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*protobuf.Empty, error) {
-	id := request.Id + "." + request.Key
-	err := svc.objectStore.Delete(ctx, id)
+	id := svc.getSupplementaryId(request.Id, request.Key)
+	err := svc.ds.DeleteMetadataSupplementary(ctx, request.Id, request.Key)
+	if err != nil {
+		return nil, err
+	}
+	err = svc.objectStore.Delete(ctx, id)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to delete supplementary file", slog.String("id", request.Id), slog.Any("error", err))
 		return nil, err

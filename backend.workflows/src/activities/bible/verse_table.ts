@@ -46,13 +46,10 @@ export class CreateVerseMarkdownTable extends Activity {
   }
 
   get id(): string {
-    return 'bible.verse.markdown.table'
+    return 'bible.book.verse.markdown.table'
   }
 
-  private async buildVerseMarkdownTable(chapter: Chapter) {
-    const table = [
-      ['USFM', 'Verse']
-    ]
+  private async buildVerseMarkdownTable(chapter: Chapter, table: string[][]) {
     const verses: Verse[] = []
     for (const verse in chapter.verseItems) {
       const usfmSplit = verse.split('.')
@@ -75,49 +72,52 @@ export class CreateVerseMarkdownTable extends Activity {
         verse.items.map((item) => item.toString().trim().replace('\r|\n', '')).join(' ')
       ])
     }
-    const { markdownTable } = await import('markdown-table');
-    return markdownTable(table)
   }
 
-  private async findChapterMetadata(metadata: BibleMetadata, chapter: Chapter): Promise<Metadata> {
+  private async findBookMetadata(metadata: BibleMetadata, book: Book): Promise<Metadata> {
     const chapterMetadatas = await useServiceClient(ContentService).findMetadata(new FindMetadataRequest({
       attributes: {
+        'bible.type': 'book',
         'bible.system.id': metadata.identification.systemId.id,
-        'bible.chapter.usfm': chapter.usfm
+        'bible.book.usfm': book.usfm
       }
     }))
     if (chapterMetadatas.metadata.length === 0) {
-      throw new Error('failed to find chapter: ' + chapter.usfm)
+      throw new Error('failed to find book: ' + book.usfm)
     }
     return chapterMetadatas.metadata[0]
   }
 
-  private async createVerseTable(workflowId: string, metadata: BibleMetadata, book: Book) {
+  private async createVerseTable(metadata: BibleMetadata, book: Book) {
+    const table = [
+      ['USFM', 'Verse']
+    ]
     const service = useServiceClient(ContentService)
     const source = await service.getSource(new IdRequest({id: 'workflow'}))
+    const bookMetadata = await this.findBookMetadata(metadata, book)
     for (const chapter of book.chapters) {
-      console.log('generating table for ' + chapter.usfm)
-      const chapterMetadata = await this.findChapterMetadata(metadata, chapter)
-      const markdown = await this.buildVerseMarkdownTable(chapter)
-      const buffer = toArrayBuffer(markdown)
-      const supplementary = await service.addMetadataSupplementary(new AddSupplementaryRequest({
-        metadataId: chapterMetadata.id,
-        name: 'Verse Markdown Table',
-        contentLength: protoInt64.parse(buffer.byteLength),
-        contentType: 'text/markdown',
-        key: 'verse-table-markdown',
-        sourceId: source.id,
-        sourceIdentifier: workflowId
-      }))
-      const uploadUrl = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({
-        id: chapterMetadata.id,
-        key: supplementary.key
-      }))
-      const uploadResponse = await execute(uploadUrl, buffer)
-      if (!uploadResponse.ok) {
-        throw new Error('failed to upload verse table: ' + chapter.usfm + ': ' + await uploadResponse.text())
-      }
+      await this.buildVerseMarkdownTable(chapter, table)
     }
+    const { markdownTable } = await import('markdown-table');
+    const markdown = markdownTable(table)
+    const buffer = toArrayBuffer(markdown)
+    const supplementary = await service.addMetadataSupplementary(new AddSupplementaryRequest({
+      metadataId: bookMetadata.id,
+      name: 'Verse Markdown Table',
+      contentLength: protoInt64.parse(buffer.byteLength),
+      contentType: 'text/markdown',
+      key: 'verse-table-markdown',
+      sourceId: source.id
+    }))
+    const uploadUrl = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({
+      id: bookMetadata.id,
+      key: supplementary.key
+    }))
+    const uploadResponse = await execute(uploadUrl, buffer)
+    if (!uploadResponse.ok) {
+      throw new Error('failed to upload verse table: ' + book.usfm + ': ' + await uploadResponse.text())
+    }
+    await service.setMetadataSupplementaryReady(new SupplementaryIdRequest({id: bookMetadata.id, key: 'verse-table-markdown'}))
   }
 
   async execute(activity: WorkflowActivityJob) {
@@ -126,7 +126,7 @@ export class CreateVerseMarkdownTable extends Activity {
       const processor = new USXProcessor()
       await processor.process(file)
       for (const book of processor.books) {
-        await this.createVerseTable(activity.workflowId, processor.metadata, book)
+        await this.createVerseTable(processor.metadata, book)
       }
     } finally {
       await this.downloader.cleanup(file)

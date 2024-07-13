@@ -107,10 +107,12 @@ export class UsxVerseItems {
   readonly usfm: string
   readonly verse: string
   readonly items: UsxItem[] = []
+  readonly position: Position
 
-  constructor(usfm: string, verse: string) {
+  constructor(usfm: string, verse: string, position: Position) {
     this.usfm = usfm
     this.verse = verse
+    this.position = position
   }
 
   addItem(item: UsxItem) {
@@ -136,8 +138,8 @@ export abstract class UsxContext {
     return this.positions[this.positions.length - 1]
   }
 
-  pushVerse(bookChapterUsfm: string, verse: string) {
-    this.verses.push(new UsxVerseItems(bookChapterUsfm + '.' + verse, verse))
+  pushVerse(bookChapterUsfm: string, verse: string, postiion: Position) {
+    this.verses.push(new UsxVerseItems(bookChapterUsfm + '.' + verse, verse, postiion))
   }
 
   popVerse(): UsxVerseItems {

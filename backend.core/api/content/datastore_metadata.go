@@ -39,6 +39,30 @@ func (ds *DataStore) AddMetadataRelationship(ctx context.Context, metadataId1 st
 	return nil
 }
 
+func (ds *DataStore) AddMetadataSupplementary(ctx context.Context, metadataId, key, name, contentType string, contentLength int64, traitIds []string, sourceId, sourceIdentifier *string) error {
+	_, err := ds.db.ExecContext(ctx, "INSERT INTO metadata_supplementary (metadata_id, \"key\", name, content_type, content_length, traits, source_id, source_identifier) values ($1::uuid, $2, $3, $4, $5, $6, $7, $8, $9)", metadataId, key, name, contentType, contentLength, traitIds, sourceId, sourceIdentifier)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ds *DataStore) SetMetadataSupplementaryReady(ctx context.Context, metadataId, key string) error {
+	_, err := ds.db.ExecContext(ctx, "update metadata_supplementary set uploaded = now() where metadata_id = $1::uuid and \"key\" = $2", metadataId, key)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ds *DataStore) DeleteMetadataSupplementary(ctx context.Context, metadataId, key string) error {
+	_, err := ds.db.ExecContext(ctx, "delete from metadata_supplementary where metadata_id = $1::uuid and \"key\" = $2", metadataId, key)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (ds *DataStore) AddMetadata(ctx context.Context, metadata *content.Metadata) (string, error) {
 	stmt, err := ds.db.PrepareContext(ctx, "INSERT INTO metadata (name, content_type, content_length, labels, attributes, source_id, source_identifier, language_tag) VALUES ($1, $2, $3, $4, ($5)::jsonb, $6, $7, $8) returning id")
 	if err != nil {
@@ -162,7 +186,7 @@ func (ds *DataStore) FindMetdata(ctx context.Context, request *content.FindMetad
 		return nil, err
 	}
 	defer metadataQuery.Close()
-	args := make([]any, 0, len(request.Attributes) * 2)
+	args := make([]any, 0, len(request.Attributes)*2)
 	for i, v := range request.Attributes {
 		args = append(args, i)
 		args = append(args, v)

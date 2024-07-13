@@ -145,9 +145,11 @@ class BookProcessorContext extends UsxContext {
       this.chapters.push(chapter)
       this.items.push(new UsxNode(node.factory, chapter, position))
     } else if (item instanceof VerseStart) {
-      this.pushVerse(this.chapters[this.chapters.length - 1].usfm, item.number)
+      this.pushVerse(this.chapters[this.chapters.length - 1].usfm, item.number, new Position(item.position.start))
     } else if (item instanceof VerseEnd) {
-      this.verseItems.push(this.popVerse())
+      const verse = this.popVerse()
+      verse.postiion.end = item.position.end
+      this.verseItems.push(verse)
     }
     if (node.item instanceof UsxItemContainer) {
       node.item.addItem(item)

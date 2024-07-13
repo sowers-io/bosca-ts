@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+./scripts/migrate-db content reset
+./scripts/migrate-db content up
+./scripts/migrate-db workflow reset
+./scripts/migrate-db workflow up

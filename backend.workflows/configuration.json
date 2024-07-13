@@ -1,0 +1,27 @@
+{
+  "queues": {
+    "metadata": {
+      "maxConcurrency": 100
+    },
+    "bible": {
+      "maxConcurrency": 100
+    }
+  },
+  "activities": {
+    "metadata.traits.process": {
+      "queue": "metadata"
+    },
+    "metadata.transition.to": {
+      "queue": "metadata"
+    },
+    "bible.process": {
+      "queue": "bible"
+    },
+    "bible.chapter.verses.create": {
+      "queue": "bible"
+    },
+    "bible.book.verse.markdown.table": {
+      "queue": "bible"
+    }
+  }
+}

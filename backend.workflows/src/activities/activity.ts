@@ -25,7 +25,6 @@ export class ActivityResult {
 }
 
 export abstract class Activity {
-
   abstract get id(): string
 
   abstract execute(activity: WorkflowActivityJob): Promise<ActivityResult | void>

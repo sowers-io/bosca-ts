@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { WorkflowExecutor } from './workflow_executor'
+import { Executor } from './executor'
 import { ProcessBibleActivity } from './activities/bible/process'
 import { DefaultDownloader } from './util/downloader'
 import { CreateVerseMarkdownTable } from './activities/bible/verse_table'
@@ -23,48 +23,42 @@ import { ProcessTraitsActivity } from './activities/metadata/traits/process'
 import { DeleteBibleActivity } from './activities/bible/delete'
 import { TransitionToActivity } from './activities/metadata/transition_to'
 import { CreateVerses } from './activities/bible/verse_create'
+import * as fs from 'node:fs'
+import { getConfiguration } from './configuration'
 
 const downloader = new DefaultDownloader()
 
-const activities = [
-  new ProcessTraitsActivity(),
-  new ProcessBibleActivity(downloader),
-  new DeleteBibleActivity(downloader),
-  new CreateVerseMarkdownTable(downloader),
-  new CreateVerses(downloader),
-  new TransitionToActivity()
-]
-
-async function main() {
-  const executor = new WorkflowExecutor()
-  const activitiesAndQueues = process.env.ACTIVITIES?.split(',')
-  if (!activitiesAndQueues) {
-    throw new Error('Environment variable `ACTIVITIES` is required')
-  }
-
+function getAvailableActivities(): { [id: string]: Activity } {
+  const activities = [
+    new ProcessTraitsActivity(),
+    new ProcessBibleActivity(downloader),
+    new DeleteBibleActivity(downloader),
+    new CreateVerseMarkdownTable(downloader),
+    new CreateVerses(downloader),
+    new TransitionToActivity(),
+  ]
   const activitiesById: { [id: string]: Activity } = {}
   for (const activity of activities) {
     activitiesById[activity.id] = activity
   }
+  return activitiesById
+}
 
-  for (const activityAndQueueStr of activitiesAndQueues) {
-    if (activityAndQueueStr.trim() === '') continue
-    const activityAndQueue = activityAndQueueStr.split(':')
-    const activityId = activityAndQueue[0].trim()
-    if (activityAndQueue.length === 1) {
-      throw new Error('missing queue definition for ' + activityId + ' in the form of activity:queue')
-    }
-    const queue = activityAndQueue[1].trim()
+async function main() {
+  const executor = new Executor()
+  const configuration = getConfiguration()
+  const activities = getAvailableActivities()
 
-    if (queue === '') {
-      throw new Error('missing queue definition for ' + activityId + ' in the form of activity:queue')
-    }
+  for (const queueConfigurationId in configuration.queues) {
+    const queueConfiguration = configuration.queues[queueConfigurationId]
+    executor.registerQueue(queueConfigurationId, queueConfiguration.maxConcurrency)
+  }
 
-    console.log('registering activity ' + activityId + ' for queue ' + queue)
-
-    const activity = activitiesById[activityId]
-    if (!activity) throw new Error('couldn\'t find activity: ' + activityId)
-    executor.register(queue, activity)
+  for (const activityConfigurationId in configuration.activities) {
+    const activityConfiguration = configuration.activities[activityConfigurationId]
+    const activity = activities[activityConfigurationId]
+    if (!activity) throw new Error("couldn't find activity: " + activityConfigurationId)
+    executor.registerActivity(activityConfiguration.queue, activity)
   }
 
   await executor.execute()

@@ -7,9 +7,7 @@ traits:
   bible.usx.book:
     workflowIds:
       - bible.usx.book
-  bible.usx.chapter:
-    workflowIds:
-      - bible.usx.chapter
+  bible.usx.chapter: { }
   bible.usx.verse:
     workflowIds:
       - bible.usx.verse
@@ -182,7 +180,7 @@ workflows:
       activities:
         bible.process: { }
       queue: bible
-    ## bible chapter workflow
+    ## bible book workflow
     bible.usx.book:
       activities:
         bible.book.verse.markdown.table:

@@ -19,18 +19,16 @@ import { BibleMetadata, Book, USXProcessor } from '@bosca/bible/lib'
 import { Downloader } from '../../util/downloader'
 import { useServiceClient } from '../../util/util'
 import { ContentService } from '../../generated/protobuf/bosca/content/service_connect'
-import {
-  AddSupplementaryRequest,
-  FindMetadataRequest,
-  Metadata
-} from '../../generated/protobuf/bosca/content/metadata_pb'
-import { execute, toArrayBuffer } from '../../util/http'
-import { protoInt64 } from '@bufbuild/protobuf'
-import { IdRequest, SupplementaryIdRequest } from '../../generated/protobuf/bosca/requests_pb'
+import { toArrayBuffer } from '../../util/http'
+import { IdRequest } from '../../generated/protobuf/bosca/requests_pb'
 import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/execution_context_pb'
+import { findFirstMetadata } from '../../util/finder'
+import { Source } from '../../generated/protobuf/bosca/content/sources_pb'
+import { uploadSupplementary } from '../../util/uploader'
+import { Retry } from '../../util/retry'
+import { Queue } from '../../util/queue'
 
 export class CreateVerseMarkdownTable extends Activity {
-
   private readonly downloader: Downloader
 
   constructor(downloader: Downloader) {
@@ -42,68 +40,49 @@ export class CreateVerseMarkdownTable extends Activity {
     return 'bible.book.verse.markdown.table'
   }
 
-  private async findBookMetadata(metadata: BibleMetadata, book: Book): Promise<Metadata> {
-    const chapterMetadatas = await useServiceClient(ContentService).findMetadata(new FindMetadataRequest({
-      attributes: {
+  private async createVerseTable(source: Source, metadata: BibleMetadata, book: Book, key: string) {
+    await Retry.execute(10, async () => {
+      const table = [['USFM', 'Verse']]
+      const bookMetadata = await findFirstMetadata({
         'bible.type': 'book',
         'bible.system.id': metadata.identification.systemId.id,
-        'bible.book.usfm': book.usfm
+        'bible.book.usfm': book.usfm,
+      })
+      for (const chapter of book.chapters) {
+        for (const verse of chapter.getVerses(book)) {
+          table.push([verse.usfm, verse.items.map((item) => item.toString().trim().replace('\r|\n', '')).join(' ')])
+        }
       }
-    }))
-    if (chapterMetadatas.metadata.length === 0) {
-      throw new Error('failed to find book: ' + book.usfm)
-    }
-    return chapterMetadatas.metadata[0]
+      const { markdownTable } = await import('markdown-table')
+      const markdown = markdownTable(table)
+      const buffer = toArrayBuffer(markdown)
+      await uploadSupplementary(
+        bookMetadata.id,
+        'Verse Markdown Table',
+        'text/markdown',
+        'verse-table-markdown',
+        source.id,
+        undefined,
+        buffer
+      )
+    })
   }
 
-  private async createVerseTable(metadata: BibleMetadata, book: Book, key: string) {
-    const table = [
-      ['USFM', 'Verse']
-    ]
-    const service = useServiceClient(ContentService)
-    const source = await service.getSource(new IdRequest({ id: 'workflow' }))
-    const bookMetadata = await this.findBookMetadata(metadata, book)
-    for (const chapter of book.chapters) {
-      for (const verse of chapter.getVerses(book)) {
-        table.push([
-          verse.usfm,
-          verse.items.map((item) => item.toString().trim().replace('\r|\n', '')).join(' ')
-        ])
-      }
-    }
-    const { markdownTable } = await import('markdown-table')
-    const markdown = markdownTable(table)
-    const buffer = toArrayBuffer(markdown)
-    const supplementary = await service.addMetadataSupplementary(new AddSupplementaryRequest({
-      metadataId: bookMetadata.id,
-      name: 'Verse Markdown Table',
-      contentLength: protoInt64.parse(buffer.byteLength),
-      contentType: 'text/markdown',
-      key: 'verse-table-markdown',
-      sourceId: source.id
-    }))
-    const uploadUrl = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({
-      id: bookMetadata.id,
-      key: supplementary.key
-    }))
-    const uploadResponse = await execute(uploadUrl, buffer)
-    if (!uploadResponse.ok) {
-      throw new Error('failed to upload verse table: ' + book.usfm + ': ' + await uploadResponse.text())
-    }
-    await service.setMetadataSupplementaryReady(new SupplementaryIdRequest({
-      id: bookMetadata.id,
-      key: key
-    }))
+  private async enqueueBook(queue: Queue, source: Source, processor: USXProcessor, book: Book, key: string) {
+    const creator = this
+    await queue.enqueue(() => creator.createVerseTable(source, processor.metadata, book, key))
   }
 
   async execute(activity: WorkflowActivityJob) {
     const file = await this.downloader.download(activity)
     try {
+      const source = await useServiceClient(ContentService).getSource(new IdRequest({ id: 'workflow' }))
       const key = activity.activity!.outputs['supplementaryId']!.value.value as string
       const processor = new USXProcessor()
       await processor.process(file)
+      const queue = new Queue(this.id, 4)
       for (const book of processor.books) {
-        await this.createVerseTable(processor.metadata, book, key)
+        await this.enqueueBook(queue, source, processor, book, key)
       }
     } finally {
       await this.downloader.cleanup(file)

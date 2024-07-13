@@ -16,7 +16,8 @@
 
 import { Activity } from '../../activity'
 import {
-  WorkflowActivityJob, WorkflowExecutionRequest
+  WorkflowActivityJob,
+  WorkflowExecutionRequest,
 } from '../../../generated/protobuf/bosca/workflow/execution_context_pb'
 import { useServiceClient } from '../../../util/util'
 import { ContentService } from '../../../generated/protobuf/bosca/content/service_connect'
@@ -24,16 +25,28 @@ import { Empty } from '../../../generated/protobuf/bosca/empty_pb'
 import { IdRequest } from '../../../generated/protobuf/bosca/requests_pb'
 import { Trait } from '../../../generated/protobuf/bosca/content/traits_pb'
 import { WorkflowService } from '../../../generated/protobuf/bosca/workflow/service_connect'
+import { Retry } from '../../../util/retry'
 
 export class ProcessTraitsActivity extends Activity {
-
   get id(): string {
     return 'metadata.traits.process'
   }
 
+  private async executeWorkflow(workflowId: string, activity: WorkflowActivityJob) {
+    await Retry.execute(100, async () => {
+      const workflowService = useServiceClient(WorkflowService)
+      await workflowService.executeWorkflow(
+        new WorkflowExecutionRequest({
+          parentExecutionId: activity.executionId,
+          workflowId: workflowId,
+          metadataId: activity.metadataId,
+        })
+      )
+    })
+  }
+
   async execute(activity: WorkflowActivityJob) {
     const contentService = useServiceClient(ContentService)
-    const workflowService = useServiceClient(WorkflowService)
     const metadata = await contentService.getMetadata(new IdRequest({ id: activity.metadataId }))
     if (!metadata.traitIds || metadata.traitIds.length === 0) return
 
@@ -48,11 +61,7 @@ export class ProcessTraitsActivity extends Activity {
       if (!trait.workflowIds || trait.workflowIds.length === 0) continue
 
       for (const workflowId of trait.workflowIds) {
-        await workflowService.executeWorkflow(new WorkflowExecutionRequest({
-          parentExecutionId: activity.executionId,
-          workflowId: workflowId,
-          metadataId: activity.metadataId,
-        }))
+        await this.executeWorkflow(workflowId, activity)
       }
     }
   }

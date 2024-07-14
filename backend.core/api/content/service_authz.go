@@ -113,6 +113,14 @@ func (svc *authorizationService) AddCollection(ctx context.Context, request *grp
 	return svc.service.AddCollection(ctx, request)
 }
 
+func (svc *authorizationService) SetCollectionReady(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_collection_type, request.Id, grpc.PermissionAction_service)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.SetCollectionReady(ctx, request)
+}
+
 func (svc *authorizationService) AddCollections(ctx context.Context, request *grpc.AddCollectionsRequest) (*protobuf.IdResponses, error) {
 	parentIdsMap := make(map[string]bool)
 	for _, collection := range request.Collections {

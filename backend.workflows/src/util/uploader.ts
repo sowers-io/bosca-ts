@@ -25,13 +25,21 @@ export async function uploadAll(response: IdResponses, buffers: ArrayBuffer[]) {
 
 export async function upload(id: string, buffer: ArrayBuffer) {
   return Retry.execute(10, async () => {
-    const idRequest = new IdRequest({ id: id })
-    const uploadUrl = await getMetadataUploadUrl(idRequest)
-    const uploadResponse = await execute(uploadUrl, buffer)
-    if (!uploadResponse.ok) {
-      throw new Error('failed to upload content: ' + (await uploadResponse.text()))
+    console.log('starting upload:', id, 'length:', buffer.byteLength)
+    try {
+      const idRequest = new IdRequest({id: id})
+      const uploadUrl = await getMetadataUploadUrl(idRequest)
+      console.log('uploading:', id, 'length:', buffer.byteLength, 'headers:', uploadUrl.headers)
+      const uploadResponse = await execute(uploadUrl, buffer)
+      if (!uploadResponse.ok) {
+        throw new Error('failed to upload content: ' + (await uploadResponse.text()))
+      }
+      await useServiceClient(ContentService).setMetadataReady(idRequest)
+      console.log('finished upload:', id, 'length:', buffer.byteLength)
+    } catch (e) {
+      console.log('upload failed:', id, 'length:', buffer.byteLength)
+      throw e
     }
-    await useServiceClient(ContentService).setMetadataReady(idRequest)
   })
 }
 
@@ -52,7 +60,7 @@ export async function uploadSupplementary(
   sourceIdentifier: string | undefined,
   buffer: ArrayBuffer
 ) {
-  return Retry.execute(10, async () => {
+  const supplementary = await Retry.execute(10, async () => {
     const service = useServiceClient(ContentService)
     const request = {
       metadataId: metadataId,
@@ -63,8 +71,10 @@ export async function uploadSupplementary(
       sourceId: sourceId,
       sourceIdentifier: sourceIdentifier,
     }
-    const supplementary = await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
-    const idRequest = new SupplementaryIdRequest({ id: supplementary.id, key: supplementary.key })
+    return await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
+  })
+  return Retry.execute(10, async () => {
+    const idRequest = new SupplementaryIdRequest({ id: supplementary.metadataId, key: supplementary.key })
     const uploadUrl = await getMetadataSupplementaryUploadUrl(idRequest)
     const uploadResponse = await execute(uploadUrl, buffer)
     if (!uploadResponse.ok) {

@@ -20,7 +20,7 @@ export class Retry {
   private readonly maxBackoff: number
   private currentBackoff: number
 
-  constructor(retries: number, backoff: number = 3000, maxBackoff: number = 60000) {
+  constructor(retries: number, backoff: number = 500, maxBackoff: number = 20000) {
     this.retries = retries
     this.backoff = backoff
     this.maxBackoff = maxBackoff
@@ -31,6 +31,7 @@ export class Retry {
     let tries = 0
     const retrier = this
     while (tries < this.retries) {
+      tries++
       try {
         return await fn()
       } catch (error) {
@@ -38,9 +39,8 @@ export class Retry {
           throw error
         }
         this.currentBackoff = Math.min(this.currentBackoff + this.backoff, this.maxBackoff)
-        console.error('failed to execute function, retrying... backoff: ' + this.currentBackoff + 'ms')
+        console.error('failed to execute function, retrying... backoff: ' + this.currentBackoff + 'ms', error)
         await new Promise((resolve) => setTimeout(resolve, retrier.currentBackoff))
-        tries++
       }
     }
     throw new Error('retry failed')

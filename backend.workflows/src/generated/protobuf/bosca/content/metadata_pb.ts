@@ -196,47 +196,42 @@ export class MetadataSupplementaries extends Message<MetadataSupplementaries> {
  */
 export class MetadataSupplementary extends Message<MetadataSupplementary> {
   /**
-   * @generated from field: string id = 1;
-   */
-  id = "";
-
-  /**
-   * @generated from field: string metadata_id = 2;
+   * @generated from field: string metadata_id = 1;
    */
   metadataId = "";
 
   /**
-   * @generated from field: string key = 3;
+   * @generated from field: string key = 2;
    */
   key = "";
 
   /**
-   * @generated from field: string name = 4;
+   * @generated from field: string name = 3;
    */
   name = "";
 
   /**
-   * @generated from field: string content_type = 5;
+   * @generated from field: string content_type = 4;
    */
   contentType = "";
 
   /**
-   * @generated from field: int64 content_length = 6;
+   * @generated from field: int64 content_length = 5;
    */
   contentLength = protoInt64.zero;
 
   /**
-   * @generated from field: repeated string trait_ids = 7;
+   * @generated from field: repeated string trait_ids = 6;
    */
   traitIds: string[] = [];
 
   /**
-   * @generated from field: optional string source_id = 8;
+   * @generated from field: optional string source_id = 7;
    */
   sourceId?: string;
 
   /**
-   * @generated from field: optional string source_identifier = 9;
+   * @generated from field: optional string source_identifier = 8;
    */
   sourceIdentifier?: string;
 
@@ -248,15 +243,14 @@ export class MetadataSupplementary extends Message<MetadataSupplementary> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "bosca.content.MetadataSupplementary";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "content_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "content_length", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 7, name: "trait_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 8, name: "source_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
-    { no: 9, name: "source_identifier", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 1, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "content_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "content_length", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 6, name: "trait_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 7, name: "source_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 8, name: "source_identifier", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MetadataSupplementary {

@@ -204,6 +204,11 @@ export class Collection extends Message<Collection> {
   type = CollectionType.standard;
 
   /**
+   * @generated from field: repeated string trait_ids = 11;
+   */
+  traitIds: string[] = [];
+
+  /**
    * @generated from field: repeated string category_ids = 12;
    */
   categoryIds: string[] = [];
@@ -244,6 +249,7 @@ export class Collection extends Message<Collection> {
     { no: 2, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "type", kind: "enum", T: proto3.getEnumType(CollectionType) },
+    { no: 11, name: "trait_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 12, name: "category_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 13, name: "labels", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 14, name: "attributes", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },

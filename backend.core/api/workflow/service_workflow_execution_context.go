@@ -24,19 +24,14 @@ import (
 	"log/slog"
 )
 
-func (svc *service) getNewWorkflowExecutionContext(ctx context.Context, workflowId string, metadataId string, context map[string]string) (*grpc.WorkflowExecutionContext, error) {
-	metadata, err := svc.getMetadata(ctx, metadataId)
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to get metadata", slog.String("id", metadataId), slog.String("workflowId", workflowId))
-		return nil, err
-	}
+func (svc *service) getNewWorkflowExecutionContext(ctx context.Context, workflowId string, metadataId *string, collectionId *string, context map[string]string) (*grpc.WorkflowExecutionContext, error) {
 	workflow, err := svc.ds.GetWorkflow(ctx, workflowId)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to get workflow", slog.String("id", metadata.Id), slog.String("workflowId", workflowId))
+		slog.ErrorContext(ctx, "failed to get workflow", slog.Any("metadataId", metadataId), slog.Any("collectionId", collectionId), slog.String("workflowId", workflowId))
 		return nil, err
 	}
 	if workflow == nil {
-		slog.ErrorContext(ctx, "workflow not found", slog.String("id", metadata.Id), slog.String("workflowId", workflowId))
+		slog.ErrorContext(ctx, "workflow not found", slog.Any("metadataId", metadataId), slog.Any("collectionId", collectionId), slog.String("workflowId", workflowId))
 		return nil, status.Error(codes.Internal, "workflow not found")
 	}
 	activities, err := svc.ds.GetWorkflowActivities(ctx, workflowId)
@@ -45,6 +40,7 @@ func (svc *service) getNewWorkflowExecutionContext(ctx context.Context, workflow
 	}
 	return &grpc.WorkflowExecutionContext{
 		MetadataId:            metadataId,
+		CollectionId:          collectionId,
 		WorkflowId:            workflowId,
 		Activities:            activities,
 		Context:               context,

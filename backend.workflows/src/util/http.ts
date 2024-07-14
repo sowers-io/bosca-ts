@@ -36,7 +36,8 @@ export async function execute(signedUrl: SignedUrl, body?: BodyInit | null): Pro
       cache: 'no-cache',
       keepalive: false,
       // @ts-ignore
-      duplex: 'half'
+      duplex: 'half',
+      signal: AbortSignal.timeout(10000)
     })
     if (!response.ok) {
       console.error('failed to execute request: ' + await response.text())

@@ -17,14 +17,13 @@
 import { Executor } from './executor'
 import { ProcessBibleActivity } from './activities/bible/process'
 import { DefaultDownloader } from './util/downloader'
-import { CreateVerseMarkdownTable } from './activities/bible/verse_table'
 import { Activity } from './activities/activity'
 import { ProcessTraitsActivity } from './activities/metadata/traits/process'
 import { DeleteBibleActivity } from './activities/bible/delete'
 import { TransitionToActivity } from './activities/metadata/transition_to'
-import { CreateVerses } from './activities/bible/verse_create'
-import * as fs from 'node:fs'
 import { getConfiguration } from './configuration'
+import { CreateVerseMarkdownTable } from './activities/bible/book/verse_table'
+import { CreateVerses } from './activities/bible/book/verse_create'
 
 const downloader = new DefaultDownloader()
 

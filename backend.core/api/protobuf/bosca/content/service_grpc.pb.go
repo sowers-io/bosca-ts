@@ -42,6 +42,7 @@ const (
 	ContentService_GetRootCollectionItems_FullMethodName              = "/bosca.content.ContentService/GetRootCollectionItems"
 	ContentService_GetCollectionItems_FullMethodName                  = "/bosca.content.ContentService/GetCollectionItems"
 	ContentService_AddCollection_FullMethodName                       = "/bosca.content.ContentService/AddCollection"
+	ContentService_SetCollectionReady_FullMethodName                  = "/bosca.content.ContentService/SetCollectionReady"
 	ContentService_AddCollections_FullMethodName                      = "/bosca.content.ContentService/AddCollections"
 	ContentService_GetCollection_FullMethodName                       = "/bosca.content.ContentService/GetCollection"
 	ContentService_DeleteCollection_FullMethodName                    = "/bosca.content.ContentService/DeleteCollection"
@@ -86,6 +87,7 @@ type ContentServiceClient interface {
 	GetRootCollectionItems(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*CollectionItems, error)
 	GetCollectionItems(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*CollectionItems, error)
 	AddCollection(ctx context.Context, in *AddCollectionRequest, opts ...grpc.CallOption) (*bosca.IdResponse, error)
+	SetCollectionReady(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddCollections(ctx context.Context, in *AddCollectionsRequest, opts ...grpc.CallOption) (*bosca.IdResponses, error)
 	GetCollection(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Collection, error)
 	DeleteCollection(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
@@ -191,6 +193,16 @@ func (c *contentServiceClient) AddCollection(ctx context.Context, in *AddCollect
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.IdResponse)
 	err := c.cc.Invoke(ctx, ContentService_AddCollection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) SetCollectionReady(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_SetCollectionReady_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -518,6 +530,7 @@ type ContentServiceServer interface {
 	GetRootCollectionItems(context.Context, *bosca.Empty) (*CollectionItems, error)
 	GetCollectionItems(context.Context, *bosca.IdRequest) (*CollectionItems, error)
 	AddCollection(context.Context, *AddCollectionRequest) (*bosca.IdResponse, error)
+	SetCollectionReady(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
 	AddCollections(context.Context, *AddCollectionsRequest) (*bosca.IdResponses, error)
 	GetCollection(context.Context, *bosca.IdRequest) (*Collection, error)
 	DeleteCollection(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
@@ -576,6 +589,9 @@ func (UnimplementedContentServiceServer) GetCollectionItems(context.Context, *bo
 }
 func (UnimplementedContentServiceServer) AddCollection(context.Context, *AddCollectionRequest) (*bosca.IdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollection not implemented")
+}
+func (UnimplementedContentServiceServer) SetCollectionReady(context.Context, *bosca.IdRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetCollectionReady not implemented")
 }
 func (UnimplementedContentServiceServer) AddCollections(context.Context, *AddCollectionsRequest) (*bosca.IdResponses, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollections not implemented")
@@ -805,6 +821,24 @@ func _ContentService_AddCollection_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).AddCollection(ctx, req.(*AddCollectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_SetCollectionReady_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).SetCollectionReady(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_SetCollectionReady_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).SetCollectionReady(ctx, req.(*bosca.IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1401,6 +1435,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddCollection",
 			Handler:    _ContentService_AddCollection_Handler,
+		},
+		{
+			MethodName: "SetCollectionReady",
+			Handler:    _ContentService_SetCollectionReady_Handler,
 		},
 		{
 			MethodName: "AddCollections",

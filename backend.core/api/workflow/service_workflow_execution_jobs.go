@@ -36,10 +36,13 @@ func (svc *service) claimNextJob(svr grpc.WorkflowService_GetWorkflowActivityJob
 		return err
 	}
 	if job != nil {
+		slog.InfoContext(svr.Context(), "found job available", slog.String("queue", request.Queue), slog.String("workerId", workerId), slog.String("executionId", job.ExecutionId))
 		err = svr.Send(job)
 		if err != nil {
 			return err
 		}
+	} else {
+		slog.InfoContext(svr.Context(), "no jobs available", slog.String("queue", request.Queue), slog.String("workerId", workerId))
 	}
 	return nil
 }
@@ -58,7 +61,7 @@ func (svc *service) GetWorkflowActivityJobs(request *grpc.WorkflowActivityJobReq
 		case <-svr.Context().Done():
 			return svc.ds.UnregisterWorker(svr.Context(), workerId)
 		case notification := <-queueChannel:
-			slog.InfoContext(svr.Context(), "checking for new jobs", slog.String("queue", request.Queue), slog.String("executionId", notification.ExecutionId))
+			slog.InfoContext(svr.Context(), "checking for new jobs", slog.String("queue", request.Queue), slog.String("workerId", workerId), slog.String("executionId", notification.ExecutionId))
 			if err = svc.claimNextJob(svr, workerId, request); err != nil {
 				return err
 			}

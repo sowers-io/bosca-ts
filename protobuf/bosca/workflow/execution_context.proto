@@ -24,9 +24,10 @@ package bosca.workflow;
 message WorkflowExecutionRequest {
   optional string parent_execution_id = 1;
   string workflow_id = 2;
-  string metadata_id = 3;
-  bool wait_for_completion = 4;
-  map<string, string> context = 5;
+  optional string metadata_id = 3;
+  optional string collection_id = 4;
+  bool wait_for_completion = 5;
+  map<string, string> context = 6;
 }
 
 message WorkflowExecutionResponse {
@@ -43,8 +44,9 @@ message WorkflowExecutionContext {
   string execution_id = 3;
   repeated WorkflowActivity activities = 4;
   int32 current_execution_group = 5;
-  string metadata_id = 6;
-  map<string, string> context = 7;
+  optional string metadata_id = 6;
+  optional string collection_id = 7;
+  map<string, string> context = 8;
 }
 
 message WorkflowActivityJob {
@@ -52,14 +54,15 @@ message WorkflowActivityJob {
   string execution_id = 2;
   string workflow_id = 3;
   string metadata_id = 4;
-  WorkflowActivity activity = 5;
-  repeated WorkflowActivityPrompt prompts = 6;
-  repeated WorkflowActivityStorageSystem storage_systems = 7;
-  repeated WorkflowActivityModel models = 8;
-  map<string, string> context = 9;
-  bool complete = 10;
-  bool success = 11;
-  optional string error = 12;
+  string collection_id = 5;
+  WorkflowActivity activity = 6;
+  repeated WorkflowActivityPrompt prompts = 7;
+  repeated WorkflowActivityStorageSystem storage_systems = 8;
+  repeated WorkflowActivityModel models = 9;
+  map<string, string> context = 10;
+  bool complete = 11;
+  bool success = 12;
+  optional string error = 13;
 }
 
 message WorkflowActivityJobRequest {

@@ -41,7 +41,6 @@ const (
 	WorkflowActivityParameterType_unknown_activity_parameter_type WorkflowActivityParameterType = 0
 	WorkflowActivityParameterType_context                         WorkflowActivityParameterType = 1
 	WorkflowActivityParameterType_supplementary                   WorkflowActivityParameterType = 2
-	WorkflowActivityParameterType_supplementary_array             WorkflowActivityParameterType = 3
 )
 
 // Enum value maps for WorkflowActivityParameterType.
@@ -50,13 +49,11 @@ var (
 		0: "unknown_activity_parameter_type",
 		1: "context",
 		2: "supplementary",
-		3: "supplementary_array",
 	}
 	WorkflowActivityParameterType_value = map[string]int32{
 		"unknown_activity_parameter_type": 0,
 		"context":                         1,
 		"supplementary":                   2,
-		"supplementary_array":             3,
 	}
 )
 
@@ -182,134 +179,6 @@ func (x *Activity) GetOutputs() map[string]WorkflowActivityParameterType {
 	return nil
 }
 
-type WorkflowActivityParameterValue struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Types that are assignable to Value:
-	//
-	//	*WorkflowActivityParameterValue_SingleValue
-	//	*WorkflowActivityParameterValue_ArrayValue
-	Value isWorkflowActivityParameterValue_Value `protobuf_oneof:"value"`
-}
-
-func (x *WorkflowActivityParameterValue) Reset() {
-	*x = WorkflowActivityParameterValue{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *WorkflowActivityParameterValue) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*WorkflowActivityParameterValue) ProtoMessage() {}
-
-func (x *WorkflowActivityParameterValue) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use WorkflowActivityParameterValue.ProtoReflect.Descriptor instead.
-func (*WorkflowActivityParameterValue) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{1}
-}
-
-func (m *WorkflowActivityParameterValue) GetValue() isWorkflowActivityParameterValue_Value {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-func (x *WorkflowActivityParameterValue) GetSingleValue() string {
-	if x, ok := x.GetValue().(*WorkflowActivityParameterValue_SingleValue); ok {
-		return x.SingleValue
-	}
-	return ""
-}
-
-func (x *WorkflowActivityParameterValue) GetArrayValue() *WorkflowActivityParameterValues {
-	if x, ok := x.GetValue().(*WorkflowActivityParameterValue_ArrayValue); ok {
-		return x.ArrayValue
-	}
-	return nil
-}
-
-type isWorkflowActivityParameterValue_Value interface {
-	isWorkflowActivityParameterValue_Value()
-}
-
-type WorkflowActivityParameterValue_SingleValue struct {
-	SingleValue string `protobuf:"bytes,1,opt,name=single_value,json=singleValue,proto3,oneof"`
-}
-
-type WorkflowActivityParameterValue_ArrayValue struct {
-	ArrayValue *WorkflowActivityParameterValues `protobuf:"bytes,2,opt,name=array_value,json=arrayValue,proto3,oneof"`
-}
-
-func (*WorkflowActivityParameterValue_SingleValue) isWorkflowActivityParameterValue_Value() {}
-
-func (*WorkflowActivityParameterValue_ArrayValue) isWorkflowActivityParameterValue_Value() {}
-
-type WorkflowActivityParameterValues struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Values []string `protobuf:"bytes,2,rep,name=values,proto3" json:"values,omitempty"`
-}
-
-func (x *WorkflowActivityParameterValues) Reset() {
-	*x = WorkflowActivityParameterValues{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *WorkflowActivityParameterValues) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*WorkflowActivityParameterValues) ProtoMessage() {}
-
-func (x *WorkflowActivityParameterValues) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use WorkflowActivityParameterValues.ProtoReflect.Descriptor instead.
-func (*WorkflowActivityParameterValues) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *WorkflowActivityParameterValues) GetValues() []string {
-	if x != nil {
-		return x.Values
-	}
-	return nil
-}
-
 type WorkflowActivityPrompt struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -322,7 +191,7 @@ type WorkflowActivityPrompt struct {
 func (x *WorkflowActivityPrompt) Reset() {
 	*x = WorkflowActivityPrompt{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[3]
+		mi := &file_bosca_workflow_activities_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -335,7 +204,7 @@ func (x *WorkflowActivityPrompt) String() string {
 func (*WorkflowActivityPrompt) ProtoMessage() {}
 
 func (x *WorkflowActivityPrompt) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[3]
+	mi := &file_bosca_workflow_activities_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -348,7 +217,7 @@ func (x *WorkflowActivityPrompt) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowActivityPrompt.ProtoReflect.Descriptor instead.
 func (*WorkflowActivityPrompt) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{3}
+	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *WorkflowActivityPrompt) GetPrompt() *Prompt {
@@ -376,7 +245,7 @@ type WorkflowActivityPrompts struct {
 func (x *WorkflowActivityPrompts) Reset() {
 	*x = WorkflowActivityPrompts{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[4]
+		mi := &file_bosca_workflow_activities_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -389,7 +258,7 @@ func (x *WorkflowActivityPrompts) String() string {
 func (*WorkflowActivityPrompts) ProtoMessage() {}
 
 func (x *WorkflowActivityPrompts) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[4]
+	mi := &file_bosca_workflow_activities_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -402,7 +271,7 @@ func (x *WorkflowActivityPrompts) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowActivityPrompts.ProtoReflect.Descriptor instead.
 func (*WorkflowActivityPrompts) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{4}
+	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *WorkflowActivityPrompts) GetPrompts() []*WorkflowActivityPrompt {
@@ -425,7 +294,7 @@ type WorkflowActivityStorageSystem struct {
 func (x *WorkflowActivityStorageSystem) Reset() {
 	*x = WorkflowActivityStorageSystem{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[5]
+		mi := &file_bosca_workflow_activities_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -438,7 +307,7 @@ func (x *WorkflowActivityStorageSystem) String() string {
 func (*WorkflowActivityStorageSystem) ProtoMessage() {}
 
 func (x *WorkflowActivityStorageSystem) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[5]
+	mi := &file_bosca_workflow_activities_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -451,7 +320,7 @@ func (x *WorkflowActivityStorageSystem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowActivityStorageSystem.ProtoReflect.Descriptor instead.
 func (*WorkflowActivityStorageSystem) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{5}
+	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *WorkflowActivityStorageSystem) GetStorageSystem() *StorageSystem {
@@ -486,7 +355,7 @@ type WorkflowActivityStorageSystems struct {
 func (x *WorkflowActivityStorageSystems) Reset() {
 	*x = WorkflowActivityStorageSystems{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[6]
+		mi := &file_bosca_workflow_activities_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -499,7 +368,7 @@ func (x *WorkflowActivityStorageSystems) String() string {
 func (*WorkflowActivityStorageSystems) ProtoMessage() {}
 
 func (x *WorkflowActivityStorageSystems) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[6]
+	mi := &file_bosca_workflow_activities_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -512,7 +381,7 @@ func (x *WorkflowActivityStorageSystems) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowActivityStorageSystems.ProtoReflect.Descriptor instead.
 func (*WorkflowActivityStorageSystems) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{6}
+	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *WorkflowActivityStorageSystems) GetSystems() []*WorkflowActivityStorageSystem {
@@ -534,7 +403,7 @@ type WorkflowActivityModel struct {
 func (x *WorkflowActivityModel) Reset() {
 	*x = WorkflowActivityModel{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[7]
+		mi := &file_bosca_workflow_activities_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -547,7 +416,7 @@ func (x *WorkflowActivityModel) String() string {
 func (*WorkflowActivityModel) ProtoMessage() {}
 
 func (x *WorkflowActivityModel) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[7]
+	mi := &file_bosca_workflow_activities_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -560,7 +429,7 @@ func (x *WorkflowActivityModel) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowActivityModel.ProtoReflect.Descriptor instead.
 func (*WorkflowActivityModel) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{7}
+	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *WorkflowActivityModel) GetModel() *Model {
@@ -582,20 +451,20 @@ type WorkflowActivity struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	WorkflowActivityId int64                                      `protobuf:"varint,1,opt,name=workflow_activity_id,json=workflowActivityId,proto3" json:"workflow_activity_id,omitempty"`
-	ActivityId         string                                     `protobuf:"bytes,2,opt,name=activity_id,json=activityId,proto3" json:"activity_id,omitempty"`
-	ChildWorkflowId    *string                                    `protobuf:"bytes,3,opt,name=child_workflow_id,json=childWorkflowId,proto3,oneof" json:"child_workflow_id,omitempty"`
-	Queue              string                                     `protobuf:"bytes,4,opt,name=queue,proto3" json:"queue,omitempty"`
-	ExecutionGroup     int32                                      `protobuf:"varint,5,opt,name=execution_group,json=executionGroup,proto3" json:"execution_group,omitempty"`
-	Configuration      map[string]string                          `protobuf:"bytes,6,rep,name=configuration,proto3" json:"configuration,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Inputs             map[string]*WorkflowActivityParameterValue `protobuf:"bytes,7,rep,name=inputs,proto3" json:"inputs,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Outputs            map[string]*WorkflowActivityParameterValue `protobuf:"bytes,8,rep,name=outputs,proto3" json:"outputs,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	WorkflowActivityId int64             `protobuf:"varint,1,opt,name=workflow_activity_id,json=workflowActivityId,proto3" json:"workflow_activity_id,omitempty"`
+	ActivityId         string            `protobuf:"bytes,2,opt,name=activity_id,json=activityId,proto3" json:"activity_id,omitempty"`
+	ChildWorkflowId    *string           `protobuf:"bytes,3,opt,name=child_workflow_id,json=childWorkflowId,proto3,oneof" json:"child_workflow_id,omitempty"`
+	Queue              string            `protobuf:"bytes,4,opt,name=queue,proto3" json:"queue,omitempty"`
+	ExecutionGroup     int32             `protobuf:"varint,5,opt,name=execution_group,json=executionGroup,proto3" json:"execution_group,omitempty"`
+	Configuration      map[string]string `protobuf:"bytes,6,rep,name=configuration,proto3" json:"configuration,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Inputs             map[string]string `protobuf:"bytes,7,rep,name=inputs,proto3" json:"inputs,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Outputs            map[string]string `protobuf:"bytes,8,rep,name=outputs,proto3" json:"outputs,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *WorkflowActivity) Reset() {
 	*x = WorkflowActivity{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[8]
+		mi := &file_bosca_workflow_activities_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -608,7 +477,7 @@ func (x *WorkflowActivity) String() string {
 func (*WorkflowActivity) ProtoMessage() {}
 
 func (x *WorkflowActivity) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[8]
+	mi := &file_bosca_workflow_activities_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -621,7 +490,7 @@ func (x *WorkflowActivity) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowActivity.ProtoReflect.Descriptor instead.
 func (*WorkflowActivity) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{8}
+	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *WorkflowActivity) GetWorkflowActivityId() int64 {
@@ -666,14 +535,14 @@ func (x *WorkflowActivity) GetConfiguration() map[string]string {
 	return nil
 }
 
-func (x *WorkflowActivity) GetInputs() map[string]*WorkflowActivityParameterValue {
+func (x *WorkflowActivity) GetInputs() map[string]string {
 	if x != nil {
 		return x.Inputs
 	}
 	return nil
 }
 
-func (x *WorkflowActivity) GetOutputs() map[string]*WorkflowActivityParameterValue {
+func (x *WorkflowActivity) GetOutputs() map[string]string {
 	if x != nil {
 		return x.Outputs
 	}
@@ -691,7 +560,7 @@ type WorkflowActivities struct {
 func (x *WorkflowActivities) Reset() {
 	*x = WorkflowActivities{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[9]
+		mi := &file_bosca_workflow_activities_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -704,7 +573,7 @@ func (x *WorkflowActivities) String() string {
 func (*WorkflowActivities) ProtoMessage() {}
 
 func (x *WorkflowActivities) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[9]
+	mi := &file_bosca_workflow_activities_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -717,7 +586,7 @@ func (x *WorkflowActivities) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowActivities.ProtoReflect.Descriptor instead.
 func (*WorkflowActivities) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{9}
+	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *WorkflowActivities) GetActivities() []*WorkflowActivity {
@@ -739,7 +608,7 @@ type WorkflowActivityIdRequest struct {
 func (x *WorkflowActivityIdRequest) Reset() {
 	*x = WorkflowActivityIdRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_workflow_activities_proto_msgTypes[10]
+		mi := &file_bosca_workflow_activities_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -752,7 +621,7 @@ func (x *WorkflowActivityIdRequest) String() string {
 func (*WorkflowActivityIdRequest) ProtoMessage() {}
 
 func (x *WorkflowActivityIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_workflow_activities_proto_msgTypes[10]
+	mi := &file_bosca_workflow_activities_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -765,7 +634,7 @@ func (x *WorkflowActivityIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowActivityIdRequest.ProtoReflect.Descriptor instead.
 func (*WorkflowActivityIdRequest) Descriptor() ([]byte, []int) {
-	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{10}
+	return file_bosca_workflow_activities_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *WorkflowActivityIdRequest) GetWorkflowId() string {
@@ -834,21 +703,7 @@ var file_bosca_workflow_activities_proto_rawDesc = []byte{
 	0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72,
 	0x54, 0x79, 0x70, 0x65, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42,
 	0x14, 0x0a, 0x12, 0x5f, 0x63, 0x68, 0x69, 0x6c, 0x64, 0x5f, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
-	0x6f, 0x77, 0x5f, 0x69, 0x64, 0x22, 0xa2, 0x01, 0x0a, 0x1e, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
-	0x6f, 0x77, 0x41, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65,
-	0x74, 0x65, 0x72, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x23, 0x0a, 0x0c, 0x73, 0x69, 0x6e, 0x67,
-	0x6c, 0x65, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00,
-	0x52, 0x0b, 0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x52, 0x0a,
-	0x0b, 0x61, 0x72, 0x72, 0x61, 0x79, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x2f, 0x2e, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66,
-	0x6c, 0x6f, 0x77, 0x2e, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x41, 0x63, 0x74, 0x69,
-	0x76, 0x69, 0x74, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x56, 0x61, 0x6c,
-	0x75, 0x65, 0x73, 0x48, 0x00, 0x52, 0x0a, 0x61, 0x72, 0x72, 0x61, 0x79, 0x56, 0x61, 0x6c, 0x75,
-	0x65, 0x42, 0x07, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x39, 0x0a, 0x1f, 0x57, 0x6f,
-	0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x41, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x50, 0x61,
-	0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x12, 0x16, 0x0a,
-	0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x76,
-	0x61, 0x6c, 0x75, 0x65, 0x73, 0x22, 0xeb, 0x01, 0x0a, 0x16, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
+	0x6f, 0x77, 0x5f, 0x69, 0x64, 0x22, 0xeb, 0x01, 0x0a, 0x16, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
 	0x6f, 0x77, 0x41, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x50, 0x72, 0x6f, 0x6d, 0x70, 0x74,
 	0x12, 0x2e, 0x0a, 0x06, 0x70, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x16, 0x2e, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f,
@@ -911,7 +766,7 @@ var file_bosca_workflow_activities_proto_rawDesc = []byte{
 	0x6e, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75,
 	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02,
-	0x38, 0x01, 0x22, 0xee, 0x05, 0x0a, 0x10, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x41,
+	0x38, 0x01, 0x22, 0x8e, 0x05, 0x0a, 0x10, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x41,
 	0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x12, 0x30, 0x0a, 0x14, 0x77, 0x6f, 0x72, 0x6b, 0x66,
 	0x6c, 0x6f, 0x77, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x5f, 0x69, 0x64, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x12, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x41,
@@ -943,20 +798,14 @@ var file_bosca_workflow_activities_proto_rawDesc = []byte{
 	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65,
 	0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05,
 	0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c,
-	0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x1a, 0x69, 0x0a, 0x0b, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x73,
+	0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x1a, 0x39, 0x0a, 0x0b, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x73,
 	0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x44, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2e, 0x2e, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2e, 0x77,
-	0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77,
-	0x41, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65,
-	0x72, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38,
-	0x01, 0x1a, 0x6a, 0x0a, 0x0c, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x73, 0x45, 0x6e, 0x74, 0x72,
+	0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38,
+	0x01, 0x1a, 0x3a, 0x0a, 0x0c, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x73, 0x45, 0x6e, 0x74, 0x72,
 	0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
-	0x6b, 0x65, 0x79, 0x12, 0x44, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x2e, 0x2e, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66,
-	0x6c, 0x6f, 0x77, 0x2e, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x41, 0x63, 0x74, 0x69,
-	0x76, 0x69, 0x74, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x56, 0x61, 0x6c,
-	0x75, 0x65, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42, 0x14, 0x0a,
+	0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42, 0x14, 0x0a,
 	0x12, 0x5f, 0x63, 0x68, 0x69, 0x6c, 0x64, 0x5f, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77,
 	0x5f, 0x69, 0x64, 0x22, 0x56, 0x0a, 0x12, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x41,
 	0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x69, 0x65, 0x73, 0x12, 0x40, 0x0a, 0x0a, 0x61, 0x63, 0x74,
@@ -969,18 +818,16 @@ var file_bosca_workflow_activities_proto_rawDesc = []byte{
 	0x66, 0x6c, 0x6f, 0x77, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x77,
 	0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x61, 0x63, 0x74,
 	0x69, 0x76, 0x69, 0x74, 0x79, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a,
-	0x61, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x49, 0x64, 0x2a, 0x7d, 0x0a, 0x1d, 0x57, 0x6f,
+	0x61, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x49, 0x64, 0x2a, 0x64, 0x0a, 0x1d, 0x57, 0x6f,
 	0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x41, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x50, 0x61,
 	0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65, 0x12, 0x23, 0x0a, 0x1f, 0x75,
 	0x6e, 0x6b, 0x6e, 0x6f, 0x77, 0x6e, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x5f,
 	0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x10, 0x00,
 	0x12, 0x0b, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x78, 0x74, 0x10, 0x01, 0x12, 0x11, 0x0a,
 	0x0d, 0x73, 0x75, 0x70, 0x70, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x72, 0x79, 0x10, 0x02,
-	0x12, 0x17, 0x0a, 0x13, 0x73, 0x75, 0x70, 0x70, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x72,
-	0x79, 0x5f, 0x61, 0x72, 0x72, 0x61, 0x79, 0x10, 0x03, 0x42, 0x26, 0x5a, 0x24, 0x62, 0x6f, 0x73,
-	0x63, 0x61, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
-	0x75, 0x66, 0x2f, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2f, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f,
-	0x77, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x42, 0x26, 0x5a, 0x24, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2f,
+	0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -996,61 +843,56 @@ func file_bosca_workflow_activities_proto_rawDescGZIP() []byte {
 }
 
 var file_bosca_workflow_activities_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_bosca_workflow_activities_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_bosca_workflow_activities_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_bosca_workflow_activities_proto_goTypes = []any{
-	(WorkflowActivityParameterType)(0),      // 0: bosca.workflow.WorkflowActivityParameterType
-	(*Activity)(nil),                        // 1: bosca.workflow.Activity
-	(*WorkflowActivityParameterValue)(nil),  // 2: bosca.workflow.WorkflowActivityParameterValue
-	(*WorkflowActivityParameterValues)(nil), // 3: bosca.workflow.WorkflowActivityParameterValues
-	(*WorkflowActivityPrompt)(nil),          // 4: bosca.workflow.WorkflowActivityPrompt
-	(*WorkflowActivityPrompts)(nil),         // 5: bosca.workflow.WorkflowActivityPrompts
-	(*WorkflowActivityStorageSystem)(nil),   // 6: bosca.workflow.WorkflowActivityStorageSystem
-	(*WorkflowActivityStorageSystems)(nil),  // 7: bosca.workflow.WorkflowActivityStorageSystems
-	(*WorkflowActivityModel)(nil),           // 8: bosca.workflow.WorkflowActivityModel
-	(*WorkflowActivity)(nil),                // 9: bosca.workflow.WorkflowActivity
-	(*WorkflowActivities)(nil),              // 10: bosca.workflow.WorkflowActivities
-	(*WorkflowActivityIdRequest)(nil),       // 11: bosca.workflow.WorkflowActivityIdRequest
-	nil,                                     // 12: bosca.workflow.Activity.ConfigurationEntry
-	nil,                                     // 13: bosca.workflow.Activity.InputsEntry
-	nil,                                     // 14: bosca.workflow.Activity.OutputsEntry
-	nil,                                     // 15: bosca.workflow.WorkflowActivityPrompt.ConfigurationEntry
-	nil,                                     // 16: bosca.workflow.WorkflowActivityStorageSystem.ConfigurationEntry
-	nil,                                     // 17: bosca.workflow.WorkflowActivityModel.ConfigurationEntry
-	nil,                                     // 18: bosca.workflow.WorkflowActivity.ConfigurationEntry
-	nil,                                     // 19: bosca.workflow.WorkflowActivity.InputsEntry
-	nil,                                     // 20: bosca.workflow.WorkflowActivity.OutputsEntry
-	(*Prompt)(nil),                          // 21: bosca.workflow.Prompt
-	(*StorageSystem)(nil),                   // 22: bosca.workflow.StorageSystem
-	(*StorageSystemModel)(nil),              // 23: bosca.workflow.StorageSystemModel
-	(*Model)(nil),                           // 24: bosca.workflow.Model
+	(WorkflowActivityParameterType)(0),     // 0: bosca.workflow.WorkflowActivityParameterType
+	(*Activity)(nil),                       // 1: bosca.workflow.Activity
+	(*WorkflowActivityPrompt)(nil),         // 2: bosca.workflow.WorkflowActivityPrompt
+	(*WorkflowActivityPrompts)(nil),        // 3: bosca.workflow.WorkflowActivityPrompts
+	(*WorkflowActivityStorageSystem)(nil),  // 4: bosca.workflow.WorkflowActivityStorageSystem
+	(*WorkflowActivityStorageSystems)(nil), // 5: bosca.workflow.WorkflowActivityStorageSystems
+	(*WorkflowActivityModel)(nil),          // 6: bosca.workflow.WorkflowActivityModel
+	(*WorkflowActivity)(nil),               // 7: bosca.workflow.WorkflowActivity
+	(*WorkflowActivities)(nil),             // 8: bosca.workflow.WorkflowActivities
+	(*WorkflowActivityIdRequest)(nil),      // 9: bosca.workflow.WorkflowActivityIdRequest
+	nil,                                    // 10: bosca.workflow.Activity.ConfigurationEntry
+	nil,                                    // 11: bosca.workflow.Activity.InputsEntry
+	nil,                                    // 12: bosca.workflow.Activity.OutputsEntry
+	nil,                                    // 13: bosca.workflow.WorkflowActivityPrompt.ConfigurationEntry
+	nil,                                    // 14: bosca.workflow.WorkflowActivityStorageSystem.ConfigurationEntry
+	nil,                                    // 15: bosca.workflow.WorkflowActivityModel.ConfigurationEntry
+	nil,                                    // 16: bosca.workflow.WorkflowActivity.ConfigurationEntry
+	nil,                                    // 17: bosca.workflow.WorkflowActivity.InputsEntry
+	nil,                                    // 18: bosca.workflow.WorkflowActivity.OutputsEntry
+	(*Prompt)(nil),                         // 19: bosca.workflow.Prompt
+	(*StorageSystem)(nil),                  // 20: bosca.workflow.StorageSystem
+	(*StorageSystemModel)(nil),             // 21: bosca.workflow.StorageSystemModel
+	(*Model)(nil),                          // 22: bosca.workflow.Model
 }
 var file_bosca_workflow_activities_proto_depIdxs = []int32{
-	12, // 0: bosca.workflow.Activity.configuration:type_name -> bosca.workflow.Activity.ConfigurationEntry
-	13, // 1: bosca.workflow.Activity.inputs:type_name -> bosca.workflow.Activity.InputsEntry
-	14, // 2: bosca.workflow.Activity.outputs:type_name -> bosca.workflow.Activity.OutputsEntry
-	3,  // 3: bosca.workflow.WorkflowActivityParameterValue.array_value:type_name -> bosca.workflow.WorkflowActivityParameterValues
-	21, // 4: bosca.workflow.WorkflowActivityPrompt.prompt:type_name -> bosca.workflow.Prompt
-	15, // 5: bosca.workflow.WorkflowActivityPrompt.configuration:type_name -> bosca.workflow.WorkflowActivityPrompt.ConfigurationEntry
-	4,  // 6: bosca.workflow.WorkflowActivityPrompts.prompts:type_name -> bosca.workflow.WorkflowActivityPrompt
-	22, // 7: bosca.workflow.WorkflowActivityStorageSystem.storage_system:type_name -> bosca.workflow.StorageSystem
-	23, // 8: bosca.workflow.WorkflowActivityStorageSystem.models:type_name -> bosca.workflow.StorageSystemModel
-	16, // 9: bosca.workflow.WorkflowActivityStorageSystem.configuration:type_name -> bosca.workflow.WorkflowActivityStorageSystem.ConfigurationEntry
-	6,  // 10: bosca.workflow.WorkflowActivityStorageSystems.systems:type_name -> bosca.workflow.WorkflowActivityStorageSystem
-	24, // 11: bosca.workflow.WorkflowActivityModel.model:type_name -> bosca.workflow.Model
-	17, // 12: bosca.workflow.WorkflowActivityModel.configuration:type_name -> bosca.workflow.WorkflowActivityModel.ConfigurationEntry
-	18, // 13: bosca.workflow.WorkflowActivity.configuration:type_name -> bosca.workflow.WorkflowActivity.ConfigurationEntry
-	19, // 14: bosca.workflow.WorkflowActivity.inputs:type_name -> bosca.workflow.WorkflowActivity.InputsEntry
-	20, // 15: bosca.workflow.WorkflowActivity.outputs:type_name -> bosca.workflow.WorkflowActivity.OutputsEntry
-	9,  // 16: bosca.workflow.WorkflowActivities.activities:type_name -> bosca.workflow.WorkflowActivity
-	0,  // 17: bosca.workflow.Activity.InputsEntry.value:type_name -> bosca.workflow.WorkflowActivityParameterType
-	0,  // 18: bosca.workflow.Activity.OutputsEntry.value:type_name -> bosca.workflow.WorkflowActivityParameterType
-	2,  // 19: bosca.workflow.WorkflowActivity.InputsEntry.value:type_name -> bosca.workflow.WorkflowActivityParameterValue
-	2,  // 20: bosca.workflow.WorkflowActivity.OutputsEntry.value:type_name -> bosca.workflow.WorkflowActivityParameterValue
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	10, // 0: bosca.workflow.Activity.configuration:type_name -> bosca.workflow.Activity.ConfigurationEntry
+	11, // 1: bosca.workflow.Activity.inputs:type_name -> bosca.workflow.Activity.InputsEntry
+	12, // 2: bosca.workflow.Activity.outputs:type_name -> bosca.workflow.Activity.OutputsEntry
+	19, // 3: bosca.workflow.WorkflowActivityPrompt.prompt:type_name -> bosca.workflow.Prompt
+	13, // 4: bosca.workflow.WorkflowActivityPrompt.configuration:type_name -> bosca.workflow.WorkflowActivityPrompt.ConfigurationEntry
+	2,  // 5: bosca.workflow.WorkflowActivityPrompts.prompts:type_name -> bosca.workflow.WorkflowActivityPrompt
+	20, // 6: bosca.workflow.WorkflowActivityStorageSystem.storage_system:type_name -> bosca.workflow.StorageSystem
+	21, // 7: bosca.workflow.WorkflowActivityStorageSystem.models:type_name -> bosca.workflow.StorageSystemModel
+	14, // 8: bosca.workflow.WorkflowActivityStorageSystem.configuration:type_name -> bosca.workflow.WorkflowActivityStorageSystem.ConfigurationEntry
+	4,  // 9: bosca.workflow.WorkflowActivityStorageSystems.systems:type_name -> bosca.workflow.WorkflowActivityStorageSystem
+	22, // 10: bosca.workflow.WorkflowActivityModel.model:type_name -> bosca.workflow.Model
+	15, // 11: bosca.workflow.WorkflowActivityModel.configuration:type_name -> bosca.workflow.WorkflowActivityModel.ConfigurationEntry
+	16, // 12: bosca.workflow.WorkflowActivity.configuration:type_name -> bosca.workflow.WorkflowActivity.ConfigurationEntry
+	17, // 13: bosca.workflow.WorkflowActivity.inputs:type_name -> bosca.workflow.WorkflowActivity.InputsEntry
+	18, // 14: bosca.workflow.WorkflowActivity.outputs:type_name -> bosca.workflow.WorkflowActivity.OutputsEntry
+	7,  // 15: bosca.workflow.WorkflowActivities.activities:type_name -> bosca.workflow.WorkflowActivity
+	0,  // 16: bosca.workflow.Activity.InputsEntry.value:type_name -> bosca.workflow.WorkflowActivityParameterType
+	0,  // 17: bosca.workflow.Activity.OutputsEntry.value:type_name -> bosca.workflow.WorkflowActivityParameterType
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_bosca_workflow_activities_proto_init() }
@@ -1075,30 +917,6 @@ func file_bosca_workflow_activities_proto_init() {
 			}
 		}
 		file_bosca_workflow_activities_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*WorkflowActivityParameterValue); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_bosca_workflow_activities_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*WorkflowActivityParameterValues); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_bosca_workflow_activities_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkflowActivityPrompt); i {
 			case 0:
 				return &v.state
@@ -1110,7 +928,7 @@ func file_bosca_workflow_activities_proto_init() {
 				return nil
 			}
 		}
-		file_bosca_workflow_activities_proto_msgTypes[4].Exporter = func(v any, i int) any {
+		file_bosca_workflow_activities_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkflowActivityPrompts); i {
 			case 0:
 				return &v.state
@@ -1122,7 +940,7 @@ func file_bosca_workflow_activities_proto_init() {
 				return nil
 			}
 		}
-		file_bosca_workflow_activities_proto_msgTypes[5].Exporter = func(v any, i int) any {
+		file_bosca_workflow_activities_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkflowActivityStorageSystem); i {
 			case 0:
 				return &v.state
@@ -1134,7 +952,7 @@ func file_bosca_workflow_activities_proto_init() {
 				return nil
 			}
 		}
-		file_bosca_workflow_activities_proto_msgTypes[6].Exporter = func(v any, i int) any {
+		file_bosca_workflow_activities_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkflowActivityStorageSystems); i {
 			case 0:
 				return &v.state
@@ -1146,7 +964,7 @@ func file_bosca_workflow_activities_proto_init() {
 				return nil
 			}
 		}
-		file_bosca_workflow_activities_proto_msgTypes[7].Exporter = func(v any, i int) any {
+		file_bosca_workflow_activities_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkflowActivityModel); i {
 			case 0:
 				return &v.state
@@ -1158,7 +976,7 @@ func file_bosca_workflow_activities_proto_init() {
 				return nil
 			}
 		}
-		file_bosca_workflow_activities_proto_msgTypes[8].Exporter = func(v any, i int) any {
+		file_bosca_workflow_activities_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkflowActivity); i {
 			case 0:
 				return &v.state
@@ -1170,7 +988,7 @@ func file_bosca_workflow_activities_proto_init() {
 				return nil
 			}
 		}
-		file_bosca_workflow_activities_proto_msgTypes[9].Exporter = func(v any, i int) any {
+		file_bosca_workflow_activities_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkflowActivities); i {
 			case 0:
 				return &v.state
@@ -1182,7 +1000,7 @@ func file_bosca_workflow_activities_proto_init() {
 				return nil
 			}
 		}
-		file_bosca_workflow_activities_proto_msgTypes[10].Exporter = func(v any, i int) any {
+		file_bosca_workflow_activities_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkflowActivityIdRequest); i {
 			case 0:
 				return &v.state
@@ -1196,18 +1014,14 @@ func file_bosca_workflow_activities_proto_init() {
 		}
 	}
 	file_bosca_workflow_activities_proto_msgTypes[0].OneofWrappers = []any{}
-	file_bosca_workflow_activities_proto_msgTypes[1].OneofWrappers = []any{
-		(*WorkflowActivityParameterValue_SingleValue)(nil),
-		(*WorkflowActivityParameterValue_ArrayValue)(nil),
-	}
-	file_bosca_workflow_activities_proto_msgTypes[8].OneofWrappers = []any{}
+	file_bosca_workflow_activities_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_bosca_workflow_activities_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   20,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

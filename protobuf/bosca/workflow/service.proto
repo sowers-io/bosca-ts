@@ -132,7 +132,7 @@ service WorkflowService {
 
   rpc ExecuteWorkflow (WorkflowExecutionRequest) returns (WorkflowExecutionResponse) {
     option (google.api.http) = {
-      post: "/v1/workflow/metadata/{metadata_id}/workflow/execute"
+      post: "/v1/workflow/execute/{workflow_id}"
       body: "*"
     };
   }

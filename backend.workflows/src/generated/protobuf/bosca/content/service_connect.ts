@@ -99,6 +99,15 @@ export const ContentService = {
       kind: MethodKind.Unary,
     },
     /**
+     * @generated from rpc bosca.content.ContentService.SetCollectionReady
+     */
+    setCollectionReady: {
+      name: "SetCollectionReady",
+      I: IdRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc bosca.content.ContentService.AddCollections
      */
     addCollections: {

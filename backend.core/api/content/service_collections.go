@@ -17,13 +17,16 @@
 package content
 
 import (
+	"bosca.io/api/graphql/common"
 	protobuf "bosca.io/api/protobuf/bosca"
 	grpc "bosca.io/api/protobuf/bosca/content"
+	workflow2 "bosca.io/api/protobuf/bosca/workflow"
 	"bosca.io/api/workflow"
 	"bosca.io/pkg/security"
 	"bosca.io/pkg/security/identity"
 	"context"
 	"errors"
+	opts "google.golang.org/grpc"
 	"log/slog"
 	"strings"
 )
@@ -263,4 +266,29 @@ func (svc *service) FindCollection(ctx context.Context, request *grpc.FindCollec
 		}
 	}
 	return &grpc.Collections{Collections: valid}, nil
+}
+
+func (svc *service) SetCollectionReady(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	collection, err := svc.GetCollection(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	if collection.TraitIds == nil {
+		return &protobuf.Empty{}, nil
+	}
+	for _, traitId := range collection.TraitIds {
+		workflowIds, err := svc.ds.GetTraitWorkflowIds(ctx, traitId)
+		if err != nil {
+			return nil, err
+		}
+		for _, workflowId := range workflowIds {
+			_, err = svc.workflowClient.ExecuteWorkflow(ctx, &workflow2.WorkflowExecutionRequest{CollectionId: &collection.Id, WorkflowId: workflowId}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+				HeaderValue: "Token " + svc.serviceAccountToken,
+			}})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return &protobuf.Empty{}, nil
 }

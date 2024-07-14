@@ -13,3 +13,7 @@ Setup Development Environment
 --
 * Clone https://github.com/sowers-io/bosca
 * Run `./scripts/initialize-dev`
+
+Start Services
+--
+* Run `./scripts/start-services`

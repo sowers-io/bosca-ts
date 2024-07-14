@@ -42,18 +42,12 @@ export enum WorkflowActivityParameterType {
    * @generated from enum value: supplementary = 2;
    */
   supplementary = 2,
-
-  /**
-   * @generated from enum value: supplementary_array = 3;
-   */
-  supplementary_array = 3,
 }
 // Retrieve enum metadata with: proto3.getEnumType(WorkflowActivityParameterType)
 proto3.util.setEnumType(WorkflowActivityParameterType, "bosca.workflow.WorkflowActivityParameterType", [
   { no: 0, name: "unknown_activity_parameter_type" },
   { no: 1, name: "context" },
   { no: 2, name: "supplementary" },
-  { no: 3, name: "supplementary_array" },
 ]);
 
 /**
@@ -126,93 +120,6 @@ export class Activity extends Message<Activity> {
 
   static equals(a: Activity | PlainMessage<Activity> | undefined, b: Activity | PlainMessage<Activity> | undefined): boolean {
     return proto3.util.equals(Activity, a, b);
-  }
-}
-
-/**
- * @generated from message bosca.workflow.WorkflowActivityParameterValue
- */
-export class WorkflowActivityParameterValue extends Message<WorkflowActivityParameterValue> {
-  /**
-   * @generated from oneof bosca.workflow.WorkflowActivityParameterValue.value
-   */
-  value: {
-    /**
-     * @generated from field: string single_value = 1;
-     */
-    value: string;
-    case: "singleValue";
-  } | {
-    /**
-     * @generated from field: bosca.workflow.WorkflowActivityParameterValues array_value = 2;
-     */
-    value: WorkflowActivityParameterValues;
-    case: "arrayValue";
-  } | { case: undefined; value?: undefined } = { case: undefined };
-
-  constructor(data?: PartialMessage<WorkflowActivityParameterValue>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "bosca.workflow.WorkflowActivityParameterValue";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "single_value", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "value" },
-    { no: 2, name: "array_value", kind: "message", T: WorkflowActivityParameterValues, oneof: "value" },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowActivityParameterValue {
-    return new WorkflowActivityParameterValue().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowActivityParameterValue {
-    return new WorkflowActivityParameterValue().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowActivityParameterValue {
-    return new WorkflowActivityParameterValue().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: WorkflowActivityParameterValue | PlainMessage<WorkflowActivityParameterValue> | undefined, b: WorkflowActivityParameterValue | PlainMessage<WorkflowActivityParameterValue> | undefined): boolean {
-    return proto3.util.equals(WorkflowActivityParameterValue, a, b);
-  }
-}
-
-/**
- * @generated from message bosca.workflow.WorkflowActivityParameterValues
- */
-export class WorkflowActivityParameterValues extends Message<WorkflowActivityParameterValues> {
-  /**
-   * @generated from field: repeated string values = 2;
-   */
-  values: string[] = [];
-
-  constructor(data?: PartialMessage<WorkflowActivityParameterValues>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "bosca.workflow.WorkflowActivityParameterValues";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 2, name: "values", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowActivityParameterValues {
-    return new WorkflowActivityParameterValues().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowActivityParameterValues {
-    return new WorkflowActivityParameterValues().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowActivityParameterValues {
-    return new WorkflowActivityParameterValues().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: WorkflowActivityParameterValues | PlainMessage<WorkflowActivityParameterValues> | undefined, b: WorkflowActivityParameterValues | PlainMessage<WorkflowActivityParameterValues> | undefined): boolean {
-    return proto3.util.equals(WorkflowActivityParameterValues, a, b);
   }
 }
 
@@ -460,14 +367,14 @@ export class WorkflowActivity extends Message<WorkflowActivity> {
   configuration: { [key: string]: string } = {};
 
   /**
-   * @generated from field: map<string, bosca.workflow.WorkflowActivityParameterValue> inputs = 7;
+   * @generated from field: map<string, string> inputs = 7;
    */
-  inputs: { [key: string]: WorkflowActivityParameterValue } = {};
+  inputs: { [key: string]: string } = {};
 
   /**
-   * @generated from field: map<string, bosca.workflow.WorkflowActivityParameterValue> outputs = 8;
+   * @generated from field: map<string, string> outputs = 8;
    */
-  outputs: { [key: string]: WorkflowActivityParameterValue } = {};
+  outputs: { [key: string]: string } = {};
 
   constructor(data?: PartialMessage<WorkflowActivity>) {
     super();
@@ -483,8 +390,8 @@ export class WorkflowActivity extends Message<WorkflowActivity> {
     { no: 4, name: "queue", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "execution_group", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 6, name: "configuration", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
-    { no: 7, name: "inputs", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: WorkflowActivityParameterValue} },
-    { no: 8, name: "outputs", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: WorkflowActivityParameterValue} },
+    { no: 7, name: "inputs", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 8, name: "outputs", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowActivity {

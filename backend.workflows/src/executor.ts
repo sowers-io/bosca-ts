@@ -61,10 +61,10 @@ export class Executor {
   private async executeActivity(queue: Queue, activity: Activity, job: WorkflowActivityJob) {
     await queue.enqueue(async () => {
       try {
-        console.log('executing job: ', job.jobId, ':: for activity: ', job.activity?.activityId, ':: in queue: ', queue)
+        console.log('executing job: ', job.jobId, ':: for activity: ', job.activity?.activityId, ':: in queue: ', queue.name)
         await activity.execute(job)
         await this.updateJobStatus(job, true, true)
-        console.log('job finished', job)
+        console.log('finished job:  ', job.jobId, ':: for activity: ', job.activity?.activityId, ':: in queue: ', queue.name)
       } catch (e) {
         console.error('failed to execute activity', job, e)
         await this.updateJobStatus(job, false, false, e)

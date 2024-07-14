@@ -77,6 +77,28 @@ func (svc *service) getMetadata(ctx context.Context, metadataId string) (*conten
 	return md, err
 }
 
+func (svc *service) getCollection(ctx context.Context, collectionId string) (*content.Collection, error) {
+	var col *content.Collection
+	var err error
+	// permissions can be laggy when first created
+	for tries := 0; tries < 10; tries++ {
+		col, err = svc.contentClient.GetCollection(ctx, &bosca.IdRequest{Id: collectionId}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+			HeaderValue: "Token " + svc.serviceAccountToken,
+		}})
+		if err != nil {
+			if err.Error() == "rpc error: code = Unauthenticated desc = permission check failed" {
+				time.Sleep(3 * time.Second)
+			} else {
+				slog.ErrorContext(ctx, "failed to get collection", slog.String("id", collectionId), slog.Any("error", err))
+				return nil, err
+			}
+		} else if col != nil {
+			break
+		}
+	}
+	return col, err
+}
+
 func (svc *service) setBeginMetadataWorkflowState(ctx context.Context, metadata *content.Metadata, toState *grpc.WorkflowState, status string) error {
 	_, err := svc.contentClient.SetWorkflowState(ctx, &content.SetWorkflowStateRequest{
 		MetadataId: metadata.Id,

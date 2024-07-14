@@ -121,20 +121,12 @@ func initializeEmbeddedWorkflow(ctx context.Context, dataStore *DataStore) {
 	}
 	for id, activity := range cfg.Workflows.Activities {
 		inputs := make(map[string]workflow2.WorkflowActivityParameterType)
-		for key, i := range activity.Inputs {
-			if _, ok := i.(string); ok {
-				inputs[key] = workflow2.WorkflowActivityParameterType_supplementary
-			} else if _, ok := i.([]string); ok {
-				inputs[key] = workflow2.WorkflowActivityParameterType_supplementary_array
-			}
+		for key, _ := range activity.Inputs {
+			inputs[key] = workflow2.WorkflowActivityParameterType_supplementary
 		}
 		outputs := make(map[string]workflow2.WorkflowActivityParameterType)
-		for key, i := range activity.Outputs {
-			if _, ok := i.(string); ok {
-				outputs[key] = workflow2.WorkflowActivityParameterType_supplementary
-			} else if _, ok := i.([]string); ok {
-				outputs[key] = workflow2.WorkflowActivityParameterType_supplementary_array
-			}
+		for key, _ := range activity.Outputs {
+			outputs[key] = workflow2.WorkflowActivityParameterType_supplementary
 		}
 		err := dataStore.AddActivity(ctx, &workflow2.Activity{
 			Id:              id,
@@ -159,41 +151,13 @@ func initializeEmbeddedWorkflow(ctx context.Context, dataStore *DataStore) {
 			Configuration: wf.Configuration,
 		})
 		for aid, activity := range wf.Activities {
-			inputs := make(map[string]*workflow2.WorkflowActivityParameterValue)
-			for key, i := range activity.Inputs {
-				if val, ok := i.(string); ok {
-					inputs[key] = &workflow2.WorkflowActivityParameterValue{
-						Value: &workflow2.WorkflowActivityParameterValue_SingleValue{
-							SingleValue: val,
-						},
-					}
-				} else if valArray, ok := i.([]string); ok {
-					inputs[key] = &workflow2.WorkflowActivityParameterValue{
-						Value: &workflow2.WorkflowActivityParameterValue_ArrayValue{
-							ArrayValue: &workflow2.WorkflowActivityParameterValues{
-								Values: valArray,
-							},
-						},
-					}
-				}
+			inputs := make(map[string]string)
+			for key, val := range activity.Inputs {
+				inputs[key] = val
 			}
-			outputs := make(map[string]*workflow2.WorkflowActivityParameterValue)
-			for key, i := range activity.Outputs {
-				if val, ok := i.(string); ok {
-					outputs[key] = &workflow2.WorkflowActivityParameterValue{
-						Value: &workflow2.WorkflowActivityParameterValue_SingleValue{
-							SingleValue: val,
-						},
-					}
-				} else if valArray, ok := i.([]string); ok {
-					outputs[key] = &workflow2.WorkflowActivityParameterValue{
-						Value: &workflow2.WorkflowActivityParameterValue_ArrayValue{
-							ArrayValue: &workflow2.WorkflowActivityParameterValues{
-								Values: valArray,
-							},
-						},
-					}
-				}
+			outputs := make(map[string]string)
+			for key, val := range activity.Outputs {
+				outputs[key] = val
 			}
 			id, err := dataStore.AddWorkflowActivity(ctx, id, &workflow2.WorkflowActivity{
 				ActivityId:     aid,

@@ -42,6 +42,6 @@ export async function findFirstMetadata(attributes: { [key: string]: string }): 
     if (result.metadata.length === 0) {
       throw new Error('Metadata not found')
     }
-    return result.metadata
+    return result.metadata[0]
   })
 }

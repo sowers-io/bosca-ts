@@ -16,14 +16,31 @@
 
 import decompress from 'decompress'
 import { parseStringPromise } from 'xml2js'
-import { BibleMetadata } from './metadata'
-import { BookProcessor } from './book_processor';
+import { BibleMetadata, ManifestName, PublicationContent } from './metadata'
+import { BookProcessor } from './book_processor'
 import { Book } from './usx/book'
+import { promisify } from 'node:util'
+import * as fs from 'node:fs'
+import { Chapter } from './usx/chapter'
+
+const readFile = promisify(fs.readFile)
 
 export class USXProcessor {
-
-  metadata!: BibleMetadata
+  metadata?: BibleMetadata
   books: Book[] = []
+
+  async processBook(name: ManifestName, content: PublicationContent, file: string): Promise<Book> {
+    const data = await readFile(file, 'utf-8')
+    const processor = new BookProcessor()
+    return await processor.process(name, content, data.toString())
+  }
+
+  async processChapter(name: ManifestName, content: PublicationContent, file: string): Promise<Chapter> {
+    const data = await readFile(file, 'utf-8')
+    const processor = new BookProcessor()
+    const book = await processor.process(name, content, data.toString())
+    return book.chapters[0]
+  }
 
   async process(file: string) {
     const files = await decompress(file)
@@ -38,8 +55,8 @@ export class USXProcessor {
     }
 
     const processor = new BookProcessor()
-    for (const name of this.metadata.publication.names) {
-      const content = this.metadata.publication.contents[name.id]
+    for (const name of this.metadata!.publication.names) {
+      const content = this.metadata!.publication.contents[name.id]
       const file = filesMap[content.file]
       const book = await processor.process(name, content, file.data.toString())
       this.books.push(book)

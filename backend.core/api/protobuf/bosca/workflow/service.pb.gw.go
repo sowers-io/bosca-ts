@@ -785,14 +785,14 @@ func request_WorkflowService_ExecuteWorkflow_0(ctx context.Context, marshaler ru
 		_   = err
 	)
 
-	val, ok = pathParams["metadata_id"]
+	val, ok = pathParams["workflow_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "metadata_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workflow_id")
 	}
 
-	protoReq.MetadataId, err = runtime.String(val)
+	protoReq.WorkflowId, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "metadata_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workflow_id", err)
 	}
 
 	msg, err := client.ExecuteWorkflow(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -815,14 +815,14 @@ func local_request_WorkflowService_ExecuteWorkflow_0(ctx context.Context, marsha
 		_   = err
 	)
 
-	val, ok = pathParams["metadata_id"]
+	val, ok = pathParams["workflow_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "metadata_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workflow_id")
 	}
 
-	protoReq.MetadataId, err = runtime.String(val)
+	protoReq.WorkflowId, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "metadata_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workflow_id", err)
 	}
 
 	msg, err := server.ExecuteWorkflow(ctx, &protoReq)
@@ -1466,7 +1466,7 @@ func RegisterWorkflowServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.workflow.WorkflowService/ExecuteWorkflow", runtime.WithHTTPPathPattern("/v1/workflow/metadata/{metadata_id}/workflow/execute"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bosca.workflow.WorkflowService/ExecuteWorkflow", runtime.WithHTTPPathPattern("/v1/workflow/execute/{workflow_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1964,7 +1964,7 @@ func RegisterWorkflowServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.workflow.WorkflowService/ExecuteWorkflow", runtime.WithHTTPPathPattern("/v1/workflow/metadata/{metadata_id}/workflow/execute"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bosca.workflow.WorkflowService/ExecuteWorkflow", runtime.WithHTTPPathPattern("/v1/workflow/execute/{workflow_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2104,7 +2104,7 @@ var (
 
 	pattern_WorkflowService_CompleteTransitionWorkflow_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 1, 2, 4, 2, 5}, []string{"v1", "workflow", "metadata", "metadata_id", "transition", "complete"}, ""))
 
-	pattern_WorkflowService_ExecuteWorkflow_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 1, 2, 4}, []string{"v1", "workflow", "metadata", "metadata_id", "execute"}, ""))
+	pattern_WorkflowService_ExecuteWorkflow_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "workflow", "execute", "workflow_id"}, ""))
 
 	pattern_WorkflowService_GetWorkflowExecutionStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "workflow", "executions", "id", "status"}, ""))
 

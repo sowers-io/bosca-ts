@@ -33,7 +33,6 @@ func (svc *service) AddMetadataSupplementary(ctx context.Context, request *grpc.
 		return nil, err
 	}
 	return &grpc.MetadataSupplementary{
-		Id:               svc.getSupplementaryId(request.MetadataId, request.Key),
 		Key:              request.Key,
 		Name:             request.Name,
 		ContentType:      request.ContentType,
@@ -55,7 +54,11 @@ func (svc *service) SetMetadataSupplementaryReady(ctx context.Context, request *
 
 func (svc *service) GetMetadataSupplementaryUploadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
 	id := svc.getSupplementaryId(request.Id, request.Key)
-	return svc.objectStore.CreateDownloadUrl(ctx, id)
+	supplementary, err := svc.ds.GetMetadataSupplementary(ctx, request.Id, request.Key)
+	if err != nil {
+		return nil, err
+	}
+	return svc.objectStore.CreateUploadUrl(ctx, id, supplementary.Name, supplementary.ContentType, supplementary.ContentLength, nil)
 }
 
 func (svc *service) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {

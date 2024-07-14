@@ -41,15 +41,15 @@ create type collection_type as enum ('root', 'standard', 'folder', 'queue');
 
 create table collections
 (
-    id                        uuid    not null default gen_random_uuid(),
-    name                      varchar not null,
-    type                      collection_type  default 'standard',
-    attributes                jsonb   not null default '{}',
+    id                        uuid      not null default gen_random_uuid(),
+    name                      varchar   not null,
+    type                      collection_type    default 'standard',
+    attributes                jsonb     not null default '{}',
     labels                    varchar[] not null default '{}',
-    created                   timestamp        default now(),
-    modified                  timestamp        default now(),
-    enabled                   boolean          default true,
-    workflow_state_id         varchar not null default 'pending',
+    created                   timestamp          default now(),
+    modified                  timestamp          default now(),
+    enabled                   boolean            default true,
+    workflow_state_id         varchar   not null default 'pending',
     workflow_state_pending_id varchar,
     primary key (id)
 );
@@ -98,18 +98,18 @@ create type metadata_type as enum ('standard', 'variant');
 
 create table metadata
 (
-    id                        uuid    not null                                  default gen_random_uuid(),
+    id                        uuid      not null                                  default gen_random_uuid(),
     parent_id                 uuid,
-    name                      varchar not null check (length(name) > 0),
-    type                      metadata_type                                     default 'standard',
-    content_type              varchar not null check (length(content_type) > 0),
+    name                      varchar   not null check (length(name) > 0),
+    type                      metadata_type                                       default 'standard',
+    content_type              varchar   not null check (length(content_type) > 0),
     content_length            bigint,
-    language_tag              varchar not null check (length(language_tag) > 0) default 'en',
+    language_tag              varchar   not null check (length(language_tag) > 0) default 'en',
     labels                    varchar[] not null                                  default '{}',
-    attributes                jsonb   not null                                  default '{}',
-    created                   timestamp                                         default now(),
-    modified                  timestamp                                         default now(),
-    workflow_state_id         varchar not null                                  default 'pending',
+    attributes                jsonb     not null                                  default '{}',
+    created                   timestamp                                           default now(),
+    modified                  timestamp                                           default now(),
+    workflow_state_id         varchar   not null                                  default 'pending',
     workflow_state_pending_id varchar,
     metadata                  jsonb,
     source_id                 uuid,
@@ -125,7 +125,8 @@ create table metadata_supplementary
     metadata_id       uuid      not null,
     key               varchar   not null,
     name              varchar   not null,
-    traits            varchar[] not null default '{}',
+    content_type      varchar   not null,
+    content_length    bigint    not null,
     created           timestamp not null default now(),
     modified          timestamp not null default now(),
     source_id         uuid,
@@ -135,6 +136,16 @@ create table metadata_supplementary
     foreign key (metadata_id) references metadata (id) on delete cascade,
     foreign key (source_id) references sources (id),
     unique (metadata_id, key)
+);
+
+create table metadata_supplementary_traits
+(
+    metadata_id uuid    not null,
+    key         varchar not null,
+    trait_id    varchar not null,
+    primary key (metadata_id, key, trait_id),
+    foreign key (metadata_id, key) references metadata_supplementary (metadata_id, key) on delete cascade,
+    foreign key (trait_id) references traits (id) on delete cascade
 );
 
 create table metadata_workflow_transition_history
@@ -220,11 +231,12 @@ drop table if exists metadata_traits cascade;
 drop table if exists metadata_categories cascade;
 drop table if exists metadata_workflow_transition_history cascade;
 drop table if exists metadata cascade;
+drop table if exists metadata_supplementary cascade;
+drop table if exists metadata_supplementary_traits cascade;
 drop type if exists metadata_type cascade;
 drop table if exists traits cascade;
 drop table if exists categories cascade;
 drop type if exists metadata_status cascade;
 drop table if exists trait_workflows cascade;
-drop table sources cascade;
-drop table metadata_supplementary cascade;
+drop table if exists sources cascade;
 -- +goose StatementEnd

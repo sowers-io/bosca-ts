@@ -49,10 +49,10 @@ func (c *Configuration) Validate() error {
 	activities := c.Workflows.Activities
 	for aid, activity := range activities {
 		if activity.Inputs == nil {
-			activity.Inputs = make(map[string]interface{})
+			activity.Inputs = make(map[string]string)
 		}
 		if activity.Outputs == nil {
-			activity.Outputs = make(map[string]interface{})
+			activity.Outputs = make(map[string]string)
 		}
 		if activity.Configuration == nil {
 			activity.Configuration = make(map[string]string)
@@ -78,10 +78,10 @@ func (c *Configuration) Validate() error {
 				return errors.New(fmt.Sprintf("workflow '%s' activities '%s' does not exist", wid, aid))
 			} else {
 				if activityInstance.Inputs == nil {
-					activityInstance.Inputs = make(map[string]interface{})
+					activityInstance.Inputs = make(map[string]string)
 				}
 				if activityInstance.Outputs == nil {
-					activityInstance.Outputs = make(map[string]interface{})
+					activityInstance.Outputs = make(map[string]string)
 				}
 				if activityInstance.Configuration == nil {
 					activityInstance.Configuration = make(map[string]string)
@@ -200,8 +200,8 @@ type ActivityConfiguration struct {
 	Description     string
 	ExecutionGroup  int32   `yaml:"executionGroup"`
 	ChildWorkflowId *string `yaml:"childWorkflowId"`
-	Inputs          map[string]interface{}
-	Outputs         map[string]interface{}
+	Inputs          map[string]string
+	Outputs         map[string]string
 	Configuration   map[string]string
 }
 
@@ -211,49 +211,13 @@ type ActivityInstanceConfiguration struct {
 	Models         map[string]ActivityConfigurationModel         `yaml:"models"`
 	Prompts        map[string]ActivityConfigurationPrompt        `yaml:"prompts"`
 	StorageSystems map[string]ActivityConfigurationStorageSystem `yaml:"storageSystems"`
-	Inputs         map[string]interface{}
-	Outputs        map[string]interface{}
+	Inputs         map[string]string
+	Outputs        map[string]string
 }
 
 func (cfg *ActivityConfiguration) ToActivityInstance() *workflow.WorkflowActivity {
-	inputs := make(map[string]*workflow.WorkflowActivityParameterValue)
-	outputs := make(map[string]*workflow.WorkflowActivityParameterValue)
-
-	for key, input := range cfg.Inputs {
-		if val, ok := input.(string); ok {
-			inputs[key] = &workflow.WorkflowActivityParameterValue{
-				Value: &workflow.WorkflowActivityParameterValue_SingleValue{
-					SingleValue: val,
-				},
-			}
-		} else if val, ok := input.([]string); ok {
-			inputs[key] = &workflow.WorkflowActivityParameterValue{
-				Value: &workflow.WorkflowActivityParameterValue_ArrayValue{
-					ArrayValue: &workflow.WorkflowActivityParameterValues{
-						Values: val,
-					},
-				},
-			}
-		}
-	}
-	for key, input := range cfg.Outputs {
-		if val, ok := input.(string); ok {
-			outputs[key] = &workflow.WorkflowActivityParameterValue{
-				Value: &workflow.WorkflowActivityParameterValue_SingleValue{
-					SingleValue: val,
-				},
-			}
-		} else if val, ok := input.([]string); ok {
-			outputs[key] = &workflow.WorkflowActivityParameterValue{
-				Value: &workflow.WorkflowActivityParameterValue_ArrayValue{
-					ArrayValue: &workflow.WorkflowActivityParameterValues{
-						Values: val,
-					},
-				},
-			}
-		}
-	}
-
+	inputs := make(map[string]string)
+	outputs := make(map[string]string)
 	return &workflow.WorkflowActivity{
 		ExecutionGroup: cfg.ExecutionGroup,
 		Configuration:  cfg.Configuration,

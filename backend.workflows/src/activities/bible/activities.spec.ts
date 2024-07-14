@@ -16,10 +16,10 @@
 
 import { Downloader, FileName } from '../../util/downloader'
 import { ProcessBibleActivity } from './process'
-import { CreateVerseMarkdownTable } from './verse_table'
 import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/execution_context_pb'
 import { WorkflowActivity } from '../../generated/protobuf/bosca/workflow/activities_pb'
-import { CreateVerses } from './verse_create'
+import {CreateVerseMarkdownTable} from "./book/verse_table";
+import {CreateVerses} from "./book/verse_create";
 
 class DummyDownloader implements Downloader {
 

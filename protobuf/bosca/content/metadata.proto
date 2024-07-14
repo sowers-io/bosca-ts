@@ -54,15 +54,14 @@ message MetadataSupplementaries {
 }
 
 message MetadataSupplementary {
-  string id = 1;
-  string metadata_id = 2;
-  string key = 3;
-  string name = 4;
-  string content_type = 5;
-  int64 content_length = 6;
-  repeated string trait_ids = 7;
-  optional string source_id = 8;
-  optional string source_identifier = 9;
+  string metadata_id = 1;
+  string key = 2;
+  string name = 3;
+  string content_type = 4;
+  int64 content_length = 5;
+  repeated string trait_ids = 6;
+  optional string source_id = 7;
+  optional string source_identifier = 8;
 }
 
 message AddMetadataRequest {

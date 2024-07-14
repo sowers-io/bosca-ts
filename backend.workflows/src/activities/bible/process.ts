@@ -58,6 +58,7 @@ export class ProcessBibleActivity extends Activity {
           name: metadata.identification.nameLocal,
           attributes: {
             'bible.type': 'bible',
+            'bible.language': metadata.language.iso,
             'bible.system.id': metadata.identification.systemId.id,
             'bible.abbreviation': metadata.identification.abbreviationLocal,
             'bible.version': version.toString(),
@@ -83,6 +84,7 @@ export class ProcessBibleActivity extends Activity {
     for (const book of books) {
       const attributes = {
         'bible.type': 'book',
+        'bible.language': metadata.language.iso,
         'bible.version': bible.attributes['bible.version'],
         'bible.system.id': bible.attributes['bible.system.id'],
         'bible.abbreviation': bible.attributes['bible.abbreviation'],
@@ -153,6 +155,7 @@ export class ProcessBibleActivity extends Activity {
             languageTag: metadata.language.iso,
             attributes: {
               'bible.type': 'chapter',
+              'bible.language': metadata.language.iso,
               'bible.version': bookCollection.attributes['bible.version'],
               'bible.system.id': bookCollection.attributes['bible.system.id'],
               'bible.abbreviation': bookCollection.attributes['bible.abbreviation'],
@@ -206,19 +209,15 @@ export class ProcessBibleActivity extends Activity {
       const processor = new USXProcessor()
       await processor.process(file)
 
-      const bibleCollection = await this.createBibleCollection(processor.metadata)
-      const bookCollections = await this.createBookCollections(
-        source,
-        processor.metadata,
-        bibleCollection,
-        processor.books
-      )
+      const metadata = processor.metadata!
+      const bibleCollection = await this.createBibleCollection(metadata)
+      const bookCollections = await this.createBookCollections(source, metadata, bibleCollection, processor.books)
 
       const queue = new Queue(this.id, 4)
       for (let bookIndex = 0; bookIndex < processor.books.length; bookIndex++) {
         const book = processor.books[bookIndex]
         const collection = bookCollections[bookIndex]
-        await this.enqueueCreateChapters(queue, source, processor.metadata, collection, book)
+        await this.enqueueCreateChapters(queue, source, metadata, collection, book)
       }
     } finally {
       await this.downloader.cleanup(file)

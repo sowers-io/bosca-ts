@@ -39,11 +39,41 @@ func (ds *DataStore) AddMetadataRelationship(ctx context.Context, metadataId1 st
 	return nil
 }
 
+func (ds *DataStore) GetMetadataSupplementary(ctx context.Context, metadataId, key string) (*content.MetadataSupplementary, error) {
+	row := ds.db.QueryRowContext(ctx, "select name, content_type, content_length, source_id, source_identifier from metadata_supplementary where metadata_id = $1::uuid and \"key\" = $2", metadataId, key)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+	s := &content.MetadataSupplementary{
+		MetadataId: metadataId,
+		Key:        key,
+	}
+	err := row.Scan(&s.Name, &s.ContentType, &s.ContentLength, &s.SourceId, &s.SourceIdentifier)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
 func (ds *DataStore) AddMetadataSupplementary(ctx context.Context, metadataId, key, name, contentType string, contentLength int64, traitIds []string, sourceId, sourceIdentifier *string) error {
-	_, err := ds.db.ExecContext(ctx, "INSERT INTO metadata_supplementary (metadata_id, \"key\", name, content_type, content_length, traits, source_id, source_identifier) values ($1::uuid, $2, $3, $4, $5, $6, $7, $8, $9)", metadataId, key, name, contentType, contentLength, traitIds, sourceId, sourceIdentifier)
+	_, err := ds.db.ExecContext(ctx, "INSERT INTO metadata_supplementary (metadata_id, \"key\", name, content_type, content_length, source_id, source_identifier) values ($1::uuid, $2, $3, $4, $5, $6, $7)", metadataId, key, name, contentType, contentLength, sourceId, sourceIdentifier)
 	if err != nil {
 		return err
 	}
+
+	stmt, err := ds.db.PrepareContext(ctx, "insert into metadata_supplementary_traits (metadata_id, key, trait_id) values ($1, $2, $3)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, traitId := range traitIds {
+		_, err = stmt.ExecContext(ctx, metadataId, key, traitId)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

@@ -41,10 +41,11 @@ export class DeleteBibleActivity extends Activity {
     try {
       const processor = new USXProcessor()
       await processor.process(file)
+      const metadata = processor.metadata!
       const contentService = useServiceClient(ContentService)
       const metadatas = await contentService.findMetadata(new FindMetadataRequest({
         attributes: {
-          'bible.system.id': processor.metadata.identification.systemId.id
+          'bible.system.id': metadata.identification.systemId.id
         }
       }))
       for (const metadata of metadatas.metadata) {
@@ -52,7 +53,7 @@ export class DeleteBibleActivity extends Activity {
       }
       const collections = await contentService.findCollection(new FindMetadataRequest({
         attributes: {
-          'bible.system.id': processor.metadata.identification.systemId.id
+          'bible.system.id': metadata.identification.systemId.id
         }
       }))
       for (const collection of collections.collections) {

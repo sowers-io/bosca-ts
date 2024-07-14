@@ -76,39 +76,20 @@ func (ds *DataStore) GetWorkflow(ctx context.Context, id string) (*workflow.Work
 	return &wf, nil
 }
 
-func getWorkflowActivityParameterValue(inputs *sql.Rows) (string, *workflow.WorkflowActivityParameterValue, error) {
+func getWorkflowActivityParameterValue(inputs *sql.Rows) (string, string, error) {
 	var name string
-	var value json.RawMessage
-	input := &workflow.WorkflowActivityParameterValue{}
+	var value string
 	err := inputs.Scan(&name, &value)
 	if err != nil {
-		return "", nil, err
+		return "", "", err
 	}
-	data := make(map[string]interface{})
-	err = json.Unmarshal(value, &data)
-	if data["Value"].(map[string]interface{})["SingleValue"] != nil {
-		input.Value = &workflow.WorkflowActivityParameterValue_SingleValue{
-			SingleValue: data["Value"].(map[string]interface{})["SingleValue"].(string),
-		}
-	} else if data["Value"].(map[string]interface{})["ArrayValue"] != nil {
-		input.Value = &workflow.WorkflowActivityParameterValue_ArrayValue{
-			ArrayValue: &workflow.WorkflowActivityParameterValues{
-				Values: data["Value"].(map[string]interface{})["ArrayValue"].([]string),
-			},
-		}
-	} else {
-		err = errors.New("unexpected value")
-	}
-	if err != nil {
-		return name, nil, err
-	}
-	return name, input, nil
+	return name, value, nil
 }
 
 func (ds *DataStore) getWorkflowActivity(ctx context.Context, rows *sql.Rows) (*workflow.WorkflowActivity, error) {
 	activity := &workflow.WorkflowActivity{
-		Inputs:  make(map[string]*workflow.WorkflowActivityParameterValue),
-		Outputs: make(map[string]*workflow.WorkflowActivityParameterValue),
+		Inputs:  make(map[string]string),
+		Outputs: make(map[string]string),
 	}
 
 	var configuration json.RawMessage
@@ -386,18 +367,14 @@ func (ds *DataStore) AddWorkflowActivity(ctx context.Context, workflowId string,
 			return 0, err
 		}
 	}
-	stmtInput, err := ds.db.PrepareContext(ctx, "INSERT INTO workflow_activity_inputs (activity_id, name, value) VALUES ($1, $2, ($3)::jsonb)")
+	stmtInput, err := ds.db.PrepareContext(ctx, "INSERT INTO workflow_activity_inputs (activity_id, name, value) VALUES ($1, $2, $3)")
 	if err != nil {
 		return 0, err
 	}
 	defer stmtInput.Close()
 
-	for name, parameterType := range activity.Inputs {
-		str, err := json.Marshal(parameterType)
-		if err != nil {
-			return 0, err
-		}
-		_, err = stmtInput.ExecContext(ctx, workflowActivityId, name, string(str))
+	for name, value := range activity.Inputs {
+		_, err = stmtInput.ExecContext(ctx, workflowActivityId, name, value)
 		if err != nil {
 			return 0, err
 		}
@@ -409,12 +386,8 @@ func (ds *DataStore) AddWorkflowActivity(ctx context.Context, workflowId string,
 	}
 	defer stmtOutput.Close()
 
-	for name, parameterType := range activity.Outputs {
-		str, err := json.Marshal(parameterType)
-		if err != nil {
-			return 0, err
-		}
-		_, err = stmtOutput.ExecContext(ctx, workflowActivityId, name, string(str))
+	for name, value := range activity.Outputs {
+		_, err = stmtOutput.ExecContext(ctx, workflowActivityId, name, value)
 		if err != nil {
 			return 0, err
 		}
@@ -422,13 +395,13 @@ func (ds *DataStore) AddWorkflowActivity(ctx context.Context, workflowId string,
 	return workflowActivityId, nil
 }
 
-func (ds *DataStore) AddWorkflowExecution(ctx context.Context, txn *sql.Tx, parentExecutionId *string, workflowId string, metadataId string, executionContext *workflow.WorkflowExecutionContext) (string, error) {
+func (ds *DataStore) AddWorkflowExecution(ctx context.Context, txn *sql.Tx, parentExecutionId *string, workflowId string, metadataId *string, collectionId *string, executionContext *workflow.WorkflowExecutionContext) (string, error) {
 	executionContext.CurrentExecutionGroup = -1
 	executionContextJson, err := json.Marshal(executionContext)
 	if err != nil {
 		return "", err
 	}
-	result, err := txn.QueryContext(ctx, "insert into workflow_executions (parent_execution_id, workflow_id, metadata_id, context) values ($1, $2, $3, ($4)::jsonb) returning id::varchar", parentExecutionId, workflowId, metadataId, executionContextJson)
+	result, err := txn.QueryContext(ctx, "insert into workflow_executions (parent_execution_id, workflow_id, metadata_id, collection_id, context) values ($1, $2, $3, $4, ($5)::jsonb) returning id::varchar", parentExecutionId, workflowId, metadataId, collectionId, executionContextJson)
 	if err != nil {
 		return "", err
 	}

@@ -74,6 +74,12 @@ service ContentService {
     };
   }
 
+  rpc SetCollectionReady(bosca.IdRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/collection/{id}/ready"
+    };
+  }
+
   rpc AddCollections(AddCollectionsRequest) returns (bosca.IdResponses) {
     option (google.api.http) = {
       put: "/v1/content/collections"

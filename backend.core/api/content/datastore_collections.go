@@ -106,7 +106,7 @@ func (ds *DataStore) getCollectionColumns() string {
 	return "id, name, type, labels, attributes, created, modified"
 }
 
-func (ds *DataStore) getCollection(row *sql.Rows) (*content.Collection, error) {
+func (ds *DataStore) getCollection(ctx context.Context, traitsQuery *sql.Stmt, row *sql.Rows) (*content.Collection, error) {
 	var collection content.Collection
 
 	m := pgtype.NewMap()
@@ -152,6 +152,22 @@ func (ds *DataStore) getCollection(row *sql.Rows) (*content.Collection, error) {
 	collection.Created = timestamppb.New(created)
 	collection.Modified = timestamppb.New(modified)
 	collection.Attributes = attributes
+	collection.TraitIds = make([]string, 0)
+
+	traits, err := traitsQuery.QueryContext(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	defer traits.Close()
+	for traits.Next() {
+		var traitId string
+		err = traits.Scan(&traitId)
+		if err != nil {
+			return nil, err
+		}
+		collection.TraitIds = append(collection.TraitIds, traitId)
+	}
+
 	return &collection, nil
 }
 
@@ -160,8 +176,15 @@ func (ds *DataStore) GetCollection(ctx context.Context, id string) (*content.Col
 	if err != nil {
 		return nil, err
 	}
+
+	traitsQuery, err := ds.db.PrepareContext(ctx, "select trait_id from collection_traits where collection_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer traitsQuery.Close()
+
 	if rows.Next() {
-		return ds.getCollection(rows)
+		return ds.getCollection(ctx, traitsQuery, rows)
 	}
 	return nil, nil
 }
@@ -197,6 +220,16 @@ func (ds *DataStore) AddCollection(ctx context.Context, collection *content.Coll
 	if err != nil {
 		return "", err
 	}
+
+	if collection.TraitIds != nil {
+		for _, traitId := range collection.TraitIds {
+			_, err = ds.db.ExecContext(ctx, "insert into collection_traits (collection_id, trait_id) values ($1, $2)", id, traitId)
+			if err != nil {
+				return id, err
+			}
+		}
+	}
+
 	return id, nil
 }
 
@@ -358,9 +391,16 @@ func (ds *DataStore) FindCollection(ctx context.Context, request *content.FindCo
 		return nil, err
 	}
 	defer rows.Close()
+
+	traitsQuery, err := ds.db.PrepareContext(ctx, "select trait_id from collection_traits where collection_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer traitsQuery.Close()
+
 	collections := make([]*content.Collection, 0)
 	for rows.Next() {
-		collection, err := ds.getCollection(rows)
+		collection, err := ds.getCollection(ctx, traitsQuery, rows)
 		if err != nil {
 			return nil, err
 		}

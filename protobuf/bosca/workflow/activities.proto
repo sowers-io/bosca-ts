@@ -27,7 +27,6 @@ enum WorkflowActivityParameterType {
   unknown_activity_parameter_type = 0;
   context = 1;
   supplementary = 2;
-  supplementary_array = 3;
 }
 
 message Activity {
@@ -38,16 +37,6 @@ message Activity {
   map<string, string> configuration = 5;
   map<string, WorkflowActivityParameterType> inputs = 6;
   map<string, WorkflowActivityParameterType> outputs = 7;
-}
-
-message WorkflowActivityParameterValue {
-  oneof value {
-    string single_value = 1;
-    WorkflowActivityParameterValues array_value = 2;
-  }
-}
-message WorkflowActivityParameterValues {
-  repeated string values = 2;
 }
 
 message WorkflowActivityPrompt {
@@ -81,8 +70,8 @@ message WorkflowActivity {
   string queue = 4;
   int32 execution_group = 5;
   map<string, string> configuration = 6;
-  map<string, WorkflowActivityParameterValue> inputs = 7;
-  map<string, WorkflowActivityParameterValue> outputs = 8;
+  map<string, string> inputs = 7;
+  map<string, string> outputs = 8;
 }
 
 message WorkflowActivities {

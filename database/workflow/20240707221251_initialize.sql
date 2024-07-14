@@ -102,7 +102,7 @@ create table workflow_activity_inputs
 (
     activity_id bigint  not null,
     name        varchar not null,
-    value       jsonb   not null,
+    value       varchar not null,
     primary key (activity_id, name),
     foreign key (activity_id) references workflow_activities
 );
@@ -111,7 +111,7 @@ create table workflow_activity_outputs
 (
     activity_id bigint  not null,
     name        varchar not null,
-    value       jsonb   not null,
+    value       varchar not null,
     primary key (activity_id, name),
     foreign key (activity_id) references workflow_activities
 );
@@ -181,7 +181,8 @@ create table workflow_executions
     parent_execution_id uuid,
     created             timestamp not null default now(),
     workflow_id         varchar   not null,
-    metadata_id         uuid      not null,
+    metadata_id         uuid,
+    collection_id       uuid,
     context             jsonb     not null,
     completed           timestamp,
     failed              timestamp,

@@ -37,17 +37,22 @@ export class WorkflowExecutionRequest extends Message<WorkflowExecutionRequest> 
   workflowId = "";
 
   /**
-   * @generated from field: string metadata_id = 3;
+   * @generated from field: optional string metadata_id = 3;
    */
-  metadataId = "";
+  metadataId?: string;
 
   /**
-   * @generated from field: bool wait_for_completion = 4;
+   * @generated from field: optional string collection_id = 4;
+   */
+  collectionId?: string;
+
+  /**
+   * @generated from field: bool wait_for_completion = 5;
    */
   waitForCompletion = false;
 
   /**
-   * @generated from field: map<string, string> context = 5;
+   * @generated from field: map<string, string> context = 6;
    */
   context: { [key: string]: string } = {};
 
@@ -61,9 +66,10 @@ export class WorkflowExecutionRequest extends Message<WorkflowExecutionRequest> 
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "parent_execution_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
     { no: 2, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "wait_for_completion", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 5, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 3, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 4, name: "collection_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 5, name: "wait_for_completion", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionRequest {
@@ -174,12 +180,17 @@ export class WorkflowExecutionContext extends Message<WorkflowExecutionContext> 
   currentExecutionGroup = 0;
 
   /**
-   * @generated from field: string metadata_id = 6;
+   * @generated from field: optional string metadata_id = 6;
    */
-  metadataId = "";
+  metadataId?: string;
 
   /**
-   * @generated from field: map<string, string> context = 7;
+   * @generated from field: optional string collection_id = 7;
+   */
+  collectionId?: string;
+
+  /**
+   * @generated from field: map<string, string> context = 8;
    */
   context: { [key: string]: string } = {};
 
@@ -196,8 +207,9 @@ export class WorkflowExecutionContext extends Message<WorkflowExecutionContext> 
     { no: 3, name: "execution_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "activities", kind: "message", T: WorkflowActivity, repeated: true },
     { no: 5, name: "current_execution_group", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 6, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 6, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 7, name: "collection_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 8, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionContext {
@@ -242,42 +254,47 @@ export class WorkflowActivityJob extends Message<WorkflowActivityJob> {
   metadataId = "";
 
   /**
-   * @generated from field: bosca.workflow.WorkflowActivity activity = 5;
+   * @generated from field: string collection_id = 5;
+   */
+  collectionId = "";
+
+  /**
+   * @generated from field: bosca.workflow.WorkflowActivity activity = 6;
    */
   activity?: WorkflowActivity;
 
   /**
-   * @generated from field: repeated bosca.workflow.WorkflowActivityPrompt prompts = 6;
+   * @generated from field: repeated bosca.workflow.WorkflowActivityPrompt prompts = 7;
    */
   prompts: WorkflowActivityPrompt[] = [];
 
   /**
-   * @generated from field: repeated bosca.workflow.WorkflowActivityStorageSystem storage_systems = 7;
+   * @generated from field: repeated bosca.workflow.WorkflowActivityStorageSystem storage_systems = 8;
    */
   storageSystems: WorkflowActivityStorageSystem[] = [];
 
   /**
-   * @generated from field: repeated bosca.workflow.WorkflowActivityModel models = 8;
+   * @generated from field: repeated bosca.workflow.WorkflowActivityModel models = 9;
    */
   models: WorkflowActivityModel[] = [];
 
   /**
-   * @generated from field: map<string, string> context = 9;
+   * @generated from field: map<string, string> context = 10;
    */
   context: { [key: string]: string } = {};
 
   /**
-   * @generated from field: bool complete = 10;
+   * @generated from field: bool complete = 11;
    */
   complete = false;
 
   /**
-   * @generated from field: bool success = 11;
+   * @generated from field: bool success = 12;
    */
   success = false;
 
   /**
-   * @generated from field: optional string error = 12;
+   * @generated from field: optional string error = 13;
    */
   error?: string;
 
@@ -293,14 +310,15 @@ export class WorkflowActivityJob extends Message<WorkflowActivityJob> {
     { no: 2, name: "execution_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "activity", kind: "message", T: WorkflowActivity },
-    { no: 6, name: "prompts", kind: "message", T: WorkflowActivityPrompt, repeated: true },
-    { no: 7, name: "storage_systems", kind: "message", T: WorkflowActivityStorageSystem, repeated: true },
-    { no: 8, name: "models", kind: "message", T: WorkflowActivityModel, repeated: true },
-    { no: 9, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
-    { no: 10, name: "complete", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 11, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 12, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 5, name: "collection_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "activity", kind: "message", T: WorkflowActivity },
+    { no: 7, name: "prompts", kind: "message", T: WorkflowActivityPrompt, repeated: true },
+    { no: 8, name: "storage_systems", kind: "message", T: WorkflowActivityStorageSystem, repeated: true },
+    { no: 9, name: "models", kind: "message", T: WorkflowActivityModel, repeated: true },
+    { no: 10, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 11, name: "complete", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 12, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 13, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowActivityJob {

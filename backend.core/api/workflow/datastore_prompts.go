@@ -23,8 +23,8 @@ import (
 )
 
 func (ds *DataStore) AddPrompt(ctx context.Context, prompt *workflow.Prompt) (string, error) {
-	rows, err := ds.db.QueryContext(ctx, "INSERT INTO prompts (name, description, prompt) VALUES ($1, $2, $3) returning id::varchar",
-		prompt.Name, prompt.Description, prompt.Prompt,
+	rows, err := ds.db.QueryContext(ctx, "INSERT INTO prompts (name, description, system_prompt, user_prompt) VALUES ($1, $2, $3, $4) returning id::varchar",
+		prompt.Name, prompt.Description, prompt.SystemPrompt, prompt.UserPrompt,
 	)
 	if err != nil {
 		return "", err
@@ -39,7 +39,7 @@ func (ds *DataStore) AddPrompt(ctx context.Context, prompt *workflow.Prompt) (st
 }
 
 func (ds *DataStore) GetPrompt(ctx context.Context, promptId string) (*workflow.Prompt, error) {
-	rows, err := ds.db.QueryContext(ctx, "select name, description, prompt from prompts where id = $1::uuid", promptId)
+	rows, err := ds.db.QueryContext(ctx, "select name, description, system_prompt, user_prompt from prompts where id = $1::uuid", promptId)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (ds *DataStore) GetPrompt(ctx context.Context, promptId string) (*workflow.
 		prompt := &workflow.Prompt{
 			Id: promptId,
 		}
-		err = rows.Scan(&prompt.Name, &prompt.Description, &prompt.Prompt)
+		err = rows.Scan(&prompt.Name, &prompt.Description, &prompt.SystemPrompt, &prompt.UserPrompt)
 		if err != nil {
 			return nil, err
 		}

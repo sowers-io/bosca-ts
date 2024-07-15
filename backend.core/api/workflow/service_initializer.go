@@ -89,9 +89,10 @@ func initializeEmbeddedWorkflow(ctx context.Context, dataStore *DataStore) {
 	}
 	for configId, prompt := range cfg.Prompts {
 		id, err := dataStore.AddPrompt(ctx, &workflow2.Prompt{
-			Name:        prompt.Name,
-			Description: prompt.Description,
-			Prompt:      prompt.Prompt,
+			Name:         prompt.Name,
+			Description:  prompt.Description,
+			SystemPrompt: prompt.SystemPrompt,
+			UserPrompt:   prompt.UserPrompt,
 		})
 		if err != nil {
 			slog.Error("failed to create prompt", slog.Any("error", err))

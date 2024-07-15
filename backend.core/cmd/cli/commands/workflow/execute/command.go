@@ -13,20 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-syntax = "proto3";
 
-option go_package = "bosca.io/api/protobuf/bosca/workflow";
+package execute
 
-package bosca.workflow;
+import (
+	"bosca.io/cmd/cli/commands/flags"
+	"bosca.io/cmd/cli/commands/workflow/execute/collection"
+	"bosca.io/cmd/cli/commands/workflow/execute/metadata"
+	"github.com/spf13/cobra"
+)
 
-message Prompt {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  string system_prompt = 4;
-  string user_prompt = 5;
+var Command = &cobra.Command{
+	Use:   "execute",
+	Short: "Execute workflows",
 }
 
-message Prompts {
-  Prompt prompts = 1;
+func init() {
+	Command.AddCommand(metadata.Command, collection.Command)
+	Command.Flags().Bool(flags.ArgsFlag, false, "The args to use to find items")
+	Command.Flags().Bool(flags.WaitFlag, false, "Wait for completion")
+	Command.Flags().String(flags.EndpointFlag, "localhost:5011", "The endpoint to use.")
 }

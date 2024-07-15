@@ -12,10 +12,11 @@ create table models
 
 create table prompts
 (
-    id          uuid    not null default gen_random_uuid(),
-    name        varchar not null,
-    description varchar not null,
-    prompt      text    not null,
+    id            uuid    not null default gen_random_uuid(),
+    name          varchar not null,
+    description   varchar not null,
+    system_prompt text    not null,
+    user_prompt   text    not null,
     primary key (id)
 );
 

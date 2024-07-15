@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package ls
+package list
 
 import (
-	grpcRequests "bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
 	"context"
@@ -26,11 +26,9 @@ import (
 )
 
 var Command = &cobra.Command{
-	Use:   "ls",
-	Short: "List all the workflow states.",
+	Use:   "list",
+	Short: "List workflows",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var err error
-
 		client, err := cli.NewWorkflowClient(cmd)
 		if err != nil {
 			return err
@@ -41,43 +39,25 @@ var Command = &cobra.Command{
 			return err
 		}
 
-		states, err := client.GetWorkflowStates(ctx, &grpcRequests.Empty{})
+		workflows, err := client.GetWorkflows(ctx, &bosca.Empty{})
+
 		if err != nil {
 			return err
 		}
 
 		tbl := table.NewWriter()
-		tbl.AppendHeader(table.Row{"ID", "Name", "Description", "Entry Workflow", "Workflow", "Exit Workflow"})
+		tbl.AppendHeader(table.Row{"ID", "Name", "Description"})
 
-		for _, state := range states.States {
-			workflowId := ""
-			if state.WorkflowId != nil {
-				workflowId = *state.WorkflowId
-			}
-			entryWorkflowId := ""
-			if state.EntryWorkflowId != nil {
-				entryWorkflowId = *state.EntryWorkflowId
-			}
-			exitWorkflowId := ""
-			if state.ExitWorkflowId != nil {
-				exitWorkflowId = *state.ExitWorkflowId
-			}
-			tbl.AppendRow(table.Row{
-				state.Id,
-				state.Name,
-				state.Description,
-				entryWorkflowId,
-				workflowId,
-				exitWorkflowId,
-			})
+		for _, workflow := range workflows.Workflows {
+			tbl.AppendRow(table.Row{workflow.Id, workflow.Name, workflow.Description})
 		}
 
 		cmd.Printf("%s", tbl.Render())
-
 		return nil
 	},
 }
 
 func init() {
-	Command.Flags().String(flags.EndpointFlag, "localhost:5013", "The endpoint to use.")
+	Command.Flags().Bool(flags.RetryFlag, false, "Retry transition")
+	Command.Flags().String(flags.EndpointFlag, "localhost:5011", "The endpoint to use.")
 }

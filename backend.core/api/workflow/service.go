@@ -77,6 +77,26 @@ func (svc *service) getMetadata(ctx context.Context, metadataId string) (*conten
 	return md, err
 }
 
+func (svc *service) findMetadata(ctx context.Context, attributes map[string]string) ([]*content.Metadata, error) {
+	md, err := svc.contentClient.FindMetadata(ctx, &content.FindMetadataRequest{Attributes: attributes}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+		HeaderValue: "Token " + svc.serviceAccountToken,
+	}})
+	if err != nil {
+		return nil, err
+	}
+	return md.Metadata, nil
+}
+
+func (svc *service) findCollection(ctx context.Context, attributes map[string]string) ([]*content.Collection, error) {
+	md, err := svc.contentClient.FindCollection(ctx, &content.FindCollectionRequest{Attributes: attributes}, opts.PerRPCCredsCallOption{Creds: &common.Authorization{
+		HeaderValue: "Token " + svc.serviceAccountToken,
+	}})
+	if err != nil {
+		return nil, err
+	}
+	return md.Collections, nil
+}
+
 func (svc *service) getCollection(ctx context.Context, collectionId string) (*content.Collection, error) {
 	var col *content.Collection
 	var err error

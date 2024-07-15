@@ -135,9 +135,10 @@ type ModelConfiguration struct {
 }
 
 type PromptConfiguration struct {
-	Name        string
-	Description string
-	Prompt      string
+	Name         string
+	Description  string
+	SystemPrompt string `yaml:"systemPrompt"`
+	UserPrompt   string `yaml:"userPrompt"`
 }
 
 type StorageSystemModel struct {

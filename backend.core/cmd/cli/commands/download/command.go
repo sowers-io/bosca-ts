@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-syntax = "proto3";
 
-option go_package = "bosca.io/api/protobuf/bosca/workflow";
+package download
 
-package bosca.workflow;
+import (
+	"bosca.io/cmd/cli/commands/download/metadata"
+	"bosca.io/cmd/cli/commands/download/supplementary"
+	"github.com/spf13/cobra"
+)
 
-message Prompt {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  string system_prompt = 4;
-  string user_prompt = 5;
+var Command = &cobra.Command{
+	Use:   "download",
+	Short: "Download a resource",
 }
 
-message Prompts {
-  Prompt prompts = 1;
+func init() {
+	Command.AddCommand(metadata.Command, supplementary.Command)
 }

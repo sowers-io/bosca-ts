@@ -30,6 +30,19 @@ message WorkflowExecutionRequest {
   map<string, string> context = 6;
 }
 
+message FindAndWorkflowExecutionRequest {
+  optional string parent_execution_id = 1;
+  string workflow_id = 2;
+  bool wait_for_completion = 5;
+  map<string, string> context = 6;
+  map<string, string> metadata_attributes = 7;
+  map<string, string> collection_attributes = 8;
+}
+
+message WorkflowExecutionResponses {
+  repeated WorkflowExecutionResponse responses = 1;
+}
+
 message WorkflowExecutionResponse {
   string execution_id = 1;
   bool success = 2;

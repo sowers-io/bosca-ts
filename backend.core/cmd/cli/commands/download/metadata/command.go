@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package ls
+package metadata
 
 import (
-	grpcRequests "bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
+	"bosca.io/pkg/util"
 	"context"
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
+	"io"
+	"net/http"
+	"net/url"
+	"os"
 )
 
 var Command = &cobra.Command{
-	Use:   "ls",
-	Short: "List all the workflow states.",
+	Use:   "metadata [id] [file]",
+	Short: "Download a metadata",
+	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var err error
-
-		client, err := cli.NewWorkflowClient(cmd)
+		client, err := cli.NewContentClient(cmd)
 		if err != nil {
 			return err
 		}
@@ -41,40 +44,41 @@ var Command = &cobra.Command{
 			return err
 		}
 
-		states, err := client.GetWorkflowStates(ctx, &grpcRequests.Empty{})
+		u, err := client.GetMetadataDownloadUrl(ctx, &bosca.IdRequest{
+			Id: args[0],
+		})
 		if err != nil {
 			return err
 		}
 
-		tbl := table.NewWriter()
-		tbl.AppendHeader(table.Row{"ID", "Name", "Description", "Entry Workflow", "Workflow", "Exit Workflow"})
-
-		for _, state := range states.States {
-			workflowId := ""
-			if state.WorkflowId != nil {
-				workflowId = *state.WorkflowId
-			}
-			entryWorkflowId := ""
-			if state.EntryWorkflowId != nil {
-				entryWorkflowId = *state.EntryWorkflowId
-			}
-			exitWorkflowId := ""
-			if state.ExitWorkflowId != nil {
-				exitWorkflowId = *state.ExitWorkflowId
-			}
-			tbl.AppendRow(table.Row{
-				state.Id,
-				state.Name,
-				state.Description,
-				entryWorkflowId,
-				workflowId,
-				exitWorkflowId,
-			})
+		urlValue, _ := url.Parse(u.Url)
+		request := &http.Request{
+			Method: u.Method,
+			Header: map[string][]string{},
+			URL:    urlValue,
 		}
 
-		cmd.Printf("%s", tbl.Render())
+		for _, header := range u.Headers {
+			if request.Header[header.Name] == nil {
+				request.Header[header.Name] = []string{header.Value}
+			} else {
+				request.Header[header.Name] = append(request.Header[header.Name], header.Value)
+			}
+		}
 
-		return nil
+		httpClient := util.NewDefaultHttpClient()
+		response, err := httpClient.Do(request)
+		if err != nil {
+			return err
+		}
+		defer response.Body.Close()
+
+		bytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+
+		return os.WriteFile(args[1], bytes, os.FileMode(0644))
 	},
 }
 

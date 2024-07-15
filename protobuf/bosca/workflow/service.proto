@@ -137,6 +137,13 @@ service WorkflowService {
     };
   }
 
+  rpc FindAndExecuteWorkflow (FindAndWorkflowExecutionRequest) returns (WorkflowExecutionResponses) {
+    option (google.api.http) = {
+      post: "/v1/workflow/find/execute/{workflow_id}"
+      body: "*"
+    };
+  }
+
   rpc GetWorkflowExecutionStatus(IdRequest) returns (WorkflowExecutionResponse) {
     option (google.api.http) = {
       get: "/v1/workflow/executions/{id}/status"

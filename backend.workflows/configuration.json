@@ -20,7 +20,7 @@
     "bible.chapter.verses.create": {
       "queue": "bible"
     },
-    "bible.book.verse.markdown.table": {
+    "bible.book.verse.table.create": {
       "queue": "bible"
     }
   }

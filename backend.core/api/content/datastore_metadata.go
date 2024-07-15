@@ -39,20 +39,44 @@ func (ds *DataStore) AddMetadataRelationship(ctx context.Context, metadataId1 st
 	return nil
 }
 
-func (ds *DataStore) GetMetadataSupplementary(ctx context.Context, metadataId, key string) (*content.MetadataSupplementary, error) {
-	row := ds.db.QueryRowContext(ctx, "select name, content_type, content_length, source_id, source_identifier from metadata_supplementary where metadata_id = $1::uuid and \"key\" = $2", metadataId, key)
-	if row.Err() != nil {
-		return nil, row.Err()
-	}
-	s := &content.MetadataSupplementary{
-		MetadataId: metadataId,
-		Key:        key,
-	}
-	err := row.Scan(&s.Name, &s.ContentType, &s.ContentLength, &s.SourceId, &s.SourceIdentifier)
+func (ds *DataStore) GetMetadataSupplementaries(ctx context.Context, metadataId string) ([]*content.MetadataSupplementary, error) {
+	rows, err := ds.db.QueryContext(ctx, "select \"key\", name, content_type, content_length, source_id, source_identifier from metadata_supplementary where metadata_id = $1::uuid", metadataId)
 	if err != nil {
 		return nil, err
 	}
-	return s, nil
+	defer rows.Close()
+	supplementaries := make([]*content.MetadataSupplementary, 0)
+	for rows.Next() {
+		s := &content.MetadataSupplementary{
+			MetadataId: metadataId,
+		}
+		err := rows.Scan(&s.Key, &s.Name, &s.ContentType, &s.ContentLength, &s.SourceId, &s.SourceIdentifier)
+		if err != nil {
+			return nil, err
+		}
+		supplementaries = append(supplementaries, s)
+	}
+	return supplementaries, nil
+}
+
+func (ds *DataStore) GetMetadataSupplementary(ctx context.Context, metadataId, key string) (*content.MetadataSupplementary, error) {
+	rows, err := ds.db.QueryContext(ctx, "select name, content_type, content_length, source_id, source_identifier from metadata_supplementary where metadata_id = $1::uuid and \"key\" = $2", metadataId, key)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	if rows.Next() {
+		s := &content.MetadataSupplementary{
+			MetadataId: metadataId,
+			Key:        key,
+		}
+		err := rows.Scan(&s.Name, &s.ContentType, &s.ContentLength, &s.SourceId, &s.SourceIdentifier)
+		if err != nil {
+			return nil, err
+		}
+		return s, nil
+	}
+	return nil, nil
 }
 
 func (ds *DataStore) AddMetadataSupplementary(ctx context.Context, metadataId, key, name, contentType string, contentLength int64, traitIds []string, sourceId, sourceIdentifier *string) error {

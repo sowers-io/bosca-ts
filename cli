@@ -2,5 +2,5 @@
 
 set -e
 
-cd backend.core
-go run ./cmd/cli/main.go $@
+./scripts/build-cli
+./build/linux/bosca-cli $@

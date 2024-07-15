@@ -17,7 +17,7 @@
 package metadata
 
 import (
-	grpc "bosca.io/api/protobuf/bosca/content"
+	"bosca.io/api/protobuf/bosca/workflow"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
 	"context"
@@ -27,10 +27,11 @@ import (
 )
 
 var Command = &cobra.Command{
-	Use:   "metadata",
-	Short: "Find a metadata",
+	Use:   "metadata [workflow]",
+	Short: "Execute metadata workflows",
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := cli.NewContentClient(cmd)
+		client, err := cli.NewWorkflowClient(cmd)
 		if err != nil {
 			return err
 		}
@@ -40,10 +41,9 @@ var Command = &cobra.Command{
 			return err
 		}
 
-		attributes := make(map[string]string)
-
 		findArgs := cmd.Flag(flags.ArgsFlag).Value.String()
 
+		attributes := make(map[string]string)
 		for _, arg := range strings.Split(findArgs, ",") {
 			kv := strings.Split(arg, "=")
 			if len(kv) != 2 {
@@ -54,33 +54,27 @@ var Command = &cobra.Command{
 
 		cmd.Printf("Args: %v\n", attributes)
 
-		response, err := client.FindMetadata(ctx, &grpc.FindMetadataRequest{
-			Attributes: attributes,
+		executions, err := client.FindAndExecuteWorkflow(ctx, &workflow.FindAndWorkflowExecutionRequest{
+			WorkflowId:         args[0],
+			MetadataAttributes: attributes,
+			WaitForCompletion:  cmd.Flag(flags.WaitFlag).Value.String() == "true",
 		})
 
-		if err != nil {
-			return err
-		}
-
 		tbl := table.NewWriter()
-		tbl.AppendHeader(table.Row{"ID", "Name", "Type", "Attributes"})
+		tbl.AppendHeader(table.Row{"ID", "Success", "Complete", "Error"})
 
-		for _, collection := range response.Metadata {
-			tbl.AppendRow(table.Row{
-				collection.Id,
-				collection.Name,
-				collection.ContentType,
-				collection.Attributes,
-			})
+		for _, execution := range executions.Responses {
+			tbl.AppendRow(table.Row{execution.ExecutionId, execution.Success, execution.Complete, execution.Error})
 		}
 
 		cmd.Printf("%s", tbl.Render())
 
-		return nil
+		return err
 	},
 }
 
 func init() {
-	Command.Flags().String(flags.EndpointFlag, "localhost:5013", "The endpoint to use.")
-	Command.Flags().String(flags.ArgsFlag, "", "The args")
+	Command.Flags().String(flags.ArgsFlag, "", "The args to use to find items")
+	Command.Flags().Bool(flags.WaitFlag, false, "Wait for completion")
+	Command.Flags().String(flags.EndpointFlag, "localhost:5011", "The endpoint to use.")
 }

@@ -315,6 +315,15 @@ export const ContentService = {
       kind: MethodKind.Unary,
     },
     /**
+     * @generated from rpc bosca.content.ContentService.GetMetadataSupplementary
+     */
+    getMetadataSupplementary: {
+      name: "GetMetadataSupplementary",
+      I: SupplementaryIdRequest,
+      O: MetadataSupplementary,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc bosca.content.ContentService.SetMetadataReady
      */
     setMetadataReady: {

@@ -27,7 +27,7 @@ import { StorageSystem, StorageSystemModels, StorageSystems } from "./storage_sy
 import { Workflow, Workflows, WorkflowState, WorkflowStates } from "./workflows_pb";
 import { WorkflowActivities, WorkflowActivityIdRequest, WorkflowActivityPrompts, WorkflowActivityStorageSystems } from "./activities_pb";
 import { BeginTransitionWorkflowRequest, CompleteTransitionWorkflowRequest } from "./transitions_pb";
-import { WorkflowActivityJob, WorkflowActivityJobRequest, WorkflowActivityJobStatus, WorkflowExecutionRequest, WorkflowExecutionResponse } from "./execution_context_pb";
+import { FindAndWorkflowExecutionRequest, WorkflowActivityJob, WorkflowActivityJobRequest, WorkflowActivityJobStatus, WorkflowExecutionRequest, WorkflowExecutionResponse, WorkflowExecutionResponses } from "./execution_context_pb";
 
 /**
  * @generated from service bosca.workflow.WorkflowService
@@ -186,6 +186,15 @@ export const WorkflowService = {
       name: "ExecuteWorkflow",
       I: WorkflowExecutionRequest,
       O: WorkflowExecutionResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.workflow.WorkflowService.FindAndExecuteWorkflow
+     */
+    findAndExecuteWorkflow: {
+      name: "FindAndExecuteWorkflow",
+      I: FindAndWorkflowExecutionRequest,
+      O: WorkflowExecutionResponses,
       kind: MethodKind.Unary,
     },
     /**

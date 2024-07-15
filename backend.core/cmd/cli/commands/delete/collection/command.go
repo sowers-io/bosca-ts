@@ -27,6 +27,7 @@ import (
 var Command = &cobra.Command{
 	Use:   "collection [name]",
 	Short: "Delete a collection",
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := cli.NewContentClient(cmd)
 		if err != nil {

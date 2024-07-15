@@ -24,6 +24,7 @@ import { TransitionToActivity } from './activities/metadata/transition_to'
 import { getConfiguration } from './configuration'
 import { CreateVerseMarkdownTable } from './activities/bible/book/verse_table'
 import { CreateVerses } from './activities/bible/book/verse_create'
+import { PromptActivity } from './activities/ai/prompt'
 
 const downloader = new DefaultDownloader()
 
@@ -35,6 +36,7 @@ function getAvailableActivities(): { [id: string]: Activity } {
     new CreateVerseMarkdownTable(downloader),
     new CreateVerses(downloader),
     new TransitionToActivity(),
+    new PromptActivity()
   ]
   const activitiesById: { [id: string]: Activity } = {}
   for (const activity of activities) {

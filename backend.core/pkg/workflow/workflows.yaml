@@ -160,12 +160,13 @@ workflows:
     bible.chapter.verses.create:
       configuration:
         trait: bible.usx.verse
-    bible.book.verse.markdown.table:
+    bible.book.verse.table.create:
       outputs:
         supplementaryId: supplementary
   workflows:
     # metadata workflows
     metadata.process:
+      queue: metadata
       activities:
         metadata.traits.process:
           executionGroup: 1
@@ -174,16 +175,16 @@ workflows:
           configuration:
             state: draft
             status:
-      queue: metadata
     # bible workflows
     bible.usx:
+      queue: bible
       activities:
         bible.process: { }
-      queue: bible
     ## bible book workflow
     bible.usx.book:
+      queue: bible
       activities:
-        bible.book.verse.markdown.table:
+        bible.book.verse.table.create:
           executionGroup: 1
           outputs:
             supplementaryId: chapter-verse-table
@@ -218,16 +219,22 @@ workflows:
             phi3:mini: { }
           storageSystems:
             bible.verse.label.vector.index: { }
+    bible.usx.book.verse.table:
       queue: bible
+      activities:
+        bible.book.verse.table.create:
+          executionGroup: 1
+          outputs:
+            supplementaryId: chapter-verse-table
     ## bible verse workflow
     bible.usx.verse:
+      queue: bible
       activities:
         metadata.text.index: { }
-      queue: bible
 
 prompts:
   verse.labeller:
-    prompt: |
+    userPrompt: |
       You are a Biblical theologian who is also an expert in felt needs.  Your job is to classify verses, annotating them with felt needs.  Examples of the felt needs are:
       * salvation
       * forgiveness

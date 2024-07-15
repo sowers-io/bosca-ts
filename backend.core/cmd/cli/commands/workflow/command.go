@@ -17,6 +17,8 @@
 package workflow
 
 import (
+	"bosca.io/cmd/cli/commands/workflow/execute"
+	"bosca.io/cmd/cli/commands/workflow/list"
 	"bosca.io/cmd/cli/commands/workflow/states"
 	"bosca.io/cmd/cli/commands/workflow/transition"
 	"github.com/spf13/cobra"
@@ -28,5 +30,5 @@ var Command = &cobra.Command{
 }
 
 func init() {
-	Command.AddCommand(transition.Command, states.Command)
+	Command.AddCommand(transition.Command, states.Command, list.Command, execute.Command)
 }

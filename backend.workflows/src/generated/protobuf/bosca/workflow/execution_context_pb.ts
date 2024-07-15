@@ -90,6 +90,110 @@ export class WorkflowExecutionRequest extends Message<WorkflowExecutionRequest> 
 }
 
 /**
+ * @generated from message bosca.workflow.FindAndWorkflowExecutionRequest
+ */
+export class FindAndWorkflowExecutionRequest extends Message<FindAndWorkflowExecutionRequest> {
+  /**
+   * @generated from field: optional string parent_execution_id = 1;
+   */
+  parentExecutionId?: string;
+
+  /**
+   * @generated from field: string workflow_id = 2;
+   */
+  workflowId = "";
+
+  /**
+   * @generated from field: bool wait_for_completion = 5;
+   */
+  waitForCompletion = false;
+
+  /**
+   * @generated from field: map<string, string> context = 6;
+   */
+  context: { [key: string]: string } = {};
+
+  /**
+   * @generated from field: map<string, string> metadata_attributes = 7;
+   */
+  metadataAttributes: { [key: string]: string } = {};
+
+  /**
+   * @generated from field: map<string, string> collection_attributes = 8;
+   */
+  collectionAttributes: { [key: string]: string } = {};
+
+  constructor(data?: PartialMessage<FindAndWorkflowExecutionRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.workflow.FindAndWorkflowExecutionRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "parent_execution_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 2, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "wait_for_completion", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "context", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 7, name: "metadata_attributes", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 8, name: "collection_attributes", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FindAndWorkflowExecutionRequest {
+    return new FindAndWorkflowExecutionRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FindAndWorkflowExecutionRequest {
+    return new FindAndWorkflowExecutionRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FindAndWorkflowExecutionRequest {
+    return new FindAndWorkflowExecutionRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FindAndWorkflowExecutionRequest | PlainMessage<FindAndWorkflowExecutionRequest> | undefined, b: FindAndWorkflowExecutionRequest | PlainMessage<FindAndWorkflowExecutionRequest> | undefined): boolean {
+    return proto3.util.equals(FindAndWorkflowExecutionRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message bosca.workflow.WorkflowExecutionResponses
+ */
+export class WorkflowExecutionResponses extends Message<WorkflowExecutionResponses> {
+  /**
+   * @generated from field: repeated bosca.workflow.WorkflowExecutionResponse responses = 1;
+   */
+  responses: WorkflowExecutionResponse[] = [];
+
+  constructor(data?: PartialMessage<WorkflowExecutionResponses>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.workflow.WorkflowExecutionResponses";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "responses", kind: "message", T: WorkflowExecutionResponse, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionResponses {
+    return new WorkflowExecutionResponses().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowExecutionResponses {
+    return new WorkflowExecutionResponses().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowExecutionResponses {
+    return new WorkflowExecutionResponses().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkflowExecutionResponses | PlainMessage<WorkflowExecutionResponses> | undefined, b: WorkflowExecutionResponses | PlainMessage<WorkflowExecutionResponses> | undefined): boolean {
+    return proto3.util.equals(WorkflowExecutionResponses, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.workflow.WorkflowExecutionResponse
  */
 export class WorkflowExecutionResponse extends Message<WorkflowExecutionResponse> {

@@ -24,8 +24,8 @@
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect-node": "^1.4.0",
-    "commander": "^12.1.0",
-    "markdown-table": "^3.0.3"
+    "@langchain/community": "^0.2.18",
+    "@langchain/core": "^0.2.15"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",

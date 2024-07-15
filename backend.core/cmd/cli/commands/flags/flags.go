@@ -21,6 +21,8 @@ const EndpointFlag = "endpoint"
 const StorageSystemFlag = "storage-system"
 const ParentFlag = "parent"
 
+const WorkflowFlag = "workflow"
+const WaitFlag = "wait"
 const RetryFlag = "retry"
 const TraitFlag = "trait"
 

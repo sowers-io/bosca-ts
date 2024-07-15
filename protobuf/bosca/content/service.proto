@@ -223,6 +223,12 @@ service ContentService {
     };
   }
 
+  rpc GetMetadataSupplementary(SupplementaryIdRequest) returns (MetadataSupplementary) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/supplementary/{key}"
+    };
+  }
+
   rpc SetMetadataReady(bosca.IdRequest) returns (Empty) {
     option (google.api.http) = {
       post: "/v1/content/metadata/{id}/ready"

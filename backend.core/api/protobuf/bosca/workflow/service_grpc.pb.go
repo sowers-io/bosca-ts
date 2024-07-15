@@ -52,6 +52,7 @@ const (
 	WorkflowService_BeginTransitionWorkflow_FullMethodName           = "/bosca.workflow.WorkflowService/BeginTransitionWorkflow"
 	WorkflowService_CompleteTransitionWorkflow_FullMethodName        = "/bosca.workflow.WorkflowService/CompleteTransitionWorkflow"
 	WorkflowService_ExecuteWorkflow_FullMethodName                   = "/bosca.workflow.WorkflowService/ExecuteWorkflow"
+	WorkflowService_FindAndExecuteWorkflow_FullMethodName            = "/bosca.workflow.WorkflowService/FindAndExecuteWorkflow"
 	WorkflowService_GetWorkflowExecutionStatus_FullMethodName        = "/bosca.workflow.WorkflowService/GetWorkflowExecutionStatus"
 	WorkflowService_GetChildWorkflowExecutions_FullMethodName        = "/bosca.workflow.WorkflowService/GetChildWorkflowExecutions"
 	WorkflowService_GetWorkflowActivityJobs_FullMethodName           = "/bosca.workflow.WorkflowService/GetWorkflowActivityJobs"
@@ -79,6 +80,7 @@ type WorkflowServiceClient interface {
 	BeginTransitionWorkflow(ctx context.Context, in *BeginTransitionWorkflowRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	CompleteTransitionWorkflow(ctx context.Context, in *CompleteTransitionWorkflowRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	ExecuteWorkflow(ctx context.Context, in *WorkflowExecutionRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponse, error)
+	FindAndExecuteWorkflow(ctx context.Context, in *FindAndWorkflowExecutionRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponses, error)
 	GetWorkflowExecutionStatus(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponse, error)
 	GetChildWorkflowExecutions(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.IdsResponse, error)
 	GetWorkflowActivityJobs(ctx context.Context, in *WorkflowActivityJobRequest, opts ...grpc.CallOption) (WorkflowService_GetWorkflowActivityJobsClient, error)
@@ -263,6 +265,16 @@ func (c *workflowServiceClient) ExecuteWorkflow(ctx context.Context, in *Workflo
 	return out, nil
 }
 
+func (c *workflowServiceClient) FindAndExecuteWorkflow(ctx context.Context, in *FindAndWorkflowExecutionRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponses, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowExecutionResponses)
+	err := c.cc.Invoke(ctx, WorkflowService_FindAndExecuteWorkflow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workflowServiceClient) GetWorkflowExecutionStatus(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(WorkflowExecutionResponse)
@@ -347,6 +359,7 @@ type WorkflowServiceServer interface {
 	BeginTransitionWorkflow(context.Context, *BeginTransitionWorkflowRequest) (*bosca.Empty, error)
 	CompleteTransitionWorkflow(context.Context, *CompleteTransitionWorkflowRequest) (*bosca.Empty, error)
 	ExecuteWorkflow(context.Context, *WorkflowExecutionRequest) (*WorkflowExecutionResponse, error)
+	FindAndExecuteWorkflow(context.Context, *FindAndWorkflowExecutionRequest) (*WorkflowExecutionResponses, error)
 	GetWorkflowExecutionStatus(context.Context, *bosca.IdRequest) (*WorkflowExecutionResponse, error)
 	GetChildWorkflowExecutions(context.Context, *bosca.IdRequest) (*bosca.IdsResponse, error)
 	GetWorkflowActivityJobs(*WorkflowActivityJobRequest, WorkflowService_GetWorkflowActivityJobsServer) error
@@ -408,6 +421,9 @@ func (UnimplementedWorkflowServiceServer) CompleteTransitionWorkflow(context.Con
 }
 func (UnimplementedWorkflowServiceServer) ExecuteWorkflow(context.Context, *WorkflowExecutionRequest) (*WorkflowExecutionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ExecuteWorkflow not implemented")
+}
+func (UnimplementedWorkflowServiceServer) FindAndExecuteWorkflow(context.Context, *FindAndWorkflowExecutionRequest) (*WorkflowExecutionResponses, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindAndExecuteWorkflow not implemented")
 }
 func (UnimplementedWorkflowServiceServer) GetWorkflowExecutionStatus(context.Context, *bosca.IdRequest) (*WorkflowExecutionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowExecutionStatus not implemented")
@@ -740,6 +756,24 @@ func _WorkflowService_ExecuteWorkflow_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkflowService_FindAndExecuteWorkflow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindAndWorkflowExecutionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).FindAndExecuteWorkflow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_FindAndExecuteWorkflow_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).FindAndExecuteWorkflow(ctx, req.(*FindAndWorkflowExecutionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkflowService_GetWorkflowExecutionStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.IdRequest)
 	if err := dec(in); err != nil {
@@ -889,6 +923,10 @@ var WorkflowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ExecuteWorkflow",
 			Handler:    _WorkflowService_ExecuteWorkflow_Handler,
+		},
+		{
+			MethodName: "FindAndExecuteWorkflow",
+			Handler:    _WorkflowService_FindAndExecuteWorkflow_Handler,
 		},
 		{
 			MethodName: "GetWorkflowExecutionStatus",

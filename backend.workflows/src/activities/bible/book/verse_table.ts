@@ -25,7 +25,7 @@ import { Metadata } from '../../../generated/protobuf/bosca/content/metadata_pb'
 
 export class CreateVerseMarkdownTable extends BookActivity {
   get id(): string {
-    return 'bible.book.verse.markdown.table'
+    return 'bible.book.verse.table.create'
   }
 
   async executeBook(
@@ -35,7 +35,7 @@ export class CreateVerseMarkdownTable extends BookActivity {
     activity: WorkflowActivityJob,
     book: Book
   ): Promise<void> {
-    const table = [['USFM', 'Verse']]
+    const verses = []
     const bookMetadata = await findFirstMetadata({
       'bible.type': 'book',
       'bible.system.id': systemId,
@@ -43,38 +43,14 @@ export class CreateVerseMarkdownTable extends BookActivity {
     })
     for (const chapter of book.chapters) {
       for (const verse of chapter.getVerses(book)) {
-        table.push([verse.usfm, verse.items.map((item) => item.toString().trim().replace('\r', '').replace('\n', '')).join(' ')])
+        verses.push({
+          'usfm': verse.usfm,
+          'verse': verse.items.map((item) => item.toString().trim().replace('\r', '').replace('\n', '')).join(' ')
+        })
       }
     }
     const key = activity.activity!.outputs['supplementaryId']
-
-    let markdown = ''
-    let lengths = [0, 0]
-    for (let r = 0; r < table.length; r++) {
-      const row = table[r]
-      for (let c = 0; c < row.length; c++) {
-        row[c] = row[c].replace('|', '\\|')
-        lengths[c] = Math.max(lengths[c], row[c].length)
-      }
-    }
-
-    for (let r = 0; r < table.length; r++) {
-      const row = table[r]
-      markdown += '|'
-      for (let c = 0; c < row.length; c++) {
-        markdown += ' ' + row[c].padEnd(lengths[c], ' ') + ' |'
-      }
-      markdown += '\r\n'
-      if (r === 0) {
-        markdown += '|'
-        for (let c = 0; c < row.length; c++) {
-          markdown += ' ' + '-'.repeat(lengths[c]) + ' |'
-        }
-        markdown += '\r\n'
-      }
-    }
-
-    const buffer = toArrayBuffer(markdown)
+    const buffer = toArrayBuffer(JSON.stringify(verses))
     await uploadSupplementary(
       bookMetadata.id,
       'Verse Markdown Table',

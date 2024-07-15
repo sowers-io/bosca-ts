@@ -267,7 +267,7 @@ func (svc *authorizationService) GetMetadataSupplementaryUploadUrl(ctx context.C
 }
 
 func (svc *authorizationService) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
-	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_view)
 	if err != nil {
 		return nil, err
 	}
@@ -304,6 +304,14 @@ func (svc *authorizationService) GetMetadataSupplementaries(ctx context.Context,
 		return nil, err
 	}
 	return svc.service.GetMetadataSupplementaries(ctx, request)
+}
+
+func (svc *authorizationService) GetMetadataSupplementary(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.MetadataSupplementary, error) {
+	err := svc.permissions.CheckWithError(ctx, grpc.PermissionObjectType_metadata_type, request.Id, grpc.PermissionAction_service)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetMetadataSupplementary(ctx, request)
 }
 
 func (svc *authorizationService) SetMetadataReady(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {

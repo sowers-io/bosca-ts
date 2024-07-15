@@ -27,6 +27,20 @@ func (svc *service) getSupplementaryId(metadataId, key string) string {
 	return metadataId + "." + key
 }
 
+func (svc *service) GetMetadataSupplementary(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.MetadataSupplementary, error) {
+	return svc.ds.GetMetadataSupplementary(ctx, request.Id, request.Key)
+}
+
+func (svc *service) GetMetadataSupplementaries(ctx context.Context, request *protobuf.IdRequest) (*grpc.MetadataSupplementaries, error) {
+	s, err := svc.ds.GetMetadataSupplementaries(ctx, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &grpc.MetadataSupplementaries{
+		Supplementaries: s,
+	}, nil
+}
+
 func (svc *service) AddMetadataSupplementary(ctx context.Context, request *grpc.AddSupplementaryRequest) (*grpc.MetadataSupplementary, error) {
 	err := svc.ds.AddMetadataSupplementary(ctx, request.MetadataId, request.Key, request.Name, request.ContentType, request.ContentLength, request.TraitIds, request.SourceId, request.SourceIdentifier)
 	if err != nil {

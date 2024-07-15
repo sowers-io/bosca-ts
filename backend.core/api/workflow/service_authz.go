@@ -184,6 +184,15 @@ func (svc *authorizationService) ExecuteWorkflow(ctx context.Context, request *g
 	return svc.service.ExecuteWorkflow(ctx, request)
 }
 
+func (svc *authorizationService) FindAndExecuteWorkflow(ctx context.Context, request *grpc.FindAndWorkflowExecutionRequest) (*grpc.WorkflowExecutionResponses, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpcContent.PermissionObjectType_workflow_state_type, "all", grpcContent.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.FindAndExecuteWorkflow(ctx, request)
+}
+
 func (svc *authorizationService) SetWorkflowActivityJobStatus(ctx context.Context, request *grpc.WorkflowActivityJobStatus) (*protobuf.Empty, error) {
 	// TODO: maybe a trait permission object?
 	err := svc.permissions.CheckWithError(ctx, grpcContent.PermissionObjectType_workflow_state_type, "all", grpcContent.PermissionAction_list)

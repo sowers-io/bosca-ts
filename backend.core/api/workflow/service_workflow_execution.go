@@ -18,7 +18,9 @@ package workflow
 
 import (
 	protobuf "bosca.io/api/protobuf/bosca"
+	"bosca.io/api/protobuf/bosca/content"
 	grpc "bosca.io/api/protobuf/bosca/workflow"
+	"bosca.io/pkg/security/identity"
 	"context"
 	"database/sql"
 	"log/slog"
@@ -105,6 +107,43 @@ func (svc *service) ExecuteWorkflow(ctx context.Context, request *grpc.WorkflowE
 		return nil, err
 	}
 	return response, nil
+}
+
+func (svc *service) FindAndExecuteWorkflow(ctx context.Context, request *grpc.FindAndWorkflowExecutionRequest) (*grpc.WorkflowExecutionResponses, error) {
+	responses := &grpc.WorkflowExecutionResponses{
+		Responses: make([]*grpc.WorkflowExecutionResponse, 0),
+	}
+	if request.MetadataAttributes != nil {
+		md, err := svc.contentClient.FindMetadata(identity.GetAuthenticatedContext(ctx), &content.FindMetadataRequest{
+			Attributes: request.MetadataAttributes,
+		})
+		if err != nil {
+			return nil, err
+		}
+		for _, m := range md.Metadata {
+			response, err := svc.executeWorkflow(ctx, request.ParentExecutionId, &m.Id, nil, request.WorkflowId, request.Context, request.WaitForCompletion)
+			if err != nil {
+				return nil, err
+			}
+			responses.Responses = append(responses.Responses, response)
+		}
+	}
+	if request.CollectionAttributes != nil {
+		md, err := svc.contentClient.FindCollection(identity.GetAuthenticatedContext(ctx), &content.FindCollectionRequest{
+			Attributes: request.CollectionAttributes,
+		})
+		if err != nil {
+			return nil, err
+		}
+		for _, m := range md.Collections {
+			response, err := svc.executeWorkflow(ctx, request.ParentExecutionId, nil, &m.Id, request.WorkflowId, request.Context, request.WaitForCompletion)
+			if err != nil {
+				return nil, err
+			}
+			responses.Responses = append(responses.Responses, response)
+		}
+	}
+	return responses, nil
 }
 
 func (svc *service) SetWorkflowActivityJobStatus(ctx context.Context, request *grpc.WorkflowActivityJobStatus) (*protobuf.Empty, error) {

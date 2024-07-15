@@ -41,9 +41,14 @@ export class Prompt extends Message<Prompt> {
   description = "";
 
   /**
-   * @generated from field: string prompt = 4;
+   * @generated from field: string system_prompt = 4;
    */
-  prompt = "";
+  systemPrompt = "";
+
+  /**
+   * @generated from field: string user_prompt = 5;
+   */
+  userPrompt = "";
 
   constructor(data?: PartialMessage<Prompt>) {
     super();
@@ -56,7 +61,8 @@ export class Prompt extends Message<Prompt> {
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "system_prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "user_prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Prompt {

@@ -25,6 +25,7 @@ import { getConfiguration } from './configuration'
 import { CreateVerseMarkdownTable } from './activities/bible/book/verse_table'
 import { CreateVerses } from './activities/bible/book/verse_create'
 import { PromptActivity } from './activities/ai/prompt'
+import { ChildWorkflow } from './activities/metadata/child_workflow'
 
 const downloader = new DefaultDownloader()
 
@@ -36,7 +37,8 @@ function getAvailableActivities(): { [id: string]: Activity } {
     new CreateVerseMarkdownTable(downloader),
     new CreateVerses(downloader),
     new TransitionToActivity(),
-    new PromptActivity()
+    new PromptActivity(),
+    new ChildWorkflow()
   ]
   const activitiesById: { [id: string]: Activity } = {}
   for (const activity of activities) {

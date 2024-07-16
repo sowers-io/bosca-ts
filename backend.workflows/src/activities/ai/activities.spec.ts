@@ -32,14 +32,20 @@ test('test prompt', async () => {
     metadataId: '540d85d3-7cfe-4b2c-b707-86e5ed2090a8',
     models: [
       new WorkflowActivityModel({
-        model: new Model({ name: 'gemma2:27b' }),
+        model: new Model({
+          type: 'openai-llm',
+          name: 'gpt-4o',
+          configuration: {
+            temperature: '0',
+          }
+        }),
       }),
     ],
     prompts: [
       new WorkflowActivityPrompt({
         prompt: new Prompt({
-          systemPrompt: '',
-          userPrompt: fs.readFileSync('../prompts/verselabeller', 'utf-8').toString(),
+          systemPrompt: fs.readFileSync('../prompts/verselabeller/system', 'utf-8').toString(),
+          userPrompt: fs.readFileSync('../prompts/verselabeller/user', 'utf-8').toString(),
         }),
       }),
     ],

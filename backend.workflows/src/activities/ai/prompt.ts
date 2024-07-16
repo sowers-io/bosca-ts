@@ -19,14 +19,45 @@ import { WorkflowActivityJob } from '../../generated/protobuf/bosca/workflow/exe
 import { useServiceClient } from '../../util/util'
 import { ContentService } from '../../generated/protobuf/bosca/content/service_connect'
 import { IdRequest, SupplementaryIdRequest } from '../../generated/protobuf/bosca/requests_pb'
-import { execute } from '../../util/http'
-import { Ollama } from "@langchain/community/llms/ollama";
+import { execute, toArrayBuffer } from '../../util/http'
+import { Ollama } from '@langchain/community/llms/ollama'
+
+import { ChatOpenAI } from '@langchain/openai'
+import { ChatPromptTemplate } from '@langchain/core/prompts'
+import { JsonOutputParser } from '@langchain/core/output_parsers'
+import { WorkflowActivityModel } from '../../generated/protobuf/bosca/workflow/activities_pb'
+import { BaseLanguageModel } from '@langchain/core/dist/language_models/base'
 import { uploadSupplementary } from '../../util/uploader'
-import { HumanMessage, SystemMessage } from '@langchain/core/messages'
 
 export class PromptActivity extends Activity {
   get id(): string {
     return 'ai.prompt'
+  }
+
+  private getModel(m: WorkflowActivityModel): BaseLanguageModel {
+    let temperature: any = m.model!.configuration!.temperature
+    if (temperature) {
+      temperature = parseFloat(temperature)
+    } else {
+      temperature = 0
+    }
+    switch (m.model!.type) {
+      case 'ollama-llm':
+        return new Ollama({
+          model: m.model!.name,
+          temperature: temperature as number,
+          format: 'json',
+        })
+      case 'openai-llm':
+        return new ChatOpenAI({
+          model: m.model!.name,
+          temperature: temperature as number,
+          apiKey: process.env.OPENAI_KEY,
+          streaming: false,
+        })
+      default:
+        throw new Error('unsupported model type: ' + m.model!.type)
+    }
   }
 
   async execute(activity: WorkflowActivityJob) {
@@ -38,32 +69,27 @@ export class PromptActivity extends Activity {
         key: activity.activity!.inputs!['supplementaryId'],
       })
     )
-    const response = await execute(downloadUrl)
-    const markdown = await response.text()
+    const downloadResponse = await execute(downloadUrl)
+    const payload = await downloadResponse.json()
+    const m = activity.models[0]
+    const prompt = activity.prompts[0]
 
-    for (const model of activity.models) {
-      const ollama = new Ollama({
-        model: model.model!.name,
-      })
-      for (const prompt of activity.prompts) {
-        const chatRequest = []
-        if (prompt.prompt!.systemPrompt && prompt.prompt!.systemPrompt.length > 0) {
-          chatRequest.push(new SystemMessage(prompt.prompt!.systemPrompt))
-        }
-        chatRequest.push(new HumanMessage(prompt.prompt!.userPrompt.replace('{table}', markdown)))
-        console.log(prompt.prompt!.userPrompt.replace('{table}', markdown))
-        const response = await ollama.invoke(chatRequest)
-        console.log(response)
-        // await uploadSupplementary(
-        //   activity.metadataId,
-        //   'AI Prompt Result',
-        //   'text/plain',
-        //   activity.activity!.outputs!['supplementaryId'],
-        //   source.id,
-        //   undefined,
-        //   response.message.content
-        // )
-      }
-    }
+    const model = this.getModel(m)
+    const promptTemplate = ChatPromptTemplate.fromMessages([
+      ['system', prompt.prompt!.systemPrompt],
+      ['user', prompt.prompt!.userPrompt],
+    ])
+    const chain = promptTemplate.pipe(model).pipe(new JsonOutputParser())
+    const response = await chain.invoke({ input: JSON.stringify(payload) })
+    const output = JSON.stringify(response)
+    await uploadSupplementary(
+      activity.metadataId,
+      'Prompt Response',
+      'application/json',
+      activity.activity!.outputs['supplementaryId'],
+      source.id,
+      undefined,
+      toArrayBuffer(output)
+    )
   }
 }

@@ -5,6 +5,9 @@
     },
     "bible": {
       "maxConcurrency": 100
+    },
+    "bible-ai": {
+      "maxConcurrency": 100
     }
   },
   "activities": {

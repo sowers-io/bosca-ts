@@ -79,7 +79,7 @@ create table workflows
     id            varchar not null, -- This is the identifier of the temporal workflow
     name          varchar not null,
     description   varchar not null,
-    queue         varchar not null,
+    queue         varchar not null check (length(queue) > 0),
     configuration jsonb   not null default '{}',
     primary key (id)
 );

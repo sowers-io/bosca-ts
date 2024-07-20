@@ -160,9 +160,13 @@ func initializeEmbeddedWorkflow(ctx context.Context, dataStore *DataStore) {
 			for key, val := range activity.Outputs {
 				outputs[key] = val
 			}
+			queue := activity.Queue
+			if queue == nil {
+				queue = &wf.Queue
+			}
 			id, err := dataStore.AddWorkflowActivity(ctx, id, &workflow2.WorkflowActivity{
 				ActivityId:     aid,
-				Queue:          wf.Queue,
+				Queue:          *queue,
 				ExecutionGroup: activity.ExecutionGroup,
 				Configuration:  activity.Configuration,
 				Inputs:         inputs,

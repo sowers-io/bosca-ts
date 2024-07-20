@@ -92,6 +92,7 @@ create table workflow_activities
     id              bigserial not null,
     workflow_id     varchar   not null,
     activity_id     varchar   not null,
+    queue           varchar,
     execution_group int       not null,
     configuration   jsonb     not null default '{}',
     primary key (id),

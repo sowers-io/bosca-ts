@@ -1,21 +1,27 @@
 {
   "queues": {
     "metadata": {
-      "maxConcurrency": 100
+      "maxConcurrency": 25
+    },
+    "traits": {
+      "maxConcurrency": 1000
+    },
+    "transition": {
+      "maxConcurrency": 1000
     },
     "bible": {
-      "maxConcurrency": 100
+      "maxConcurrency": 25
     },
     "bible-ai": {
-      "maxConcurrency": 100
+      "maxConcurrency": 1
     }
   },
   "activities": {
     "metadata.traits.process": {
-      "queue": "metadata"
+      "queue": "traits"
     },
     "metadata.transition.to": {
-      "queue": "metadata"
+      "queue": "transition"
     },
     "bible.process": {
       "queue": "bible"
@@ -25,6 +31,9 @@
     },
     "bible.book.verse.table.create": {
       "queue": "bible"
+    },
+    "ai.prompt": {
+      "queue": "bible-ai"
     }
   }
 }

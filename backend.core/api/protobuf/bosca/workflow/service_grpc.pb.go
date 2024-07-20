@@ -55,7 +55,10 @@ const (
 	WorkflowService_FindAndExecuteWorkflow_FullMethodName            = "/bosca.workflow.WorkflowService/FindAndExecuteWorkflow"
 	WorkflowService_GetWorkflowExecutionStatus_FullMethodName        = "/bosca.workflow.WorkflowService/GetWorkflowExecutionStatus"
 	WorkflowService_GetChildWorkflowExecutions_FullMethodName        = "/bosca.workflow.WorkflowService/GetChildWorkflowExecutions"
-	WorkflowService_GetWorkflowActivityJobs_FullMethodName           = "/bosca.workflow.WorkflowService/GetWorkflowActivityJobs"
+	WorkflowService_RegisterWorker_FullMethodName                    = "/bosca.workflow.WorkflowService/RegisterWorker"
+	WorkflowService_WorkerHeartbeat_FullMethodName                   = "/bosca.workflow.WorkflowService/WorkerHeartbeat"
+	WorkflowService_UnregisterWorker_FullMethodName                  = "/bosca.workflow.WorkflowService/UnregisterWorker"
+	WorkflowService_GetWorkflowActivityJob_FullMethodName            = "/bosca.workflow.WorkflowService/GetWorkflowActivityJob"
 	WorkflowService_SetWorkflowActivityJobStatus_FullMethodName      = "/bosca.workflow.WorkflowService/SetWorkflowActivityJobStatus"
 )
 
@@ -83,7 +86,10 @@ type WorkflowServiceClient interface {
 	FindAndExecuteWorkflow(ctx context.Context, in *FindAndWorkflowExecutionRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponses, error)
 	GetWorkflowExecutionStatus(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowExecutionResponse, error)
 	GetChildWorkflowExecutions(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.IdsResponse, error)
-	GetWorkflowActivityJobs(ctx context.Context, in *WorkflowActivityJobRequest, opts ...grpc.CallOption) (WorkflowService_GetWorkflowActivityJobsClient, error)
+	RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*bosca.IdResponse, error)
+	WorkerHeartbeat(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	UnregisterWorker(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	GetWorkflowActivityJob(ctx context.Context, in *WorkflowActivityJobRequest, opts ...grpc.CallOption) (*WorkflowActivityJob, error)
 	SetWorkflowActivityJobStatus(ctx context.Context, in *WorkflowActivityJobStatus, opts ...grpc.CallOption) (*bosca.Empty, error)
 }
 
@@ -295,37 +301,44 @@ func (c *workflowServiceClient) GetChildWorkflowExecutions(ctx context.Context, 
 	return out, nil
 }
 
-func (c *workflowServiceClient) GetWorkflowActivityJobs(ctx context.Context, in *WorkflowActivityJobRequest, opts ...grpc.CallOption) (WorkflowService_GetWorkflowActivityJobsClient, error) {
+func (c *workflowServiceClient) RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*bosca.IdResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &WorkflowService_ServiceDesc.Streams[0], WorkflowService_GetWorkflowActivityJobs_FullMethodName, cOpts...)
+	out := new(bosca.IdResponse)
+	err := c.cc.Invoke(ctx, WorkflowService_RegisterWorker_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &workflowServiceGetWorkflowActivityJobsClient{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
 
-type WorkflowService_GetWorkflowActivityJobsClient interface {
-	Recv() (*WorkflowActivityJob, error)
-	grpc.ClientStream
-}
-
-type workflowServiceGetWorkflowActivityJobsClient struct {
-	grpc.ClientStream
-}
-
-func (x *workflowServiceGetWorkflowActivityJobsClient) Recv() (*WorkflowActivityJob, error) {
-	m := new(WorkflowActivityJob)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
+func (c *workflowServiceClient) WorkerHeartbeat(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, WorkflowService_WorkerHeartbeat_FullMethodName, in, out, cOpts...)
+	if err != nil {
 		return nil, err
 	}
-	return m, nil
+	return out, nil
+}
+
+func (c *workflowServiceClient) UnregisterWorker(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, WorkflowService_UnregisterWorker_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) GetWorkflowActivityJob(ctx context.Context, in *WorkflowActivityJobRequest, opts ...grpc.CallOption) (*WorkflowActivityJob, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowActivityJob)
+	err := c.cc.Invoke(ctx, WorkflowService_GetWorkflowActivityJob_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *workflowServiceClient) SetWorkflowActivityJobStatus(ctx context.Context, in *WorkflowActivityJobStatus, opts ...grpc.CallOption) (*bosca.Empty, error) {
@@ -362,7 +375,10 @@ type WorkflowServiceServer interface {
 	FindAndExecuteWorkflow(context.Context, *FindAndWorkflowExecutionRequest) (*WorkflowExecutionResponses, error)
 	GetWorkflowExecutionStatus(context.Context, *bosca.IdRequest) (*WorkflowExecutionResponse, error)
 	GetChildWorkflowExecutions(context.Context, *bosca.IdRequest) (*bosca.IdsResponse, error)
-	GetWorkflowActivityJobs(*WorkflowActivityJobRequest, WorkflowService_GetWorkflowActivityJobsServer) error
+	RegisterWorker(context.Context, *RegisterWorkerRequest) (*bosca.IdResponse, error)
+	WorkerHeartbeat(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
+	UnregisterWorker(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
+	GetWorkflowActivityJob(context.Context, *WorkflowActivityJobRequest) (*WorkflowActivityJob, error)
 	SetWorkflowActivityJobStatus(context.Context, *WorkflowActivityJobStatus) (*bosca.Empty, error)
 	mustEmbedUnimplementedWorkflowServiceServer()
 }
@@ -431,8 +447,17 @@ func (UnimplementedWorkflowServiceServer) GetWorkflowExecutionStatus(context.Con
 func (UnimplementedWorkflowServiceServer) GetChildWorkflowExecutions(context.Context, *bosca.IdRequest) (*bosca.IdsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetChildWorkflowExecutions not implemented")
 }
-func (UnimplementedWorkflowServiceServer) GetWorkflowActivityJobs(*WorkflowActivityJobRequest, WorkflowService_GetWorkflowActivityJobsServer) error {
-	return status.Errorf(codes.Unimplemented, "method GetWorkflowActivityJobs not implemented")
+func (UnimplementedWorkflowServiceServer) RegisterWorker(context.Context, *RegisterWorkerRequest) (*bosca.IdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterWorker not implemented")
+}
+func (UnimplementedWorkflowServiceServer) WorkerHeartbeat(context.Context, *bosca.IdRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WorkerHeartbeat not implemented")
+}
+func (UnimplementedWorkflowServiceServer) UnregisterWorker(context.Context, *bosca.IdRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnregisterWorker not implemented")
+}
+func (UnimplementedWorkflowServiceServer) GetWorkflowActivityJob(context.Context, *WorkflowActivityJobRequest) (*WorkflowActivityJob, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowActivityJob not implemented")
 }
 func (UnimplementedWorkflowServiceServer) SetWorkflowActivityJobStatus(context.Context, *WorkflowActivityJobStatus) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetWorkflowActivityJobStatus not implemented")
@@ -810,25 +835,76 @@ func _WorkflowService_GetChildWorkflowExecutions_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _WorkflowService_GetWorkflowActivityJobs_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(WorkflowActivityJobRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _WorkflowService_RegisterWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterWorkerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(WorkflowServiceServer).GetWorkflowActivityJobs(m, &workflowServiceGetWorkflowActivityJobsServer{ServerStream: stream})
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).RegisterWorker(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_RegisterWorker_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).RegisterWorker(ctx, req.(*RegisterWorkerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-type WorkflowService_GetWorkflowActivityJobsServer interface {
-	Send(*WorkflowActivityJob) error
-	grpc.ServerStream
+func _WorkflowService_WorkerHeartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).WorkerHeartbeat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_WorkerHeartbeat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).WorkerHeartbeat(ctx, req.(*bosca.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-type workflowServiceGetWorkflowActivityJobsServer struct {
-	grpc.ServerStream
+func _WorkflowService_UnregisterWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).UnregisterWorker(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_UnregisterWorker_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).UnregisterWorker(ctx, req.(*bosca.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func (x *workflowServiceGetWorkflowActivityJobsServer) Send(m *WorkflowActivityJob) error {
-	return x.ServerStream.SendMsg(m)
+func _WorkflowService_GetWorkflowActivityJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorkflowActivityJobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).GetWorkflowActivityJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_GetWorkflowActivityJob_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).GetWorkflowActivityJob(ctx, req.(*WorkflowActivityJobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _WorkflowService_SetWorkflowActivityJobStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -937,16 +1013,26 @@ var WorkflowService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _WorkflowService_GetChildWorkflowExecutions_Handler,
 		},
 		{
+			MethodName: "RegisterWorker",
+			Handler:    _WorkflowService_RegisterWorker_Handler,
+		},
+		{
+			MethodName: "WorkerHeartbeat",
+			Handler:    _WorkflowService_WorkerHeartbeat_Handler,
+		},
+		{
+			MethodName: "UnregisterWorker",
+			Handler:    _WorkflowService_UnregisterWorker_Handler,
+		},
+		{
+			MethodName: "GetWorkflowActivityJob",
+			Handler:    _WorkflowService_GetWorkflowActivityJob_Handler,
+		},
+		{
 			MethodName: "SetWorkflowActivityJobStatus",
 			Handler:    _WorkflowService_SetWorkflowActivityJobStatus_Handler,
 		},
 	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "GetWorkflowActivityJobs",
-			Handler:       _WorkflowService_GetWorkflowActivityJobs_Handler,
-			ServerStreams: true,
-		},
-	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "bosca/workflow/service.proto",
 }

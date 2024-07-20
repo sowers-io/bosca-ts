@@ -52,7 +52,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	ds := workflow.NewDataStore(stdlib.OpenDBFromPool(pool))
+	pubsub := workflow.NewPubSub(cfg.ClientEndPoints)
+	ds := workflow.NewDataStore(stdlib.OpenDBFromPool(pool), pubsub)
 	permissions := spicedb.NewPermissionManager(spicedb.NewSpiceDBClient(cfg))
 
 	contentConnection, err := clients.NewClientConnection(cfg.ClientEndPoints.ContentApiAddress)

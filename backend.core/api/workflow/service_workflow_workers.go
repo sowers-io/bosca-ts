@@ -17,30 +17,27 @@
 package workflow
 
 import (
+	"bosca.io/api/protobuf/bosca"
 	grpc "bosca.io/api/protobuf/bosca/workflow"
 	"context"
-	"log/slog"
 )
 
-func (svc *service) GetWorkflowActivityJob(ctx context.Context, request *grpc.WorkflowActivityJobRequest) (*grpc.WorkflowActivityJob, error) {
-	txn, err := svc.ds.NewTransaction(ctx)
+func (svc *service) RegisterWorker(ctx context.Context, request *grpc.RegisterWorkerRequest) (*bosca.IdResponse, error) {
+	id, err := svc.ds.RegisterWorker(ctx, request.Queue, request.ActivityId)
 	if err != nil {
 		return nil, err
 	}
-	job, err := svc.ds.ClaimNextJob(ctx, txn, request.WorkerId, request.Queue, request.ActivityId)
+	return &bosca.IdResponse{Id: id}, nil
+}
+
+func (svc *service) HeartbeatWorker(ctx context.Context, request *bosca.IdRequest) (*bosca.Empty, error) {
+	return &bosca.Empty{}, nil
+}
+
+func (svc *service) UnregisterWorker(ctx context.Context, request *bosca.IdRequest) (*bosca.Empty, error) {
+	err := svc.ds.UnregisterWorker(ctx, request.Id)
 	if err != nil {
-		txn.Rollback()
 		return nil, err
 	}
-	err = txn.Commit()
-	if err != nil {
-		return nil, err
-	}
-	if job != nil {
-		slog.InfoContext(ctx, "found job available", slog.String("queue", request.Queue), slog.String("workerId", request.WorkerId), slog.String("executionId", job.ExecutionId))
-		return job, nil
-	} else {
-		slog.InfoContext(ctx, "no jobs available", slog.String("queue", request.Queue), slog.String("workerId", request.WorkerId))
-	}
-	return nil, nil
+	return &bosca.Empty{}, nil
 }

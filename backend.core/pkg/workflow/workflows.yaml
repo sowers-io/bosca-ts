@@ -177,8 +177,10 @@ workflows:
       queue: metadata
       activities:
         metadata.traits.process:
+          queue: traits
           executionGroup: 1
         metadata.transition.to:
+          queue: transition
           executionGroup: 2
           configuration:
             state: draft

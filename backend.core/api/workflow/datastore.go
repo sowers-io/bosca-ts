@@ -17,53 +17,36 @@
 package workflow
 
 import (
+	"bosca.io/api/protobuf/bosca/workflow"
 	"context"
 	"database/sql"
-	"errors"
-	"log/slog"
-	"sync"
-	"time"
 )
 
 type DataStore struct {
-	db *sql.DB
-
-	executionChannels     map[string]chan *ExecutionNotification
-	queueChannels         map[string]chan *ExecutionNotification
-	executionChannelMutex sync.Mutex
+	db     *sql.DB
+	pubsub *PubSub
 }
 
-func NewDataStore(db *sql.DB) *DataStore {
+func NewDataStore(db *sql.DB, pubsub *PubSub) *DataStore {
 	ds := &DataStore{
-		db:                db,
-		executionChannels: make(map[string]chan *ExecutionNotification),
-		queueChannels:     make(map[string]chan *ExecutionNotification),
+		db:     db,
+		pubsub: pubsub,
 	}
-	go func() {
-		ctx := context.Background()
-		for {
-			allQueues, err := ds.GetAllQueues(ctx)
-			if err != nil {
-				slog.Error("failed to get queues", slog.Any("error", err))
-			}
-
-			// warm up any connections
-			err = ds.NotifyJobAvailable(ctx, allQueues)
-			if err != nil {
-				slog.Error("failed to notify queues", slog.Any("error", err))
-			}
-
-			ctxTimeout, ctxCancel := context.WithTimeout(ctx, 30 * time.Second)
-			err = ds.ListenForCompletions(ctxTimeout)
-			if err != nil && !errors.Is(err, context.DeadlineExceeded) {
-				slog.Error("failed to listen for completions", slog.Any("error", err))
-			}
-			ctxCancel()
-		}
-	}()
 	return ds
 }
 
 func (ds *DataStore) NewTransaction(ctx context.Context) (*sql.Tx, error) {
 	return ds.db.BeginTx(ctx, nil)
+}
+
+func (ds *DataStore) WaitForExecutionCompletion(ctx context.Context, queue string, executionId string) (*workflow.WorkflowExecutionNotification, error) {
+	var notification *workflow.WorkflowExecutionNotification
+	err := ds.pubsub.Listen(ctx, queue, func(e *workflow.WorkflowExecutionNotification) (bool, error) {
+		if e.Type == workflow.WorkflowExecutionNotificationType_execution_completion && e.ExecutionId == executionId {
+			notification = e
+			return false, nil
+		}
+		return true, nil
+	})
+	return notification, err
 }

@@ -72,7 +72,12 @@ export class PromptActivity extends Activity {
     const downloadResponse = await execute(downloadUrl)
     const payload = await downloadResponse.json()
     const m = activity.models[0]
+
+    if (!m) throw new Error('missing model')
+
     const prompt = activity.prompts[0]
+
+    if (!prompt) throw new Error('missing prompt')
 
     const model = this.getModel(m)
     const promptTemplate = ChatPromptTemplate.fromMessages([

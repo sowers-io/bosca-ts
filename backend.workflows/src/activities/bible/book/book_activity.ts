@@ -52,6 +52,9 @@ export abstract class BookActivity extends Activity {
       const content = new PublicationContent({ $: { role: metadata.attributes['bible.book.usfm'] } })
       const book = await processor.processBook(name, content, file)
       await this.executeBook(source, systemId, metadata, activity, book)
+    } catch (e) {
+      console.error('failed to process book', e)
+      throw e
     } finally {
       await this.downloader.cleanup(file)
     }

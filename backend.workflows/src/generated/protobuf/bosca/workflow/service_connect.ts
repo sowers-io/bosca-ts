@@ -21,13 +21,13 @@
 import { Empty } from "../empty_pb";
 import { Model, Models } from "./models_pb";
 import { MethodKind } from "@bufbuild/protobuf";
-import { IdRequest, IdsResponse } from "../requests_pb";
+import { IdRequest, IdResponse, IdsResponse } from "../requests_pb";
 import { Prompt, Prompts } from "./prompts_pb";
 import { StorageSystem, StorageSystemModels, StorageSystems } from "./storage_systems_pb";
 import { Workflow, Workflows, WorkflowState, WorkflowStates } from "./workflows_pb";
 import { WorkflowActivities, WorkflowActivityIdRequest, WorkflowActivityPrompts, WorkflowActivityStorageSystems } from "./activities_pb";
 import { BeginTransitionWorkflowRequest, CompleteTransitionWorkflowRequest } from "./transitions_pb";
-import { FindAndWorkflowExecutionRequest, WorkflowActivityJob, WorkflowActivityJobRequest, WorkflowActivityJobStatus, WorkflowExecutionRequest, WorkflowExecutionResponse, WorkflowExecutionResponses } from "./execution_context_pb";
+import { FindAndWorkflowExecutionRequest, RegisterWorkerRequest, WorkflowActivityJob, WorkflowActivityJobRequest, WorkflowActivityJobStatus, WorkflowExecutionRequest, WorkflowExecutionResponse, WorkflowExecutionResponses } from "./execution_context_pb";
 
 /**
  * @generated from service bosca.workflow.WorkflowService
@@ -216,13 +216,40 @@ export const WorkflowService = {
       kind: MethodKind.Unary,
     },
     /**
-     * @generated from rpc bosca.workflow.WorkflowService.GetWorkflowActivityJobs
+     * @generated from rpc bosca.workflow.WorkflowService.RegisterWorker
      */
-    getWorkflowActivityJobs: {
-      name: "GetWorkflowActivityJobs",
+    registerWorker: {
+      name: "RegisterWorker",
+      I: RegisterWorkerRequest,
+      O: IdResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.workflow.WorkflowService.WorkerHeartbeat
+     */
+    workerHeartbeat: {
+      name: "WorkerHeartbeat",
+      I: IdRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.workflow.WorkflowService.UnregisterWorker
+     */
+    unregisterWorker: {
+      name: "UnregisterWorker",
+      I: IdRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.workflow.WorkflowService.GetWorkflowActivityJob
+     */
+    getWorkflowActivityJob: {
+      name: "GetWorkflowActivityJob",
       I: WorkflowActivityJobRequest,
       O: WorkflowActivityJob,
-      kind: MethodKind.ServerStreaming,
+      kind: MethodKind.Unary,
     },
     /**
      * @generated from rpc bosca.workflow.WorkflowService.SetWorkflowActivityJobStatus

@@ -69,9 +69,12 @@ func (svc *service) addCollection(ctx context.Context, userId string, request *g
 		return nil, nil, err
 	}
 	if request.Parent != "" {
-		if unique, err := svc.verifyUniqueName(ctx, request.Parent, request.Collection.Name); !unique || err != nil {
+		if id, err := svc.verifyUniqueName(ctx, request.Parent, request.Collection.Name); id != nil || err != nil {
+			slog.ErrorContext(ctx, "name must be unique", slog.Any("request", request), slog.Any("error", err))
 			if err == nil {
-				return nil, nil, errors.New("name must be unique")
+				return &protobuf.IdResponse{
+					Id: *id,
+				}, nil, errors.New("name must be unique")
 			}
 			return nil, nil, err
 		}
@@ -105,15 +108,13 @@ func (svc *service) AddCollections(ctx context.Context, request *grpc.AddCollect
 	}
 	ids := make([]*protobuf.IdResponsesId, len(request.Collections))
 	allPermissions := make([]*grpc.Permission, 0)
-	var firstError error
 	for i, collection := range request.Collections {
 		var id *protobuf.IdResponse
 		var permissions []*grpc.Permission
 		id, permissions, err = svc.addCollection(ctx, userId, collection)
-		if firstError == nil {
-			firstError = err
+		if permissions != nil {
+			allPermissions = append(allPermissions, permissions...)
 		}
-		allPermissions = append(allPermissions, permissions...)
 		var errMsg *string
 		if err != nil {
 			e := err.Error()
@@ -133,7 +134,7 @@ func (svc *service) AddCollections(ctx context.Context, request *grpc.AddCollect
 	}
 	return &protobuf.IdResponses{
 		Id: ids,
-	}, firstError
+	}, nil
 }
 
 func (svc *service) AddCollection(ctx context.Context, request *grpc.AddCollectionRequest) (*protobuf.IdResponse, error) {

@@ -35,22 +35,26 @@ import (
 	"strings"
 )
 
-func (svc *service) verifyUniqueName(ctx context.Context, collectionId string, name string) (bool, error) {
+func (svc *service) verifyUniqueName(ctx context.Context, collectionId string, name string) (*string, error) {
 	collectionNames, err := svc.ds.GetCollectionCollectionItemNames(ctx, collectionId)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	if slices.ContainsFunc(collectionNames, func(n IdName) bool { return n.Name == name }) {
-		return false, nil
+	i, found := slices.BinarySearchFunc(collectionNames, name, func(a IdName, b string) int { return strings.Compare(a.Name, b) })
+	if found {
+		item := collectionNames[i]
+		return &item.Id, nil
 	}
 	metadataNames, err := svc.ds.GetCollectionMetadataItemNames(ctx, collectionId)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	if slices.Contains(metadataNames, name) {
-		return false, nil
+	i, found = slices.BinarySearchFunc(metadataNames, name, func(a IdName, b string) int { return strings.Compare(a.Name, b) })
+	if found {
+		item := metadataNames[i]
+		return &item.Id, nil
 	}
-	return true, nil
+	return nil, nil
 }
 
 func (svc *service) AddMetadataRelationship(ctx context.Context, request *grpc.MetadataRelationship) (*protobuf.Empty, error) {
@@ -91,9 +95,12 @@ func (svc *service) addMetadata(ctx context.Context, userId string, request *grp
 		return nil, nil, err
 	}
 	if request.Collection != nil {
-		if unique, err := svc.verifyUniqueName(ctx, *request.Collection, request.Metadata.Name); !unique || err != nil {
+		if id, err := svc.verifyUniqueName(ctx, *request.Collection, request.Metadata.Name); id != nil || err != nil {
+			slog.ErrorContext(ctx, "name must be unique", slog.Any("request", request), slog.Any("error", err))
 			if err == nil {
-				return nil, nil, errors.New("name must be unique")
+				return &protobuf.IdResponse{
+					Id: *id,
+				}, nil, errors.New("name must be unique")
 			}
 			return nil, nil, err
 		}
@@ -148,7 +155,6 @@ func (svc *service) AddMetadatas(ctx context.Context, request *grpc.AddMetadatas
 	}
 	ids := make([]*protobuf.IdResponsesId, len(request.Metadatas))
 	allPermissions := make([]*grpc.Permission, 0)
-	var firstError error
 	for i, md := range request.Metadatas {
 		var id *protobuf.IdResponse
 		var permissions []*grpc.Permission
@@ -161,7 +167,9 @@ func (svc *service) AddMetadatas(ctx context.Context, request *grpc.AddMetadatas
 				id = &protobuf.IdResponse{}
 			}
 		}
-		allPermissions = append(allPermissions, permissions...)
+		if permissions != nil {
+			allPermissions = append(allPermissions, permissions...)
+		}
 		ids[i] = &protobuf.IdResponsesId{
 			Id:    id.Id,
 			Error: errMsg,
@@ -173,7 +181,7 @@ func (svc *service) AddMetadatas(ctx context.Context, request *grpc.AddMetadatas
 	}
 	return &protobuf.IdResponses{
 		Id: ids,
-	}, firstError
+	}, nil
 }
 
 func (svc *service) DeleteMetadata(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {

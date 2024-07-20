@@ -202,11 +202,38 @@ func (svc *authorizationService) SetWorkflowActivityJobStatus(ctx context.Contex
 	return svc.service.SetWorkflowActivityJobStatus(ctx, request)
 }
 
-func (svc *authorizationService) GetWorkflowActivityJobs(request *grpc.WorkflowActivityJobRequest, svr grpc.WorkflowService_GetWorkflowActivityJobsServer) error {
+func (svc *authorizationService) RegisterWorker(ctx context.Context, request *grpc.RegisterWorkerRequest) (*protobuf.IdResponse, error) {
 	// TODO: maybe a trait permission object?
-	err := svc.permissions.CheckWithError(svr.Context(), grpcContent.PermissionObjectType_workflow_state_type, "all", grpcContent.PermissionAction_list)
+	err := svc.permissions.CheckWithError(ctx, grpcContent.PermissionObjectType_workflow_state_type, "all", grpcContent.PermissionAction_list)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return svc.service.GetWorkflowActivityJobs(request, svr)
+	return svc.service.RegisterWorker(ctx, request)
+}
+
+func (svc *authorizationService) WorkerHeartbeat(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpcContent.PermissionObjectType_workflow_state_type, "all", grpcContent.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.WorkerHeartbeat(ctx, request)
+}
+
+func (svc *authorizationService) UnregisterWorker(ctx context.Context, request *protobuf.IdRequest) (*protobuf.Empty, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpcContent.PermissionObjectType_workflow_state_type, "all", grpcContent.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.UnregisterWorker(ctx, request)
+}
+
+func (svc *authorizationService) GetWorkflowActivityJob(ctx context.Context, request *grpc.WorkflowActivityJobRequest) (*grpc.WorkflowActivityJob, error) {
+	// TODO: maybe a trait permission object?
+	err := svc.permissions.CheckWithError(ctx, grpcContent.PermissionObjectType_workflow_state_type, "all", grpcContent.PermissionAction_list)
+	if err != nil {
+		return nil, err
+	}
+	return svc.service.GetWorkflowActivityJob(ctx, request)
 }

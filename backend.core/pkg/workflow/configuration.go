@@ -212,6 +212,7 @@ type ActivityInstanceConfiguration struct {
 	Models         map[string]ActivityConfigurationModel         `yaml:"models"`
 	Prompts        map[string]ActivityConfigurationPrompt        `yaml:"prompts"`
 	StorageSystems map[string]ActivityConfigurationStorageSystem `yaml:"storageSystems"`
+	Queue          *string
 	Inputs         map[string]string
 	Outputs        map[string]string
 }

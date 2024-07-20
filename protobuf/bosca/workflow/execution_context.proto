@@ -21,6 +21,20 @@ import "bosca/workflow/activities.proto";
 
 package bosca.workflow;
 
+enum WorkflowExecutionNotificationType {
+  unknown = 0;
+  execution_completion = 1;
+  job_available = 2;
+  execution_failed = 3;
+}
+
+message WorkflowExecutionNotification {
+  WorkflowExecutionNotificationType type = 1;
+  bool success = 2;
+  string execution_id = 3;
+  optional string error = 4;
+}
+
 message WorkflowExecutionRequest {
   optional string parent_execution_id = 1;
   string workflow_id = 2;
@@ -78,9 +92,15 @@ message WorkflowActivityJob {
   optional string error = 13;
 }
 
-message WorkflowActivityJobRequest {
+message RegisterWorkerRequest {
   string queue = 1;
   repeated string activity_id = 2;
+}
+
+message WorkflowActivityJobRequest {
+  string worker_id = 1;
+  string queue = 2;
+  repeated string activity_id = 3;
 }
 
 message WorkflowActivityJobStatus {

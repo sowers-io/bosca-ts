@@ -156,10 +156,27 @@ service WorkflowService {
     };
   }
 
-  rpc GetWorkflowActivityJobs(WorkflowActivityJobRequest) returns (stream WorkflowActivityJob) {
+  rpc RegisterWorker(RegisterWorkerRequest) returns (IdResponse) {
     option (google.api.http) = {
-      post: "/v1/workflow/queue/{queue}/activities"
-      body: "*"
+      post: "/v1/workflow/workers/register/{queue}"
+    };
+  }
+
+  rpc WorkerHeartbeat(IdRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v1/workflow/workers/{id}/heartbeat"
+    };
+  }
+
+  rpc UnregisterWorker(IdRequest) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/v1/workflow/workers/{id}"
+    };
+  }
+
+  rpc GetWorkflowActivityJob(WorkflowActivityJobRequest) returns (WorkflowActivityJob) {
+    option (google.api.http) = {
+      get: "/v1/workflow/queue/{queue}"
     };
   }
 

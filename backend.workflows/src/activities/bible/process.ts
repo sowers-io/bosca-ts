@@ -198,7 +198,8 @@ export class ProcessBibleActivity extends Activity {
     book: Book
   ) {
     const creator = this
-    await queue.enqueue(() => creator.createChapters(source, metadata, collection, book))
+    queue.enqueue(() => creator.createChapters(source, metadata, collection, book))
+    await queue.process()
   }
 
   async execute(activity: WorkflowActivityJob) {

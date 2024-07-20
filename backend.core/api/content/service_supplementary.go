@@ -72,11 +72,21 @@ func (svc *service) GetMetadataSupplementaryUploadUrl(ctx context.Context, reque
 	if err != nil {
 		return nil, err
 	}
+	if supplementary == nil {
+		return nil, nil
+	}
 	return svc.objectStore.CreateUploadUrl(ctx, id, supplementary.Name, supplementary.ContentType, supplementary.ContentLength, nil)
 }
 
 func (svc *service) GetMetadataSupplementaryDownloadUrl(ctx context.Context, request *protobuf.SupplementaryIdRequest) (*grpc.SignedUrl, error) {
 	id := svc.getSupplementaryId(request.Id, request.Key)
+	supplementary, err := svc.ds.GetMetadataSupplementary(ctx, request.Id, request.Key)
+	if err != nil {
+		return nil, err
+	}
+	if supplementary == nil {
+		return nil, nil
+	}
 	return svc.objectStore.CreateDownloadUrl(ctx, id)
 }
 

@@ -10,6 +10,7 @@
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:5013" />
       <env name="BOSCA_SERVICE_ACCOUNT_TOKEN" value="sat" />
       <env name="BOSCA_WORKFLOW_API_ADDRESS" value="localhost:5011" />
+      <env name="BOSCA_REDIS_ADDRESS" value="redis://localhost:6379" />
     </envs>
     <method v="2" />
   </configuration>

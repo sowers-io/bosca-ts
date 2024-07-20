@@ -105,6 +105,7 @@ type ClientEndpoints struct {
 	TextExtractorApiAddress string `envconfig:"TEXT_EXTRACTOR_API_ADDRESS"`
 	QdrantApiAddress        string `envconfig:"QDRANT_API_ADDRESS"`
 	OllamaApiAddress        string `envconfig:"OLLAMA_API_ADDRESS"`
+	RedisAddress            string `envconfig:"REDIS_ADDRESS"`
 }
 
 func getBaseConfiguration(defaultRestPort, defaultGrpcPort int) *ServerConfiguration {

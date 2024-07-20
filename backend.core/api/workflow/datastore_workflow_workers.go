@@ -25,8 +25,17 @@ import (
 	"time"
 )
 
-func (ds *DataStore) RegisterWorker(ctx context.Context, request *grpc.WorkflowActivityJobRequest) (string, error) {
-	cfg, err := json.Marshal(request)
+type WorkerConfiguration struct {
+	Queue       string
+	ActivityIds []string
+}
+
+func (ds *DataStore) RegisterWorker(ctx context.Context, queue string, activityIds []string) (string, error) {
+	wcfg := &WorkerConfiguration{
+		Queue:       queue,
+		ActivityIds: activityIds,
+	}
+	cfg, err := json.Marshal(wcfg)
 	if err != nil {
 		return "", err
 	}

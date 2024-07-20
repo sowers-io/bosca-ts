@@ -45,7 +45,7 @@ type service struct {
 
 func NewService(cfg *configuration.ServerConfiguration, dataStore *DataStore, serviceAccountId, serviceAccountToken string, objectStore objectstore.ObjectStore, permissions security.PermissionManager, contentClient content.ContentServiceClient) grpc.WorkflowServiceServer {
 	go initializeService(cfg, dataStore)
-	return &service{
+	svc := &service{
 		ds:                  dataStore,
 		objectStore:         objectStore,
 		serviceAccountId:    serviceAccountId,
@@ -53,6 +53,22 @@ func NewService(cfg *configuration.ServerConfiguration, dataStore *DataStore, se
 		permissions:         permissions,
 		contentClient:       contentClient,
 	}
+	go func() {
+		ctx := context.Background()
+		for {
+			time.Sleep(5 * time.Second)
+			queues, err := svc.ds.GetAllQueues(ctx)
+			if err != nil {
+				slog.ErrorContext(ctx, "failed to get queues", slog.Any("error", err))
+			}
+			// TODO: check if there are actually jobs in the queues
+			err = svc.ds.NotifyJobAvailable(ctx, queues)
+			if err != nil {
+				slog.ErrorContext(ctx, "notifying there are jobs... even if there are not", slog.Any("error", err))
+			}
+		}
+	}()
+	return svc
 }
 
 func (svc *service) getMetadata(ctx context.Context, metadataId string) (*content.Metadata, error) {

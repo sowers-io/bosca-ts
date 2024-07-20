@@ -18,74 +18,111 @@ export type PromiseFactory = () => Promise<any>
 
 export class Queue {
   readonly name: string
-  private readonly maxActive: number
-  private active = 0
+  readonly maxActive: number
+
+  private _active = 0
+  private _processed = 0
+  private _waited = 0
+  private _waiting = 0
   private items: PromiseFactory[] = []
-  private waiter: Promise<void> | null = null
-  private waitNotifier: (() => void) | null = null
+  private _waiter: Promise<void> | null = null
+  private _waitNotifier: (() => void) | null = null
+  private _blocking = false
 
   constructor(name: string, maxActive: number) {
     this.name = name
     this.maxActive = maxActive
   }
 
-  async enqueue(factory: PromiseFactory): Promise<void> {
-    this.items.push(factory)
-    console.log('queue::enqueue', this.name, 'active:', this.active, 'items:', this.items.length)
-    await this.processNext()
+  get processed(): number {
+    return this._processed
   }
 
-  private async processNext(): Promise<void> {
-    while (this.waiter) {
-      console.log('queue::processNextItem::waiting', this.name, 'active:', this.active, 'items:', this.items.length)
+  get waited(): number {
+    return this._waited
+  }
+
+  get waiting(): number {
+    return this._waiting
+  }
+
+  get active(): number {
+    return this._active
+  }
+
+  get queued(): number {
+    return this.items.length
+  }
+
+  get waiter(): Promise<void> | null {
+    return this._waiter
+  }
+
+  enqueue(factory: PromiseFactory) {
+    this.items.push(factory)
+  }
+
+  async process(): Promise<void> {
+    let waited = false
+    while (this._blocking) {
+      if (!waited) {
+        waited = true
+        this._waited++
+      }
+      this._waiting++
       await this.waiter
-      console.log('queue::processNextItem::not waiting', this.name, 'active:', this.active, 'items:', this.items.length)
+      this._waiting--
     }
     const factory = this.items.shift()
     if (!factory) return
+    await factory()
     this.processNextItem(factory)
   }
 
   private processNextItem(factory: PromiseFactory) {
     const queue = this
-    queue.active++
-    console.log('queue::processNextItem::start', this.name, 'active:', queue.active, 'items:', this.items.length)
+    queue._processed++
+    queue._active++
     if (queue.active === queue.maxActive) {
-      queue.waiter = new Promise((resolve) => {
-        queue.waitNotifier = resolve
+      queue._blocking = true
+      if (queue._waiter) {
+        throw new Error('queue::processNextItem::waiter should be null')
+      }
+      queue._waiter = new Promise((resolve) => {
+        queue._waitNotifier = resolve
       })
     }
     factory()
       .catch((e) => {
         console.error(
           'queue::processNextItem::error',
-          this.name,
+          queue.name,
           'active:',
           queue.active,
           'items:',
-          this.items.length,
+          queue.items.length,
           'error: ',
           e
         )
       })
       .finally(() => {
-        queue.active--
-        console.log('queue::processNextItem::done', this.name, 'active:', queue.active, 'items:', this.items.length)
+        queue._active--
         if (queue.active < queue.maxActive) {
-          const notifier = queue.waitNotifier
-          queue.waiter = null
-          queue.waitNotifier = null
+          queue._blocking = false
+          const notifier = queue._waitNotifier
+          queue._waiter = null
+          queue._waitNotifier = null
           if (notifier) {
             notifier()
           }
         } else {
           console.error(
             'queue::processNextItem::still full',
-            this.name,
+            queue.name,
             'active:',
             queue.active,
             'items:',
-            this.items.length
+            queue.items.length
           )
         }
       })

@@ -38,7 +38,7 @@ func (ds *DataStore) AddWorkflow(ctx context.Context, workflow *workflow.Workflo
 }
 
 func (ds *DataStore) GetAllQueues(ctx context.Context) ([]string, error) {
-	rows, err := ds.db.QueryContext(ctx, "select distinct queue from workflows")
+	rows, err := ds.db.QueryContext(ctx, "select distinct queue from (select queue from workflow_activities union select queue from workflows)")
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (ds *DataStore) getWorkflowActivity(ctx context.Context, rows *sql.Rows) (*
 }
 
 func (ds *DataStore) GetWorkflowActivity(ctx context.Context, id int64) (*workflow.WorkflowActivity, error) {
-	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration, w.queue FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) inner join workflows w on (wa.workflow_id = w.id) WHERE wa.id = $1", id)
+	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration, wa.queue FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) inner join workflows w on (wa.workflow_id = w.id) WHERE wa.id = $1", id)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (ds *DataStore) GetWorkflowActivity(ctx context.Context, id int64) (*workfl
 }
 
 func (ds *DataStore) GetWorkflowActivities(ctx context.Context, workflowId string) ([]*workflow.WorkflowActivity, error) {
-	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration, w.queue FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) inner join workflows w on (wa.workflow_id = w.id) where workflow_id = $1 order by wa.execution_group", workflowId)
+	rows, err := ds.db.QueryContext(ctx, "SELECT wa.id, wa.activity_id, a.child_workflow_id, wa.execution_group, wa.configuration, wa.queue FROM workflow_activities wa inner join activities a on (wa.activity_id = a.id) inner join workflows w on (wa.workflow_id = w.id) where workflow_id = $1 order by wa.execution_group", workflowId)
 	if err != nil {
 		return nil, err
 	}
@@ -353,8 +353,8 @@ func (ds *DataStore) AddWorkflowActivity(ctx context.Context, workflowId string,
 		return 0, err
 	}
 
-	rows, err := ds.db.QueryContext(ctx, "INSERT INTO workflow_activities (workflow_id, activity_id, execution_group, configuration) VALUES ($1, $2, $3, ($4)::jsonb) returning id",
-		workflowId, activity.ActivityId, activity.ExecutionGroup, string(config),
+	rows, err := ds.db.QueryContext(ctx, "INSERT INTO workflow_activities (workflow_id, activity_id, execution_group, queue, configuration) VALUES ($1, $2, $3, $4, ($5)::jsonb) returning id",
+		workflowId, activity.ActivityId, activity.ExecutionGroup, activity.Queue, string(config),
 	)
 	if err != nil {
 		return 0, err

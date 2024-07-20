@@ -80,7 +80,7 @@ func (ds *DataStore) GetMetadataSupplementary(ctx context.Context, metadataId, k
 }
 
 func (ds *DataStore) AddMetadataSupplementary(ctx context.Context, metadataId, key, name, contentType string, contentLength int64, traitIds []string, sourceId, sourceIdentifier *string) error {
-	_, err := ds.db.ExecContext(ctx, "INSERT INTO metadata_supplementary (metadata_id, \"key\", name, content_type, content_length, source_id, source_identifier) values ($1::uuid, $2, $3, $4, $5, $6, $7)", metadataId, key, name, contentType, contentLength, sourceId, sourceIdentifier)
+	_, err := ds.db.ExecContext(ctx, "insert into metadata_supplementary (metadata_id, \"key\", name, content_type, content_length, source_id, source_identifier) values ($1::uuid, $2, $3, $4, $5, $6, $7)", metadataId, key, name, contentType, contentLength, sourceId, sourceIdentifier)
 	if err != nil {
 		return err
 	}

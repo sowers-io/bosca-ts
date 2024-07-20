@@ -24,21 +24,21 @@ import (
 	"log/slog"
 )
 
-func (svc *service) getNewWorkflowExecutionContext(ctx context.Context, workflowId string, metadataId *string, collectionId *string, context map[string]string) (*grpc.WorkflowExecutionContext, error) {
+func (svc *service) getNewWorkflowExecutionContext(ctx context.Context, workflowId string, metadataId *string, collectionId *string, context map[string]string) (*grpc.Workflow, *grpc.WorkflowExecutionContext, error) {
 	workflow, err := svc.ds.GetWorkflow(ctx, workflowId)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to get workflow", slog.Any("metadataId", metadataId), slog.Any("collectionId", collectionId), slog.String("workflowId", workflowId))
-		return nil, err
+		return nil, nil, err
 	}
 	if workflow == nil {
 		slog.ErrorContext(ctx, "workflow not found", slog.Any("metadataId", metadataId), slog.Any("collectionId", collectionId), slog.String("workflowId", workflowId))
-		return nil, status.Error(codes.Internal, "workflow not found")
+		return nil, nil, status.Error(codes.Internal, "workflow not found")
 	}
 	activities, err := svc.ds.GetWorkflowActivities(ctx, workflowId)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &grpc.WorkflowExecutionContext{
+	return workflow, &grpc.WorkflowExecutionContext{
 		MetadataId:            metadataId,
 		CollectionId:          collectionId,
 		WorkflowId:            workflowId,

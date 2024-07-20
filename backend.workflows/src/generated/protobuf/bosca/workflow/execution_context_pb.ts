@@ -23,6 +23,93 @@ import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 import { WorkflowActivity, WorkflowActivityModel, WorkflowActivityPrompt, WorkflowActivityStorageSystem } from "./activities_pb";
 
 /**
+ * @generated from enum bosca.workflow.WorkflowExecutionNotificationType
+ */
+export enum WorkflowExecutionNotificationType {
+  /**
+   * @generated from enum value: unknown = 0;
+   */
+  unknown = 0,
+
+  /**
+   * @generated from enum value: execution_completion = 1;
+   */
+  execution_completion = 1,
+
+  /**
+   * @generated from enum value: job_available = 2;
+   */
+  job_available = 2,
+
+  /**
+   * @generated from enum value: execution_failed = 3;
+   */
+  execution_failed = 3,
+}
+// Retrieve enum metadata with: proto3.getEnumType(WorkflowExecutionNotificationType)
+proto3.util.setEnumType(WorkflowExecutionNotificationType, "bosca.workflow.WorkflowExecutionNotificationType", [
+  { no: 0, name: "unknown" },
+  { no: 1, name: "execution_completion" },
+  { no: 2, name: "job_available" },
+  { no: 3, name: "execution_failed" },
+]);
+
+/**
+ * @generated from message bosca.workflow.WorkflowExecutionNotification
+ */
+export class WorkflowExecutionNotification extends Message<WorkflowExecutionNotification> {
+  /**
+   * @generated from field: bosca.workflow.WorkflowExecutionNotificationType type = 1;
+   */
+  type = WorkflowExecutionNotificationType.unknown;
+
+  /**
+   * @generated from field: bool success = 2;
+   */
+  success = false;
+
+  /**
+   * @generated from field: string execution_id = 3;
+   */
+  executionId = "";
+
+  /**
+   * @generated from field: optional string error = 4;
+   */
+  error?: string;
+
+  constructor(data?: PartialMessage<WorkflowExecutionNotification>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.workflow.WorkflowExecutionNotification";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "type", kind: "enum", T: proto3.getEnumType(WorkflowExecutionNotificationType) },
+    { no: 2, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "execution_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionNotification {
+    return new WorkflowExecutionNotification().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowExecutionNotification {
+    return new WorkflowExecutionNotification().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowExecutionNotification {
+    return new WorkflowExecutionNotification().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkflowExecutionNotification | PlainMessage<WorkflowExecutionNotification> | undefined, b: WorkflowExecutionNotification | PlainMessage<WorkflowExecutionNotification> | undefined): boolean {
+    return proto3.util.equals(WorkflowExecutionNotification, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.workflow.WorkflowExecutionRequest
  */
 export class WorkflowExecutionRequest extends Message<WorkflowExecutionRequest> {
@@ -443,9 +530,9 @@ export class WorkflowActivityJob extends Message<WorkflowActivityJob> {
 }
 
 /**
- * @generated from message bosca.workflow.WorkflowActivityJobRequest
+ * @generated from message bosca.workflow.RegisterWorkerRequest
  */
-export class WorkflowActivityJobRequest extends Message<WorkflowActivityJobRequest> {
+export class RegisterWorkerRequest extends Message<RegisterWorkerRequest> {
   /**
    * @generated from field: string queue = 1;
    */
@@ -453,6 +540,54 @@ export class WorkflowActivityJobRequest extends Message<WorkflowActivityJobReque
 
   /**
    * @generated from field: repeated string activity_id = 2;
+   */
+  activityId: string[] = [];
+
+  constructor(data?: PartialMessage<RegisterWorkerRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.workflow.RegisterWorkerRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "queue", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "activity_id", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterWorkerRequest {
+    return new RegisterWorkerRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterWorkerRequest {
+    return new RegisterWorkerRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterWorkerRequest {
+    return new RegisterWorkerRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RegisterWorkerRequest | PlainMessage<RegisterWorkerRequest> | undefined, b: RegisterWorkerRequest | PlainMessage<RegisterWorkerRequest> | undefined): boolean {
+    return proto3.util.equals(RegisterWorkerRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message bosca.workflow.WorkflowActivityJobRequest
+ */
+export class WorkflowActivityJobRequest extends Message<WorkflowActivityJobRequest> {
+  /**
+   * @generated from field: string worker_id = 1;
+   */
+  workerId = "";
+
+  /**
+   * @generated from field: string queue = 2;
+   */
+  queue = "";
+
+  /**
+   * @generated from field: repeated string activity_id = 3;
    */
   activityId: string[] = [];
 
@@ -464,8 +599,9 @@ export class WorkflowActivityJobRequest extends Message<WorkflowActivityJobReque
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "bosca.workflow.WorkflowActivityJobRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "queue", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "activity_id", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 1, name: "worker_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "queue", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "activity_id", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowActivityJobRequest {

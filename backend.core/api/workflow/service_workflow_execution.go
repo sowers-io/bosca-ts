@@ -27,7 +27,7 @@ import (
 )
 
 func (svc *service) executeWorkflow(ctx context.Context, parentExecutionId *string, metadataId *string, collectionId *string, workflowId string, context map[string]string, waitForCompletion bool) (*grpc.WorkflowExecutionResponse, error) {
-	executionContext, err := svc.getNewWorkflowExecutionContext(ctx, workflowId, metadataId, collectionId, context)
+	workflow, executionContext, err := svc.getNewWorkflowExecutionContext(ctx, workflowId, metadataId, collectionId, context)
 	if err != nil {
 		return nil, err
 	}
@@ -89,9 +89,9 @@ func (svc *service) executeWorkflow(ctx context.Context, parentExecutionId *stri
 	}
 
 	if waitForCompletion {
-		notification := svc.ds.WaitForExecutionCompletion(executionId)
-		if notification.Error != "" {
-			response.Error = &notification.Error
+		notification, err := svc.ds.WaitForExecutionCompletion(ctx, workflow.Queue, executionId)
+		if notification.Error != nil {
+			response.Error = notification.Error
 			slog.ErrorContext(ctx, "failed to wait for execution completion", slog.Any("error", err), slog.Any("metadataId", metadataId), slog.Any("collectionId", collectionId), slog.String("workflowId", workflowId))
 		}
 		response.Success = notification.Success
@@ -215,7 +215,7 @@ func (svc *service) processWorkflowExecution(ctx context.Context, executionId st
 			if err != nil {
 				return err
 			}
-			err := svc.ds.NotifyJobAvailable(ctx, getAllQueues(executionContext))
+			err = svc.ds.NotifyJobAvailable(ctx, getAllQueues(executionContext))
 			if err != nil {
 				slog.ErrorContext(ctx, "failed to notify jobs are complete", slog.Any("error", err), slog.String("executionId", executionContext.ExecutionId))
 				return err
@@ -245,7 +245,7 @@ func (svc *service) processWorkflowExecution(ctx context.Context, executionId st
 			return svc.processWorkflowExecution(ctx, *executionContext.ParentExecutionId, nil)
 		}
 	} else if isCurrentExecutionGroupComplete {
-		err := svc.ds.NotifyJobAvailable(ctx, queues)
+		err = svc.ds.NotifyJobAvailable(ctx, queues)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to notify jobs are complete", slog.Any("error", err), slog.String("executionId", executionContext.ExecutionId))
 			return err

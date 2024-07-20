@@ -15,6 +15,13 @@
  */
 
 export class Retry {
+
+  private static _retries = 0
+
+  static get retries(): number {
+    return Retry._retries
+  }
+
   private readonly retries: number
   private readonly backoff: number
   private readonly maxBackoff: number
@@ -36,8 +43,10 @@ export class Retry {
         return await fn()
       } catch (error) {
         if (tries === this.retries - 1) {
+          console.error('failed to execute function, no more retries', error)
           throw error
         }
+        Retry._retries++
         this.currentBackoff = Math.min(this.currentBackoff + this.backoff, this.maxBackoff)
         console.error('failed to execute function, retrying... backoff: ' + this.currentBackoff + 'ms', error)
         await new Promise((resolve) => setTimeout(resolve, retrier.currentBackoff))

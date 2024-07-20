@@ -25,7 +25,8 @@ import { AddSupplementaryRequest } from '../generated/protobuf/bosca/content/met
 import { protoInt64 } from '@bufbuild/protobuf'
 
 async function uploadInQueue(queue: Queue, id: string, buffer: ArrayBuffer) {
-  await queue.enqueue(() => upload(id, buffer))
+  queue.enqueue(() => upload(id, buffer))
+  await queue.process()
 }
 
 export async function uploadAll(response: IdResponses, buffers: ArrayBuffer[]) {
@@ -80,7 +81,7 @@ export async function uploadSupplementary(
     const service = useServiceClient(ContentService)
     const idRequest = new SupplementaryIdRequest({ id: metadataId, key: key })
     const supplementary = await service.getMetadataSupplementary(idRequest)
-    if (supplementary) {
+    if (supplementary && supplementary.metadataId && supplementary.metadataId.length > 0) {
       await service.deleteMetadataSupplementary(idRequest)
     }
     const request = {
@@ -92,7 +93,17 @@ export async function uploadSupplementary(
       sourceId: sourceId,
       sourceIdentifier: sourceIdentifier,
     }
-    return await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
+    console.error(request)
+    try {
+      const result = await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
+      console.error(result)
+      return result
+    } catch (e: any) {
+      if (e.toString() === 'ConnectError: [unknown] ERROR: duplicate key value violates unique constraint "metadata_supplementary_pkey" (SQLSTATE 23505)') {
+        await service.deleteMetadataSupplementary(idRequest)
+      }
+      throw e
+    }
   })
   return Retry.execute(10, async () => {
     const idRequest = new SupplementaryIdRequest({ id: supplementary.metadataId, key: supplementary.key })

@@ -1,0 +1,1 @@
+{"version":3,"file":"interceptor.d.ts","sourceRoot":"","sources":["../../src/authentication/interceptor.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,qBAAqB,CAAA;AAGtD,OAAO,EAAE,aAAa,EAAE,OAAO,EAAE,MAAM,kBAAkB,CAAA;AAGzD,eAAO,MAAM,UAAU,mDAKtB,CAAA;AAED,wBAAgB,4BAA4B,CAAC,aAAa,EAAE,aAAa,GAAG,WAAW,CA0BtF"}

@@ -1,0 +1,29 @@
+{
+  "maxUploadConcurrency": 20,
+  "queues": {
+    "metadata": {
+      "maxConcurrency": 10
+    },
+    "traits": {
+      "maxConcurrency": 100
+    },
+    "transition": {
+      "maxConcurrency": 100
+    },
+    "bible": {
+      "maxConcurrency": 20
+    },
+    "bible-book": {
+      "maxConcurrency": 20
+    },
+    "bible-verse": {
+      "maxConcurrency": 20
+    },
+    "bible-ai": {
+      "maxConcurrency": 2
+    },
+    "search-index": {
+      "maxConcurrency": 20
+    }
+  }
+}

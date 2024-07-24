@@ -18,25 +18,17 @@ syntax = "proto3";
 option go_package = "bosca.io/api/protobuf/bosca/workflow";
 
 import "bosca/workflow/activities.proto";
+import "bosca/workflow/workflows.proto";
 
 package bosca.workflow;
 
-enum WorkflowExecutionNotificationType {
-  unknown = 0;
-  execution_completion = 1;
-  job_available = 2;
-  execution_failed = 3;
-}
-
-message WorkflowExecutionNotification {
-  WorkflowExecutionNotificationType type = 1;
-  bool success = 2;
-  string execution_id = 3;
-  optional string error = 4;
+message WorkflowParentJobId {
+  string id = 1;
+  string queue = 2;
 }
 
 message WorkflowExecutionRequest {
-  optional string parent_execution_id = 1;
+  optional WorkflowParentJobId parent = 1;
   string workflow_id = 2;
   optional string metadata_id = 3;
   optional string collection_id = 4;
@@ -45,69 +37,45 @@ message WorkflowExecutionRequest {
 }
 
 message FindAndWorkflowExecutionRequest {
-  optional string parent_execution_id = 1;
+  optional WorkflowParentJobId parent = 1;
   string workflow_id = 2;
+  optional string metadata_id = 3;
+  optional string collection_id = 4;
   bool wait_for_completion = 5;
   map<string, string> context = 6;
   map<string, string> metadata_attributes = 7;
   map<string, string> collection_attributes = 8;
 }
 
-message WorkflowExecutionResponses {
-  repeated WorkflowExecutionResponse responses = 1;
+message WorkflowEnqueueRequest {
+  optional WorkflowParentJobId parent = 1;
+  Workflow workflow = 2;
+  repeated WorkflowJob jobs = 3;
+  optional string metadata_id = 4;
+  optional string collection_id = 5;
+  map<string, string> context = 6;
+  bool wait_for_completion = 7;
 }
 
-message WorkflowExecutionResponse {
-  string execution_id = 1;
+message WorkflowEnqueueResponses {
+  repeated WorkflowEnqueueResponse responses = 1;
+}
+
+message WorkflowEnqueueResponse {
+  string job_id = 1;
   bool success = 2;
   bool complete = 3;
   optional string error = 4;
   map<string, string> context = 5;
 }
 
-message WorkflowExecutionContext {
-  optional string parent_execution_id = 1;
-  string workflow_id = 2;
-  string execution_id = 3;
-  repeated WorkflowActivity activities = 4;
-  int32 current_execution_group = 5;
-  optional string metadata_id = 6;
-  optional string collection_id = 7;
-  map<string, string> context = 8;
-}
-
-message WorkflowActivityJob {
-  string job_id = 1;
-  string execution_id = 2;
-  string workflow_id = 3;
-  string metadata_id = 4;
-  string collection_id = 5;
+message WorkflowJob {
+  string workflow_id = 1;
+  optional string collection_id = 2;
+  optional string metadata_id = 3;
   WorkflowActivity activity = 6;
   repeated WorkflowActivityPrompt prompts = 7;
   repeated WorkflowActivityStorageSystem storage_systems = 8;
   repeated WorkflowActivityModel models = 9;
   map<string, string> context = 10;
-  bool complete = 11;
-  bool success = 12;
-  optional string error = 13;
-}
-
-message RegisterWorkerRequest {
-  string queue = 1;
-  repeated string activity_id = 2;
-}
-
-message WorkflowActivityJobRequest {
-  string worker_id = 1;
-  string queue = 2;
-  repeated string activity_id = 3;
-}
-
-message WorkflowActivityJobStatus {
-  string execution_id = 1;
-  string job_id = 2;
-  int64 workflow_activity_id = 3;
-  bool complete = 4;
-  bool success = 5;
-  optional string error = 6;
 }

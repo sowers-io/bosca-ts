@@ -1,0 +1,11 @@
+extend type Query {
+
+    sources: [Source!]!
+
+    metadata(id: ID!): Metadata
+}
+
+extend type Mutation {
+
+    addMetadata(metadata: MetadataInput!): Metadata
+}

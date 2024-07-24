@@ -1,0 +1,16 @@
+scalar Date
+
+type Query
+type Mutation
+
+type SignedUrlHeader {
+    name: String!
+    value: String!
+}
+
+type SignedUrl {
+    id: String!
+    url: String!
+    method: String!
+    headers: [SignedUrlHeader!]!
+}

@@ -3,5 +3,11 @@
     "@bufbuild/buf": "^1.34.0",
     "@bufbuild/protoc-gen-es": "^1.10.0",
     "@connectrpc/protoc-gen-connect-es": "^1.4.0"
+  },
+  "dependencies": {
+    "@connectrpc/connect": "^1.4.0",
+    "bullmq": "^5.10.3",
+    "decompress": "^4.2.1",
+    "pg": "^8.12.0"
   }
 }

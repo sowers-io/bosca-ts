@@ -130,59 +130,16 @@ service WorkflowService {
     };
   }
 
-  rpc ExecuteWorkflow (WorkflowExecutionRequest) returns (WorkflowExecutionResponse) {
+  rpc ExecuteWorkflow (WorkflowExecutionRequest) returns (WorkflowEnqueueResponse) {
     option (google.api.http) = {
-      post: "/v1/workflow/execute/{workflow_id}"
+      post: "/v1/workflow/execute"
       body: "*"
     };
   }
 
-  rpc FindAndExecuteWorkflow (FindAndWorkflowExecutionRequest) returns (WorkflowExecutionResponses) {
+  rpc FindAndExecuteWorkflow (FindAndWorkflowExecutionRequest) returns (WorkflowEnqueueResponses) {
     option (google.api.http) = {
-      post: "/v1/workflow/find/execute/{workflow_id}"
-      body: "*"
-    };
-  }
-
-  rpc GetWorkflowExecutionStatus(IdRequest) returns (WorkflowExecutionResponse) {
-    option (google.api.http) = {
-      get: "/v1/workflow/executions/{id}/status"
-    };
-  }
-
-  rpc GetChildWorkflowExecutions(IdRequest) returns (IdsResponse) {
-    option (google.api.http) = {
-      get: "/v1/workflow/executions/{id}/workflow/execute"
-    };
-  }
-
-  rpc RegisterWorker(RegisterWorkerRequest) returns (IdResponse) {
-    option (google.api.http) = {
-      post: "/v1/workflow/workers/register/{queue}"
-    };
-  }
-
-  rpc WorkerHeartbeat(IdRequest) returns (Empty) {
-    option (google.api.http) = {
-      post: "/v1/workflow/workers/{id}/heartbeat"
-    };
-  }
-
-  rpc UnregisterWorker(IdRequest) returns (Empty) {
-    option (google.api.http) = {
-      delete: "/v1/workflow/workers/{id}"
-    };
-  }
-
-  rpc GetWorkflowActivityJob(WorkflowActivityJobRequest) returns (WorkflowActivityJob) {
-    option (google.api.http) = {
-      get: "/v1/workflow/queue/{queue}"
-    };
-  }
-
-  rpc SetWorkflowActivityJobStatus(WorkflowActivityJobStatus) returns (Empty) {
-    option (google.api.http) = {
-      post: "/v1/workflow/executions/{execution_id}/activities/{workflow_activity_id}/status"
+      post: "/v1/workflow/find/execute"
       body: "*"
     };
   }

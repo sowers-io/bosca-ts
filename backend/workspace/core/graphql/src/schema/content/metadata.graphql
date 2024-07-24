@@ -1,0 +1,42 @@
+input MetadataInput {
+    name: String!
+    contentType: String!
+    contentLength: Int
+    languageTag: String!
+}
+
+type MetadataAttribute {
+    name: String!
+    value: String!
+}
+
+type MetadataWorkflowState {
+    id: String!
+    pendingId: String
+    deleteWorkflowId: String
+}
+
+type Metadata {
+    parentId: String
+
+    id: ID!
+    name: String!
+
+    contentType: String!
+    contentLength: Int
+    languageTag: String!
+
+    labels: [String!]!
+    attributes: [MetadataAttribute!]!
+
+    sourceId: String
+    sourceIdentifier: String
+
+    workflowState: MetadataWorkflowState!
+
+    created: Date!
+    modified: Date!
+
+    downloadUrl: SignedUrl!
+    uploadUrl: SignedUrl!
+}

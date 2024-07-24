@@ -1,0 +1,21 @@
+{
+  "name": "@bosca/workflow-coordinator",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --build",
+    "build.watch": "tsc --build --watch",
+    "lint": "eslint .",
+    "start": "cross-env BOSCA_REDIS_HOST=localhost BOSCA_REDIS_PORT=6379 ts-node src/main.ts"
+  },
+  "dependencies": {
+    "@connectrpc/connect-fastify": "^1.4.0",
+    "@connectrpc/connect-node": "^1.4.0",
+    "bullmq": "^5.10.3",
+    "fastify": "^4.28.1",
+    "@bosca/protobufs": "0.0.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  }
+}

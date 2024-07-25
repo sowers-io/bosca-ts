@@ -6,20 +6,56 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
-export type Scalars = {
+export interface Scalars {
   ID: { input: string; output: string; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   Date: { input: any; output: any; }
-};
+}
 
-export type Metadata = {
+export interface Attribute {
+  __typename?: 'Attribute';
+  name: Scalars['String']['output'];
+  value: Scalars['String']['output'];
+}
+
+export interface Collection {
+  __typename?: 'Collection';
+  attributes: Array<Attribute>;
+  categoryIds: Array<Scalars['String']['output']>;
+  created: Scalars['Date']['output'];
+  id: Scalars['ID']['output'];
+  items?: Maybe<Array<Maybe<CollectionItem>>>;
+  labels: Array<Scalars['String']['output']>;
+  modified: Scalars['Date']['output'];
+  name: Scalars['String']['output'];
+  traitIds: Array<Scalars['String']['output']>;
+  type: CollectionType;
+}
+
+export interface CollectionInput {
+  contentLength?: InputMaybe<Scalars['Int']['input']>;
+  contentType: Scalars['String']['input'];
+  languageTag: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+}
+
+export type CollectionItem = Collection | Metadata;
+
+export enum CollectionType {
+  Folder = 'folder',
+  Root = 'root',
+  Standard = 'standard'
+}
+
+export interface Metadata {
   __typename?: 'Metadata';
-  attributes: Array<MetadataAttribute>;
+  attributes: Array<Attribute>;
   contentLength?: Maybe<Scalars['Int']['output']>;
   contentType: Scalars['String']['output'];
   created: Scalars['Date']['output'];
@@ -29,73 +65,100 @@ export type Metadata = {
   languageTag: Scalars['String']['output'];
   modified: Scalars['Date']['output'];
   name: Scalars['String']['output'];
-  parentId?: Maybe<Scalars['String']['output']>;
+  parentId?: Maybe<Scalars['ID']['output']>;
   sourceId?: Maybe<Scalars['String']['output']>;
   sourceIdentifier?: Maybe<Scalars['String']['output']>;
   uploadUrl: SignedUrl;
   workflowState: MetadataWorkflowState;
-};
+}
 
-export type MetadataAttribute = {
-  __typename?: 'MetadataAttribute';
-  name: Scalars['String']['output'];
-  value: Scalars['String']['output'];
-};
-
-export type MetadataInput = {
+export interface MetadataInput {
   contentLength?: InputMaybe<Scalars['Int']['input']>;
   contentType: Scalars['String']['input'];
   languageTag: Scalars['String']['input'];
   name: Scalars['String']['input'];
-};
+}
 
-export type MetadataWorkflowState = {
+export interface MetadataWorkflowState {
   __typename?: 'MetadataWorkflowState';
   deleteWorkflowId?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   pendingId?: Maybe<Scalars['String']['output']>;
-};
+}
 
-export type Mutation = {
+export interface Mutation {
   __typename?: 'Mutation';
   addMetadata?: Maybe<Metadata>;
-};
+  login?: Maybe<Scalars['String']['output']>;
+}
 
 
-export type MutationAddMetadataArgs = {
+export interface MutationAddMetadataArgs {
   metadata: MetadataInput;
-};
+}
 
-export type Query = {
+
+export interface MutationLoginArgs {
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+}
+
+export interface Query {
   __typename?: 'Query';
+  collection?: Maybe<Collection>;
   metadata?: Maybe<Metadata>;
+  source?: Maybe<Source>;
   sources: Array<Source>;
-};
+  trait?: Maybe<Trait>;
+  traits: Array<Trait>;
+}
 
 
-export type QueryMetadataArgs = {
+export interface QueryCollectionArgs {
   id: Scalars['ID']['input'];
-};
+}
 
-export type SignedUrl = {
+
+export interface QueryMetadataArgs {
+  id: Scalars['ID']['input'];
+}
+
+
+export interface QuerySourceArgs {
+  id: Scalars['ID']['input'];
+}
+
+
+export interface QueryTraitArgs {
+  id: Scalars['ID']['input'];
+}
+
+export interface SignedUrl {
   __typename?: 'SignedUrl';
   headers: Array<SignedUrlHeader>;
   id: Scalars['String']['output'];
   method: Scalars['String']['output'];
   url: Scalars['String']['output'];
-};
+}
 
-export type SignedUrlHeader = {
+export interface SignedUrlHeader {
   __typename?: 'SignedUrlHeader';
   name: Scalars['String']['output'];
   value: Scalars['String']['output'];
-};
+}
 
-export type Source = {
+export interface Source {
   __typename?: 'Source';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-};
+}
+
+export interface Trait {
+  __typename?: 'Trait';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  workflowIds: Array<Scalars['ID']['output']>;
+}
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
@@ -165,16 +228,24 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
+/** Mapping of union types */
+export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = ResolversObject<{
+  CollectionItem: ( Omit<Collection, 'items'> & { items?: Maybe<Array<Maybe<_RefType['CollectionItem']>>> } ) | ( Metadata );
+}>;
 
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
+  Attribute: ResolverTypeWrapper<Attribute>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  Collection: ResolverTypeWrapper<Omit<Collection, 'items'> & { items?: Maybe<Array<Maybe<ResolversTypes['CollectionItem']>>> }>;
+  CollectionInput: CollectionInput;
+  CollectionItem: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CollectionItem']>;
+  CollectionType: CollectionType;
   Date: ResolverTypeWrapper<Scalars['Date']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Metadata: ResolverTypeWrapper<Metadata>;
-  MetadataAttribute: ResolverTypeWrapper<MetadataAttribute>;
   MetadataInput: MetadataInput;
   MetadataWorkflowState: ResolverTypeWrapper<MetadataWorkflowState>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -183,16 +254,20 @@ export type ResolversTypes = ResolversObject<{
   SignedUrlHeader: ResolverTypeWrapper<SignedUrlHeader>;
   Source: ResolverTypeWrapper<Source>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Trait: ResolverTypeWrapper<Trait>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
+  Attribute: Attribute;
   Boolean: Scalars['Boolean']['output'];
+  Collection: Omit<Collection, 'items'> & { items?: Maybe<Array<Maybe<ResolversParentTypes['CollectionItem']>>> };
+  CollectionInput: CollectionInput;
+  CollectionItem: ResolversUnionTypes<ResolversParentTypes>['CollectionItem'];
   Date: Scalars['Date']['output'];
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Metadata: Metadata;
-  MetadataAttribute: MetadataAttribute;
   MetadataInput: MetadataInput;
   MetadataWorkflowState: MetadataWorkflowState;
   Mutation: {};
@@ -201,6 +276,31 @@ export type ResolversParentTypes = ResolversObject<{
   SignedUrlHeader: SignedUrlHeader;
   Source: Source;
   String: Scalars['String']['output'];
+  Trait: Trait;
+}>;
+
+export type AttributeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Attribute'] = ResolversParentTypes['Attribute']> = ResolversObject<{
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CollectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Collection'] = ResolversParentTypes['Collection']> = ResolversObject<{
+  attributes?: Resolver<Array<ResolversTypes['Attribute']>, ParentType, ContextType>;
+  categoryIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  items?: Resolver<Maybe<Array<Maybe<ResolversTypes['CollectionItem']>>>, ParentType, ContextType>;
+  labels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  modified?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['CollectionType'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CollectionItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['CollectionItem'] = ResolversParentTypes['CollectionItem']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'Collection' | 'Metadata', ParentType, ContextType>;
 }>;
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
@@ -208,7 +308,7 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['Metadata'] = ResolversParentTypes['Metadata']> = ResolversObject<{
-  attributes?: Resolver<Array<ResolversTypes['MetadataAttribute']>, ParentType, ContextType>;
+  attributes?: Resolver<Array<ResolversTypes['Attribute']>, ParentType, ContextType>;
   contentLength?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   contentType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
@@ -218,17 +318,11 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
   languageTag?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   modified?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  parentId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  parentId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   sourceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   sourceIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   uploadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
   workflowState?: Resolver<ResolversTypes['MetadataWorkflowState'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type MetadataAttributeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MetadataAttribute'] = ResolversParentTypes['MetadataAttribute']> = ResolversObject<{
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -241,11 +335,16 @@ export type MetadataWorkflowStateResolvers<ContextType = any, ParentType extends
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   addMetadata?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationAddMetadataArgs, 'metadata'>>;
+  login?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'password' | 'username'>>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  collection?: Resolver<Maybe<ResolversTypes['Collection']>, ParentType, ContextType, RequireFields<QueryCollectionArgs, 'id'>>;
   metadata?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<QueryMetadataArgs, 'id'>>;
+  source?: Resolver<Maybe<ResolversTypes['Source']>, ParentType, ContextType, RequireFields<QuerySourceArgs, 'id'>>;
   sources?: Resolver<Array<ResolversTypes['Source']>, ParentType, ContextType>;
+  trait?: Resolver<Maybe<ResolversTypes['Trait']>, ParentType, ContextType, RequireFields<QueryTraitArgs, 'id'>>;
+  traits?: Resolver<Array<ResolversTypes['Trait']>, ParentType, ContextType>;
 }>;
 
 export type SignedUrlResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignedUrl'] = ResolversParentTypes['SignedUrl']> = ResolversObject<{
@@ -268,15 +367,25 @@ export type SourceResolvers<ContextType = any, ParentType extends ResolversParen
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type TraitResolvers<ContextType = any, ParentType extends ResolversParentTypes['Trait'] = ResolversParentTypes['Trait']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  workflowIds?: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = any> = ResolversObject<{
+  Attribute?: AttributeResolvers<ContextType>;
+  Collection?: CollectionResolvers<ContextType>;
+  CollectionItem?: CollectionItemResolvers<ContextType>;
   Date?: GraphQLScalarType;
   Metadata?: MetadataResolvers<ContextType>;
-  MetadataAttribute?: MetadataAttributeResolvers<ContextType>;
   MetadataWorkflowState?: MetadataWorkflowStateResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SignedUrl?: SignedUrlResolvers<ContextType>;
   SignedUrlHeader?: SignedUrlHeaderResolvers<ContextType>;
   Source?: SourceResolvers<ContextType>;
+  Trait?: TraitResolvers<ContextType>;
 }>;
 

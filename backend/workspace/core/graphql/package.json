@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@graphql-tools/load-files": "^7.0.0",
+    "@ory/kratos-client-fetch": "^1.2.1",
     "fastify": "^4.28.1",
     "graphql": "^16.9.0",
     "graphql-yoga": "^5.6.1"

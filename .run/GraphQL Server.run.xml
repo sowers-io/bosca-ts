@@ -8,6 +8,7 @@
     <node-interpreter value="project" />
     <envs>
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:7000" />
+      <env name="KRATOS_BASE_PATH" value="http://localhost:4433" />
     </envs>
     <method v="2" />
   </configuration>

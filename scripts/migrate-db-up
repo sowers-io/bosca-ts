@@ -3,4 +3,3 @@
 set -e
 
 ./scripts/migrate-db content up
-./scripts/migrate-db workflow up

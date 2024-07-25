@@ -6,7 +6,9 @@ import { HttpSessionInterceptor, HttpSubjectFinder, newAuthenticationInterceptor
 async function main() {
   const grpcServer = fastify({
     http2: true,
-    logger: true,
+    logger: {
+      level: 'debug',
+    },
   })
   const sessionInterceptor = new HttpSessionInterceptor()
   const subjectFinder = new HttpSubjectFinder(

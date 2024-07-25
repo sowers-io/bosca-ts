@@ -1,0 +1,34 @@
+input CollectionInput {
+    name: String!
+    contentType: String!
+    contentLength: Int
+    languageTag: String!
+}
+
+enum CollectionType {
+    root
+    standard
+    folder
+}
+
+extend type Query {
+
+    collection(id: ID!): Collection
+}
+
+type Collection {
+    id: ID!
+    name: String!
+
+    type: CollectionType!
+
+    traitIds: [String!]!
+    categoryIds: [String!]!
+    labels: [String!]!
+    attributes: [Attribute!]!
+
+    created: Date!
+    modified: Date!
+
+    items: [CollectionItem]
+}

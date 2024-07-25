@@ -5,7 +5,7 @@ import { AddMetadataRequest, ContentService, IdRequest, Metadata } from '@bosca/
 import { execute, getHeaders } from '../../util/requests'
 
 function transformMetadata(metadata: Metadata): GMetadata {
-  const m = metadata.toJson() as GMetadata
+  const m = metadata.toJson() as unknown as GMetadata
   if (metadata.attributes) {
     m.attributes = []
     for (const key in metadata.attributes) {
@@ -37,13 +37,13 @@ export const resolvers: Resolvers<RequestContext> = {
   },
   Metadata: {
     uploadUrl: async (parent, args, context) => {
-      return (await execute(async () => {
+      return await execute<GSignedUrl>(async () => {
         const service = useClient(ContentService)
         const url = await service.getMetadataUploadUrl(new IdRequest({ id: parent.id }), {
           headers: getHeaders(context),
         })
-        return url.toJson() as GSignedUrl
-      }))!
+        return url.toJson() as unknown as GSignedUrl
+      })
     },
     downloadUrl: async (parent, args, context) => {
       return (await execute(async () => {
@@ -51,7 +51,7 @@ export const resolvers: Resolvers<RequestContext> = {
         const url = await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
           headers: getHeaders(context),
         })
-        return url.toJson() as GSignedUrl
+        return url.toJson() as unknown as GSignedUrl
       }))!
     },
   },
@@ -61,7 +61,10 @@ export const resolvers: Resolvers<RequestContext> = {
         const service = useClient(ContentService)
         const response = await service.addMetadata(
           new AddMetadataRequest({
-            metadata: Metadata.fromJson(args.metadata),
+            metadata: {
+              name: args.metadata.name,
+// todo
+            },
           })
         )
         const metadata = await service.getMetadata(new IdRequest({ id: response.id }), {

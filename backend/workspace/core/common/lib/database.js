@@ -21,6 +21,38 @@ class DataSource {
             client.release();
         }
     }
+    async queryAndMap(factory, sql, values = [], mapper = undefined) {
+        const client = await this.pool.connect();
+        try {
+            const records = await client.query(sql, values);
+            return records.rows.map((r) => {
+                const instance = factory();
+                if (mapper) {
+                    mapper(r);
+                }
+                return instance.fromJson(r, { ignoreUnknownFields: true });
+            });
+        }
+        finally {
+            client.release();
+        }
+    }
+    async queryAndMapFirst(factory, sql, values = [], mapper = undefined) {
+        const client = await this.pool.connect();
+        try {
+            const records = await client.query(sql, values);
+            if (records && records.rows && records.rows.length > 0) {
+                if (mapper) {
+                    mapper(records.rows[0]);
+                }
+                return factory().fromJson(records.rows[0], { ignoreUnknownFields: true });
+            }
+            return null;
+        }
+        finally {
+            client.release();
+        }
+    }
 }
 exports.DataSource = DataSource;
 //# sourceMappingURL=database.js.map

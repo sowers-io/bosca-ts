@@ -12,13 +12,13 @@ export function getHeaders(context: RequestContext): Record<string, string> {
   return headers
 }
 
-export async function execute<T>(fn: () => Promise<T>): Promise<T | null> {
+export async function execute<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn()
   } catch (e: any) {
     if (e instanceof ConnectError) {
       if (e.code == Code.NotFound) {
-        return null
+        return null as T
       }
     }
     throw new GraphQLError(e.message, {

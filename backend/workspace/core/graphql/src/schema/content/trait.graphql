@@ -1,0 +1,10 @@
+type Trait {
+    id: ID!
+    name: String!
+    workflowIds: [ID!]!
+}
+
+extend type Query {
+    traits: [Trait!]!
+    trait(id: ID!): Trait
+}

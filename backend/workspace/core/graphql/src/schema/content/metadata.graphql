@@ -5,19 +5,19 @@ input MetadataInput {
     languageTag: String!
 }
 
-type MetadataAttribute {
-    name: String!
-    value: String!
-}
-
 type MetadataWorkflowState {
     id: String!
     pendingId: String
     deleteWorkflowId: String
 }
 
+extend type Query {
+
+    metadata(id: ID!): Metadata
+}
+
 type Metadata {
-    parentId: String
+    parentId: ID
 
     id: ID!
     name: String!
@@ -27,7 +27,7 @@ type Metadata {
     languageTag: String!
 
     labels: [String!]!
-    attributes: [MetadataAttribute!]!
+    attributes: [Attribute!]!
 
     sourceId: String
     sourceIdentifier: String

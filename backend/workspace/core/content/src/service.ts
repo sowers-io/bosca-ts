@@ -16,10 +16,11 @@ import {
   SetWorkflowStateCompleteRequest,
   SetWorkflowStateRequest,
   SignedUrl,
-  SupplementaryIdRequest,
+  Sources,
+  SupplementaryIdRequest, Traits
 } from '@bosca/protobufs'
 import { Code, ConnectError, type ConnectRouter } from '@connectrpc/connect'
-import { ContentDataSource } from './datasource'
+import { ContentDataSource } from './datasources/content'
 import {
   createPool,
   DataSource,
@@ -30,6 +31,7 @@ import {
 } from '@bosca/common'
 import { MinioObjectStore } from './objectstores/minio'
 import { ObjectStore } from './objectstores/objectstore'
+import { WorkflowDataSource } from './datasources/workflow'
 
 const RootCollectionId = '00000000-0000-0000-0000-000000000000'
 
@@ -40,20 +42,30 @@ export default (router: ConnectRouter) => {
     process.env.BOSCA_PERMISSIONS_ENDPOINT!,
     process.env.BOSCA_PERMISSIONS_SHARED_TOKEN!
   )
-  const dataSource = new ContentDataSource(pool)
+  const workflowDataSource = new WorkflowDataSource(pool)
+  const dataSource = new ContentDataSource(pool, workflowDataSource)
+
+  dataSource.addRootCollection().catch((e: any) => {
+    console.error('failed to create root collection', e)
+  })
+
   const serviceAccountId = process.env.BOSCA_SERVICE_ACCOUNT_ID!
   return router.service(ContentService, {
     async getSources(request, context) {
-      throw new Error('unimplemented')
+      return new Sources({ sources: await dataSource.getSources() })
     },
     async getSource(request, context) {
-      throw new Error('unimplemented')
+      const source = await dataSource.getSource(request.id)
+      if (!source) throw new ConnectError('missing source', Code.NotFound)
+      return source
     },
     async getTraits(request, context) {
-      throw new Error('unimplemented')
+      return new Traits({ traits: await dataSource.getTraits() })
     },
     async getTrait(request, context) {
-      throw new Error('unimplemented')
+      const trait = await dataSource.getTrait(request.id)
+      if (!trait) throw new ConnectError('missing trait', Code.NotFound)
+      return trait
     },
     async getRootCollectionItems(request, context) {
       throw new Error('unimplemented')
@@ -83,7 +95,11 @@ export default (router: ConnectRouter) => {
       throw new Error('unimplemented')
     },
     async getCollection(request, context) {
-      throw new Error('unimplemented')
+      const collection = await dataSource.getCollection(request.id)
+      if (!collection) throw new ConnectError('missing collection', Code.NotFound)
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(subject, PermissionObjectType.collection_type, collection.id, PermissionAction.view)
+      return collection
     },
     async findCollection(request, context) {
       throw new Error('unimplemented')
@@ -116,7 +132,12 @@ export default (router: ConnectRouter) => {
         throw new ConnectError('missing metadata', Code.NotFound)
       }
       const subject = context.values.get(SubjectKey)
-      await permissions.checkWithError(subject, PermissionObjectType.metadata_type, metadata.id, PermissionAction.delete)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        metadata.id,
+        PermissionAction.delete
+      )
       await objectStore.delete(metadata.id)
       if (metadata.sourceIdentifier) {
         await objectStore.delete(metadata.sourceIdentifier)

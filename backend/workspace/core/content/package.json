@@ -15,7 +15,8 @@
     "@connectrpc/connect-node": "^1.4.0",
     "bullmq": "^5.10.3",
     "fastify": "^4.28.1",
-    "minio": "^8.0.1"
+    "minio": "^8.0.1",
+    "yaml": "^2.5.0"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.4",

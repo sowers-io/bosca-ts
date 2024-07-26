@@ -491,3 +491,46 @@ export class WorkflowActivityIdRequest extends Message<WorkflowActivityIdRequest
   }
 }
 
+/**
+ * @generated from message bosca.workflow.WorkflowActivityIdIntRequest
+ */
+export class WorkflowActivityIdIntRequest extends Message<WorkflowActivityIdIntRequest> {
+  /**
+   * @generated from field: string workflow_id = 1;
+   */
+  workflowId = "";
+
+  /**
+   * @generated from field: int64 workflow_activity_id = 2;
+   */
+  workflowActivityId = protoInt64.zero;
+
+  constructor(data?: PartialMessage<WorkflowActivityIdIntRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.workflow.WorkflowActivityIdIntRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "workflow_activity_id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowActivityIdIntRequest {
+    return new WorkflowActivityIdIntRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowActivityIdIntRequest {
+    return new WorkflowActivityIdIntRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowActivityIdIntRequest {
+    return new WorkflowActivityIdIntRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkflowActivityIdIntRequest | PlainMessage<WorkflowActivityIdIntRequest> | undefined, b: WorkflowActivityIdIntRequest | PlainMessage<WorkflowActivityIdIntRequest> | undefined): boolean {
+    return proto3.util.equals(WorkflowActivityIdIntRequest, a, b);
+  }
+}
+

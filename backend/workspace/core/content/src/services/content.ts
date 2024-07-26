@@ -1,4 +1,5 @@
 import {
+  BeginTransitionWorkflowRequest,
   Collections,
   ContentService,
   Empty,
@@ -16,14 +17,16 @@ import {
   PermissionSubjectType,
   Sources,
   Traits,
+  WorkflowService,
 } from '@bosca/protobufs'
 import { Code, ConnectError, type ConnectRouter } from '@connectrpc/connect'
 import { PermissionManager, SubjectKey, SubjectType, useServiceAccountClient } from '@bosca/common'
 import { ContentDataSource, RootCollectionId } from '../datasources/content'
 import { ObjectStore } from '../objectstores/objectstore'
 import { addCollection, getCollectionItems, setCollectionReady } from './util/collections'
-import { addMetadata, setMetadataReady } from './util/metadata'
+import { addMetadata, setMetadataReady, setWorkflowStateComplete } from './util/metadata'
 import { toValidIds } from './util/permissions'
+import { StateProcessing } from './util/workflows'
 
 export function content(
   router: ConnectRouter,
@@ -247,7 +250,27 @@ export function content(
       return new IdResponses({ id: ids })
     },
     async addMetadataTrait(request, context) {
-      throw new Error('unimplemented')
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        request.metadataId,
+        PermissionAction.manage
+      )
+      const metadata = await dataSource.getMetadata(request.metadataId)
+      if (!metadata) {
+        throw new ConnectError('missing metadata', Code.NotFound)
+      }
+      await dataSource.addMetadataTrait(request.metadataId, request.traitId)
+      metadata.traitIds.push(request.traitId)
+      await useServiceAccountClient(WorkflowService).beginTransitionWorkflow(
+        new BeginTransitionWorkflowRequest({
+          metadataId: request.metadataId,
+          status: 'adding trait: ' + request.traitId,
+          stateId: StateProcessing,
+        })
+      )
+      return metadata
     },
     async addMetadata(request, context) {
       if (!request.metadata) throw new ConnectError('missing metadata', Code.InvalidArgument)
@@ -261,17 +284,12 @@ export function content(
       return new IdResponse({ id: id.id })
     },
     async deleteMetadata(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(subject, PermissionObjectType.metadata_type, request.id, PermissionAction.delete)
       const metadata = await dataSource.getMetadata(request.id)
       if (!metadata) {
         throw new ConnectError('missing metadata', Code.NotFound)
       }
-      const subject = context.values.get(SubjectKey)
-      await permissions.checkWithError(
-        subject,
-        PermissionObjectType.metadata_type,
-        metadata.id,
-        PermissionAction.delete
-      )
       await objectStore.delete(metadata)
       if (metadata.sourceIdentifier) {
         await objectStore.delete(metadata.sourceIdentifier.split('+')[0])
@@ -311,7 +329,7 @@ export function content(
       if (!metadata) {
         throw new ConnectError('missing metadata', Code.NotFound)
       }
-      return objectStore.createUploadUrl(metadata)
+      return await objectStore.createUploadUrl(metadata)
     },
     async getMetadataDownloadUrl(request, context) {
       const subject = context.values.get(SubjectKey)
@@ -320,7 +338,7 @@ export function content(
       if (!metadata) {
         throw new ConnectError('missing metadata', Code.NotFound)
       }
-      return objectStore.createDownloadUrl(metadata)
+      return await objectStore.createDownloadUrl(metadata)
     },
     async addMetadataSupplementary(request, context) {
       const subject = context.values.get(SubjectKey)
@@ -424,7 +442,7 @@ export function content(
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
-        throw new ConnectError('not found', Code.NotFound)
+        throw new ConnectError('missing metadata', Code.NotFound)
       }
       return supplementary
     },
@@ -434,6 +452,8 @@ export function content(
       return new Empty()
     },
     async getMetadataPermissions(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(subject, PermissionObjectType.metadata_type, request.id, PermissionAction.manage)
       return await permissions.getPermissions(PermissionObjectType.metadata_type, request.id)
     },
     async addMetadataPermissions(request, context) {
@@ -488,23 +508,7 @@ export function content(
         request.metadataId,
         PermissionAction.service
       )
-      const metadata = await dataSource.getMetadata(request.metadataId)
-      if (!metadata) {
-        throw new ConnectError('missing metadata', Code.NotFound)
-      }
-      let state = metadata.workflowStateId
-      if (metadata.workflowStatePendingId) {
-        state = metadata.workflowStatePendingId
-      }
-      await dataSource.setWorkflowState(
-        subject,
-        metadata.id,
-        metadata.workflowStateId,
-        state,
-        request.status,
-        true,
-        true
-      )
+      await setWorkflowStateComplete(subject, dataSource, request.metadataId, request.status)
     },
     async addMetadataRelationship(request, context) {
       const subject = context.values.get(SubjectKey)

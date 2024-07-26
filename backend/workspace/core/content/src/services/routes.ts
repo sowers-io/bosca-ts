@@ -5,6 +5,7 @@ import { MinioObjectStore } from '../objectstores/minio'
 import { ObjectStore } from '../objectstores/objectstore'
 import { WorkflowDataSource } from '../datasources/workflow'
 import { content } from './content'
+import { workflow } from './workflow'
 
 export default (router: ConnectRouter) => {
   const pool = createPool()
@@ -23,6 +24,7 @@ export default (router: ConnectRouter) => {
   const serviceAccountId = process.env.BOSCA_SERVICE_ACCOUNT_ID!
 
   router = content(router, serviceAccountId, permissions, dataSource, objectStore)
+  router = workflow(router, permissions, workflowDataSource, dataSource)
 
   return router
 }

@@ -104,15 +104,15 @@ service WorkflowService {
     };
   }
 
-  rpc GetWorkflowActivityStorageSystems(WorkflowActivityIdRequest) returns (WorkflowActivityStorageSystems) {
+  rpc GetWorkflowActivityStorageSystems(WorkflowActivityIdIntRequest) returns (WorkflowActivityStorageSystems) {
     option (google.api.http) = {
-      get: "/v1/workflow/workflows/{workflow_id}/activities/{activity_id}/storagesystems"
+      get: "/v1/workflow/workflows/{workflow_id}/activities/{workflow_activity_id}/storagesystems"
     };
   }
 
-  rpc GetWorkflowActivityPrompts(WorkflowActivityIdRequest) returns (WorkflowActivityPrompts) {
+  rpc GetWorkflowActivityPrompts(WorkflowActivityIdIntRequest) returns (WorkflowActivityPrompts) {
     option (google.api.http) = {
-      get: "/v1/workflow/workflows/{workflow_id}/activities/{activity_id}/prompts"
+      get: "/v1/workflow/workflows/{workflow_id}/activities/{workflow_activity_id}/prompts"
     };
   }
 

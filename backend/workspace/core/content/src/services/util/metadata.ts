@@ -86,3 +86,20 @@ export async function setMetadataReady(
     })
   )
 }
+
+export async function setWorkflowStateComplete(
+  subject: Subject,
+  dataSource: ContentDataSource,
+  metadataId: string,
+  status: string
+) {
+  const metadata = await dataSource.getMetadata(metadataId)
+  if (!metadata) {
+    throw new ConnectError('missing metadata', Code.NotFound)
+  }
+  let state = metadata.workflowStateId
+  if (metadata.workflowStatePendingId) {
+    state = metadata.workflowStatePendingId
+  }
+  await dataSource.setWorkflowState(subject, metadata.id, metadata.workflowStateId, state, status, true, true)
+}

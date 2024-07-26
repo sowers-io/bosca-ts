@@ -87,9 +87,9 @@ export class Prompt extends Message<Prompt> {
  */
 export class Prompts extends Message<Prompts> {
   /**
-   * @generated from field: bosca.workflow.Prompt prompts = 1;
+   * @generated from field: repeated bosca.workflow.Prompt prompts = 1;
    */
-  prompts?: Prompt;
+  prompts: Prompt[] = [];
 
   constructor(data?: PartialMessage<Prompts>) {
     super();
@@ -99,7 +99,7 @@ export class Prompts extends Message<Prompts> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "bosca.workflow.Prompts";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "prompts", kind: "message", T: Prompt },
+    { no: 1, name: "prompts", kind: "message", T: Prompt, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Prompts {

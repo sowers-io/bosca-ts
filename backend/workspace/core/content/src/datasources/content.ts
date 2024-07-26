@@ -197,7 +197,7 @@ export class ContentDataSource extends DataSource {
     )
     const metadataId = record.rows[0].id
     for (const traitId of metadata.traitIds) {
-      await this.query('insert into metadata_traits (metadata_id, trait_id) values ($1, $2)', [metadataId, traitId])
+      await this.addMetadataTrait(metadataId, traitId)
     }
     for (const categoryId of metadata.categoryIds) {
       await this.query('insert into metadata_categories (metadata_id, category_id) values ($1, $2)', [
@@ -206,6 +206,10 @@ export class ContentDataSource extends DataSource {
       ])
     }
     return metadataId
+  }
+
+  async addMetadataTrait(metadataId: string, traitId: string): Promise<void> {
+    await this.query('insert into metadata_traits (metadata_id, trait_id) values ($1, $2)', [metadataId, traitId])
   }
 
   async findMetadata(attributes: { [key: string]: string }): Promise<Metadata[]> {

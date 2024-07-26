@@ -12,6 +12,24 @@ class DataSource {
     constructor(pool) {
         this.pool = pool;
     }
+    async transaction(txn) {
+        const client = await this.pool.connect();
+        try {
+            await client.query('BEGIN');
+            try {
+                const result = await txn(client);
+                await client.query('COMMIT');
+                return result;
+            }
+            catch (e) {
+                await client.query('ROLLBACK');
+                throw e;
+            }
+        }
+        finally {
+            client.release();
+        }
+    }
     async query(sql, values = []) {
         const client = await this.pool.connect();
         try {

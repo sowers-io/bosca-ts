@@ -1,7 +1,7 @@
 import { fastify } from 'fastify'
 import { fastifyConnectPlugin } from '@connectrpc/connect-fastify'
-import routes from './service'
 import { HttpSessionInterceptor, HttpSubjectFinder, newAuthenticationInterceptor } from '@bosca/common'
+import routes from './services/routes'
 
 async function main() {
   const grpcServer = fastify({

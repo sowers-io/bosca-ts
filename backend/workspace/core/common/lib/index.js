@@ -19,7 +19,6 @@ __exportStar(require("./service_client"), exports);
 __exportStar(require("./database"), exports);
 __exportStar(require("./permissions/permissions"), exports);
 __exportStar(require("./permissions/spicedb"), exports);
-__exportStar(require("./permissions/metadata"), exports);
 __exportStar(require("./authentication/interceptor"), exports);
 __exportStar(require("./authentication/subject_finder"), exports);
 __exportStar(require("./authentication/http_subject_finder"), exports);

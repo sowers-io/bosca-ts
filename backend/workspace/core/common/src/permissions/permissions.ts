@@ -47,5 +47,5 @@ export interface PermissionManager {
 
   createRelationship(objectType: PermissionObjectType, permission: Permission): Promise<void>
 
-  getPermissions(bjectType: PermissionObjectType, resourceId: string): Promise<Permissions>
+  getPermissions(objectType: PermissionObjectType, resourceId: string): Promise<Permissions>
 }

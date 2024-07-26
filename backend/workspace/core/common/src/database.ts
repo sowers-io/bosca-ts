@@ -1,4 +1,4 @@
-import { Pool, QueryResult } from 'pg'
+import { Pool, PoolClient, QueryResult } from 'pg'
 import { Message } from '@bufbuild/protobuf'
 
 export function createPool(connectionString?: string): Pool {
@@ -12,6 +12,23 @@ export class DataSource {
 
   constructor(pool: Pool) {
     this.pool = pool
+  }
+
+  async transaction<T>(txn: (client: PoolClient) => Promise<T>): Promise<T> {
+    const client = await this.pool.connect()
+    try {
+      await client.query('BEGIN')
+      try {
+        const result = await txn(client)
+        await client.query('COMMIT')
+        return result
+      } catch (e) {
+        await client.query('ROLLBACK')
+        throw e
+      }
+    } finally {
+      client.release()
+    }
   }
 
   async query(sql: string, values: any[] = []): Promise<QueryResult> {

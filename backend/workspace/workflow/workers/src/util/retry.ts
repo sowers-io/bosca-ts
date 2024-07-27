@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-export class Retry {
+import { logger } from '@bosca/common'
 
+let retries = 0
+
+export class Retry {
   static get retries(): number {
-    if (!global.retries) {
-      global.retries = 0
+    if (!retries) {
+      retries = 0
     }
-    return global.retries
+    return retries
   }
 
   private readonly retries: number
@@ -44,12 +47,12 @@ export class Retry {
         return await fn()
       } catch (error) {
         if (tries >= this.retries - 1) {
-          console.error('failed to execute function, no more retries', error)
+          logger.error({ error }, 'failed to execute function, no more retries')
           throw error
         }
-        global.retries++
+        retries++
         this.currentBackoff = Math.min(this.currentBackoff + this.backoff, this.maxBackoff)
-        console.error('failed to execute function, retrying... backoff: ' + this.currentBackoff + 'ms', error)
+        logger.error({ error }, 'failed to execute function, retrying... backoff: ' + this.currentBackoff + 'ms')
         await new Promise((resolve) => setTimeout(resolve, retrier.currentBackoff))
       }
     }

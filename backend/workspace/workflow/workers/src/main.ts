@@ -25,13 +25,15 @@ import { CreateVerseMarkdownTable } from './activities/bible/book/verse_table'
 import { CreateVerses } from './activities/bible/book/verse_create'
 import { PromptActivity } from './activities/ai/prompt'
 import { ChildWorkflow } from './activities/metadata/child_workflow'
-import { ConnectionOptions, QueueEvents, Worker } from 'bullmq'
+import { ConnectionOptions, QueueEvents, WaitingChildrenError, Worker } from 'bullmq'
 import { WorkflowJob } from '@bosca/protobufs'
 import { CreatePendingEmbeddingsFromMarkdownTable } from './activities/ai/create_pending_embeddings_markdown'
 import { CreateTextEmbeddings } from './activities/ai/create_text_embeddings'
 import { CreatePendingEmbeddingsIndex } from './activities/ai/create_pending_embeddings_index'
 import { IndexText } from './activities/metadata/text'
 import { initializeUploadLimiter } from './util/uploader'
+import { logger } from '@bosca/common/lib/logger'
+import { Job } from 'bullmq/dist/esm/classes/job'
 
 const downloader = new DefaultDownloader()
 
@@ -57,6 +59,27 @@ function getAvailableActivities(): { [id: string]: Activity } {
   return activitiesById
 }
 
+async function runJob(job: Job, definition: WorkflowJob, activities: { [id: string]: Activity }): Promise<any> {
+  if (!definition.activity) return
+  const activity = activities[definition.activity.activityId]
+  if (!activity) {
+    throw new Error('activity not found: ' + definition.activity.activityId)
+  }
+  const executor = activity.newJobExecutor(job, definition)
+  try {
+    const result = await executor.execute()
+    logger.info({ jobId: job.id, jobName: job.name }, 'finished job')
+    return result
+  } catch (e) {
+    if (e instanceof WaitingChildrenError) {
+      logger.info({ jobId: job.id, jobName: job.name }, 'job waiting on children')
+    } else {
+      logger.error({ jobId: job.id, jobName: job.name, error: e }, 'error running job')
+    }
+    throw e
+  }
+}
+
 async function main() {
   const configuration = getConfiguration()
   const activities = getAvailableActivities()
@@ -73,40 +96,43 @@ async function main() {
     const worker = new Worker(
       queueConfigurationId,
       async (job) => {
-        console.log('new job', job.id, job.name)
-        const definition = WorkflowJob.fromJson(job.data)
-        if (!definition.activity) return
-        const activity = activities[definition.activity.activityId]
-        if (!activity) {
-          throw new Error('activity not found: ' + definition.activity.activityId)
+        logger.info({ jobId: job.id, jobName: job.name }, 'running job')
+        switch (job.data.type) {
+          case 'job':
+            const definition = WorkflowJob.fromJson(job.data.job)
+            return await runJob(job, definition, activities)
+          case 'workflow':
+            break
         }
-        const executor = activity.newJobExecutor(job, definition)
-        return await executor.execute()
       },
       {
         connection: connection,
         concurrency: queueConfiguration.maxConcurrency,
-        stalledInterval: 600000,
-        lockDuration: 600000,
-        maxStalledCount: 10,
+        stalledInterval: 60000,
+        lockDuration: 60000,
+        maxStalledCount: 50,
       }
     )
     worker.on('completed', (job) => {
-      console.log(`${job.id} has completed!`)
+      logger.info({ jobId: job.id }, 'job completed')
     })
     worker.on('failed', (job, err) => {
-      console.log(`${job.id} has failed with ${err.message}`)
+      logger.error({ jobId: job?.id, error: err }, 'job failed')
     })
 
     const events = new QueueEvents(queueConfigurationId, { connection })
     events.on('added', async (job) => {
-      console.log('job added', job.jobId, job.name)
+      logger.info({ jobId: job.jobId, jobName: job.name }, 'job added')
     })
-    events.on('error', async (err) => {
-      console.log('job error', err)
+    events.on('error', async (error) => {
+      if (error instanceof WaitingChildrenError) {
+        logger.info('job waiting on children')
+      } else {
+        logger.error({ error }, 'job error')
+      }
     })
   }
-  console.log('running...')
+  logger.info('running...')
 }
 
 main().catch((e) => {

@@ -1,9 +1,9 @@
 import { Pool, PoolClient, QueryResult } from 'pg'
 import { Message } from '@bufbuild/protobuf'
 
-export function createPool(connectionString?: string): Pool {
+export function createPool(connectionString: string): Pool {
   return new Pool({
-    connectionString: connectionString || process.env.BOSCA_CONTENT_CONNECTION_STRING,
+    connectionString: connectionString,
   })
 }
 

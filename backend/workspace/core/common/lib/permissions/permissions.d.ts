@@ -15,6 +15,7 @@ export interface PermissionManager {
     checkWithSubjectIdError(subjectType: PermissionSubjectType, subjectId: string, objectType: PermissionObjectType, resourceId: string, action: PermissionAction): Promise<void>;
     createRelationships(objectType: PermissionObjectType, permissions: Permission[]): Promise<void>;
     createRelationship(objectType: PermissionObjectType, permission: Permission): Promise<void>;
+    waitForPermissions(objectType: PermissionObjectType, permissions: Permission[]): Promise<void>;
     getPermissions(objectType: PermissionObjectType, resourceId: string): Promise<Permissions>;
 }
 //# sourceMappingURL=permissions.d.ts.map

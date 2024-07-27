@@ -19,7 +19,7 @@ import { USXProcessor } from '@bosca/bible'
 import { Downloader } from '../../util/downloader'
 import { Job } from 'bullmq/dist/esm/classes/job'
 import { ContentService, FindMetadataRequest, IdRequest, WorkflowJob } from '@bosca/protobufs'
-import { useServiceClient } from '../../util/util'
+import { useServiceAccountClient } from '@bosca/common'
 
 export class DeleteBibleActivity extends Activity {
   readonly downloader: Downloader
@@ -46,7 +46,7 @@ class Executor extends ActivityJobExecutor<DeleteBibleActivity> {
       const processor = new USXProcessor()
       await processor.process(file)
       const metadata = processor.metadata!
-      const contentService = useServiceClient(ContentService)
+      const contentService = useServiceAccountClient(ContentService)
       const metadatas = await contentService.findMetadata(new FindMetadataRequest({
         attributes: {
           'bible.system.id': metadata.identification.systemId.id

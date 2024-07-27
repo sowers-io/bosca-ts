@@ -16,6 +16,9 @@
 
 import { SignedUrl } from '@bosca/protobufs'
 import * as http from 'node:http'
+import { logger } from '@bosca/common'
+
+let executing = 0
 
 export function toArrayBuffer(value: string): ArrayBuffer {
   const enc = new TextEncoder()
@@ -28,22 +31,22 @@ export async function execute(signedUrl: SignedUrl, body?: ArrayBuffer | null): 
     headers[header.name] = header.value
   }
   const url = signedUrl.url
-  if (!global.executing) {
-    global.executing = 0
+  if (!executing) {
+    executing = 0
   }
-  global.executing++
+  executing++
   try {
-    console.log('executing request (', global.executing, '): ', url)
+    logger.info({ url, executing }, 'executing request')
     const buffer = await new Promise<Buffer>((resolve, reject) => {
       const options = {
         method: signedUrl.method,
         headers: headers,
       }
       const request = http.request(signedUrl.url, options, function (res) {
-        if (res.statusCode < 200 || res.statusCode >= 300) {
+        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
           return reject(new Error('Request Failed: ' + res.statusCode))
         }
-        const body = []
+        const body: any = []
         res.on('data', function (chunk) {
           body.push(chunk)
         })
@@ -66,17 +69,17 @@ export async function execute(signedUrl: SignedUrl, body?: ArrayBuffer | null): 
 
       setTimeout(() => {
         if (!request.destroyed) {
-          console.error('request timeout (', global.executing, '): ', url)
+          logger.error({ url, executing }, 'request timeout')
           request.destroy(new Error('timeout'))
         }
-      }, 6000)
+      }, 15000)
     })
-    global.executing--
-    console.log('request complete (', global.executing, '): ', url)
+    executing--
+    logger.info({ url, executing }, 'request complete')
     return buffer
   } catch (e) {
-    global.executing--
-    console.log('request failed (', global.executing, '): ', url, e)
+    executing--
+    logger.error({ url, executing, error: e }, 'request failed')
     throw e
   }
 }

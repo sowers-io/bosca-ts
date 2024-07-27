@@ -15,9 +15,9 @@
  */
 
 import { Activity, ActivityJobExecutor } from '../activity'
-import { useServiceClient } from '../../util/util'
 import { Job } from 'bullmq/dist/esm/classes/job'
 import { ContentService, SetWorkflowStateCompleteRequest, SetWorkflowStateRequest, WorkflowJob } from '@bosca/protobufs'
+import { useServiceAccountClient } from '@bosca/common'
 
 export class TransitionToActivity extends Activity {
   get id(): string {
@@ -31,7 +31,7 @@ export class TransitionToActivity extends Activity {
 
 class Executor extends ActivityJobExecutor<TransitionToActivity> {
   async execute() {
-    const contentService = useServiceClient(ContentService)
+    const contentService = useServiceAccountClient(ContentService)
     const state = this.definition.activity?.configuration['state']
     const status = this.definition.activity?.configuration['status']
     await contentService.setWorkflowStateComplete(

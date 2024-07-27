@@ -76,6 +76,6 @@ var Command = &cobra.Command{
 }
 
 func init() {
-	Command.Flags().String(flags.EndpointFlag, "localhost:5013", "The endpoint to use.")
+	Command.Flags().String(flags.EndpointFlag, "localhost:7000", "The endpoint to use.")
 	Command.Flags().String(flags.ArgsFlag, "", "The args")
 }

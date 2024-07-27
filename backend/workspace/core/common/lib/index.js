@@ -22,6 +22,8 @@ __exportStar(require("./permissions/spicedb"), exports);
 __exportStar(require("./authentication/interceptor"), exports);
 __exportStar(require("./authentication/subject_finder"), exports);
 __exportStar(require("./authentication/http_subject_finder"), exports);
+__exportStar(require("./logger"), exports);
+__exportStar(require("./workflows"), exports);
 var pg_1 = require("pg");
 Object.defineProperty(exports, "Pool", { enumerable: true, get: function () { return pg_1.Pool; } });
 //# sourceMappingURL=index.js.map

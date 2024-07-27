@@ -16,9 +16,9 @@
 
 import { Activity, ActivityJobExecutor } from '../activity'
 
-import { useServiceClient } from '../../util/util'
 import { WorkflowExecutionRequest, WorkflowJob, WorkflowParentJobId, WorkflowService } from '@bosca/protobufs'
-import { Job } from 'bullmq'
+import { Job, WaitingChildrenError } from 'bullmq'
+import { useServiceAccountClient } from '@bosca/common'
 
 export class ChildWorkflow extends Activity {
   get id(): string {
@@ -33,7 +33,7 @@ export class ChildWorkflow extends Activity {
 class Executor extends ActivityJobExecutor<ChildWorkflow> {
   async execute() {
     const workflowId = this.definition.activity?.configuration['workflowId']
-    const workflowService = useServiceClient(WorkflowService)
+    const workflowService = useServiceAccountClient(WorkflowService)
 
     await workflowService.executeWorkflow(
       new WorkflowExecutionRequest({
@@ -45,5 +45,9 @@ class Executor extends ActivityJobExecutor<ChildWorkflow> {
         metadataId: this.definition.metadataId,
       })
     )
+
+    if (await this.job.moveToWaitingChildren(this.job.token!)) {
+      throw new WaitingChildrenError()
+    }
   }
 }

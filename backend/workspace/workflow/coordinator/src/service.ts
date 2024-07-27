@@ -5,7 +5,8 @@ import {
 } from "@bosca/protobufs";
 import { ConnectionOptions, FlowJob, FlowProducer, QueueEvents } from "bullmq";
 
-import type { ConnectRouter } from "@connectrpc/connect";
+import { Code, ConnectError, ConnectRouter } from '@connectrpc/connect'
+import { logger } from "@bosca/common";
 
 export default (router: ConnectRouter) => {
   const connection: ConnectionOptions = {
@@ -17,7 +18,7 @@ export default (router: ConnectRouter) => {
   return router.service(WorkflowQueueService, {
     async enqueue(request: WorkflowEnqueueRequest) {
       const workflow = request.workflow;
-      if (!workflow) throw new Error("workflow is required");
+      if (!workflow) throw new ConnectError("workflow is required", Code.InvalidArgument);
 
       if (request.waitForCompletion) {
         let events = queueEvents[workflow.queue];
@@ -35,32 +36,49 @@ export default (router: ConnectRouter) => {
       const flowJobs: FlowJob[] = [];
       const flowJob: FlowJob = {
         name: name,
+        data: {
+          type: 'workflow',
+          workflow: request.toJson(),
+        },
         queueName: workflow.queue,
         children: flowJobs,
         opts: {
           failParentOnFailure: true,
+          attempts: 10,
+          backoff: {
+            type: 'exponential',
+            delay: 1000,
+          },
         },
       };
 
       let last: FlowJob | null = null;
 
       for (let i = request.jobs.length - 1; i >= 0; i--) {
-        const job = request.jobs[i]
+        const job = request.jobs[i];
         if (!job.activity) throw new Error("activity is required");
-        const parent = last
+        const parent = last;
         last = {
           name: job.activity.activityId,
-          data: job.toJson(),
+          data: {
+            type: 'job',
+            job: job.toJson(),
+          },
           queueName: job.activity.queue,
           children: [],
           opts: {
             failParentOnFailure: true,
+            attempts: 10,
+            backoff: {
+              type: 'exponential',
+              delay: 1000,
+            },
           },
-        }
+        };
         if (parent) {
-          parent.children!.push(last)
+          parent.children!.push(last);
         } else {
-          flowJobs.push(last)
+          flowJobs.push(last);
         }
       }
 
@@ -76,6 +94,11 @@ export default (router: ConnectRouter) => {
       let success = false;
       let complete = false;
 
+      logger.info(
+        { jobId: flow.job.id, jobName: flow.job.name, flowJob },
+        "flow enqueued"
+      );
+
       if (request.waitForCompletion) {
         try {
           let events = queueEvents[workflow.queue];
@@ -87,8 +110,6 @@ export default (router: ConnectRouter) => {
           error = e.toString();
         }
       }
-
-      console.log("flow enqueued", flow.job.id, flow.job.name, flowJob);
 
       return new WorkflowEnqueueResponse({
         jobId: flow.job.id,

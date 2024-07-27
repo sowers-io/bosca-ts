@@ -15,7 +15,6 @@
  */
 
 import { Retry } from './retry'
-import { useServiceClient } from './util'
 import { uploadAll } from './uploader'
 import {
   AddCollectionRequest,
@@ -24,10 +23,11 @@ import {
   ContentService,
   IdResponses
 } from '@bosca/protobufs'
+import { useServiceAccountClient } from '@bosca/common'
 
 export async function addCollections(addCollectionRequests: AddCollectionRequest[]): Promise<IdResponses> {
   return Retry.execute(10, () =>
-    useServiceClient(ContentService).addCollections(
+    useServiceAccountClient(ContentService).addCollections(
       new AddCollectionsRequest({
         collections: addCollectionRequests,
       })
@@ -39,15 +39,14 @@ export async function addMetadatas(
   addMetadataRequests: AddMetadataRequest[],
   buffers: ArrayBuffer[] | null = null
 ): Promise<IdResponses> {
-  const responses = await Retry.execute(10, () =>
-    useServiceClient(ContentService).addMetadatas(
+  return await Retry.execute(10, async () => {
+    const responses = await useServiceAccountClient(ContentService).addMetadatas(
       new AddMetadatasRequest({
         metadatas: addMetadataRequests,
       })
     )
-  )
-  if (buffers) {
-    await uploadAll(responses, buffers)
-  }
-  return responses
+    if (buffers) {
+      await uploadAll(responses, buffers)
+    }
+  })
 }

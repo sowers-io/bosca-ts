@@ -10,6 +10,8 @@ import { PermissionError, PermissionManager, SubjectType } from './permissions'
 import { v1 } from '@authzed/authzed-node'
 import { Subject } from '../authentication/subject_finder'
 import * as grpc from '@grpc/grpc-js'
+import { logger } from '../logger'
+import { Code, ConnectError } from '@connectrpc/connect'
 
 export class SpiceDBPermissionManager implements PermissionManager {
   private readonly client: v1.ZedPromiseClientInterface
@@ -79,7 +81,14 @@ export class SpiceDBPermissionManager implements PermissionManager {
           ) {
             ids.push(resourceId[i])
           } else if (item.permissionship == v1.CheckPermissionResponse_Permissionship.NO_PERMISSION) {
-            console.log('permission check failed', resourceId[i], subjectId, this.getAction(action))
+            console.log(
+              {
+                resourceId: resourceId[i],
+                subjectId,
+                action: this.getAction(action),
+              },
+              'permission check failed'
+            )
           }
           break
         case 'error':
@@ -138,7 +147,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
         response.permissionship === v1.CheckPermissionResponse_Permissionship.NO_PERMISSION ||
         response.permissionship === v1.CheckPermissionResponse_Permissionship.UNSPECIFIED
       ) {
-        console.error('permission check failed', resourceId, subjectId, this.getAction(action))
+        logger.error({ resourceId, subjectId, action: this.getAction(action) }, 'permission check failed')
         throw new PermissionError('permission check failed')
       }
     } catch (e) {
@@ -176,6 +185,37 @@ export class SpiceDBPermissionManager implements PermissionManager {
     await this.createRelationships(objectType, [permission])
   }
 
+  async waitForPermissions(objectType: PermissionObjectType, permissions: Permission[]): Promise<void> {
+    for (const permission of permissions) {
+      let tries = 1000
+      while (tries-- > 0) {
+        const current = await this.getPermissions(objectType, permission.id)
+        if (current) {
+          let match = false
+          for (const p of current.permissions) {
+            if (
+              permission.id === p.id &&
+              permission.subjectType === p.subjectType &&
+              permission.subject === p.subject &&
+              permission.relation === p.relation
+            ) {
+              match = true
+              break
+            }
+          }
+          if (match) {
+            break
+          } else {
+            await new Promise((resolve) => setTimeout(resolve, 500))
+          }
+        }
+      }
+      if (tries <= 0) {
+        throw new ConnectError('failed to create permissions', Code.DeadlineExceeded)
+      }
+    }
+  }
+
   async getPermissions(objectType: PermissionObjectType, resourceId: string): Promise<Permissions> {
     const response = await this.client.readRelationships(
       v1.ReadRelationshipsRequest.create({
@@ -183,7 +223,6 @@ export class SpiceDBPermissionManager implements PermissionManager {
           resourceType: this.getObjectType(objectType),
           optionalResourceId: resourceId,
         },
-        optionalLimit: 0,
         consistency: v1.Consistency.create({ requirement: { oneofKind: 'fullyConsistent', fullyConsistent: true } }),
       })
     )
@@ -191,7 +230,15 @@ export class SpiceDBPermissionManager implements PermissionManager {
     const permissions = []
     for (const r of response) {
       const relationship = r.relationship
-      if (!relationship || !relationship.subject || !relationship.subject.object) continue
+      if (
+        !relationship ||
+        !relationship.resource ||
+        !relationship.resource.objectId ||
+        !relationship.subject ||
+        !relationship.subject.object
+      ) {
+        continue
+      }
       let action = PermissionRelation.viewers
       switch (relationship.relation) {
         case 'viewers':
@@ -214,7 +261,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
           break
       }
       const permission = new Permission({
-        id: relationship.subject.object.objectId,
+        id: relationship.resource.objectId,
         relation: action,
         subject: relationship.subject.object.objectId,
         subjectType: PermissionSubjectType.user,

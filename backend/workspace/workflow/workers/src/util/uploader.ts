@@ -15,7 +15,6 @@
  */
 
 import { getMetadataUploadUrl } from './service'
-import { useServiceClient } from './util'
 import { execute } from './http'
 import { Retry } from './retry'
 import { protoInt64 } from '@bufbuild/protobuf'
@@ -24,21 +23,24 @@ import {
   ContentService,
   IdRequest,
   IdResponses,
+  MetadataSupplementary,
   SupplementaryIdRequest,
 } from '@bosca/protobufs'
-import pLimit from './limiter'
+import { logger, useServiceAccountClient } from '@bosca/common'
+import { Code, ConnectError } from '@connectrpc/connect'
 
-let limiter
+let uploading = 0
 
-export function initializeUploadLimiter(concurrency: number) {
-  // limiter = pLimit(concurrency)
-}
+export function initializeUploadLimiter(concurrency: number) {}
 
 export async function uploadAll(response: IdResponses, buffers: ArrayBuffer[]) {
   for (let ix = 0; ix < response.id.length; ix++) {
     const addResponse = response.id[ix]
     if (addResponse.error) {
-      throw new Error(addResponse.error)
+      if (addResponse.error != 'name must be unique') {
+        throw new Error(addResponse.error)
+      }
+      logger.error(addResponse.error)
     }
     await upload(addResponse.id, buffers[ix])
   }
@@ -46,35 +48,39 @@ export async function uploadAll(response: IdResponses, buffers: ArrayBuffer[]) {
 
 export async function upload(id: string, buffer: ArrayBuffer) {
   return Retry.execute(10, async () => {
-    // await limiter(async () => {
-    if (!global.uploading) {
-      global.uploading = 0
-    }
-    global.uploading++
-    console.log('starting upload:', id, 'length:', buffer.byteLength, 'uploading:', global.uploading)
+    uploading++
+    logger.info({ id, uploading, length: buffer.byteLength }, 'starting upload')
     try {
       const idRequest = new IdRequest({ id: id })
       const uploadUrl = await getMetadataUploadUrl(idRequest)
-      console.log('uploading:', id, 'length:', buffer.byteLength, 'headers:', uploadUrl.headers)
+      logger.info({ id, uploading, length: buffer.byteLength, headers: uploadUrl.headers }, 'starting upload')
       await execute(uploadUrl, buffer)
-      await useServiceClient(ContentService).setMetadataReady(idRequest)
-      console.log('finished upload:', id, 'length:', buffer.byteLength, 'uploading: ', global.uploading)
+      await useServiceAccountClient(ContentService).setMetadataReady(idRequest)
+      logger.info({ id, uploading, length: buffer.byteLength }, 'finished upload')
     } catch (e) {
-      console.log('upload failed:', id, 'length:', buffer.byteLength)
+      logger.error({ id, uploading, error: e, length: buffer.byteLength }, 'upload error')
       throw e
     } finally {
-      global.uploading--
+      uploading--
     }
-    // })
   })
 }
 
 export async function getMetadataSupplementaryUploadUrl(id: SupplementaryIdRequest) {
-  return Retry.execute(10, () => useServiceClient(ContentService).getMetadataSupplementaryUploadUrl(id))
+  return Retry.execute(10, async () => {
+    try {
+      return useServiceAccountClient(ContentService).getMetadataSupplementaryUploadUrl(id)
+    } catch (e) {
+      if (e instanceof ConnectError && e.code == Code.NotFound) {
+        return null
+      }
+      throw e
+    }
+  })
 }
 
 async function setMetadataSupplementaryUploaded(id: SupplementaryIdRequest) {
-  return Retry.execute(10, () => useServiceClient(ContentService).setMetadataSupplementaryReady(id))
+  return Retry.execute(10, () => useServiceAccountClient(ContentService).setMetadataSupplementaryReady(id))
 }
 
 export async function uploadSupplementary(
@@ -87,9 +93,18 @@ export async function uploadSupplementary(
   buffer: ArrayBuffer
 ) {
   const supplementary = await Retry.execute(10, async () => {
-    const service = useServiceClient(ContentService)
+    const service = useServiceAccountClient(ContentService)
     const idRequest = new SupplementaryIdRequest({ id: metadataId, key: key })
-    const supplementary = await service.getMetadataSupplementary(idRequest)
+    let supplementary: MetadataSupplementary | undefined
+    try {
+      supplementary = await service.getMetadataSupplementary(idRequest)
+    } catch (e) {
+      if (e instanceof ConnectError && e.code == Code.NotFound) {
+        supplementary = undefined
+      } else {
+        throw e
+      }
+    }
     if (supplementary && supplementary.metadataId && supplementary.metadataId.length > 0) {
       await service.deleteMetadataSupplementary(idRequest)
     }
@@ -102,10 +117,10 @@ export async function uploadSupplementary(
       sourceId: sourceId,
       sourceIdentifier: sourceIdentifier,
     }
-    console.error(request)
+    logger.error(request)
     try {
       const result = await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
-      console.error(result)
+      logger.error(result)
       return result
     } catch (e: any) {
       if (

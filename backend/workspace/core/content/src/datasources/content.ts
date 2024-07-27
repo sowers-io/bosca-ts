@@ -1,7 +1,14 @@
 import { DataSource, Subject } from '@bosca/common'
-import { Collection, Metadata, MetadataRelationship, MetadataSupplementary, Source, Trait } from '@bosca/protobufs'
-import { WorkflowDataSource } from './workflow'
-import { Pool } from 'pg'
+import {
+  Collection,
+  CollectionType,
+  Metadata,
+  MetadataRelationship,
+  MetadataSupplementary,
+  Source,
+  Trait
+} from '@bosca/protobufs'
+import { proto3 } from '@bufbuild/protobuf'
 
 export const RootCollectionId = '00000000-0000-0000-0000-000000000000'
 
@@ -11,19 +18,16 @@ export interface IdName {
 }
 
 export class ContentDataSource extends DataSource {
-  private readonly workflows: WorkflowDataSource
-
-  constructor(pool: Pool, workflows: WorkflowDataSource) {
-    super(pool)
-    this.workflows = workflows
-  }
-
   async getSources(): Promise<Source[]> {
     return await this.queryAndMap(() => new Source(), 'select id, name, description, configuration from sources')
   }
 
   async getSource(id: string): Promise<Source | null> {
-    return await this.queryAndMapFirst(() => new Source(), 'select * from sources where id = $1::uuid', [id])
+    try {
+      const source = await this.queryAndMapFirst(() => new Source(), 'select * from sources where id = $1::uuid', [id])
+      if (source) return source
+    } catch (ignore) {}
+    return await this.queryAndMapFirst(() => new Source(), 'select * from sources where name = $1', [id])
   }
 
   async getTraits(): Promise<Trait[]> {
@@ -95,10 +99,16 @@ export class ContentDataSource extends DataSource {
       if (where.length > 0) {
         where += ' and '
       }
-      where += `attributes->>'\$${i}' = \$'${i + 1}'`
+      where += `attributes->>(\$${i}::varchar) = \$${i + 1}::varchar`
       i += 2
     }
     return where
+  }
+
+  private async mapCollection(collection: Collection) {
+    collection.traitIds = (
+      await this.query('select trait_id from collection_traits where collection_id = $1::uuid', [collection.id])
+    ).rows.map((r) => r.trait_id)
   }
 
   async findCollection(attributes: { [key: string]: string }): Promise<Collection[]> {
@@ -107,23 +117,27 @@ export class ContentDataSource extends DataSource {
       args.push(key)
       args.push(attributes[key])
     }
+    const query = 'select * from collections where ' + this.buildFindWhere(attributes)
     const collections = await this.queryAndMap(
       () => new Collection(),
-      'select * from collections where ' + this.buildFindWhere(attributes),
-      args
+      query,
+      args,
+      (r) => {
+        r.modified = r.modified.toISOString()
+        r.created = r.created.toISOString()
+      }
     )
     for (const collection of collections) {
-      collection.traitIds = (
-        await this.query('select trait_id from collection_traits where collection_id = $1::uuid', [collection.id])
-      ).rows.map((r) => r.trait_id)
+      await this.mapCollection(collection)
     }
     return collections
   }
 
   async addCollection(collection: Collection): Promise<string> {
+    const CollectionTypeEnum = proto3.getEnumType(CollectionType)
     const records = await this.query(
       'insert into collections (name, type, labels, attributes) values ($1, $2, $3, ($4)::jsonb) returning id',
-      [collection.name, collection.type, collection.labels, JSON.stringify(collection.attributes)]
+      [collection.name, CollectionTypeEnum.findNumber(collection.type)?.name, collection.labels, JSON.stringify(collection.attributes)]
     )
     const collectionId = records.rows[0].id
     for (const traitId in collection.traitIds) {
@@ -164,16 +178,13 @@ export class ContentDataSource extends DataSource {
       }
     )
     if (!collection) return null
-    collection.traitIds = (
-      await this.query('select trait_id from collection_traits where collection_id = $1::uuid', [id])
-    ).rows.map((r) => r.trait_id)
+    await this.mapCollection(collection)
     return collection
   }
 
   async addRootCollection(): Promise<boolean> {
     const root = await this.getCollection(RootCollectionId)
     if (root) return false
-    await this.workflows.initialize()
     await this.query(
       "insert into collections (id, name, type, workflow_state_id) values ($1, 'Root', 'root', 'published')",
       [RootCollectionId]
@@ -200,16 +211,20 @@ export class ContentDataSource extends DataSource {
       await this.addMetadataTrait(metadataId, traitId)
     }
     for (const categoryId of metadata.categoryIds) {
-      await this.query('insert into metadata_categories (metadata_id, category_id) values ($1, $2)', [
-        metadataId,
-        categoryId,
-      ])
+      await this.addMetadataCategory(metadataId, categoryId)
     }
     return metadataId
   }
 
   async addMetadataTrait(metadataId: string, traitId: string): Promise<void> {
     await this.query('insert into metadata_traits (metadata_id, trait_id) values ($1, $2)', [metadataId, traitId])
+  }
+
+  async addMetadataCategory(metadataId: string, categoryId: string): Promise<void> {
+    await this.query('insert into metadata_categories (metadata_id, category_id) values ($1, $2)', [
+      metadataId,
+      categoryId,
+    ])
   }
 
   async findMetadata(attributes: { [key: string]: string }): Promise<Metadata[]> {
@@ -230,7 +245,7 @@ export class ContentDataSource extends DataSource {
   }
 
   async getMetadata(id: string): Promise<Metadata | null> {
-    return await this.queryAndMapFirst(
+    const metadata = await this.queryAndMapFirst(
       () => new Metadata(),
       'select * from metadata where id = $1::uuid',
       [id],
@@ -239,6 +254,14 @@ export class ContentDataSource extends DataSource {
         r.created = r.created.toISOString()
       }
     )
+    if (!metadata) return null
+    metadata.traitIds = (
+      await this.query('select trait_id from metadata_traits where metadata_id = $1::uuid', [id])
+    ).rows.map((r) => r.trait_id)
+    metadata.categoryIds = (
+      await this.query('select category_id from metadata_categories where metadata_id = $1::uuid', [id])
+    ).rows.map((r) => r.category_id)
+    return metadata
   }
 
   async addMetadataRelationship(metadataId1: string, metadataId2: string, relationship: string): Promise<void> {

@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { useServiceClient } from './util'
 import { Retry } from './retry'
 import { Collection, ContentService, IdRequest, Metadata, SignedUrl } from '@bosca/protobufs'
+import { useServiceAccountClient } from '@bosca/common'
 
 export async function getCollection(id: IdRequest): Promise<Collection> {
-  return Retry.execute(10, () => useServiceClient(ContentService).getCollection(id))
+  return Retry.execute(10, () => useServiceAccountClient(ContentService).getCollection(id))
 }
 
 export async function getMetadata(id: IdRequest): Promise<Metadata> {
-  return Retry.execute(10, () => useServiceClient(ContentService).getMetadata(id))
+  return Retry.execute(10, () => useServiceAccountClient(ContentService).getMetadata(id))
 }
 
 export async function getMetadataUploadUrl(id: IdRequest): Promise<SignedUrl> {
-  return Retry.execute(10, () => useServiceClient(ContentService).getMetadataUploadUrl(id))
+  return Retry.execute(10, () => useServiceAccountClient(ContentService).getMetadataUploadUrl(id))
 }

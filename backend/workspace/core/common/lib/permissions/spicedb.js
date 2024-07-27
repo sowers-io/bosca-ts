@@ -28,6 +28,7 @@ const protobufs_1 = require("@bosca/protobufs");
 const permissions_1 = require("./permissions");
 const authzed_node_1 = require("@authzed/authzed-node");
 const grpc = __importStar(require("@grpc/grpc-js"));
+const logger_1 = require("../logger");
 class SpiceDBPermissionManager {
     constructor(endpoint, token) {
         const client = authzed_node_1.v1.NewClient(token, endpoint, authzed_node_1.v1.ClientSecurity.INSECURE_PLAINTEXT_CREDENTIALS, 1, grpc.ServerCredentials.createInsecure());
@@ -80,7 +81,11 @@ class SpiceDBPermissionManager {
                         ids.push(resourceId[i]);
                     }
                     else if (item.permissionship == authzed_node_1.v1.CheckPermissionResponse_Permissionship.NO_PERMISSION) {
-                        console.log('permission check failed', resourceId[i], subjectId, this.getAction(action));
+                        console.log({
+                            resourceId: resourceId[i],
+                            subjectId,
+                            action: this.getAction(action),
+                        }, 'permission check failed');
                     }
                     break;
                 case 'error':
@@ -125,7 +130,7 @@ class SpiceDBPermissionManager {
                 throw new permissions_1.PermissionError('no response');
             if (response.permissionship === authzed_node_1.v1.CheckPermissionResponse_Permissionship.NO_PERMISSION ||
                 response.permissionship === authzed_node_1.v1.CheckPermissionResponse_Permissionship.UNSPECIFIED) {
-                console.error('permission check failed', resourceId, subjectId, this.getAction(action));
+                logger_1.logger.error({ resourceId, subjectId, action: this.getAction(action) }, 'permission check failed');
                 throw new permissions_1.PermissionError('permission check failed');
             }
         }
@@ -159,20 +164,49 @@ class SpiceDBPermissionManager {
     async createRelationship(objectType, permission) {
         await this.createRelationships(objectType, [permission]);
     }
+    async waitForPermissions(objectType, permissions) {
+        for (const permission of permissions) {
+            while (true) {
+                const current = await this.getPermissions(objectType, permission.id);
+                if (current) {
+                    let match = false;
+                    for (const p of current.permissions) {
+                        if (permission.id === p.id &&
+                            permission.subjectType === p.subjectType &&
+                            permission.subject === p.subject &&
+                            permission.relation === p.relation) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        break;
+                    }
+                    else {
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+                }
+            }
+        }
+    }
     async getPermissions(objectType, resourceId) {
         const response = await this.client.readRelationships(authzed_node_1.v1.ReadRelationshipsRequest.create({
             relationshipFilter: {
                 resourceType: this.getObjectType(objectType),
                 optionalResourceId: resourceId,
             },
-            optionalLimit: 0,
             consistency: authzed_node_1.v1.Consistency.create({ requirement: { oneofKind: 'fullyConsistent', fullyConsistent: true } }),
         }));
         const permissions = [];
         for (const r of response) {
             const relationship = r.relationship;
-            if (!relationship || !relationship.subject || !relationship.subject.object)
+            if (!relationship ||
+                !relationship.resource ||
+                !relationship.resource.objectId ||
+                !relationship.subject ||
+                !relationship.subject.object) {
                 continue;
+            }
             let action = protobufs_1.PermissionRelation.viewers;
             switch (relationship.relation) {
                 case 'viewers':
@@ -195,7 +229,7 @@ class SpiceDBPermissionManager {
                     break;
             }
             const permission = new protobufs_1.Permission({
-                id: relationship.subject.object.objectId,
+                id: relationship.resource.objectId,
                 relation: action,
                 subject: relationship.subject.object.objectId,
                 subjectType: protobufs_1.PermissionSubjectType.user,

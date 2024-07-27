@@ -1,7 +1,13 @@
 import { fastify } from 'fastify'
 import { fastifyConnectPlugin } from '@connectrpc/connect-fastify'
-import { HttpSessionInterceptor, HttpSubjectFinder, newAuthenticationInterceptor } from '@bosca/common'
+import {
+  HttpSessionInterceptor,
+  HttpSubjectFinder,
+  newAuthenticationInterceptor,
+  newLoggingInterceptor,
+} from '@bosca/common'
 import routes from './services/routes'
+import { logger } from '@bosca/common'
 
 async function main() {
   const grpcServer = fastify({
@@ -10,6 +16,10 @@ async function main() {
       level: 'debug',
     },
   })
+  grpcServer.setErrorHandler((error, request, reply) => {
+    logger.error({ error, request }, 'uncaught error')
+    reply.status(500).send({ ok: false })
+  })
   const sessionInterceptor = new HttpSessionInterceptor()
   const subjectFinder = new HttpSubjectFinder(
     process.env.BOSCA_SESSION_ENDPOINT!,
@@ -17,13 +27,11 @@ async function main() {
     process.env.BOSCA_SERVICE_ACCOUNT_TOKEN!,
     sessionInterceptor
   )
-  const authenticationInterceptor = newAuthenticationInterceptor(subjectFinder)
   await grpcServer.register(fastifyConnectPlugin, {
     routes,
-    interceptors: [authenticationInterceptor],
+    interceptors: [newLoggingInterceptor(), newAuthenticationInterceptor(subjectFinder)],
   })
   await grpcServer.listen({ host: '0.0.0.0', port: 7000 })
-  console.log('server is listening at', grpcServer.addresses()[0].address + ':' + grpcServer.addresses()[0].port)
 }
 
 void main()

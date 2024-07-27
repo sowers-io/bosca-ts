@@ -2,10 +2,13 @@ import { fastify } from 'fastify'
 import { createSchema, createYoga } from 'graphql-yoga'
 import { loadFiles } from '@graphql-tools/load-files'
 import { RequestContext } from './context'
+import { logger } from '@bosca/common'
 
 async function main() {
   const server = fastify({
-    logger: true,
+    logger: {
+      level: 'debug',
+    },
   })
   const schema = createSchema<RequestContext>({
     typeDefs: await loadFiles('src/schema/**/*.graphql'),
@@ -34,7 +37,6 @@ async function main() {
     },
   })
   await server.listen({ host: '0.0.0.0', port: 9000 })
-  console.log('server is listening at', server.addresses()[0].address + ':' + server.addresses()[0].port)
 }
 
 void main()

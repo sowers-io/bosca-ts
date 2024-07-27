@@ -20,13 +20,19 @@ import {
   WorkflowService,
 } from '@bosca/protobufs'
 import { Code, ConnectError, type ConnectRouter } from '@connectrpc/connect'
-import { PermissionManager, SubjectKey, SubjectType, useServiceAccountClient } from '@bosca/common'
+import {
+  logger,
+  PermissionManager,
+  StateProcessing,
+  SubjectKey,
+  SubjectType,
+  useServiceAccountClient,
+} from '@bosca/common'
 import { ContentDataSource, RootCollectionId } from '../datasources/content'
 import { ObjectStore } from '../objectstores/objectstore'
 import { addCollection, getCollectionItems, setCollectionReady } from './util/collections'
 import { addMetadata, setMetadataReady, setWorkflowStateComplete } from './util/metadata'
 import { toValidIds } from './util/permissions'
-import { StateProcessing } from './util/workflows'
 
 export function content(
   router: ConnectRouter,
@@ -82,8 +88,9 @@ export function content(
               addRequest.collection
             )
           )
-        } catch (e: any) {
-          ids.push(new IdResponsesId({ error: e.message }))
+        } catch (error: any) {
+          logger.error({ error }, 'error adding collection')
+          ids.push(new IdResponsesId({ error: error.message }))
         }
       }
       return new IdResponses({ id: ids })
@@ -212,7 +219,7 @@ export function content(
             type: type,
           },
           request.objectType,
-          request.subject,
+          request.object,
           request.action
         )
         return new PermissionCheckResponse({ allowed: true })
@@ -243,8 +250,9 @@ export function content(
           ids.push(
             await addMetadata(dataSource, permissions, serviceAccountId, subject, collection, addRequest.metadata)
           )
-        } catch (e: any) {
-          ids.push(new IdResponsesId({ error: e.message }))
+        } catch (error: any) {
+          logger.error({ error }, 'error adding metadata')
+          ids.push(new IdResponsesId({ error: error.message }))
         }
       }
       return new IdResponses({ id: ids })
@@ -442,7 +450,7 @@ export function content(
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
-        throw new ConnectError('missing metadata', Code.NotFound)
+        throw new ConnectError('missing metadata supplementary', Code.NotFound)
       }
       return supplementary
     },

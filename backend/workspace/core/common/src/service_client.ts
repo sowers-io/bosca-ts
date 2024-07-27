@@ -40,6 +40,12 @@ function newTransport(typeName: string, serviceAuthorization: Interceptor | unde
         httpVersion: '2',
         interceptors: interceptors,
       })
+    case 'bosca.workflow.WorkflowQueueService':
+      return createGrpcTransport({
+        baseUrl: 'http://' + process.env.BOSCA_WORKFLOW_QUEUE_API_ADDRESS,
+        httpVersion: '2',
+        interceptors: interceptors,
+      })
     default:
       throw new Error('unsupported transport: ' + typeName)
   }

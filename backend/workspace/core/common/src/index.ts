@@ -5,5 +5,7 @@ export * from './permissions/spicedb'
 export * from './authentication/interceptor'
 export * from './authentication/subject_finder'
 export * from './authentication/http_subject_finder'
+export * from './logger'
+export * from './workflows'
 
 export { Pool } from 'pg'

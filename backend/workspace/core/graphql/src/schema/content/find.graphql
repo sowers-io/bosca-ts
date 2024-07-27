@@ -1,0 +1,14 @@
+input FindQuery {
+    attributes: [FindInputAttribute!]!
+}
+
+input FindInputAttribute {
+    name: String!
+    value: String
+}
+
+type Find {
+
+    collections(query: FindQuery): [Collection!]!
+    metadata(query: FindQuery): [Metadata!]!
+}

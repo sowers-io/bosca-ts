@@ -2,7 +2,6 @@ import {
   Collection,
   CollectionItem,
   CollectionItems,
-  Empty,
   IdResponse,
   IdResponsesId,
   Permission,
@@ -13,7 +12,7 @@ import {
   WorkflowExecutionRequest,
   WorkflowService,
 } from '@bosca/protobufs'
-import { PermissionManager, Subject, SubjectKey, useServiceAccountClient } from '@bosca/common'
+import { logger, PermissionManager, Subject, useServiceAccountClient } from '@bosca/common'
 import { ContentDataSource, IdName } from '../../datasources/content'
 import { Code, ConnectError } from '@connectrpc/connect'
 
@@ -42,7 +41,7 @@ export async function getCollectionItems(
   for (const id of collectionItemIds) {
     const collection = await dataSource.getCollection(id)
     if (!collection) {
-      console.error('failed to get collection', collectionId, id)
+      logger.error({ collectionId, id }, 'failed to get collection')
       continue
     }
     items.push(new CollectionItem({ Item: { case: 'collection', value: collection } }))
@@ -50,7 +49,7 @@ export async function getCollectionItems(
   for (const id of metadataItemIds) {
     const metadata = await dataSource.getMetadata(id)
     if (!metadata) {
-      console.error('failed to get metadata, ignoring, collection:', collectionId, 'metadata:', id)
+      logger.error({ collectionId, metadataId: id }, 'failed to get metadata')
       continue
     }
     items.push(new CollectionItem({ Item: { case: 'metadata', value: metadata } }))
@@ -68,7 +67,7 @@ export async function findNonUniqueId(
   if (found.length > 0) {
     return found[0].id
   }
-  found = await dataSource.getMetadataIdNames(parentId)
+  found = await dataSource.getMetadataIdName(parentId, name)
   if (found.length > 0) {
     return found[0].id
   }
@@ -93,13 +92,12 @@ export async function addCollection(
     }
   }
   const id = await dataSource.addCollection(collection)
-  await permissions.createRelationships(
-    PermissionObjectType.collection_type,
-    newCollectionPermissions(serviceAccountId, subject.id, id)
-  )
+  const newPermissions = newCollectionPermissions(serviceAccountId, subject.id, id)
+  await permissions.createRelationships(PermissionObjectType.collection_type, newPermissions)
   if (parentId && parentId.length) {
     await dataSource.addCollectionCollectionItem(parentId, id)
   }
+  await permissions.waitForPermissions(PermissionObjectType.collection_type, newPermissions)
   return new IdResponsesId({ id: id })
 }
 

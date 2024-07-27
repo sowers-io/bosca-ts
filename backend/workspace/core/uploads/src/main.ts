@@ -1,16 +1,22 @@
 import { fastify } from 'fastify'
 import { Server, FileKvStore } from '@tus/server'
 import { S3Store } from '@tus/s3-store'
-import { HttpSessionInterceptor, HttpSubjectFinder, useServiceAccountClient } from '@bosca/common'
+import { HttpSessionInterceptor, HttpSubjectFinder, logger, useServiceAccountClient } from '@bosca/common'
 import { verifyPermissions } from './authorization'
 import { ContentService, IdRequest, Metadata } from '@bosca/protobufs'
 import { protoInt64 } from '@bufbuild/protobuf'
+import { Code, ConnectError } from '@connectrpc/connect'
+import http, { ServerResponse } from 'node:http'
 
 async function main() {
   const server = fastify({
     logger: {
       level: 'debug',
     },
+  })
+  server.setErrorHandler((error, request, reply) => {
+    logger.error({ error, request }, 'uncaught error')
+    reply.status(500).send({ ok: false })
   })
 
   const sessionInterceptor = new HttpSessionInterceptor()
@@ -21,54 +27,89 @@ async function main() {
     sessionInterceptor
   )
 
+  function onError(res: ServerResponse<http.IncomingMessage>, e: any, rethrow: boolean) {
+    if (e instanceof ConnectError) {
+      switch (e.code) {
+        case Code.Unauthenticated:
+          res.statusCode = 401
+          break
+        case Code.PermissionDenied:
+          res.statusCode = 403
+          break
+        default:
+          if (rethrow) {
+            throw e
+          }
+          res.statusCode = 500
+      }
+    } else {
+      if (rethrow) {
+        throw e
+      }
+      res.statusCode = 500
+    }
+  }
+
   const tusServer = new Server({
     path: '/files',
     datastore: new S3Store({
       s3ClientConfig: {
-        bucket: process.env.BOSCA_BUCKET || 'bosca',
-        region: process.env.BOSCA_REGION || 'us-east-1',
-        endpoint: process.env.BOSCA_ENDPOINT || 'http://localhost:9000',
+        bucket: process.env.BOSCA_S3_BUCKET || 'bosca',
+        region: process.env.BOSCA_S3_REGION || 'us-east-1',
+        endpoint: process.env.BOSCA_S3_ENDPOINT || 'http://127.0.0.1:9010',
         credentials: {
-          accessKeyId: process.env.BOSCA_ACCESS_KEY_ID!,
-          secretAccessKey: process.env.BOSCA_SECRET_ACCESS_KEY!,
+          accessKeyId: process.env.BOSCA_S3_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.BOSCA_S3_SECRET_ACCESS_KEY!,
         },
       },
       cache: new FileKvStore(process.env.UPLOAD_DIR || '/tmp/uploads'),
     }),
-    onUploadCreate: async (req, res) => {
+    onUploadCreate: async (req, res, upload) => {
       try {
-        const url = new URL(req.url!)
-        let collection = url.searchParams.get('collection')
-        if (!collection) throw new Error('TODO: collection is required')
+        let collection = upload.metadata!['collection']
+        if (!collection) {
+          collection = '00000000-0000-0000-0000-000000000000'
+        }
         if (req.headers.cookie) {
           await verifyPermissions(true, req.headers.cookie, collection, subjectFinder)
         } else if (req.headers.authorization) {
           await verifyPermissions(false, req.headers.authorization, collection, subjectFinder)
         }
       } catch (e) {
-        res.statusCode = 401
+        onError(res, e, true)
       }
       return res
     },
+    onResponseError: async (req, res, error) => {
+      logger.error({ error }, 'failed to upload')
+      onError(res, error, false)
+    },
     onUploadFinish: async (req, res, upload) => {
-      const url = new URL(req.url!)
-      let collection = url.searchParams.get('collection')
-      if (!collection) throw new Error('TODO: collection is required')
-      const traits = url.searchParams.get('trait')?.split(',')
-      const metadata = new Metadata({
-        name: upload.metadata!['name']!,
-        contentType: upload.metadata!['filetype']!,
-        traitIds: traits,
-        contentLength: protoInt64.parse(upload.size!),
-        sourceId: 'TODO',
-        sourceIdentifier: upload.id,
-      })
-      const service = useServiceAccountClient(ContentService)
-      const newMetadata = await service.addMetadata({
-        collection: collection,
-        metadata: metadata,
-      })
-      await service.setMetadataReady(new IdRequest({ id: newMetadata.id }))
+      try {
+        let collection = upload.metadata!['collection']
+        if (!collection) {
+          collection = '00000000-0000-0000-0000-000000000000'
+        }
+        const service = useServiceAccountClient(ContentService)
+        const source = await service.getSource(new IdRequest({ id: 'uploader' }))
+        let traits = upload.metadata!['traits']?.split(',') || []
+        const metadata = new Metadata({
+          name: upload.metadata!['name']!,
+          contentType: upload.metadata!['filetype']!,
+          traitIds: traits,
+          contentLength: protoInt64.parse(upload.size!),
+          languageTag: upload.metadata!['language'] || 'en',
+          sourceId: source.id,
+          sourceIdentifier: upload.id,
+        })
+        const newMetadata = await service.addMetadata({
+          collection: collection,
+          metadata: metadata,
+        })
+        await service.setMetadataReady(new IdRequest({ id: newMetadata.id }))
+      } catch (e) {
+        onError(res, e, true)
+      }
       return res
     },
   })
@@ -96,7 +137,6 @@ async function main() {
   })
 
   await server.listen({ host: '0.0.0.0', port: 7001 })
-  console.log('server is listening at', server.addresses()[0].address + ':' + server.addresses()[0].port)
 }
 
 void main()

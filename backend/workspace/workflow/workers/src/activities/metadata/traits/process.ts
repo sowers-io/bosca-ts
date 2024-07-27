@@ -15,7 +15,6 @@
  */
 
 import { Activity, ActivityJobExecutor } from '../../activity'
-import { useServiceClient } from '../../../util/util'
 import { Retry } from '../../../util/retry'
 import {
   ContentService,
@@ -28,6 +27,8 @@ import {
   WorkflowService,
 } from '@bosca/protobufs'
 import { Job } from 'bullmq/dist/esm/classes/job'
+import { useServiceAccountClient } from '@bosca/common'
+import { WaitingChildrenError } from 'bullmq'
 
 export class ProcessTraitsActivity extends Activity {
   get id(): string {
@@ -42,7 +43,7 @@ export class ProcessTraitsActivity extends Activity {
 class Executor extends ActivityJobExecutor<ProcessTraitsActivity> {
   private async executeWorkflow(workflowId: string) {
     await Retry.execute(100, async () => {
-      const workflowService = useServiceClient(WorkflowService)
+      const workflowService = useServiceAccountClient(WorkflowService)
       await workflowService.executeWorkflow(
         new WorkflowExecutionRequest({
           parent: new WorkflowParentJobId({
@@ -57,8 +58,11 @@ class Executor extends ActivityJobExecutor<ProcessTraitsActivity> {
   }
 
   async execute() {
-    const contentService = useServiceClient(ContentService)
-    const metadata = await contentService.getMetadata(new IdRequest({ id: this.definition.metadataId }))
+    const contentService = useServiceAccountClient(ContentService)
+    const metadata = await Retry.execute(
+      10,
+      async () => await contentService.getMetadata(new IdRequest({ id: this.definition.metadataId }))
+    )
     if (!metadata.traitIds || metadata.traitIds.length === 0) return
 
     const traits = await contentService.getTraits(new Empty())
@@ -67,13 +71,25 @@ class Executor extends ActivityJobExecutor<ProcessTraitsActivity> {
       traitsById[trait.id] = trait
     }
 
+    if (!this.job.data.hasOwnProperty('executed')) {
+      this.job.data.executed = []
+    }
+    let executed = false
     for (const traitId of metadata.traitIds) {
       const trait = traitsById[traitId]
       if (!trait.workflowIds || trait.workflowIds.length === 0) continue
-
       for (const workflowId of trait.workflowIds) {
+        const key = traitId + '-' + workflowId
+        if (this.job.data.executed.includes(key)) continue
         await this.executeWorkflow(workflowId)
+        executed = true
+        this.job.data.executed.push(key)
+        await this.job.updateData(this.job.data)
       }
+    }
+
+    if (executed && (await this.job.moveToWaitingChildren(this.job.token!))) {
+      throw new WaitingChildrenError()
     }
   }
 }

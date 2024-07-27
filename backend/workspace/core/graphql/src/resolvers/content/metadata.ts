@@ -4,8 +4,9 @@ import { useClient } from '@bosca/common'
 import { AddMetadataRequest, ContentService, IdRequest, Metadata } from '@bosca/protobufs'
 import { execute, getHeaders } from '../../util/requests'
 
-function transformMetadata(metadata: Metadata): GMetadata {
+export function transformMetadata(metadata: Metadata): GMetadata {
   const m = metadata.toJson() as unknown as GMetadata
+  m.__typename = 'Metadata'
   if (metadata.attributes) {
     m.attributes = []
     for (const key in metadata.attributes) {

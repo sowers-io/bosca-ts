@@ -1,6 +1,6 @@
 import { Pool, PoolClient, QueryResult } from 'pg';
 import { Message } from '@bufbuild/protobuf';
-export declare function createPool(connectionString?: string): Pool;
+export declare function createPool(connectionString: string): Pool;
 export declare class DataSource {
     private readonly pool;
     constructor(pool: Pool);

@@ -15,7 +15,6 @@
  */
 
 import { Activity, ActivityJobExecutor } from '../activity'
-import { useServiceClient } from '../../util/util'
 import { execute, toArrayBuffer } from '../../util/http'
 import { Ollama } from '@langchain/community/llms/ollama'
 

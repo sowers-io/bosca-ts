@@ -12,10 +12,9 @@ import {
 } from '@bosca/protobufs'
 import { AdministratorGroup } from './permissions'
 import { ContentDataSource } from '../../datasources/content'
-import { PermissionManager, Subject, useServiceAccountClient } from '@bosca/common'
+import { PermissionManager, StateProcessing, Subject, useServiceAccountClient } from '@bosca/common'
 import { Code, ConnectError } from '@connectrpc/connect'
 import { findNonUniqueId } from './collections'
-import { StateProcessing } from './workflows'
 
 export async function addMetadata(
   dataSource: ContentDataSource,
@@ -35,13 +34,12 @@ export async function addMetadata(
     }
   }
   const id = await dataSource.addMetadata(metadata)
-  await permissions.createRelationships(
-    PermissionObjectType.metadata_type,
-    newMetadataPermissions(serviceAccountId, subject.id, id)
-  )
+  const newPermissions = newMetadataPermissions(serviceAccountId, subject.id, id)
+  await permissions.createRelationships(PermissionObjectType.metadata_type, newPermissions)
   if (parentId && parentId.length > 0) {
     await dataSource.addCollectionMetadataItem(parentId, id)
   }
+  await permissions.waitForPermissions(PermissionObjectType.metadata_type, newPermissions)
   return new IdResponsesId({ id: id })
 }
 
@@ -57,7 +55,7 @@ export function newMetadataPermissions(serviceAccountId: string, userId: string,
       id: metadataId,
       subject: serviceAccountId,
       subjectType: PermissionSubjectType.service_account,
-      relation: PermissionRelation.owners,
+      relation: PermissionRelation.serviceaccounts,
     }),
     new Permission({
       id: metadataId,

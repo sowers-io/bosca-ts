@@ -17,9 +17,9 @@
 import { Activity, ActivityJobExecutor } from '../../activity'
 import { Book, ManifestName, PublicationContent, USXProcessor } from '@bosca/bible'
 import { Downloader } from '../../../util/downloader'
-import { useServiceClient } from '../../../util/util'
 import { ContentService, IdRequest, Metadata, Source, WorkflowJob } from '@bosca/protobufs'
 import { Job } from 'bullmq/dist/esm/classes/job'
+import { useServiceAccountClient } from '@bosca/common'
 
 export abstract class BookActivity extends Activity {
   readonly downloader: Downloader
@@ -55,7 +55,7 @@ class Executor extends ActivityJobExecutor<BookActivity> {
   }
 
   async execute() {
-    const contentService = useServiceClient(ContentService)
+    const contentService = useServiceAccountClient(ContentService)
     const metadata = await contentService.getMetadata(new IdRequest({ id: this.definition.metadataId }))
     const systemId = metadata.attributes['bible.system.id']
     const file = await this.activity.downloader.download(this.definition)

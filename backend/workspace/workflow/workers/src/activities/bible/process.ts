@@ -28,11 +28,11 @@ import {
 } from '@bosca/protobufs'
 import { Activity, ActivityJobExecutor } from '../activity'
 import { Downloader } from '../../util/downloader'
-import { useServiceClient } from '../../util/util'
 import { getCollection } from '../../util/service'
 import { toArrayBuffer } from '../../util/http'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { addCollections, addMetadatas } from '../../util/adder'
+import { useServiceAccountClient } from '@bosca/common'
 
 export class ProcessBibleActivity extends Activity {
   readonly downloader: Downloader
@@ -55,7 +55,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
 
   private async createBibleCollection(metadata: BibleMetadata): Promise<Collection> {
     const version = await this.findNextVersion(metadata)
-    const service = useServiceClient(ContentService)
+    const service = useServiceAccountClient(ContentService)
     const addResponse = await service.addCollection(
       new AddCollectionRequest({
         collection: new Collection({
@@ -180,7 +180,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
 
   private async findNextVersion(metadata: BibleMetadata): Promise<number> {
     let version = 1
-    const collections = await useServiceClient(ContentService).findCollection(
+    const collections = await useServiceAccountClient(ContentService).findCollection(
       new FindCollectionRequest({
         attributes: {
           'bible.type': 'bible',
@@ -195,7 +195,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
   }
 
   async execute() {
-    const source = await useServiceClient(ContentService).getSource(new IdRequest({ id: 'workflow' }))
+    const source = await useServiceAccountClient(ContentService).getSource(new IdRequest({ id: 'workflow' }))
     const file = await this.activity.downloader.download(this.definition)
     try {
       const processor = new USXProcessor()

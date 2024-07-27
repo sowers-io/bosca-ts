@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { useServiceClient } from './util'
 import * as fs from 'node:fs'
 import path, { sep } from 'node:path'
 import { execute } from './http'
 import { promisify } from 'node:util'
 import { tmpdir } from 'node:os'
 import { ContentService, IdRequest, WorkflowJob } from '@bosca/protobufs'
+import { useServiceAccountClient } from '@bosca/common'
 
 export type FileName = string
 
@@ -39,7 +39,7 @@ export interface Downloader {
 export class DefaultDownloader implements Downloader {
 
   async download(definition: WorkflowJob): Promise<FileName> {
-    const service = useServiceClient(ContentService)
+    const service = useServiceAccountClient(ContentService)
     const temporaryDirectory = tmpdir()
     const directory = await mkdtemp(`${temporaryDirectory}${sep}`)
     const url = await service.getMetadataDownloadUrl(new IdRequest({ id: definition.metadataId }))

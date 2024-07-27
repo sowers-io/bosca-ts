@@ -1,11 +1,13 @@
-import { Resolvers, Collection as GCollection } from '../../generated/resolvers'
+import { Resolvers, Collection as GCollection, CollectionItem as GCollectionItem } from '../../generated/resolvers'
 import { RequestContext } from '../../context'
 import { useClient } from '@bosca/common'
-import { ContentService, IdRequest, Collection } from '@bosca/protobufs'
+import { ContentService, IdRequest, Collection, Collections, CollectionItem } from '@bosca/protobufs'
 import { execute, getHeaders } from '../../util/requests'
+import { transformMetadata } from './metadata'
 
-function transformCollection(collection: Collection): GCollection {
+export function transformCollection(collection: Collection): GCollection {
   const c = collection.toJson() as unknown as GCollection
+  c.__typename = 'Collection'
   if (collection.attributes) {
     c.attributes = []
     for (const key in collection.attributes) {
@@ -28,6 +30,25 @@ export const resolvers: Resolvers<RequestContext> = {
         })
         if (!collection) return null
         return transformCollection(collection)
+      })
+    },
+  },
+  Collection: {
+    items: async (parent, args, context) => {
+      return await execute<GCollectionItem[]>(async () => {
+        const service = useClient(ContentService)
+        const items = await service.getCollectionItems(new IdRequest({ id: parent.id }), {
+          headers: getHeaders(context),
+        })
+        return items.items.map((item) => {
+          if (item.Item.case === 'collection') {
+            return transformCollection(item.Item.value)
+          } else if (item.Item.case === 'metadata') {
+            return transformMetadata(item.Item.value)
+          } else {
+            throw new Error('unsupported type: ' + item.Item.case)
+          }
+        }) as GCollectionItem[]
       })
     },
   },

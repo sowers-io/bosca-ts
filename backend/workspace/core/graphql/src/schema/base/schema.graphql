@@ -12,5 +12,5 @@ type SignedUrl {
     id: String!
     url: String!
     method: String!
-    headers: [SignedUrlHeader!]!
+    headers: [SignedUrlHeader!]
 }

@@ -5,7 +5,7 @@ exports.createPool = createPool;
 const pg_1 = require("pg");
 function createPool(connectionString) {
     return new pg_1.Pool({
-        connectionString: connectionString || process.env.BOSCA_CONTENT_CONNECTION_STRING,
+        connectionString: connectionString,
     });
 }
 class DataSource {

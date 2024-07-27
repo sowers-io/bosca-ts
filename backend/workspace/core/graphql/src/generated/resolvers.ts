@@ -53,6 +53,31 @@ export enum CollectionType {
   Standard = 'standard'
 }
 
+export interface Find {
+  __typename?: 'Find';
+  collections: Array<Collection>;
+  metadata: Array<Metadata>;
+}
+
+
+export interface FindCollectionsArgs {
+  query?: InputMaybe<FindQuery>;
+}
+
+
+export interface FindMetadataArgs {
+  query?: InputMaybe<FindQuery>;
+}
+
+export interface FindInputAttribute {
+  name: Scalars['String']['input'];
+  value?: InputMaybe<Scalars['String']['input']>;
+}
+
+export interface FindQuery {
+  attributes: Array<FindInputAttribute>;
+}
+
 export interface Metadata {
   __typename?: 'Metadata';
   attributes: Array<Attribute>;
@@ -106,6 +131,7 @@ export interface MutationLoginArgs {
 export interface Query {
   __typename?: 'Query';
   collection?: Maybe<Collection>;
+  find?: Maybe<Find>;
   metadata?: Maybe<Metadata>;
   source?: Maybe<Source>;
   sources: Array<Source>;
@@ -135,7 +161,7 @@ export interface QueryTraitArgs {
 
 export interface SignedUrl {
   __typename?: 'SignedUrl';
-  headers: Array<SignedUrlHeader>;
+  headers?: Maybe<Array<SignedUrlHeader>>;
   id: Scalars['String']['output'];
   method: Scalars['String']['output'];
   url: Scalars['String']['output'];
@@ -243,6 +269,9 @@ export type ResolversTypes = ResolversObject<{
   CollectionItem: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CollectionItem']>;
   CollectionType: CollectionType;
   Date: ResolverTypeWrapper<Scalars['Date']['output']>;
+  Find: ResolverTypeWrapper<Omit<Find, 'collections'> & { collections: Array<ResolversTypes['Collection']> }>;
+  FindInputAttribute: FindInputAttribute;
+  FindQuery: FindQuery;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Metadata: ResolverTypeWrapper<Metadata>;
@@ -265,6 +294,9 @@ export type ResolversParentTypes = ResolversObject<{
   CollectionInput: CollectionInput;
   CollectionItem: ResolversUnionTypes<ResolversParentTypes>['CollectionItem'];
   Date: Scalars['Date']['output'];
+  Find: Omit<Find, 'collections'> & { collections: Array<ResolversParentTypes['Collection']> };
+  FindInputAttribute: FindInputAttribute;
+  FindQuery: FindQuery;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Metadata: Metadata;
@@ -307,6 +339,12 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Date';
 }
 
+export type FindResolvers<ContextType = any, ParentType extends ResolversParentTypes['Find'] = ResolversParentTypes['Find']> = ResolversObject<{
+  collections?: Resolver<Array<ResolversTypes['Collection']>, ParentType, ContextType, Partial<FindCollectionsArgs>>;
+  metadata?: Resolver<Array<ResolversTypes['Metadata']>, ParentType, ContextType, Partial<FindMetadataArgs>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['Metadata'] = ResolversParentTypes['Metadata']> = ResolversObject<{
   attributes?: Resolver<Array<ResolversTypes['Attribute']>, ParentType, ContextType>;
   contentLength?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -340,6 +378,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   collection?: Resolver<Maybe<ResolversTypes['Collection']>, ParentType, ContextType, RequireFields<QueryCollectionArgs, 'id'>>;
+  find?: Resolver<Maybe<ResolversTypes['Find']>, ParentType, ContextType>;
   metadata?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<QueryMetadataArgs, 'id'>>;
   source?: Resolver<Maybe<ResolversTypes['Source']>, ParentType, ContextType, RequireFields<QuerySourceArgs, 'id'>>;
   sources?: Resolver<Array<ResolversTypes['Source']>, ParentType, ContextType>;
@@ -348,7 +387,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 }>;
 
 export type SignedUrlResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignedUrl'] = ResolversParentTypes['SignedUrl']> = ResolversObject<{
-  headers?: Resolver<Array<ResolversTypes['SignedUrlHeader']>, ParentType, ContextType>;
+  headers?: Resolver<Maybe<Array<ResolversTypes['SignedUrlHeader']>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   method?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -379,6 +418,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   Collection?: CollectionResolvers<ContextType>;
   CollectionItem?: CollectionItemResolvers<ContextType>;
   Date?: GraphQLScalarType;
+  Find?: FindResolvers<ContextType>;
   Metadata?: MetadataResolvers<ContextType>;
   MetadataWorkflowState?: MetadataWorkflowStateResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;

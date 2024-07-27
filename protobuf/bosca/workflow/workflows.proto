@@ -1,0 +1,72 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+syntax = "proto3";
+
+option go_package = "bosca.io/api/protobuf/bosca/workflow";
+
+import "bosca/workflow/prompts.proto";
+import "bosca/workflow/storage_systems.proto";
+import "bosca/workflow/models.proto";
+
+package bosca.workflow;
+
+message Workflows {
+  repeated Workflow workflows = 1;
+}
+
+message Workflow {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string queue = 4;
+  map<string, string> configuration = 5;
+}
+
+message WorkflowStates {
+  repeated WorkflowState states = 1;
+}
+
+enum WorkflowStateType {
+  unknown_workflow_type = 0;
+  processing = 1;
+  draft = 2;
+  pending = 3;
+  approval = 4;
+  approved = 5;
+  published = 6;
+  failure = 7;
+}
+
+message WorkflowState {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  WorkflowStateType type = 4;
+  map<string, string> configuration = 5;
+  optional string workflow_id = 6;
+  optional string entry_workflow_id = 7;
+  optional string exit_workflow_id = 8;
+}
+
+message WorkflowStateTransitions {
+  repeated WorkflowStateTransition transitions = 1;
+}
+
+message WorkflowStateTransition {
+  string from_state_id = 1;
+  string to_state_id = 2;
+  string description = 3;
+}

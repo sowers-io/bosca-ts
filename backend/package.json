@@ -1,0 +1,13 @@
+{
+  "name": "bosca",
+  "version": "1.0.0",
+  "scripts": {
+  },
+  "workspaces": [
+    "workspace/*",
+    "workspace/**/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.14.10"
+  }
+}

@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14\x62osca/requests.proto\x12\x05\x62osca\"\x1a\n\x0cIntIdRequest\x12\n\n\x02id\x18\x01 \x01(\x03\"\x17\n\tIdRequest\x12\n\n\x02id\x18\x01 \x01(\t\"\x18\n\nIdResponse\x12\n\n\x02id\x18\x01 \x01(\t\"\x12\n\x03Url\x12\x0b\n\x03url\x18\x01 \x01(\t\"\x18\n\nIdsRequest\x12\n\n\x02id\x18\x01 \x03(\tB\x1dZ\x1b\x62osca.io/api/protobuf/boscab\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14\x62osca/requests.proto\x12\x05\x62osca\"\x1a\n\x0cIntIdRequest\x12\n\n\x02id\x18\x01 \x01(\x03\"\x17\n\tIdRequest\x12\n\n\x02id\x18\x01 \x01(\t\"\x18\n\nIdResponse\x12\n\n\x02id\x18\x01 \x01(\t\"9\n\rIdResponsesId\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\x05\x65rror\x18\x02 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_error\"/\n\x0bIdResponses\x12 \n\x02id\x18\x01 \x03(\x0b\x32\x14.bosca.IdResponsesId\"\x12\n\x03Url\x12\x0b\n\x03url\x18\x01 \x01(\t\"\x18\n\nIdsRequest\x12\n\n\x02id\x18\x01 \x03(\tB\x1dZ\x1b\x62osca.io/api/protobuf/boscab\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -28,8 +28,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_IDREQUEST']._serialized_end=82
   _globals['_IDRESPONSE']._serialized_start=84
   _globals['_IDRESPONSE']._serialized_end=108
-  _globals['_URL']._serialized_start=110
-  _globals['_URL']._serialized_end=128
-  _globals['_IDSREQUEST']._serialized_start=130
-  _globals['_IDSREQUEST']._serialized_end=154
+  _globals['_IDRESPONSESID']._serialized_start=110
+  _globals['_IDRESPONSESID']._serialized_end=167
+  _globals['_IDRESPONSES']._serialized_start=169
+  _globals['_IDRESPONSES']._serialized_end=216
+  _globals['_URL']._serialized_start=218
+  _globals['_URL']._serialized_end=236
+  _globals['_IDSREQUEST']._serialized_start=238
+  _globals['_IDSREQUEST']._serialized_end=262
 # @@protoc_insertion_point(module_scope)

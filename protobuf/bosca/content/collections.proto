@@ -19,6 +19,7 @@ option go_package = "bosca.io/api/protobuf/bosca/content";
 
 import "bosca/content/metadata.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 package bosca.content;
 
@@ -33,18 +34,37 @@ message AddCollectionRequest {
   Collection collection = 2;
 }
 
+message AddCollectionsRequest {
+  repeated AddCollectionRequest collections = 1;
+}
+
+message AddCollectionItemRequest {
+  string collection_id = 1;
+  oneof item_id {
+    string child_collection_id = 2;
+    string child_metadata_id = 3;
+  }
+}
+
 message Collection {
   string id = 2;
   string name = 3;
 
   CollectionType type = 5;
 
+  repeated string trait_ids = 11;
   repeated string category_ids = 12;
-  repeated string tags = 13;
+  repeated string labels = 13;
   map<string, string> attributes = 14;
 
   google.protobuf.Timestamp created = 20;
   google.protobuf.Timestamp modified = 21;
+
+  google.protobuf.Struct metadata = 33;
+}
+
+message Collections {
+  repeated Collection collections = 1;
 }
 
 message CollectionItems {
@@ -56,4 +76,8 @@ message CollectionItem {
     Metadata metadata = 1;
     Collection collection = 3;
   }
+}
+
+message FindCollectionRequest {
+  map<string, string> attributes = 1;
 }

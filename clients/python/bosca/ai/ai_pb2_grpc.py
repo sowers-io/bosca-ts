@@ -39,9 +39,14 @@ class AIServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Query = channel.unary_unary(
-                '/bosca.ai.AIService/Query',
-                request_serializer=bosca_dot_ai_dot_ai__pb2.QueryRequest.SerializeToString,
+        self.QueryStorage = channel.unary_unary(
+                '/bosca.ai.AIService/QueryStorage',
+                request_serializer=bosca_dot_ai_dot_ai__pb2.QueryStorageRequest.SerializeToString,
+                response_deserializer=bosca_dot_ai_dot_ai__pb2.QueryResponse.FromString,
+                _registered_method=True)
+        self.QueryPrompt = channel.unary_unary(
+                '/bosca.ai.AIService/QueryPrompt',
+                request_serializer=bosca_dot_ai_dot_ai__pb2.QueryPromptRequest.SerializeToString,
                 response_deserializer=bosca_dot_ai_dot_ai__pb2.QueryResponse.FromString,
                 _registered_method=True)
 
@@ -49,7 +54,13 @@ class AIServiceStub(object):
 class AIServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def Query(self, request, context):
+    def QueryStorage(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def QueryPrompt(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -58,9 +69,14 @@ class AIServiceServicer(object):
 
 def add_AIServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Query': grpc.unary_unary_rpc_method_handler(
-                    servicer.Query,
-                    request_deserializer=bosca_dot_ai_dot_ai__pb2.QueryRequest.FromString,
+            'QueryStorage': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryStorage,
+                    request_deserializer=bosca_dot_ai_dot_ai__pb2.QueryStorageRequest.FromString,
+                    response_serializer=bosca_dot_ai_dot_ai__pb2.QueryResponse.SerializeToString,
+            ),
+            'QueryPrompt': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryPrompt,
+                    request_deserializer=bosca_dot_ai_dot_ai__pb2.QueryPromptRequest.FromString,
                     response_serializer=bosca_dot_ai_dot_ai__pb2.QueryResponse.SerializeToString,
             ),
     }
@@ -75,7 +91,7 @@ class AIService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def Query(request,
+    def QueryStorage(request,
             target,
             options=(),
             channel_credentials=None,
@@ -88,8 +104,35 @@ class AIService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/bosca.ai.AIService/Query',
-            bosca_dot_ai_dot_ai__pb2.QueryRequest.SerializeToString,
+            '/bosca.ai.AIService/QueryStorage',
+            bosca_dot_ai_dot_ai__pb2.QueryStorageRequest.SerializeToString,
+            bosca_dot_ai_dot_ai__pb2.QueryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def QueryPrompt(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bosca.ai.AIService/QueryPrompt',
+            bosca_dot_ai_dot_ai__pb2.QueryPromptRequest.SerializeToString,
             bosca_dot_ai_dot_ai__pb2.QueryResponse.FromString,
             options,
             channel_credentials,

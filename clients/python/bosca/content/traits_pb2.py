@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1a\x62osca/content/traits.proto\x12\rbosca.content\".\n\x06Traits\x12$\n\x06traits\x18\x01 \x03(\x0b\x32\x14.bosca.content.Trait\"R\n\x05Trait\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x1a\n\x12trait_workflow_ids\x18\x04 \x03(\t\"J\n!TraitWorkflowStorageSystemRequest\x12\x10\n\x08trait_id\x18\x01 \x01(\t\x12\x13\n\x0bworkflow_id\x18\x02 \x01(\tB%Z#bosca.io/api/protobuf/bosca/contentb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1a\x62osca/content/traits.proto\x12\rbosca.content\".\n\x06Traits\x12$\n\x06traits\x18\x01 \x03(\x0b\x32\x14.bosca.content.Trait\"L\n\x05Trait\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x14\n\x0cworkflow_ids\x18\x04 \x03(\t\"?\n\x16TraitWorkflowIdRequest\x12\x10\n\x08trait_id\x18\x01 \x01(\t\x12\x13\n\x0bworkflow_id\x18\x02 \x01(\t\"\\\n\x1eTraitWorkflowActivityIdRequest\x12\x10\n\x08trait_id\x18\x01 \x01(\t\x12\x13\n\x0bworkflow_id\x18\x02 \x01(\t\x12\x13\n\x0b\x61\x63tivity_id\x18\x03 \x01(\tB%Z#bosca.io/api/protobuf/bosca/contentb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -25,7 +25,9 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_TRAITS']._serialized_start=45
   _globals['_TRAITS']._serialized_end=91
   _globals['_TRAIT']._serialized_start=93
-  _globals['_TRAIT']._serialized_end=175
-  _globals['_TRAITWORKFLOWSTORAGESYSTEMREQUEST']._serialized_start=177
-  _globals['_TRAITWORKFLOWSTORAGESYSTEMREQUEST']._serialized_end=251
+  _globals['_TRAIT']._serialized_end=169
+  _globals['_TRAITWORKFLOWIDREQUEST']._serialized_start=171
+  _globals['_TRAITWORKFLOWIDREQUEST']._serialized_end=234
+  _globals['_TRAITWORKFLOWACTIVITYIDREQUEST']._serialized_start=236
+  _globals['_TRAITWORKFLOWACTIVITYIDREQUEST']._serialized_end=328
 # @@protoc_insertion_point(module_scope)

@@ -1,0 +1,38 @@
+{
+  "name": "@bosca/graphql",
+  "version": "0.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "ts-node src/main.ts",
+    "build": "tsc --build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "generate": "graphql-codegen"
+  },
+  "dependencies": {
+    "@graphql-tools/load-files": "^7.0.0",
+    "@ory/kratos-client-fetch": "^1.2.1",
+    "fastify": "^4.28.1",
+    "graphql": "^16.9.0",
+    "graphql-yoga": "^5.6.1"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/typescript-resolvers": "^4.2.1",
+    "@tsconfig/node18": "^18.2.4",
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-deprecation": "^1.2.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.5.1",
+    "prettier": "^2.8.8",
+    "ts-node": "^10.2.1",
+    "typescript": "^5.5.3"
+  }
+}

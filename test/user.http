@@ -51,6 +51,10 @@ mutation {
         }
     }
 }
+###
+GET http://localhost:5003/v1/content/collections
+Authorization: Token sat
+Accept: application/json
 
 ###
 POST http://localhost:5003/v1/content/collections
@@ -131,3 +135,8 @@ Content-Type: application/json
 {
   "id": "a90e0f1b-de62-4a71-ab05-5fd95f1b55a8"
 }
+
+###
+GET http://localhost:5003/v1/content/find/metadata?attributes=bible.usfm&attributes=EXO
+Authorization: Bearer {{session_token}}
+Accept: application/json

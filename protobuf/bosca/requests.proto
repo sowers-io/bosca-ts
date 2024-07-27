@@ -27,8 +27,26 @@ message IdRequest {
   string id = 1;
 }
 
+message SupplementaryIdRequest {
+  string id = 1;
+  string key = 2;
+}
+
 message IdResponse {
   string id = 1;
+}
+
+message IdsResponse {
+  repeated string ids = 1;
+}
+
+message IdResponsesId {
+  string id = 1;
+  optional string error = 2;
+}
+
+message IdResponses {
+  repeated IdResponsesId id = 1;
 }
 
 message Url {

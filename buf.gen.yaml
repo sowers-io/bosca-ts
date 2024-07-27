@@ -1,0 +1,23 @@
+version: v2
+plugins:
+  - local: protoc-gen-es
+    out: backend/workspace/core/protobufs/src
+    opt:
+      - target=ts
+      - import_extension=none
+  - local: protoc-gen-connect-es
+    out: backend/workspace/core/protobufs/src
+    opt:
+      - target=ts
+      - import_extension=none
+  - local: protoc-gen-go
+    out: cli/api/protobuf
+    opt: paths=source_relative
+  - local: protoc-gen-go-grpc
+    out: cli/api/protobuf
+    opt: paths=source_relative
+#  - local: protoc-gen-grpc-gateway
+#    out: backend.core/api/protobuf
+#    opt:
+#      - paths=source_relative
+#      - repeated_path_param_separator=ssv

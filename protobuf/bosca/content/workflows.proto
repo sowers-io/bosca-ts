@@ -17,74 +17,16 @@ syntax = "proto3";
 
 option go_package = "bosca.io/api/protobuf/bosca/content";
 
-import "bosca/content/metadata.proto";
-
 package bosca.content;
 
-message Workflows {
-  repeated Workflow workflows = 1;
-}
-
-message Workflow {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  string queue = 4;
-  map<string, string> configuration = 5;
-}
-
-message WorkflowStates {
-  repeated WorkflowState states = 1;
-}
-
-enum WorkflowStateType {
-  unknown_workflow_type = 0;
-  processing = 1;
-  draft = 2;
-  pending = 3;
-  approval = 4;
-  approved = 5;
-  published = 6;
-  failure = 7;
-}
-
-message WorkflowState {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  WorkflowStateType type = 4;
-  map<string, string> configuration = 5;
-  optional string workflow_id = 6;
-  optional string entry_workflow_id = 7;
-  optional string exit_workflow_id = 8;
-}
-
-message WorkflowStateTransitions {
-  repeated WorkflowStateTransition transitions = 1;
-}
-
-message WorkflowStateTransition {
-  string from_state_id = 1;
-  string to_state_id = 2;
-  string description = 3;
-}
-
-message TransitionWorkflowRequest {
+message SetWorkflowStateRequest {
   string metadata_id = 1;
   string state_id = 2;
   string status = 3;
-  bool retry = 4;
+  bool immediate = 4;
 }
 
-message CompleteTransitionWorkflowRequest {
+message SetWorkflowStateCompleteRequest {
   string metadata_id = 1;
   string status = 2;
-  bool success = 3;
-}
-
-message TraitWorkflow {
-  string trait_id = 1;
-  string workflow_id = 2;
-  string queue = 3;
-  Metadata metadata = 4;
 }

@@ -53,6 +53,23 @@ services:
       timeout: 10s
       retries: 3
 
+  dragonfly:
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    ulimits:
+      memlock: -1
+    environment:
+      DFLY_cluster_mode: emulated
+      DFLY_lock_on_hashtags: true
+      DFLY_default_lua_flags: allow-undeclared-keys
+    ports:
+      - "6379:6379"
+    # For better performance, consider `host` mode instead `port` to avoid docker NAT.
+    # `host` mode is NOT currently supported in Swarm Mode.
+    # https://docs.docker.com/compose/compose-file/compose-file-v3/#network_mode
+    # network_mode: "host"
+    volumes:
+      - dragonflydata:/data
+
   postgres:
     image: postgres:16-alpine
     restart: always
@@ -156,7 +173,7 @@ services:
         condition: service_completed_successfully
 
   spicedb:
-    image: authzed/spicedb:v1.33.0
+    image: authzed/spicedb:v1.34.0
     command: "serve"
     restart: "always"
     ports:
@@ -194,7 +211,7 @@ services:
       - net1
 
   spicedb-migrate:
-    image: authzed/spicedb:v1.33.0
+    image: authzed/spicedb:v1.34.0
     command: "migrate head"
     restart: "on-failure"
     environment:
@@ -268,117 +285,6 @@ services:
     networks:
       - net1
 
-#  spark:
-#    image: docker.io/bitnami/spark:3.5
-#    environment:
-#      - SPARK_MODE=master
-#      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-#      - SPARK_RPC_ENCRYPTION_ENABLED=no
-#      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-#      - SPARK_SSL_ENABLED=no
-#      - SPARK_USER=spark
-#    ports:
-#      - '9080:8080'
-#      - '7077:7077'
-#    networks:
-#      - net1
-
-#  spark-worker:
-#    image: docker.io/bitnami/spark:3.5
-#    environment:
-#      - SPARK_MODE=worker
-#      - SPARK_MASTER_URL=spark://spark:7077
-#      - SPARK_WORKER_MEMORY=1G
-#      - SPARK_WORKER_CORES=1
-#      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-#      - SPARK_RPC_ENCRYPTION_ENABLED=no
-#      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-#      - SPARK_SSL_ENABLED=no
-#      - SPARK_USER=spark
-#    ports:
-#      - '9081:8081'
-#    networks:
-#      - net1
-
-  temporal-admin-tools:
-    container_name: temporal-admin-tools
-    restart: always
-    depends_on:
-      - temporal
-    environment:
-      - TEMPORAL_ADDRESS=temporal:7233
-      - TEMPORAL_CLI_ADDRESS=temporal:7233
-    image: temporalio/admin-tools:1.23.1
-    networks:
-      - net1
-    stdin_open: true
-    tty: true
-
-  temporal-ui:
-    container_name: temporal-ui
-    restart: always
-    depends_on:
-      - temporal
-    environment:
-      - TEMPORAL_ADDRESS=temporal:7233
-      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
-    image: temporalio/ui:2.26.2
-    networks:
-      - net1
-    ports:
-      - 8085:8080
-
-  temporal:
-    image: temporalio/auto-setup:1.23.1
-    restart: always
-    environment:
-      - DB=postgres
-      - DB_PORT=5432
-      - POSTGRES_USER=bosca
-      - POSTGRES_PWD=bosca
-      - POSTGRES_SEEDS=postgres
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
-    networks:
-      - net1
-    ports:
-      - 7233:7233
-    volumes:
-      - ./temporal:/etc/temporal/config/dynamicconfig
-    healthcheck:
-      test: ['CMD-SHELL', 'tctl --address temporal:7233 workflow list']
-      interval: 1s
-      timeout: 5s
-      start_period: 2s
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-#  mlflow:
-#    restart: always
-#    platform: linux/amd64
-#    image: ghcr.io/mlflow/mlflow:v2.0.1
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
-#    ports:
-#      - "5001:5000"
-#    networks:
-#      - net1
-#    environment:
-#      - AWS_ACCESS_KEY_ID=67fO5gFs6BuksBrh6rMp
-#      - AWS_SECRET_ACCESS_KEY=eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
-#      - MLFLOW_S3_ENDPOINT_URL=http://minio-nginx:9010
-#      - MLFLOW_S3_IGNORE_TLS=true
-#    command:
-#      - bash
-#      - -c
-#      - "python3 -m pip install pip --upgrade && \ python3 -m pip install psycopg2-binary && \ mlflow server --backend.core-store-uri postgresql://bosca:bosca@postgres:5432/mlflow --host 0.0.0.0 --serve-artifacts --artifacts-destination s3://mlflow"
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:5000/" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-
 #  ollama:
 #    image: ollama/ollama:latest
 #    ports:
@@ -442,3 +348,4 @@ volumes:
   minio-data4-2:
   qdrant:
   meilisearch:
+  dragonflydata:

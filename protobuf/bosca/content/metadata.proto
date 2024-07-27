@@ -18,6 +18,7 @@ syntax = "proto3";
 option go_package = "bosca.io/api/protobuf/bosca/content";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 package bosca.content;
 
@@ -28,14 +29,15 @@ message Metadata {
   string name = 3;
   string content_type = 4;
 
-  optional string source = 5;
+  optional string source_id = 5;
+  optional string source_identifier = 6;
 
-  string language_tag = 6;
-  int64 content_length = 7;
+  string language_tag = 7;
+  optional int64 content_length = 8;
 
   repeated string trait_ids = 11;
   repeated string category_ids = 12;
-  repeated string tags = 13;
+  repeated string labels = 13;
   map<string, string> attributes = 14;
 
   google.protobuf.Timestamp created = 20;
@@ -43,21 +45,53 @@ message Metadata {
 
   string workflow_state_id = 31;
   optional string workflow_state_pending_id = 32;
+  optional string delete_workflow_id = 33;
+
+  google.protobuf.Struct metadata = 34;
+}
+
+message MetadataSupplementaries {
+  repeated MetadataSupplementary supplementaries = 1;
+}
+
+message MetadataSupplementary {
+  string metadata_id = 1;
+  string key = 2;
+  string name = 3;
+  string content_type = 4;
+  int64 content_length = 5;
+  repeated string trait_ids = 6;
+  optional string source_id = 7;
+  optional string source_identifier = 8;
 }
 
 message AddMetadataRequest {
-  string collection = 1;
+  optional string collection = 1;
   Metadata metadata = 2;
+}
+
+message AddMetadatasRequest {
+  repeated AddMetadataRequest metadatas = 1;
 }
 
 message Metadatas {
   repeated Metadata metadata = 1;
 }
 
-message AddMetadataRelationshipRequest {
+message MetadataRelationshipIdRequest {
+  string id = 1;
+  string relationship = 2;
+}
+
+message MetadataRelationship {
   string metadata_id1 = 1;
   string metadata_id2 = 2;
   string relationship = 3;
+  map<string, string> attributes = 4;
+}
+
+message MetadataRelationships {
+  repeated MetadataRelationship relationships = 1;
 }
 
 message AddMetadataTraitRequest {
@@ -66,14 +100,17 @@ message AddMetadataTraitRequest {
 }
 
 message AddSupplementaryRequest {
-  string id = 1;
-  string type = 2;
-  string name = 3;
-  string content_type = 4;
-  int64 content_length = 5;
+  reserved 1;
+  string metadata_id = 2;
+  string key = 3;
+  string name = 4;
+  string content_type = 5;
+  int64 content_length = 6;
+  repeated string trait_ids = 7;
+  optional string source_id = 8;
+  optional string source_identifier = 9;
 }
 
-message SupplementaryIdRequest {
-  string id = 1;
-  string type = 2;
+message FindMetadataRequest {
+  map<string, string> attributes = 1;
 }

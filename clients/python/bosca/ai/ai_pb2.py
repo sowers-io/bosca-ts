@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x62osca/ai/ai.proto\x12\x08\x62osca.ai\x1a\x1cgoogle/api/annotations.proto\"5\n\x0cQueryRequest\x12\x16\n\x0estorage_system\x18\x01 \x01(\t\x12\r\n\x05query\x18\x02 \x01(\t\"!\n\rQueryResponse\x12\x10\n\x08response\x18\x01 \x01(\t2^\n\tAIService\x12Q\n\x05Query\x12\x16.bosca.ai.QueryRequest\x1a\x17.bosca.ai.QueryResponse\"\x17\x82\xd3\xe4\x93\x02\x11\"\x0c/v1/ai/query:\x01*B\x1eZ\x1c\x62osca.io/api/protobuf/searchb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x62osca/ai/ai.proto\x12\x08\x62osca.ai\x1a\x1cgoogle/api/annotations.proto\"<\n\x13QueryStorageRequest\x12\x16\n\x0estorage_system\x18\x01 \x01(\t\x12\r\n\x05query\x18\x02 \x01(\t\"\xab\x01\n\x12QueryPromptRequest\x12\x11\n\tprompt_id\x18\x01 \x01(\t\x12\x10\n\x08model_id\x18\x02 \x01(\t\x12>\n\targuments\x18\x03 \x03(\x0b\x32+.bosca.ai.QueryPromptRequest.ArgumentsEntry\x1a\x30\n\x0e\x41rgumentsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"!\n\rQueryResponse\x12\x10\n\x08response\x18\x01 \x01(\t2\xcc\x01\n\tAIService\x12_\n\x0cQueryStorage\x12\x1d.bosca.ai.QueryStorageRequest\x1a\x17.bosca.ai.QueryResponse\"\x17\x82\xd3\xe4\x93\x02\x11\"\x0c/v1/ai/query:\x01*\x12^\n\x0bQueryPrompt\x12\x1c.bosca.ai.QueryPromptRequest\x1a\x17.bosca.ai.QueryResponse\"\x18\x82\xd3\xe4\x93\x02\x12\"\r/v1/ai/prompt:\x01*B\x1eZ\x1c\x62osca.io/api/protobuf/searchb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,12 +23,20 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'bosca.ai.ai_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z\034bosca.io/api/protobuf/search'
-  _globals['_AISERVICE'].methods_by_name['Query']._loaded_options = None
-  _globals['_AISERVICE'].methods_by_name['Query']._serialized_options = b'\202\323\344\223\002\021\"\014/v1/ai/query:\001*'
-  _globals['_QUERYREQUEST']._serialized_start=61
-  _globals['_QUERYREQUEST']._serialized_end=114
-  _globals['_QUERYRESPONSE']._serialized_start=116
-  _globals['_QUERYRESPONSE']._serialized_end=149
-  _globals['_AISERVICE']._serialized_start=151
-  _globals['_AISERVICE']._serialized_end=245
+  _globals['_QUERYPROMPTREQUEST_ARGUMENTSENTRY']._loaded_options = None
+  _globals['_QUERYPROMPTREQUEST_ARGUMENTSENTRY']._serialized_options = b'8\001'
+  _globals['_AISERVICE'].methods_by_name['QueryStorage']._loaded_options = None
+  _globals['_AISERVICE'].methods_by_name['QueryStorage']._serialized_options = b'\202\323\344\223\002\021\"\014/v1/ai/query:\001*'
+  _globals['_AISERVICE'].methods_by_name['QueryPrompt']._loaded_options = None
+  _globals['_AISERVICE'].methods_by_name['QueryPrompt']._serialized_options = b'\202\323\344\223\002\022\"\r/v1/ai/prompt:\001*'
+  _globals['_QUERYSTORAGEREQUEST']._serialized_start=61
+  _globals['_QUERYSTORAGEREQUEST']._serialized_end=121
+  _globals['_QUERYPROMPTREQUEST']._serialized_start=124
+  _globals['_QUERYPROMPTREQUEST']._serialized_end=295
+  _globals['_QUERYPROMPTREQUEST_ARGUMENTSENTRY']._serialized_start=247
+  _globals['_QUERYPROMPTREQUEST_ARGUMENTSENTRY']._serialized_end=295
+  _globals['_QUERYRESPONSE']._serialized_start=297
+  _globals['_QUERYRESPONSE']._serialized_end=330
+  _globals['_AISERVICE']._serialized_start=333
+  _globals['_AISERVICE']._serialized_end=537
 # @@protoc_insertion_point(module_scope)

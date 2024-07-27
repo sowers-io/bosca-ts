@@ -1,0 +1,81 @@
+/*
+ * Copyright 2024 Sowers, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+syntax = "proto3";
+
+option go_package = "bosca.io/api/protobuf/bosca/workflow";
+
+import "bosca/workflow/activities.proto";
+import "bosca/workflow/workflows.proto";
+
+package bosca.workflow;
+
+message WorkflowParentJobId {
+  string id = 1;
+  string queue = 2;
+}
+
+message WorkflowExecutionRequest {
+  optional WorkflowParentJobId parent = 1;
+  string workflow_id = 2;
+  optional string metadata_id = 3;
+  optional string collection_id = 4;
+  bool wait_for_completion = 5;
+  map<string, string> context = 6;
+}
+
+message FindAndWorkflowExecutionRequest {
+  optional WorkflowParentJobId parent = 1;
+  string workflow_id = 2;
+  optional string metadata_id = 3;
+  optional string collection_id = 4;
+  bool wait_for_completion = 5;
+  map<string, string> context = 6;
+  map<string, string> metadata_attributes = 7;
+  map<string, string> collection_attributes = 8;
+}
+
+message WorkflowEnqueueRequest {
+  optional WorkflowParentJobId parent = 1;
+  Workflow workflow = 2;
+  repeated WorkflowJob jobs = 3;
+  optional string metadata_id = 4;
+  optional string collection_id = 5;
+  map<string, string> context = 6;
+  bool wait_for_completion = 7;
+}
+
+message WorkflowEnqueueResponses {
+  repeated WorkflowEnqueueResponse responses = 1;
+}
+
+message WorkflowEnqueueResponse {
+  string job_id = 1;
+  bool success = 2;
+  bool complete = 3;
+  optional string error = 4;
+  map<string, string> context = 5;
+}
+
+message WorkflowJob {
+  string workflow_id = 1;
+  optional string collection_id = 2;
+  optional string metadata_id = 3;
+  WorkflowActivity activity = 6;
+  repeated WorkflowActivityPrompt prompts = 7;
+  repeated WorkflowActivityStorageSystem storage_systems = 8;
+  repeated WorkflowActivityModel models = 9;
+  map<string, string> context = 10;
+}

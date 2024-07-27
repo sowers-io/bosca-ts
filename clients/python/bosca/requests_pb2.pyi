@@ -1,7 +1,7 @@
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Optional as _Optional
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -22,6 +22,20 @@ class IdResponse(_message.Message):
     ID_FIELD_NUMBER: _ClassVar[int]
     id: str
     def __init__(self, id: _Optional[str] = ...) -> None: ...
+
+class IdResponsesId(_message.Message):
+    __slots__ = ("id", "error")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    error: str
+    def __init__(self, id: _Optional[str] = ..., error: _Optional[str] = ...) -> None: ...
+
+class IdResponses(_message.Message):
+    __slots__ = ("id",)
+    ID_FIELD_NUMBER: _ClassVar[int]
+    id: _containers.RepeatedCompositeFieldContainer[IdResponsesId]
+    def __init__(self, id: _Optional[_Iterable[_Union[IdResponsesId, _Mapping]]] = ...) -> None: ...
 
 class Url(_message.Message):
     __slots__ = ("url",)

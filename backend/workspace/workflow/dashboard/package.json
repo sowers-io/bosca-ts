@@ -1,13 +1,10 @@
 {
   "name": "@bosca/workflow-dashboard",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node src/main.ts"
   },
-  "author": "felixmosh",
-  "license": "ISC",
   "dependencies": {
     "@bull-board/fastify": "^5.8.3",
     "@bull-board/api": "^5.8.3",

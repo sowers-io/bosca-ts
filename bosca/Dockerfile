@@ -5,6 +5,7 @@ WORKDIR /build
 COPY . .
 
 RUN npm install
+RUN rm .env.dev
 RUN npm run build
 
 FROM node:20 AS release

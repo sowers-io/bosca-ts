@@ -1,4 +1,4 @@
-name: GO
+name: Publish
 
 on:
   push:
@@ -9,30 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:14-alpine
-        env:
-          POSTGRES_PASSWORD: bosca
-          POSTGRES_USER: bosca
-          POSTGRES_DB: boscatest
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       IMAGE_TAG: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: 'backend.core/go.mod'
-      - name: Test
-        run: ./scripts/test
       - name: Build
         run: ./scripts/build publish

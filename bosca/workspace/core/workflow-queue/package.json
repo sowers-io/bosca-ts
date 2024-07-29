@@ -1,0 +1,35 @@
+{
+  "name": "@bosca/workflow-queue",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --build",
+    "build.watch": "tsc --build --watch",
+    "lint": "eslint .",
+    "dev": "cross-env BOSCA_REDIS_HOST=localhost BOSCA_REDIS_PORT=6379 ts-node --require ./src/instrumentation.ts src/main.ts"
+  },
+  "dependencies": {
+    "@bosca/protobufs": "workspace:*",
+    "@bosca/common": "workspace:*",
+    "@connectrpc/connect-fastify": "^1.4.0",
+    "@connectrpc/connect-node": "^1.4.0",
+    "bullmq": "^5.10.3",
+    "fastify": "^4.28.1"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.4",
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-deprecation": "^1.2.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.5.1",
+    "prettier": "^2.8.8",
+    "ts-node": "^10.2.1",
+    "typescript": "^5.5.3"
+  }
+}

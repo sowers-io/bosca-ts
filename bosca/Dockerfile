@@ -7,6 +7,7 @@ RUN corepack enable
 
 FROM base AS build
 COPY . /usr/src/app
+RUN mv /usr/src/app/.npmrc-docker /usr/src/app/.npmrc
 WORKDIR /usr/src/app
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cd bosca
+
+docker build . --target content --tag ghcr.io/sowers-io/bosca/migration/content:dev
+docker build . --target graphql --tag ghcr.io/sowers-io/bosca/migration/graphql:dev
+docker build . --target uploads --tag ghcr.io/sowers-io/bosca/migration/uploads:dev
+docker build . --target workflow --tag ghcr.io/sowers-io/bosca/migration/workflow:dev
+docker build . --target workflow-queue --tag ghcr.io/sowers-io/bosca/migration/workflow-queue:dev
+docker build . --target workflow-workers --tag ghcr.io/sowers-io/bosca/migration/workflow-workers:dev
+docker build . --target workflow-dashboard --tag ghcr.io/sowers-io/bosca/migration/workflow-dashboard:dev

@@ -57,6 +57,11 @@ COPY --from=build /prod/workflow-workers /prod/workflow-workers
 WORKDIR /prod/workflow-workers
 CMD [ "pnpm", "start" ]
 
+FROM base AS workflow-dashboard
+COPY --from=build /prod/workflow-dashboard /prod/workflow-dashboard
+WORKDIR /prod/workflow-dashboard
+CMD [ "pnpm", "start" ]
+
 FROM base AS ui
 COPY --from=build /prod/ui /prod/ui
 WORKDIR /prod/ui

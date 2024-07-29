@@ -29,7 +29,7 @@ async function main() {
   const grpcServer = fastify({
     http2: true,
     logger: {
-      level: 'debug',
+      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     },
   })
   grpcServer.setErrorHandler((error, request, reply) => {

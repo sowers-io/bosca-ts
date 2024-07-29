@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "ts-node ./src/main.ts"
+    "dev": "DISABLE_OTEL=true ts-node ./src/main.ts"
   },
   "dependencies": {
+    "@bosca/common": "workspace:*",
     "@bull-board/fastify": "^5.8.3",
     "@bull-board/api": "^5.8.3",
     "bullmq": "^5.10.3",

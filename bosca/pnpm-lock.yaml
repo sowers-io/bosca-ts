@@ -84,14 +84,14 @@ importers:
         specifier: ^1.9.0
         version: 1.9.0
       '@opentelemetry/auto-instrumentations-node':
-        specifier: ^0.48.0
-        version: 0.48.0(@opentelemetry/api@1.9.0)
+        specifier: ^0.49.0
+        version: 0.49.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/exporter-metrics-otlp-http':
         specifier: ^0.52.1
         version: 0.52.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/exporter-trace-otlp-http':
-        specifier: ^0.45.1
-        version: 0.45.1(@opentelemetry/api@1.9.0)
+        specifier: ^0.52.1
+        version: 0.52.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-metrics':
         specifier: ^1.25.1
         version: 1.25.1(@opentelemetry/api@1.9.0)
@@ -104,6 +104,9 @@ importers:
       fastify:
         specifier: ^4.28.1
         version: 4.28.1
+      fastify-plugin:
+        specifier: ^4.5.1
+        version: 4.5.1
       pg:
         specifier: ^8.12.0
         version: 8.12.0
@@ -115,29 +118,29 @@ importers:
         specifier: ^18.2.4
         version: 18.2.4
       '@types/node':
-        specifier: ^20.14.10
+        specifier: ^20.14.13
         version: 20.14.13
       '@types/pg':
         specifier: ^8.11.6
         version: 8.11.6
       '@typescript-eslint/eslint-plugin':
-        specifier: ^7.16.1
+        specifier: ^7.17.0
         version: 7.17.0(@typescript-eslint/parser@7.17.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)
       '@typescript-eslint/parser':
-        specifier: ^7.16.1
+        specifier: ^7.17.0
         version: 7.17.0(eslint@8.57.0)(typescript@5.5.4)
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
       eslint-config-prettier:
-        specifier: ^8.3.0
+        specifier: ^8.10.0
         version: 8.10.0(eslint@8.57.0)
       eslint-config-standard:
         specifier: ^17.1.0
         version: 17.1.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.17.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint-plugin-n@16.6.2(eslint@8.57.0))(eslint-plugin-promise@6.6.0(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-deprecation:
-        specifier: ^1.2.1
-        version: 1.6.0(eslint@8.57.0)(typescript@5.5.4)
+        specifier: ^1.5.0
+        version: 1.5.0(eslint@8.57.0)(typescript@5.5.4)
       eslint-plugin-import:
         specifier: ^2.29.1
         version: 2.29.1(@typescript-eslint/parser@7.17.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)
@@ -145,22 +148,28 @@ importers:
         specifier: ^16.6.2
         version: 16.6.2(eslint@8.57.0)
       eslint-plugin-promise:
-        specifier: ^6.5.1
+        specifier: ^6.6.0
         version: 6.6.0(eslint@8.57.0)
       prettier:
         specifier: ^2.8.8
         version: 2.8.8
       ts-node:
-        specifier: ^10.2.1
+        specifier: ^10.9.2
         version: 10.9.2(@types/node@20.14.13)(typescript@5.5.4)
       typescript:
-        specifier: ^5.5.3
+        specifier: ^5.5.4
         version: 5.5.4
 
   workspace/core/content:
     dependencies:
       '@aws-sdk/client-s3':
         specifier: ^3.620.0
+        version: 3.620.0
+      '@aws-sdk/client-sso-oidc':
+        specifier: ^3.614.0
+        version: 3.620.0(@aws-sdk/client-sts@3.620.0)
+      '@aws-sdk/client-sts':
+        specifier: '>=3.620.0 <4.0.0-0'
         version: 3.620.0
       '@aws-sdk/hash-node':
         specifier: ^3.374.0
@@ -235,6 +244,12 @@ importers:
 
   workspace/core/graphql:
     dependencies:
+      '@bosca/common':
+        specifier: workspace:*
+        version: link:../common
+      '@bosca/protobufs':
+        specifier: workspace:*
+        version: link:../protobufs
       '@graphql-tools/load-files':
         specifier: ^7.0.0
         version: 7.0.0(graphql@16.9.0)
@@ -560,17 +575,23 @@ importers:
         version: 1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.10.0))
       '@langchain/community':
         specifier: ^0.2.18
-        version: 0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0)
+        version: 0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0)
       '@langchain/core':
         specifier: ^0.2.15
-        version: 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+        version: 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
       bullmq:
         specifier: ^5.10.3
         version: 5.11.0
+      fastify-plugin:
+        specifier: ^4.5.1
+        version: 4.5.1
       zod-to-json-schema:
         specifier: ^3.23.1
         version: 3.23.2(zod@3.23.8)
     devDependencies:
+      '@aws-sdk/client-sso-oidc':
+        specifier: ^3.614.0
+        version: 3.620.0(@aws-sdk/client-sts@3.620.0)
       '@tsconfig/node18':
         specifier: ^18.2.4
         version: 18.2.4
@@ -778,6 +799,9 @@ importers:
       next:
         specifier: 14.2.3
         version: 14.2.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next-themes:
+        specifier: ^0.3.0
+        version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -840,8 +864,11 @@ importers:
         specifier: ^5
         version: 5.5.4
 
-  workspace/workflow/dashboard:
+  workspace/frontend/workflow-dashboard:
     dependencies:
+      '@bosca/common':
+        specifier: workspace:*
+        version: link:../../core/common
       '@bull-board/api':
         specifier: ^5.8.3
         version: 5.21.1(@bull-board/ui@5.21.1)
@@ -2441,10 +2468,6 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@opentelemetry/api-logs@0.45.1':
-    resolution: {integrity: sha512-zVGq/k70l+kB/Wuv3O/zhptP2hvDhEbhDu9EtHde1iWZJf3FedeYS/nWVcMBkkyPAjS/JKNk86WN4CBQLGUuOw==}
-    engines: {node: '>=14'}
-
   '@opentelemetry/api-logs@0.52.1':
     resolution: {integrity: sha512-qnSqB2DQ9TPP96dl8cDubDvrUyWc0/sK81xHTK8eSUspzDM3bsewX903qclQFvVhgStjRWdC5bLb3kQqMkfV5A==}
     engines: {node: '>=14'}
@@ -2453,8 +2476,8 @@ packages:
     resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
     engines: {node: '>=8.0.0'}
 
-  '@opentelemetry/auto-instrumentations-node@0.48.0':
-    resolution: {integrity: sha512-meON9LM9dyPun8ZlIs90BzqHAIWfWkC8g+OoPuIEeV5UOSyKqMsWtbMyiTbs/k/i7k1V4miJQMX/PcLbD7pWcQ==}
+  '@opentelemetry/auto-instrumentations-node@0.49.0':
+    resolution: {integrity: sha512-3DvteM2EPVKeU1xiXuPVGQQ2zEGts3zXr38xmiJ+KiTuC7r1FgecsJ4cp3OHffYKQGG/cY1bcw+o5Axcbc6ghA==}
     engines: {node: '>=14'}
     peerDependencies:
       '@opentelemetry/api': ^1.4.1
@@ -2464,12 +2487,6 @@ packages:
     engines: {node: '>=14'}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
-
-  '@opentelemetry/core@1.18.1':
-    resolution: {integrity: sha512-kvnUqezHMhsQvdsnhnqTNfAJs3ox/isB0SVrM1dhVFw7SsB7TstuVa6fgWnN2GdPyilIFLUvvbTZoVRmx6eiRg==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.0.0 <1.8.0'
 
   '@opentelemetry/core@1.25.1':
     resolution: {integrity: sha512-GeT/l6rBYWVQ4XArluLVB6WWQ8flHbdb6r2FCHC3smtdOAbrJBIv35tpV/yp9bmYUJf+xmZpu9DRTIeJVhFbEQ==}
@@ -2485,12 +2502,6 @@ packages:
 
   '@opentelemetry/exporter-trace-otlp-grpc@0.52.1':
     resolution: {integrity: sha512-pVkSH20crBwMTqB3nIN4jpQKUEoB0Z94drIHpYyEqs7UBr+I0cpYyOR3bqjA/UasQUMROb3GX8ZX4/9cVRqGBQ==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': ^1.0.0
-
-  '@opentelemetry/exporter-trace-otlp-http@0.45.1':
-    resolution: {integrity: sha512-a6CGqSG66n5R1mghzLMzyzn3iGap1b0v+0PjKFjfYuwLtpHQBxh2PHxItu+m2mXSwnM4R0GJlk9oUW5sQkCE0w==}
     engines: {node: '>=14'}
     peerDependencies:
       '@opentelemetry/api': ^1.0.0
@@ -2513,8 +2524,8 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.0.0
 
-  '@opentelemetry/instrumentation-amqplib@0.39.0':
-    resolution: {integrity: sha512-i9SccU5bbHivmmN8ba8HitLnM915BWdGwk5Jl6dwHTp0eV4KpoprZLE/jXUY1AAP/LXpTrM7NgVHmslFSVWRYA==}
+  '@opentelemetry/instrumentation-amqplib@0.40.0':
+    resolution: {integrity: sha512-rxtVrahrX0DoISBZNUTrINQSDflR1NeQHjxX+HB2df5L9wvuxZP6vLeGmsnGIV+5hDi0L+/a3xm4vCoI476SjQ==}
     engines: {node: '>=14'}
     peerDependencies:
       '@opentelemetry/api': ^1.3.0
@@ -2621,8 +2632,14 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.3.0
 
-  '@opentelemetry/instrumentation-knex@0.38.0':
-    resolution: {integrity: sha512-EFef6Ss5ATsf5AxJOLE+pxkfupcWDaejkPH+2q7TNeG1UwsBFobfiWM+iHROZ1Cl/y3mTi60MW70FxsaX2/TjA==}
+  '@opentelemetry/instrumentation-kafkajs@0.2.0':
+    resolution: {integrity: sha512-uKKmhEFd0zR280tJovuiBG7cfnNZT4kvVTvqtHPxQP7nOmRbJstCYHFH13YzjVcKjkmoArmxiSulmZmF7SLIlg==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@opentelemetry/api': ^1.3.0
+
+  '@opentelemetry/instrumentation-knex@0.39.0':
+    resolution: {integrity: sha512-lRwTqIKQecPWDkH1KEcAUcFhCaNssbKSpxf4sxRTAROCwrCEnYkjOuqJHV+q1/CApjMTaKu0Er4LBv/6bDpoxA==}
     engines: {node: '>=14'}
     peerDependencies:
       '@opentelemetry/api': ^1.3.0
@@ -2747,12 +2764,6 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.3.0
 
-  '@opentelemetry/otlp-exporter-base@0.45.1':
-    resolution: {integrity: sha512-Jvd6x8EwWGKEPWF4tkP4LpTPXiIkkafMNMvMJUfJd5DyNAftL1vAz+48jmi3URL2LMPkGryrvWPz8Tdu917gQw==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': ^1.0.0
-
   '@opentelemetry/otlp-exporter-base@0.52.1':
     resolution: {integrity: sha512-z175NXOtX5ihdlshtYBe5RpGeBoTXVCKPPLiQlD6FHvpM4Ch+p2B0yWKYSrBfLH24H9zjJiBdTrtD+hLlfnXEQ==}
     engines: {node: '>=14'}
@@ -2764,12 +2775,6 @@ packages:
     engines: {node: '>=14'}
     peerDependencies:
       '@opentelemetry/api': ^1.0.0
-
-  '@opentelemetry/otlp-transformer@0.45.1':
-    resolution: {integrity: sha512-FhIHgfC0b0XtoBrS5ISfva939yWffNl47ypXR8I7Ru+dunlySpmf2TLocKHYLHGcWiuoeSNO5O4dZCmSKOtpXw==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.3.0 <1.8.0'
 
   '@opentelemetry/otlp-transformer@0.52.1':
     resolution: {integrity: sha512-I88uCZSZZtVa0XniRqQWKbjAUm73I8tpEy/uJYPPYw5d7BRdVk0RfTBQw8kSUl01oVWEuqxLDa802222MYyWHg==}
@@ -2835,36 +2840,17 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.0.0
 
-  '@opentelemetry/resources@1.18.1':
-    resolution: {integrity: sha512-JjbcQLYMttXcIabflLRuaw5oof5gToYV9fuXbcsoOeQ0BlbwUn6DAZi++PNsSz2jjPeASfDls10iaO/8BRIPRA==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.0.0 <1.8.0'
-
   '@opentelemetry/resources@1.25.1':
     resolution: {integrity: sha512-pkZT+iFYIZsVn6+GzM0kSX+u3MSLCY9md+lIJOoKl/P+gJFfxJte/60Usdp8Ce4rOs8GduUpSPNe1ddGyDT1sQ==}
     engines: {node: '>=14'}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
-  '@opentelemetry/sdk-logs@0.45.1':
-    resolution: {integrity: sha512-z0RRgW4LeKEKnhXS4F/HnqB6+7gsy63YK47F4XAJYHs4s1KKg8XnQ2RkbuL31i/a9nXkylttYtvsT50CGr487g==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.4.0 <1.8.0'
-      '@opentelemetry/api-logs': '>=0.39.1'
-
   '@opentelemetry/sdk-logs@0.52.1':
     resolution: {integrity: sha512-MBYh+WcPPsN8YpRHRmK1Hsca9pVlyyKd4BxOC4SsgHACnl/bPp4Cri9hWhVm5+2tiQ9Zf4qSc1Jshw9tOLGWQA==}
     engines: {node: '>=14'}
     peerDependencies:
       '@opentelemetry/api': '>=1.4.0 <1.10.0'
-
-  '@opentelemetry/sdk-metrics@1.18.1':
-    resolution: {integrity: sha512-TEFgeNFhdULBYiCoHbz31Y4PDsfjjxRp8Wmdp6ybLQZPqMNEb+dRq+XN8Xw3ivIgTaf9gYsomgV5ensX99RuEQ==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.3.0 <1.8.0'
 
   '@opentelemetry/sdk-metrics@1.25.1':
     resolution: {integrity: sha512-9Mb7q5ioFL4E4dDrc4wC/A3NTHDat44v4I3p2pLPSxRvqUbDIQyMVr9uK+EU69+HWhlET1VaSrRzwdckWqY15Q==}
@@ -2878,12 +2864,6 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
 
-  '@opentelemetry/sdk-trace-base@1.18.1':
-    resolution: {integrity: sha512-tRHfDxN5dO+nop78EWJpzZwHsN1ewrZRVVwo03VJa3JQZxToRDH29/+MB24+yoa+IArerdr7INFJiX/iN4gjqg==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.0.0 <1.8.0'
-
   '@opentelemetry/sdk-trace-base@1.25.1':
     resolution: {integrity: sha512-C8k4hnEbc5FamuZQ92nTOp8X/diCY56XUTnMiv9UTuJitCzaNNHAVsdm5+HLCdI8SLQsLWIrG38tddMxLVoftw==}
     engines: {node: '>=14'}
@@ -2895,10 +2875,6 @@ packages:
     engines: {node: '>=14'}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
-
-  '@opentelemetry/semantic-conventions@1.18.1':
-    resolution: {integrity: sha512-+NLGHr6VZwcgE/2lw8zDIufOCGnzsA5CbQIMleXZTrgkBd0TanCX+MiDYJ1TOS4KL/Tqk0nFRxawnaYr6pkZkA==}
-    engines: {node: '>=14'}
 
   '@opentelemetry/semantic-conventions@1.25.1':
     resolution: {integrity: sha512-ZDjMJJQRlyk8A1KZFCc+bCbsyrn1wTwdNt56F7twdfUfnHUZUq77/WfONCj8p72NZOyP7pNTdUWSTYC3GTbuuQ==}
@@ -5379,6 +5355,12 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
 
+  eslint-plugin-deprecation@1.5.0:
+    resolution: {integrity: sha512-mRcssI/tLROueBQ6yf4LnnGTijbMsTCPIpbRbPj5R5wGYVCpk1zDmAS0SEkgcUDXOPc22qMNFR24Qw7vSPrlTA==}
+    peerDependencies:
+      eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
+      typescript: ^3.7.5 || ^4.0.0 || ^5.0.0
+
   eslint-plugin-deprecation@1.6.0:
     resolution: {integrity: sha512-rld+Vrneh/NXRtDB0vQifOvgUy0HJYoejaxWlVnsk/LK7iij2tCWQIFcCKG4uzQb+Ef86bDke39w1lh4wnon4Q==}
     deprecated: this package has been deprecated, please use v2.0.0
@@ -6791,6 +6773,12 @@ packages:
 
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
+
+  next-themes@0.3.0:
+    resolution: {integrity: sha512-/QHIrsYpd6Kfk7xakK4svpDI5mmXP0gfvCoJdGpZQ2TOrQZmsW0QxjaiLn8wbIKjtm4BTSqLoix4lxYYOnLJ/w==}
+    peerDependencies:
+      react: ^16.8 || ^17 || ^18
+      react-dom: ^16.8 || ^17 || ^18
 
   next@14.2.3:
     resolution: {integrity: sha512-dowFkFTR8v79NPJO4QsBUtxv0g9BrS/phluVpMAt2ku7H+cbcBJlopXjkWlwxrk/xGqMemr7JkGPGemPrLLX7A==}
@@ -10052,16 +10040,16 @@ snapshots:
 
   '@kamilkisiela/fast-url-parser@1.1.4': {}
 
-  '@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0)':
+  '@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0)':
     dependencies:
-      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
-      '@langchain/openai': 0.2.5(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))
+      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+      '@langchain/openai': 0.2.5(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))
       binary-extensions: 2.3.0
       expr-eval: 2.0.2
       flat: 5.0.2
       js-yaml: 4.1.0
-      langchain: 0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0)
-      langsmith: 0.1.39(@langchain/core@0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2))(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+      langchain: 0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0)
+      langsmith: 0.1.39(olwi7vlwykftpasiet52inoh7y)
       uuid: 10.0.0
       zod: 3.23.8
       zod-to-json-schema: 3.23.2(zod@3.23.8)
@@ -10094,13 +10082,13 @@ snapshots:
       - peggy
       - pyodide
 
-  '@langchain/core@0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)':
+  '@langchain/core@0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)':
     dependencies:
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.12
-      langsmith: 0.1.39(@langchain/core@0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2))(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+      langsmith: 0.1.39(olwi7vlwykftpasiet52inoh7y)
       ml-distance: 4.0.1
       mustache: 4.2.0
       p-queue: 6.6.2
@@ -10112,9 +10100,9 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/openai@0.2.5(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))':
+  '@langchain/openai@0.2.5(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))':
     dependencies:
-      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
       js-tiktoken: 1.0.12
       openai: 4.53.2
       zod: 3.23.8
@@ -10123,9 +10111,9 @@ snapshots:
       - encoding
       - langchain
 
-  '@langchain/textsplitters@0.0.3(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)':
+  '@langchain/textsplitters@0.0.3(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)':
     dependencies:
-      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
       js-tiktoken: 1.0.12
     transitivePeerDependencies:
       - langchain
@@ -10196,21 +10184,17 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@opentelemetry/api-logs@0.45.1':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-
   '@opentelemetry/api-logs@0.52.1':
     dependencies:
       '@opentelemetry/api': 1.9.0
 
   '@opentelemetry/api@1.9.0': {}
 
-  '@opentelemetry/auto-instrumentations-node@0.48.0(@opentelemetry/api@1.9.0)':
+  '@opentelemetry/auto-instrumentations-node@0.49.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/instrumentation': 0.52.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/instrumentation-amqplib': 0.39.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation-amqplib': 0.40.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-aws-lambda': 0.43.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-aws-sdk': 0.43.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-bunyan': 0.40.0(@opentelemetry/api@1.9.0)
@@ -10228,7 +10212,8 @@ snapshots:
       '@opentelemetry/instrumentation-hapi': 0.40.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-http': 0.52.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-ioredis': 0.42.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/instrumentation-knex': 0.38.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation-kafkajs': 0.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation-knex': 0.39.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-koa': 0.42.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-lru-memoizer': 0.39.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-memcached': 0.38.0(@opentelemetry/api@1.9.0)
@@ -10263,11 +10248,6 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.0
 
-  '@opentelemetry/core@1.18.1(@opentelemetry/api@1.9.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/semantic-conventions': 1.18.1
-
   '@opentelemetry/core@1.25.1(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
@@ -10291,15 +10271,6 @@ snapshots:
       '@opentelemetry/otlp-transformer': 0.52.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 1.25.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.25.1(@opentelemetry/api@1.9.0)
-
-  '@opentelemetry/exporter-trace-otlp-http@0.45.1(@opentelemetry/api@1.9.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/otlp-exporter-base': 0.45.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/otlp-transformer': 0.45.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/resources': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-trace-base': 1.18.1(@opentelemetry/api@1.9.0)
 
   '@opentelemetry/exporter-trace-otlp-http@0.52.1(@opentelemetry/api@1.9.0)':
     dependencies:
@@ -10327,7 +10298,7 @@ snapshots:
       '@opentelemetry/sdk-trace-base': 1.25.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.25.1
 
-  '@opentelemetry/instrumentation-amqplib@0.39.0(@opentelemetry/api@1.9.0)':
+  '@opentelemetry/instrumentation-amqplib@0.40.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/core': 1.25.1(@opentelemetry/api@1.9.0)
@@ -10483,7 +10454,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/instrumentation-knex@0.38.0(@opentelemetry/api@1.9.0)':
+  '@opentelemetry/instrumentation-kafkajs@0.2.0(@opentelemetry/api@1.9.0)':
+    dependencies:
+      '@opentelemetry/api': 1.9.0
+      '@opentelemetry/instrumentation': 0.52.1(@opentelemetry/api@1.9.0)
+      '@opentelemetry/semantic-conventions': 1.25.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@opentelemetry/instrumentation-knex@0.39.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/instrumentation': 0.52.1(@opentelemetry/api@1.9.0)
@@ -10668,11 +10647,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/otlp-exporter-base@0.45.1(@opentelemetry/api@1.9.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.9.0)
-
   '@opentelemetry/otlp-exporter-base@0.52.1(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
@@ -10686,16 +10660,6 @@ snapshots:
       '@opentelemetry/core': 1.25.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/otlp-exporter-base': 0.52.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/otlp-transformer': 0.52.1(@opentelemetry/api@1.9.0)
-
-  '@opentelemetry/otlp-transformer@0.45.1(@opentelemetry/api@1.9.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/api-logs': 0.45.1
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/resources': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-logs': 0.45.1(@opentelemetry/api-logs@0.45.1)(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-metrics': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-trace-base': 1.18.1(@opentelemetry/api@1.9.0)
 
   '@opentelemetry/otlp-transformer@0.52.1(@opentelemetry/api@1.9.0)':
     dependencies:
@@ -10765,24 +10729,11 @@ snapshots:
       - encoding
       - supports-color
 
-  '@opentelemetry/resources@1.18.1(@opentelemetry/api@1.9.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/semantic-conventions': 1.18.1
-
   '@opentelemetry/resources@1.25.1(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/core': 1.25.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.25.1
-
-  '@opentelemetry/sdk-logs@0.45.1(@opentelemetry/api-logs@0.45.1)(@opentelemetry/api@1.9.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/api-logs': 0.45.1
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/resources': 1.18.1(@opentelemetry/api@1.9.0)
 
   '@opentelemetry/sdk-logs@0.52.1(@opentelemetry/api@1.9.0)':
     dependencies:
@@ -10790,13 +10741,6 @@ snapshots:
       '@opentelemetry/api-logs': 0.52.1
       '@opentelemetry/core': 1.25.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 1.25.1(@opentelemetry/api@1.9.0)
-
-  '@opentelemetry/sdk-metrics@1.18.1(@opentelemetry/api@1.9.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/resources': 1.18.1(@opentelemetry/api@1.9.0)
-      lodash.merge: 4.6.2
 
   '@opentelemetry/sdk-metrics@1.25.1(@opentelemetry/api@1.9.0)':
     dependencies:
@@ -10824,13 +10768,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/sdk-trace-base@1.18.1(@opentelemetry/api@1.9.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/resources': 1.18.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/semantic-conventions': 1.18.1
-
   '@opentelemetry/sdk-trace-base@1.25.1(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
@@ -10847,8 +10784,6 @@ snapshots:
       '@opentelemetry/propagator-jaeger': 1.25.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.25.1(@opentelemetry/api@1.9.0)
       semver: 7.6.3
-
-  '@opentelemetry/semantic-conventions@1.18.1': {}
 
   '@opentelemetry/semantic-conventions@1.25.1': {}
 
@@ -12578,6 +12513,21 @@ snapshots:
       - supports-color
       - typescript
 
+  '@typescript-eslint/utils@5.62.0(eslint@8.57.0)(typescript@5.5.4)':
+    dependencies:
+      '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.0)
+      '@types/json-schema': 7.0.15
+      '@types/semver': 7.5.8
+      '@typescript-eslint/scope-manager': 5.62.0
+      '@typescript-eslint/types': 5.62.0
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.5.4)
+      eslint: 8.57.0
+      eslint-scope: 5.1.1
+      semver: 7.6.3
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
   '@typescript-eslint/utils@6.21.0(eslint@7.32.0)(typescript@4.9.5)':
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@7.32.0)
@@ -13841,6 +13791,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  eslint-plugin-deprecation@1.5.0(eslint@8.57.0)(typescript@5.5.4):
+    dependencies:
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.5.4)
+      eslint: 8.57.0
+      tslib: 2.6.3
+      tsutils: 3.21.0(typescript@5.5.4)
+      typescript: 5.5.4
+    transitivePeerDependencies:
+      - supports-color
+
   eslint-plugin-deprecation@1.6.0(eslint@7.32.0)(typescript@4.9.5):
     dependencies:
       '@typescript-eslint/utils': 6.21.0(eslint@7.32.0)(typescript@4.9.5)
@@ -14998,17 +14958,17 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0):
+  langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0):
     dependencies:
-      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
-      '@langchain/openai': 0.2.5(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))
-      '@langchain/textsplitters': 0.0.3(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+      '@langchain/openai': 0.2.5(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))
+      '@langchain/textsplitters': 0.0.3(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
       binary-extensions: 2.3.0
       js-tiktoken: 1.0.12
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
       langchainhub: 0.0.11
-      langsmith: 0.1.39(@langchain/core@0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2))(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+      langsmith: 0.1.39(olwi7vlwykftpasiet52inoh7y)
       ml-distance: 4.0.1
       openapi-types: 12.1.3
       p-retry: 4.6.2
@@ -15019,7 +14979,7 @@ snapshots:
     optionalDependencies:
       '@aws-sdk/client-s3': 3.620.0
       '@aws-sdk/credential-provider-node': 3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0)
-      '@langchain/community': 0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0)
+      '@langchain/community': 0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0)
       fast-xml-parser: 4.4.1
       ignore: 5.3.1
       ioredis: 5.4.1
@@ -15030,7 +14990,7 @@ snapshots:
 
   langchainhub@0.0.11: {}
 
-  langsmith@0.1.39(@langchain/core@0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2))(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2):
+  langsmith@0.1.39(olwi7vlwykftpasiet52inoh7y):
     dependencies:
       '@types/uuid': 9.0.8
       commander: 10.0.1
@@ -15038,8 +14998,8 @@ snapshots:
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
-      langchain: 0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0)(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0)
+      '@langchain/core': 0.2.18(langchain@0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0))(openai@4.53.2)
+      langchain: 0.2.11(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@langchain/community@0.2.20(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-s3@3.620.0)(@aws-sdk/credential-provider-node@3.620.0(@aws-sdk/client-sso-oidc@3.620.0(@aws-sdk/client-sts@3.620.0))(@aws-sdk/client-sts@3.620.0))(@smithy/util-utf8@2.3.0)(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(lodash@4.17.21)(openai@4.53.2)(pg@8.12.0)(ws@8.18.0))(fast-xml-parser@4.4.1)(ignore@5.3.1)(ioredis@5.4.1)(openai@4.53.2)(ws@8.18.0)
       openai: 4.53.2
 
   language-subtag-registry@0.3.23: {}
@@ -15341,6 +15301,11 @@ snapshots:
   natural-compare-lite@1.4.0: {}
 
   natural-compare@1.4.0: {}
+
+  next-themes@0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   next@14.2.3(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:

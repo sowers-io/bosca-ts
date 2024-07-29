@@ -23,7 +23,7 @@ async function main() {
   const server = fastify({
     http2: true,
     logger: {
-      level: 'debug',
+      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     },
   });
   server.setErrorHandler((error, request, reply) => {

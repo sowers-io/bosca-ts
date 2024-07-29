@@ -23,7 +23,7 @@ import { logger } from '@bosca/common'
 async function main() {
   const server = fastify({
     logger: {
-      level: 'debug',
+      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     },
   })
   const schema = createSchema<RequestContext>({

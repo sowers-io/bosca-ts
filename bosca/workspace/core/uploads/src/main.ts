@@ -27,7 +27,7 @@ import http, { ServerResponse } from 'node:http'
 async function main() {
   const server = fastify({
     logger: {
-      level: 'debug',
+      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     },
   })
   server.setErrorHandler((error, request, reply) => {

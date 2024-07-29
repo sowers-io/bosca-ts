@@ -1,23 +1,62 @@
-FROM node:20 AS build
+FROM node:20-slim AS base
 
-WORKDIR /build
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 
-COPY . .
+RUN corepack enable
 
-RUN npm install
-RUN rm .env.dev
-RUN npm run build
+FROM base AS build
+COPY . /usr/src/app
+WORKDIR /usr/src/app
 
-FROM node:20 AS release
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-WORKDIR /app
+RUN pnpm run -r build
+RUN pnpm deploy --filter=@bosca/content --prod /prod/content
+RUN pnpm deploy --filter=@bosca/graphql --prod /prod/graphql
+RUN pnpm deploy --filter=@bosca/uploads --prod /prod/uploads
+RUN pnpm deploy --filter=@bosca/workflow --prod /prod/workflow
+RUN pnpm deploy --filter=@bosca/workflow-queue --prod /prod/workflow-queue
+RUN pnpm deploy --filter=@bosca/workflow-workers --prod /prod/workflow-workers
+RUN pnpm deploy --filter=@bosca/workflow-dashboard --prod /prod/workflow-dashboard
+RUN pnpm deploy --filter=@bosca/ui --prod /prod/ui
 
-COPY --from=build /build/.output/ /app
+FROM base AS content
+COPY --from=build /prod/content /prod/content
+WORKDIR /prod/content
+EXPOSE 7000
+CMD [ "pnpm", "start" ]
 
-EXPOSE 3000
+FROM base AS graphql
+COPY --from=build /prod/graphql /prod/graphql
+WORKDIR /prod/graphql
+EXPOSE 9000
+CMD [ "pnpm", "start" ]
 
-RUN echo "echo 'Starting Server...' && NODE_ENV=production node " > /app/entrypoint
+FROM base AS uploads
+COPY --from=build /prod/uploads /prod/uploads
+WORKDIR /prod/uploads
+EXPOSE 7001
+CMD [ "pnpm", "start" ]
 
-USER 1000
+FROM base AS workflow
+COPY --from=build /prod/workflow /prod/workflow
+WORKDIR /prod/workflow
+EXPOSE 7100
+CMD [ "pnpm", "start" ]
 
-ENTRYPOINT ["sh", "/app/entrypoint"]
+FROM base AS workflow-queue
+COPY --from=build /prod/workflow-queue /prod/workflow-queue
+WORKDIR /prod/workflow-queue
+EXPOSE 7200
+CMD [ "pnpm", "start" ]
+
+FROM base AS workflow-workers
+COPY --from=build /prod/workflow-workers /prod/workflow-workers
+WORKDIR /prod/workflow-workers
+CMD [ "pnpm", "start" ]
+
+FROM base AS ui
+COPY --from=build /prod/ui /prod/ui
+WORKDIR /prod/ui
+CMD [ "pnpm", "start" ]

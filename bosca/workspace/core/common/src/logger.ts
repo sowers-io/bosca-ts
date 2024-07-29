@@ -18,7 +18,7 @@ import pino from 'pino'
 import { Interceptor } from '@connectrpc/connect'
 
 export const logger = pino({
-  level: 'debug',
+  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
   serializers: {
     err: pino.stdSerializers.err,
     error: pino.stdSerializers.err,

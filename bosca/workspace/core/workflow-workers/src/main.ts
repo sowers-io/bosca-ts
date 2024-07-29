@@ -34,6 +34,7 @@ import { IndexText } from './activities/metadata/text'
 import { initializeUploadLimiter } from './util/uploader'
 import { logger } from '@bosca/common/lib/logger'
 import { Job } from 'bullmq/dist/esm/classes/job'
+import { jobCount, workerCount } from './metrics'
 
 const downloader = new DefaultDownloader()
 
@@ -99,6 +100,7 @@ async function main() {
         logger.info({ jobId: job.id, jobName: job.name }, 'running job')
         switch (job.data.type) {
           case 'job':
+            jobCount.add(1)
             const definition = WorkflowJob.fromJson(job.data.job)
             return await runJob(job, definition, activities)
           case 'workflow':
@@ -131,8 +133,14 @@ async function main() {
         logger.error({ error }, 'job error')
       }
     })
+
+    workerCount.add(1)
+    logger.info({ queue: queueConfigurationId, concurrency: queueConfiguration.maxConcurrency }, 'worker started')
   }
   logger.info('running...')
+  process.on('SIGTERM', () => {
+    workerCount.add(-1)
+  })
 }
 
 main().catch((e) => {

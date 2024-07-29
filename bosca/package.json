@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "clean": "rm -Rf node_modules && pnpm -r exec rm -Rf node_modules && pnpm -r exec rm -Rf lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

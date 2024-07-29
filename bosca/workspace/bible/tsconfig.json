@@ -1,17 +1,15 @@
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
-  "version": "4.4.2",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "CommonJS",
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "sourceMap": true,
-    "rootDir": "./src",
     "outDir": "./lib",
-    "lib": ["ESNext", "DOM"],
-    "types": ["vitest/globals"]
+    "rootDir": "./src",
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "lib",
+    "node_modules",
+    "src/**/*.test.*/*"
+  ]
 }

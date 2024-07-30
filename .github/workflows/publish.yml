@@ -15,6 +15,9 @@ jobs:
       IMAGE_TAG: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PRIVATE_PAT }}
+          submodules: recursive
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:

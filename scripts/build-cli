@@ -4,13 +4,13 @@ set -e
 
 echo "Building CLI...\n"
 
-cd backend.core
+cd cli
 go mod download
 
 mkdir -p ../build/linux
 mkdir -p ../build/darwin
 mkdir -p ../build/windows
 
-CGO_ENABLED=0 GOOS=linux go build -o ../build/linux/bosca-cli cmd/cli/main.go
-CGO_ENABLED=0 GOOS=darwin go build -o ../build/darwin/bosca-cli cmd/cli/main.go
-CGO_ENABLED=0 GOOS=windows go build -o ../build/windows/bosca-cli cmd/cli/main.go
+CGO_ENABLED=0 GOOS=linux go build -o ../build/linux/bosca-cli cmd/main.go
+CGO_ENABLED=0 GOOS=darwin go build -o ../build/darwin/bosca-cli cmd/main.go
+CGO_ENABLED=0 GOOS=windows go build -o ../build/windows/bosca-cli cmd/main.go

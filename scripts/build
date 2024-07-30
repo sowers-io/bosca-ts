@@ -1,11 +1,23 @@
 #!/bin/sh
 
-cd bosca
+set -e
 
-docker build . --target content --tag ghcr.io/sowers-io/bosca/migration/content:dev
-docker build . --target graphql --tag ghcr.io/sowers-io/bosca/migration/graphql:dev
-docker build . --target uploads --tag ghcr.io/sowers-io/bosca/migration/uploads:dev
-docker build . --target workflow --tag ghcr.io/sowers-io/bosca/migration/workflow:dev
-docker build . --target workflow-queue --tag ghcr.io/sowers-io/bosca/migration/workflow-queue:dev
-docker build . --target workflow-workers --tag ghcr.io/sowers-io/bosca/migration/workflow-workers:dev
-docker build . --target workflow-dashboard --tag ghcr.io/sowers-io/bosca/migration/workflow-dashboard:dev
+if [ "$IMAGE_TAG" = "" ]; then
+  IMAGE_TAG="latest"
+fi
+
+for project in content graphql uploads workflow workflow-queue workflow-workers workflow-dashboard ui; do
+  if [ "$1" = "publish" ]; then
+    docker push ghcr.io/sowers-io/bosca/$project:$IMAGE_TAG
+  else
+    docker build . --target $project --tag ghcr.io/sowers-io/bosca/$project:$IMAGE_TAG
+  fi
+done
+
+for migration in content profiles security; do
+  if [ "$1" = "publish" ]; then
+    docker push ghcr.io/sowers-io/bosca/migration-$migration:$IMAGE_TAG
+  else
+    docker build . -f Dockerfile-migration --build-arg BACKEND=$migration --tag ghcr.io/sowers-io/bosca/migration-$migration:$IMAGE_TAG
+  fi
+done

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+echo "Building Docker Images...."
+
+ROOT=`pwd`
+
+tag="latest"
+
+if [ "$IMAGE_TAG" != "" ]; then
+  tag="$IMAGE_TAG"
+fi
+
+docker build -t ghcr.io/sowers-io/bosca/bosca-ui:latest .
+docker image tag ghcr.io/sowers-io/bosca/bosca-ui:latest ghcr.io/sowers-io/bosca/bosca-ui:$tag
+
+echo "...done"

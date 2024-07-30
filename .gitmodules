@@ -1,3 +1,3 @@
-[submodule "bosca/workspace/frontend/bosca-ui"]
-	path = bosca/workspace/frontend/bosca-ui
+[submodule "workspace/frontend/bosca-ui"]
+	path = workspace/frontend/bosca-ui
 	url = git@github.com:sowers-io/bosca-ui.git

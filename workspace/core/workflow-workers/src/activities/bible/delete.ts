@@ -15,7 +15,7 @@
  */
 
 import { Activity, ActivityJobExecutor } from '../activity'
-import { USXProcessor } from '@bosca/bible'
+import { USXProcessor } from '@bosca/bible-processor'
 import { Downloader } from '../../util/downloader'
 import { Job } from 'bullmq/dist/esm/classes/job'
 import { ContentService, FindMetadataRequest, IdRequest, WorkflowJob } from '@bosca/protobufs'

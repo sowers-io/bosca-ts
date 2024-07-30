@@ -15,7 +15,7 @@
  */
 
 import { Activity, ActivityJobExecutor } from '../../activity'
-import { Book, ManifestName, PublicationContent, USXProcessor } from '@bosca/bible'
+import { Book, ManifestName, PublicationContent, USXProcessor } from '@bosca/bible-processor'
 import { Downloader } from '../../../util/downloader'
 import { ContentService, IdRequest, Metadata, Source, WorkflowJob } from '@bosca/protobufs'
 import { Job } from 'bullmq/dist/esm/classes/job'

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { USXProcessor, BibleMetadata, Book } from '@bosca/bible'
+import { USXProcessor, BibleMetadata, Book } from '@bosca/bible-processor'
 import { Job } from 'bullmq/dist/esm/classes/job'
 import {
   AddCollectionRequest,

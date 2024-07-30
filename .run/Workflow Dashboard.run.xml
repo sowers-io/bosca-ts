@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Workflow Dashboard" type="js.build_tools.npm">
-    <package-json value="$PROJECT_DIR$/bosca/workspace/frontend/workflow-dashboard/package.json" />
+    <package-json value="$PROJECT_DIR$/workspace/frontend/workflow-dashboard/package.json" />
     <command value="run" />
     <scripts>
       <script value="dev" />

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Book } from '@bosca/bible'
+import { Book } from '@bosca/bible-processor'
 import { toArrayBuffer } from '../../../util/http'
 import { findFirstMetadata } from '../../../util/finder'
 import { uploadSupplementary } from '../../../util/uploader'

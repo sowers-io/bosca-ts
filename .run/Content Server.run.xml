@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Content Server" type="js.build_tools.npm">
-    <package-json value="$PROJECT_DIR$/bosca/workspace/core/content/package.json" />
+    <package-json value="$PROJECT_DIR$/workspace/core/content/package.json" />
     <command value="run" />
     <scripts>
       <script value="dev" />

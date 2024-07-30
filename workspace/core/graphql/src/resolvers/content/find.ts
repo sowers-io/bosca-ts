@@ -54,9 +54,11 @@ export const resolvers: Resolvers<RequestContext> = {
     },
     metadata: async (parent, args, context, info) => {
       return await execute<GMetadata[]>(async () => {
+        if (!args.query) return []
         const request = new FindMetadataRequest({ attributes: {} })
-        for (const attribute of args.query!.attributes) {
-          request.attributes[attribute.name!] = attribute.value || ''
+        for (const attribute of args.query.attributes) {
+          if (!attribute.name) continue
+          request.attributes[attribute.name] = attribute.value || ''
         }
         const service = useClient(ContentService)
         const metadata = await service.findMetadata(request, {

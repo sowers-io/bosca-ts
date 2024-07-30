@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Upload Server" type="js.build_tools.npm">
-    <package-json value="$PROJECT_DIR$/bosca/workspace/core/uploads/package.json" />
+    <package-json value="$PROJECT_DIR$/workspace/core/uploads/package.json" />
     <command value="run" />
     <scripts>
       <script value="dev" />

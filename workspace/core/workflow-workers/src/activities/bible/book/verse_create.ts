@@ -15,7 +15,7 @@
  */
 
 import { BookActivity, BookExecutor } from './book_activity'
-import { Book } from '@bosca/bible'
+import { Book } from '@bosca/bible-processor'
 import { addCollections, addMetadatas } from '../../../util/adder'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { findFirstCollection } from '../../../util/finder'

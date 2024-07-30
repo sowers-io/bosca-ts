@@ -1,5 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Dev" type="CompoundRunConfigurationType">
+    <toRun name="Bible GraphQL Server" type="js.build_tools.npm" />
     <toRun name="Content Server" type="js.build_tools.npm" />
     <toRun name="GraphQL Server" type="js.build_tools.npm" />
     <toRun name="Upload Server" type="js.build_tools.npm" />

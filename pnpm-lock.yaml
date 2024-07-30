@@ -8,7 +8,89 @@ importers:
 
   .: {}
 
-  workspace/bible:
+  workspace/bible/graphql:
+    dependencies:
+      '@bosca/common':
+        specifier: workspace:*
+        version: link:../../core/common
+      '@bosca/protobufs':
+        specifier: workspace:*
+        version: link:../../core/protobufs
+      '@bufbuild/protobuf':
+        specifier: ^1.10.0
+        version: 1.10.0
+      '@connectrpc/connect':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.10.0)
+      '@connectrpc/connect-node':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.10.0))
+      '@graphql-tools/load-files':
+        specifier: ^7.0.0
+        version: 7.0.0(graphql@16.9.0)
+      '@ory/kratos-client-fetch':
+        specifier: ^1.2.1
+        version: 1.2.1
+      fastify:
+        specifier: ^4.28.1
+        version: 4.28.1
+      graphql:
+        specifier: ^16.9.0
+        version: 16.9.0
+      graphql-yoga:
+        specifier: ^5.6.1
+        version: 5.6.2(graphql@16.9.0)
+    devDependencies:
+      '@graphql-codegen/cli':
+        specifier: ^5.0.2
+        version: 5.0.2(@types/node@20.14.13)(enquirer@2.4.1)(graphql@16.9.0)(typescript@5.5.4)
+      '@graphql-codegen/typescript-resolvers':
+        specifier: ^4.2.1
+        version: 4.2.1(graphql@16.9.0)
+      '@tsconfig/node18':
+        specifier: ^18.2.4
+        version: 18.2.4
+      '@types/node':
+        specifier: ^20.14.10
+        version: 20.14.13
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.16.1
+        version: 7.17.0(@typescript-eslint/parser@7.17.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)
+      '@typescript-eslint/parser':
+        specifier: ^7.16.1
+        version: 7.17.0(eslint@8.57.0)(typescript@5.5.4)
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
+      eslint-config-prettier:
+        specifier: ^8.3.0
+        version: 8.10.0(eslint@8.57.0)
+      eslint-config-standard:
+        specifier: ^17.1.0
+        version: 17.1.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.17.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint-plugin-n@16.6.2(eslint@8.57.0))(eslint-plugin-promise@6.6.0(eslint@8.57.0))(eslint@8.57.0)
+      eslint-plugin-deprecation:
+        specifier: ^1.2.1
+        version: 1.6.0(eslint@8.57.0)(typescript@5.5.4)
+      eslint-plugin-import:
+        specifier: ^2.29.1
+        version: 2.29.1(@typescript-eslint/parser@7.17.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)
+      eslint-plugin-n:
+        specifier: ^16.6.2
+        version: 16.6.2(eslint@8.57.0)
+      eslint-plugin-promise:
+        specifier: ^6.5.1
+        version: 6.6.0(eslint@8.57.0)
+      prettier:
+        specifier: ^2.8.8
+        version: 2.8.8
+      ts-node:
+        specifier: ^10.2.1
+        version: 10.9.2(@types/node@20.14.13)(typescript@5.5.4)
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.4
+
+  workspace/bible/processor:
     dependencies:
       decompress:
         specifier: ^4.2.1
@@ -594,9 +676,9 @@ importers:
 
   workspace/core/workflow-workers:
     dependencies:
-      '@bosca/bible':
+      '@bosca/bible-processor':
         specifier: workspace:*
-        version: link:../../bible
+        version: link:../../bible/processor
       '@bosca/common':
         specifier: workspace:*
         version: link:../common

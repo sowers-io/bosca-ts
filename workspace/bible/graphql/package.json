@@ -1,31 +1,31 @@
 {
-  "name": "@bosca/workflow-workers",
+  "name": "@bosca/bible-graphql",
   "version": "0.0.0",
   "private": true,
+  "type": "commonjs",
   "scripts": {
-    "build": "tsc --build",
-    "build.watch": "tsc --build --watch",
-    "lint": "eslint .",
     "dev": "DISABLE_OTEL=true ts-node --require ./src/instrumentation.ts src/main.ts",
-    "start": "node --require ./lib/instrumentation.js ./lib/main.js"
+    "start": "node --require ./lib/instrumentation.js ./lib/main.js",
+    "build": "tsc --build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "generate": "graphql-codegen"
   },
   "dependencies": {
-    "@bosca/bible-processor": "workspace:*",
     "@bosca/common": "workspace:*",
     "@bosca/protobufs": "workspace:*",
     "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect": "^1.4.0",
     "@connectrpc/connect-node": "^1.4.0",
-    "@langchain/community": "^0.2.18",
-    "@langchain/core": "^0.2.15",
-    "@langchain/openai": "^0.2.5",
-    "@opentelemetry/api": "^1.9.0",
-    "bullmq": "^5.10.3",
-    "fastify-plugin": "^4.5.1",
-    "zod-to-json-schema": "^3.23.1"
+    "@graphql-tools/load-files": "^7.0.0",
+    "@ory/kratos-client-fetch": "^1.2.1",
+    "fastify": "^4.28.1",
+    "graphql": "^16.9.0",
+    "graphql-yoga": "^5.6.1"
   },
   "devDependencies": {
-    "@aws-sdk/client-sso-oidc": "^3.614.0",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/typescript-resolvers": "^4.2.1",
     "@tsconfig/node18": "^18.2.4",
     "@types/node": "^20.14.10",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
@@ -39,10 +39,6 @@
     "eslint-plugin-promise": "^6.5.1",
     "prettier": "^2.8.8",
     "ts-node": "^10.2.1",
-    "typescript": "^5.5.3",
-    "vitest": "^1.6.0"
-  },
-  "peerDependencies": {
-    "@aws-sdk/client-sso-oidc": "^3.614.0"
+    "typescript": "^5.5.3"
   }
 }

@@ -6,8 +6,8 @@ Required Development Software
 * Docker or Podman
 * Docker Compose
 * Go 1.22.2
-* Protobuf 26.1
-* [Poetry](https://python-poetry.org/docs/#installation)
+* Node 20
+* PNPM (https://pnpm.io/)
 
 Setup Development Environment
 --

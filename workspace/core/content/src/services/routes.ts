@@ -16,7 +16,7 @@
 
 import { type ConnectRouter } from '@connectrpc/connect'
 import { ContentDataSource } from '../datasources/content'
-import { createPool, logger, PermissionManager, SpiceDBPermissionManager } from '@bosca/common'
+import { health, createPool, logger, PermissionManager, SpiceDBPermissionManager } from '@bosca/common'
 import { S3ObjectStore } from '../objectstores/s3'
 import { ObjectStore } from '../objectstores/objectstore'
 import { content } from './content'
@@ -34,5 +34,5 @@ export default (router: ConnectRouter) => {
     process.exit(1)
   })
   const serviceAccountId = process.env.BOSCA_SERVICE_ACCOUNT_ID!
-  return content(router, serviceAccountId, permissions, dataSource, objectStore)
+  return content(health(router), serviceAccountId, permissions, dataSource, objectStore)
 }

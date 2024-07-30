@@ -12,6 +12,7 @@
   "dependencies": {
     "@bosca/protobufs": "workspace:*",
     "@bosca/common": "workspace:*",
+    "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect": "^1.4.0",
     "@connectrpc/connect-fastify": "^1.4.0",
     "@connectrpc/connect-node": "^1.4.0",

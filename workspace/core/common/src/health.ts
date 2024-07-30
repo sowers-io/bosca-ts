@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-export * from './service_client'
-export * from './database'
-export * from './permissions/permissions'
-export * from './permissions/spicedb'
-export * from './authentication/interceptor'
-export * from './authentication/subject_finder'
-export * from './authentication/http_subject_finder'
-export * from './logger'
-export * from './workflows'
-export * from './instrumentation/instrumentation'
-export * from './instrumentation/fastify'
-export * from './health'
+import { Health, HealthCheckResponse, HealthCheckResponse_ServingStatus } from '@bosca/protobufs'
+import { type ConnectRouter } from '@connectrpc/connect'
 
-export { Pool } from 'pg'
+export function health(router: ConnectRouter): ConnectRouter {
+  return router.service(Health, {
+    check: async () => {
+      return new HealthCheckResponse({
+        status: HealthCheckResponse_ServingStatus.SERVING,
+      })
+    },
+    watch: async function* (request, handler) {
+      yield new HealthCheckResponse({
+        status: HealthCheckResponse_ServingStatus.SERVING,
+      })
+    },
+  })
+}

@@ -1,12 +1,12 @@
 version: v2
 plugins:
   - local: protoc-gen-es
-    out: bosca/workspace/core/protobufs/src
+    out: workspace/core/protobufs/src
     opt:
       - target=ts
       - import_extension=none
   - local: protoc-gen-connect-es
-    out: bosca/workspace/core/protobufs/src
+    out: workspace/core/protobufs/src
     opt:
       - target=ts
       - import_extension=none

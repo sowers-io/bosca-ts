@@ -22,6 +22,7 @@ RUN pnpm deploy --filter=@bosca/workflow --prod /prod/workflow
 RUN pnpm deploy --filter=@bosca/workflow-queue --prod /prod/workflow-queue
 RUN pnpm deploy --filter=@bosca/workflow-workers --prod /prod/workflow-workers
 RUN pnpm deploy --filter=@bosca/workflow-dashboard --prod /prod/workflow-dashboard
+RUN pnpm deploy --filter=@bosca/bible-graphql --prod /prod/bible-graphql
 RUN pnpm deploy --filter=@bosca/ui --prod /prod/ui
 
 FROM base AS content

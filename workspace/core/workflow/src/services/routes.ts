@@ -15,7 +15,7 @@
  */
 
 import { type ConnectRouter } from '@connectrpc/connect'
-import { createPool, logger, PermissionManager, SpiceDBPermissionManager } from '@bosca/common'
+import { health, createPool, logger, PermissionManager, SpiceDBPermissionManager } from '@bosca/common'
 import { WorkflowDataSource } from '../datasources/workflow'
 import { workflow } from './workflow'
 
@@ -30,5 +30,5 @@ export default (router: ConnectRouter) => {
     logger.error({ error }, 'Failed to initialize workflow data source')
     process.exit(1)
   })
-  return workflow(router, permissions, workflowDataSource)
+  return workflow(health(router), permissions, workflowDataSource)
 }

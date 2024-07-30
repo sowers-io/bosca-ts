@@ -40,6 +40,22 @@ async function main() {
     },
   })
   server.route({
+    url: '/health',
+    method: ['GET', 'POST', 'OPTIONS'],
+    handler: async (request, reply) => {
+      reply.status(200)
+      return reply
+    }
+  })
+  server.route({
+    url: '/alive',
+    method: ['GET', 'POST', 'OPTIONS'],
+    handler: async (request, reply) => {
+      reply.status(200)
+      return reply
+    }
+  })
+  server.route({
     url: yoga.graphqlEndpoint,
     method: ['GET', 'POST', 'OPTIONS'],
     handler: async (request, reply) => {

@@ -25,9 +25,12 @@ export function health(router: ConnectRouter): ConnectRouter {
       })
     },
     watch: async function* (request, handler) {
-      yield new HealthCheckResponse({
-        status: HealthCheckResponse_ServingStatus.SERVING,
-      })
+      while (!handler.signal.aborted) {
+        yield new HealthCheckResponse({
+          status: HealthCheckResponse_ServingStatus.SERVING,
+        })
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      }
     },
   })
 }

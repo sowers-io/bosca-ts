@@ -35,12 +35,12 @@ export async function createSchemaWithContext<TContext extends GraphQLRequestCon
       return await import(url.pathToFileURL(path).toString())
     },
   }
-  const disableRequireMethod = process.env.DISABLE_REQUIRE_METHOD === 'true'
+  const production = process.env.NODE_ENV === 'production'
   return createSchema<TContext>({
-    typeDefs: await loadFiles('src/schema/**/*.graphql', disableRequireMethod ? undefined : options),
+    typeDefs: await loadFiles('src/schema/**/*.graphql', production ? undefined : options),
     resolvers: await loadFiles(
-      ['src/resolvers/*.ts', 'src/resolvers/**/*.ts'],
-      disableRequireMethod ? undefined : options
+      production ? ['lib/resolvers/*.js', 'lib/resolvers/**/*.js'] : ['src/resolvers/*.ts', 'src/resolvers/**/*.ts'],
+      production ? undefined : options
     ),
   })
 }

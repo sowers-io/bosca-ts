@@ -15,27 +15,26 @@
  */
 
 import { Resolvers, Source as GSource } from '../../generated/resolvers'
-import { RequestContext } from '../../context'
+import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders } from '@bosca/common'
 import { useClient } from '@bosca/common'
 import { ContentService, Empty, IdRequest } from '@bosca/protobufs'
-import { execute, getHeaders } from '../../util/requests'
 
-export const resolvers: Resolvers<RequestContext> = {
+export const resolvers: Resolvers<GraphQLRequestContext> = {
   Query: {
     sources: async (_, __, context) => {
-      return await execute<GSource[]>(async () => {
+      return await executeGraphQL<GSource[]>(async () => {
         const service = useClient(ContentService)
         const sources = await service.getSources(new Empty(), {
-          headers: getHeaders(context),
+          headers: getGraphQLHeaders(context),
         })
         return sources.sources.map((s) => s.toJson()) as unknown as GSource[]
       })
     },
     source: async (_, { id }, context) => {
-      return await execute<GSource | null>(async () => {
+      return await executeGraphQL<GSource | null>(async () => {
         const service = useClient(ContentService)
         const source = await service.getSource(new IdRequest({id: id}), {
-          headers: getHeaders(context),
+          headers: getGraphQLHeaders(context),
         })
         if (!source) return null
         return source.toJson() as unknown as GSource

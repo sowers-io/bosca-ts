@@ -26,5 +26,7 @@ export * from './workflows'
 export * from './instrumentation/instrumentation'
 export * from './instrumentation/fastify'
 export * from './health'
+export * from './graphql/graphql'
+export * from './graphql/requests'
 
 export { Pool } from 'pg'

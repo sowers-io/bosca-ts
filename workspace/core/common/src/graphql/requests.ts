@@ -16,11 +16,11 @@
 
 import { GraphQLError } from 'graphql/error'
 import { ConnectError, Code } from '@connectrpc/connect'
-import { RequestContext } from '../context'
+import { GraphQLRequestContext } from './graphql'
 
-export function getHeaders(context: RequestContext): Record<string, string> {
+export function getGraphQLHeaders(context: GraphQLRequestContext): Record<string, string> {
   const headers: Record<string, string> = {}
-  // @ts-expect-error
+  // @ts-ignore
   const authorization = context.request.headers.headersInit!['authorization']
   if (authorization && authorization.length > 0) {
     headers['Authorization'] = authorization
@@ -28,7 +28,7 @@ export function getHeaders(context: RequestContext): Record<string, string> {
   return headers
 }
 
-export async function execute<T>(fn: () => Promise<T>): Promise<T> {
+export async function executeGraphQL<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn()
   } catch (e: any) {

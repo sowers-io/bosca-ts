@@ -15,10 +15,10 @@
  */
 
 import { Resolvers } from '../generated/resolvers'
-import { RequestContext } from '../context'
 import { Configuration, FrontendApi } from '@ory/kratos-client-fetch'
+import { GraphQLRequestContext } from '@bosca/common'
 
-export const resolvers: Resolvers<RequestContext> = {
+export const resolvers: Resolvers<GraphQLRequestContext> = {
   Mutation: {
     login: async (_, args) => {
       const configuration = new Configuration({

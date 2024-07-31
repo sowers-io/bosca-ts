@@ -15,15 +15,13 @@
  */
 
 import { Resolvers } from '../generated/resolvers'
-import { RequestContext } from '../context'
-import { useClient } from '@bosca/common'
+import { executeGraphQL, getGraphQLHeaders, GraphQLRequestContext, useClient } from '@bosca/common'
 import { ContentService, FindCollectionRequest, FindMetadataRequest } from '@bosca/protobufs'
-import { execute, getHeaders } from '../util/requests'
 
-export const resolvers: Resolvers<RequestContext> = {
+export const resolvers: Resolvers<GraphQLRequestContext> = {
   Query: {
     bibles: async (_, __, context) => {
-      return await execute(async () => {
+      return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const bibles = await service.findCollection(
           new FindCollectionRequest({
@@ -32,7 +30,7 @@ export const resolvers: Resolvers<RequestContext> = {
             },
           }),
           {
-            headers: getHeaders(context),
+            headers: getGraphQLHeaders(context),
           }
         )
         return bibles.collections.map((collection) => {
@@ -51,7 +49,7 @@ export const resolvers: Resolvers<RequestContext> = {
       })
     },
     verse: async (_, args, context) => {
-      return await execute(async () => {
+      return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const verses = await service.findMetadata(
           new FindMetadataRequest({
@@ -63,7 +61,7 @@ export const resolvers: Resolvers<RequestContext> = {
             },
           }),
           {
-            headers: getHeaders(context),
+            headers: getGraphQLHeaders(context),
           }
         )
         if (verses.metadata.length === 0) {
@@ -86,7 +84,7 @@ export const resolvers: Resolvers<RequestContext> = {
   },
   Bible: {
     books: async (bible, _, context) => {
-      return await execute(async () => {
+      return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const books = await service.findCollection(
           new FindCollectionRequest({
@@ -97,7 +95,7 @@ export const resolvers: Resolvers<RequestContext> = {
             },
           }),
           {
-            headers: getHeaders(context),
+            headers: getGraphQLHeaders(context),
           }
         )
         books.collections.sort((a, b) => {
@@ -123,7 +121,7 @@ export const resolvers: Resolvers<RequestContext> = {
   },
   Book: {
     chapters: async (book, _, context) => {
-      return await execute(async () => {
+      return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const books = await service.findMetadata(
           new FindMetadataRequest({
@@ -135,7 +133,7 @@ export const resolvers: Resolvers<RequestContext> = {
             },
           }),
           {
-            headers: getHeaders(context),
+            headers: getGraphQLHeaders(context),
           }
         )
         books.metadata.sort((a, b) => {

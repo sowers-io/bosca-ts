@@ -15,10 +15,9 @@
  */
 
 import { Resolvers, Collection as GCollection, CollectionItem as GCollectionItem } from '../../generated/resolvers'
-import { RequestContext } from '../../context'
+import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders } from '@bosca/common'
 import { useClient } from '@bosca/common'
-import { ContentService, IdRequest, Collection, Collections, CollectionItem } from '@bosca/protobufs'
-import { execute, getHeaders } from '../../util/requests'
+import { ContentService, IdRequest, Collection } from '@bosca/protobufs'
 import { transformMetadata } from './metadata'
 
 export function transformCollection(collection: Collection): GCollection {
@@ -36,13 +35,13 @@ export function transformCollection(collection: Collection): GCollection {
   return c
 }
 
-export const resolvers: Resolvers<RequestContext> = {
+export const resolvers: Resolvers<GraphQLRequestContext> = {
   Query: {
     collection: async (_, { id }, context) => {
-      return await execute<GCollection | null>(async () => {
+      return await executeGraphQL<GCollection | null>(async () => {
         const service = useClient(ContentService)
         const collection = await service.getCollection(new IdRequest({ id: id }), {
-          headers: getHeaders(context),
+          headers: getGraphQLHeaders(context),
         })
         if (!collection) return null
         return transformCollection(collection)
@@ -51,10 +50,10 @@ export const resolvers: Resolvers<RequestContext> = {
   },
   Collection: {
     items: async (parent, args, context) => {
-      return await execute<GCollectionItem[]>(async () => {
+      return await executeGraphQL<GCollectionItem[]>(async () => {
         const service = useClient(ContentService)
         const items = await service.getCollectionItems(new IdRequest({ id: parent.id }), {
-          headers: getHeaders(context),
+          headers: getGraphQLHeaders(context),
         })
         return items.items.map((item) => {
           if (item.Item.case === 'collection') {

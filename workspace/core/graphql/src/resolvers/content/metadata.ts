@@ -15,10 +15,9 @@
  */
 
 import { Resolvers, Metadata as GMetadata, SignedUrl as GSignedUrl } from '../../generated/resolvers'
-import { RequestContext } from '../../context'
+import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders } from '@bosca/common'
 import { useClient } from '@bosca/common'
 import { AddMetadataRequest, ContentService, IdRequest, Metadata } from '@bosca/protobufs'
-import { execute, getHeaders } from '../../util/requests'
 
 export function transformMetadata(metadata: Metadata): GMetadata {
   const m = metadata.toJson() as unknown as GMetadata
@@ -40,13 +39,13 @@ export function transformMetadata(metadata: Metadata): GMetadata {
   return m
 }
 
-export const resolvers: Resolvers<RequestContext> = {
+export const resolvers: Resolvers<GraphQLRequestContext> = {
   Query: {
     metadata: async (parent, args, context) => {
-      return await execute(async () => {
+      return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
-          headers: getHeaders(context),
+          headers: getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)
       })
@@ -54,19 +53,19 @@ export const resolvers: Resolvers<RequestContext> = {
   },
   Metadata: {
     uploadUrl: async (parent, args, context) => {
-      return await execute<GSignedUrl>(async () => {
+      return await executeGraphQL<GSignedUrl>(async () => {
         const service = useClient(ContentService)
         const url = await service.getMetadataUploadUrl(new IdRequest({ id: parent.id }), {
-          headers: getHeaders(context),
+          headers: getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
       })
     },
     downloadUrl: async (parent, args, context) => {
-      return (await execute(async () => {
+      return (await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const url = await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
-          headers: getHeaders(context),
+          headers: getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
       }))!
@@ -74,18 +73,18 @@ export const resolvers: Resolvers<RequestContext> = {
   },
   Mutation: {
     addMetadata: async (parent, args, context) => {
-      return await execute(async () => {
+      return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const response = await service.addMetadata(
           new AddMetadataRequest({
             metadata: {
               name: args.metadata.name,
-// todo
+              // todo
             },
           })
         )
         const metadata = await service.getMetadata(new IdRequest({ id: response.id }), {
-          headers: getHeaders(context),
+          headers: getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)
       })

@@ -16,9 +16,10 @@
 
 import { fastify } from 'fastify'
 import { createSchema, createYoga } from 'graphql-yoga'
-import { loadFiles } from '@graphql-tools/load-files'
+import { loadFiles, LoadFilesOptions } from '@graphql-tools/load-files'
 import { RequestContext } from './context'
 import { logger } from '@bosca/common'
+import url from 'url'
 
 async function main() {
   const server = fastify({
@@ -26,9 +27,15 @@ async function main() {
       level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     },
   })
+  const options: LoadFilesOptions = {
+    ignoreIndex: true,
+    requireMethod: async (path: any) => {
+      return await import(url.pathToFileURL(path).toString());
+    },
+  }
   const schema = createSchema<RequestContext>({
-    typeDefs: await loadFiles('src/schema/**/*.graphql'),
-    resolvers: await loadFiles(['src/resolvers/*.ts', 'src/resolvers/**/*.ts']),
+    typeDefs: await loadFiles('src/schema/**/*.graphql', options),
+    resolvers: await loadFiles(['src/resolvers/*.ts', 'src/resolvers/**/*.ts'], options),
   })
   const yoga = createYoga<RequestContext>({
     schema: schema,

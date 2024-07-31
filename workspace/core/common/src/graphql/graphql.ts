@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import url from 'url'
 import { createSchema, GraphQLSchemaWithContext, YogaInitialContext } from 'graphql-yoga'
 import { loadFiles, LoadFilesOptions } from '@graphql-tools/load-files'
 

@@ -141,16 +141,20 @@ async function main() {
     url: '/health',
     method: ['GET', 'POST', 'OPTIONS'],
     handler: async (request, reply) => {
-      reply.status(200)
-      return reply
+      reply
+        .code(200)
+        .header('Content-Type', 'application/json; charset=utf-8')
+        .send({ success: true })
     },
   })
   server.route({
     url: '/alive',
     method: ['GET', 'POST', 'OPTIONS'],
     handler: async (request, reply) => {
-      reply.status(200)
-      return reply
+      reply
+        .code(200)
+        .header('Content-Type', 'application/json; charset=utf-8')
+        .send({ success: true })
     },
   })
 

@@ -137,6 +137,23 @@ async function main() {
    */
   server.addContentTypeParser('application/offset+octet-stream', (request, payload, done) => done(null))
 
+  server.route({
+    url: '/health',
+    method: ['GET', 'POST', 'OPTIONS'],
+    handler: async (request, reply) => {
+      reply.status(200)
+      return reply
+    },
+  })
+  server.route({
+    url: '/alive',
+    method: ['GET', 'POST', 'OPTIONS'],
+    handler: async (request, reply) => {
+      reply.status(200)
+      return reply
+    },
+  })
+
   /**
    * let tus handle preparation and filehandling requests
    * fastify exposes raw nodejs http req/res via .raw property

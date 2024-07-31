@@ -37,10 +37,10 @@ export async function createSchemaWithContext<TContext extends GraphQLRequestCon
   }
   const production = process.env.NODE_ENV === 'production'
   return createSchema<TContext>({
-    typeDefs: await loadFiles('src/schema/**/*.graphql', production ? undefined : options),
+    typeDefs: await loadFiles('src/schema/**/*.graphql', production ? options : undefined),
     resolvers: await loadFiles(
       production ? ['lib/resolvers/*.js', 'lib/resolvers/**/*.js'] : ['src/resolvers/*.ts', 'src/resolvers/**/*.ts'],
-      production ? undefined : options
+      production ? options : undefined
     ),
   })
 }
@@ -65,16 +65,20 @@ export async function createAndRunServer<TContext extends GraphQLRequestContext>
     url: '/health',
     method: ['GET', 'POST', 'OPTIONS'],
     handler: async (request, reply) => {
-      reply.status(200)
-      return reply
+      reply
+        .code(200)
+        .header('Content-Type', 'application/json; charset=utf-8')
+        .send({ success: true })
     },
   })
   server.route({
     url: '/alive',
     method: ['GET', 'POST', 'OPTIONS'],
     handler: async (request, reply) => {
-      reply.status(200)
-      return reply
+      reply
+        .code(200)
+        .header('Content-Type', 'application/json; charset=utf-8')
+        .send({ success: true })
     },
   })
   server.route({

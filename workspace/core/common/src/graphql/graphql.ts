@@ -29,18 +29,11 @@ export interface GraphQLRequestContext extends YogaInitialContext {
 export async function createSchemaWithContext<TContext extends GraphQLRequestContext>(): Promise<
   GraphQLSchemaWithContext<TContext>
 > {
-  const options: LoadFilesOptions = {
-    ignoreIndex: true,
-    requireMethod: async (path: any) => {
-      return await import(url.pathToFileURL(path).toString())
-    },
-  }
   const production = process.env.NODE_ENV === 'production'
   return createSchema<TContext>({
-    typeDefs: await loadFiles('src/schema/**/*.graphql', production ? options : undefined),
+    typeDefs: await loadFiles('src/schema/**/*.graphql'),
     resolvers: await loadFiles(
       production ? ['lib/resolvers/*.js', 'lib/resolvers/**/*.js'] : ['src/resolvers/*.ts', 'src/resolvers/**/*.ts'],
-      production ? options : undefined
     ),
   })
 }

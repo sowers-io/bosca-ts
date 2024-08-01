@@ -19,6 +19,8 @@
       <env name="BOSCA_SESSION_ENDPOINT" value="http://localhost:4433/sessions/whoami" />
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
       <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
+      <env name="BOSCA_MEILISEARCH_API_ADDRESS" value="http://localhost:7700" />
+      <env name="BOSCA_MEILISEARCH_KEY" value="p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M" />
     </envs>
     <method v="2" />
   </configuration>

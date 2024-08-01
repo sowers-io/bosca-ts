@@ -16,9 +16,13 @@
 
 import { Activity, ActivityJobExecutor } from '../../activity'
 import { Job } from 'bullmq'
-import { WorkflowJob } from '@bosca/protobufs'
+import { ContentService, IdRequest, WorkflowJob } from '@bosca/protobufs'
+import { useServiceAccountClient } from '@bosca/common/lib/service_client'
+import { execute } from '../../../util/http'
+import { getStorageSystem } from '@bosca/common/lib/storage/systems'
 
 export class IndexText extends Activity {
+
   get id(): string {
     return 'metadata.text.index'
   }
@@ -29,5 +33,13 @@ export class IndexText extends Activity {
 }
 
 class Executor extends ActivityJobExecutor<IndexText> {
-  async execute() {}
+  async execute() {
+    const idRequest = new IdRequest({ id: this.definition.metadataId })
+    const service = useServiceAccountClient(ContentService)
+    const downloadUrl = await service.getMetadataDownloadUrl(idRequest)
+    const payload = await execute(downloadUrl)
+    const metadata = await service.getMetadata(idRequest)
+    const system = await getStorageSystem(this.definition.storageSystems[0].configuration)
+    await system.store(metadata, payload)
+  }
 }

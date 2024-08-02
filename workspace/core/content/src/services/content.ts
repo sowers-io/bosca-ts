@@ -47,7 +47,7 @@ import {
 import { ContentDataSource, RootCollectionId } from '../datasources/content'
 import { ObjectStore } from '../objectstores/objectstore'
 import { addCollection, getCollectionItems, setCollectionReady } from './util/collections'
-import { addMetadata, setMetadataReady, setWorkflowStateComplete } from './util/metadata'
+import { addMetadata, setMetadataReady, setMetadataSupplementaryReady, setWorkflowStateComplete } from './util/metadata'
 import { toValidIds } from './util/permissions'
 
 export function content(
@@ -395,13 +395,8 @@ export function content(
     },
     async setMetadataSupplementaryReady(request, context) {
       const subject = context.values.get(SubjectKey)
-      await permissions.checkWithError(
-        subject,
-        PermissionObjectType.metadata_type,
-        request.id,
-        PermissionAction.service
-      )
-      await dataSource.setMetadataSupplementaryReady(request.id, request.key)
+      await setMetadataSupplementaryReady(dataSource, permissions, subject, request.id, request.key)
+      return new Empty()
     },
     async getMetadataSupplementaryUploadUrl(request, context) {
       const subject = context.values.get(SubjectKey)

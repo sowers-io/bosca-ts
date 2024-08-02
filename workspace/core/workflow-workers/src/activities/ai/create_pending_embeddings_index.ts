@@ -16,7 +16,9 @@
 
 import { Activity, ActivityJobExecutor } from '../activity'
 import { Job } from 'bullmq'
-import { WorkflowJob } from '@bosca/protobufs'
+import { WorkflowJob, PendingEmbeddings, IdRequest, ContentService, SupplementaryIdRequest } from '@bosca/protobufs'
+import { getIStorageSystem, useServiceAccountClient } from '@bosca/common'
+import { execute } from '../../util/http'
 
 export class CreatePendingEmbeddingsIndex extends Activity {
   get id(): string {
@@ -29,5 +31,22 @@ export class CreatePendingEmbeddingsIndex extends Activity {
 }
 
 class Executor extends ActivityJobExecutor<CreatePendingEmbeddingsIndex> {
-  async execute() {}
+  async execute() {
+    const idRequest = new IdRequest({ id: this.definition.metadataId })
+    const service = useServiceAccountClient(ContentService)
+    const metadata = await service.getMetadata(idRequest)
+    const key = this.definition.supplementaryId
+      ? this.definition.activity!.inputs!['supplementaryId'] + this.definition.supplementaryId
+      : this.definition.activity!.inputs!['supplementaryId']
+    const downloadUrl = await service.getMetadataSupplementaryDownloadUrl(
+      new SupplementaryIdRequest({
+        id: this.definition.metadataId,
+        key: key,
+      })
+    )
+    const payload = await execute(downloadUrl)
+    const pendingEmbeddings = PendingEmbeddings.fromBinary(payload)
+    const system = await getIStorageSystem(this.definition.storageSystems[0].storageSystem!)
+    await system.storePendingEmbeddings(this.definition, metadata, pendingEmbeddings)
+  }
 }

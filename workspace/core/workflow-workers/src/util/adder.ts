@@ -48,5 +48,6 @@ export async function addMetadatas(
     if (buffers) {
       await uploadAll(responses, buffers)
     }
+    return responses
   })
 }

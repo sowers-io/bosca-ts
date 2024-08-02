@@ -21,6 +21,20 @@ import { S3ObjectStore } from '../objectstores/s3'
 import { ObjectStore } from '../objectstores/objectstore'
 import { content } from './content'
 
+async function initialize(dataSource: ContentDataSource) {
+  for (let i = 0; i < 10; i++) {
+    try {
+      await dataSource.addRootCollection()
+      logger.info('root collection ready')
+      return
+    } catch (e) {
+      logger.error({ error: e }, 'failed to create root collection')
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
+  }
+  process.exit(1)
+}
+
 export default (router: ConnectRouter) => {
   const pool = createPool(process.env.BOSCA_CONTENT_CONNECTION_STRING!)
   const objectStore: ObjectStore = new S3ObjectStore()
@@ -29,10 +43,7 @@ export default (router: ConnectRouter) => {
     process.env.BOSCA_PERMISSIONS_SHARED_TOKEN!
   )
   const dataSource = new ContentDataSource(pool)
-  dataSource.addRootCollection().catch((e: any) => {
-    logger.error({ error: e }, 'failed to create root collection')
-    process.exit(1)
-  })
+  void initialize(dataSource)
   const serviceAccountId = process.env.BOSCA_SERVICE_ACCOUNT_ID!
   return content(health(router), serviceAccountId, permissions, dataSource, objectStore)
 }

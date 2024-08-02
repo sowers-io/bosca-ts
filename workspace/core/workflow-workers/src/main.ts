@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { fastify } from 'fastify'
+import { fastifyConnectPlugin } from '@connectrpc/connect-fastify'
+import { newLoggingInterceptor } from '@bosca/common'
 import { ProcessBibleActivity } from './activities/bible/process'
 import { DefaultDownloader } from './util/downloader'
 import { Activity } from './activities/activity'
@@ -21,20 +24,21 @@ import { ProcessTraitsActivity } from './activities/metadata/traits/process'
 import { DeleteBibleActivity } from './activities/bible/delete'
 import { TransitionToActivity } from './activities/metadata/transition_to'
 import { getConfiguration } from './configuration'
-import { CreateVerseMarkdownTable } from './activities/bible/book/verse_table'
+import { CreateVerseJsonTable } from './activities/bible/book/verse_table'
 import { CreateVerses } from './activities/bible/book/verse_create'
 import { PromptActivity } from './activities/ai/prompt'
 import { ChildWorkflow } from './activities/metadata/child_workflow'
 import { ConnectionOptions, QueueEvents, WaitingChildrenError, Worker } from 'bullmq'
 import { WorkflowJob } from '@bosca/protobufs'
-import { CreatePendingEmbeddingsFromMarkdownTable } from './activities/ai/create_pending_embeddings_markdown'
+import { CreatePendingEmbeddingsFromJsonTable } from './activities/ai/create_pending_embeddings_json'
 import { CreateTextEmbeddings } from './activities/ai/create_text_embeddings'
 import { CreatePendingEmbeddingsIndex } from './activities/ai/create_pending_embeddings_index'
 import { IndexText } from './activities/metadata/text'
 import { initializeUploadLimiter } from './util/uploader'
 import { logger } from '@bosca/common/lib/logger'
 import { Job } from 'bullmq/dist/esm/classes/job'
-import { jobCount, workerCount } from './metrics'
+import { jobStartedCount, jobErrorCount, jobFinishedCount, jobAddedCount, jobFailedCount, workerCount } from './metrics'
+import routes from './routes'
 
 const downloader = new DefaultDownloader()
 
@@ -43,12 +47,12 @@ function getAvailableActivities(): { [id: string]: Activity } {
     new ProcessTraitsActivity(),
     new ProcessBibleActivity(downloader),
     new DeleteBibleActivity(downloader),
-    new CreateVerseMarkdownTable(downloader),
+    new CreateVerseJsonTable(downloader),
     new CreateVerses(downloader),
     new TransitionToActivity(),
     new PromptActivity(),
     new ChildWorkflow(),
-    new CreatePendingEmbeddingsFromMarkdownTable(),
+    new CreatePendingEmbeddingsFromJsonTable(),
     new CreatePendingEmbeddingsIndex(),
     new CreateTextEmbeddings(),
     new IndexText(),
@@ -69,11 +73,11 @@ async function runJob(job: Job, definition: WorkflowJob, activities: { [id: stri
   const executor = activity.newJobExecutor(job, definition)
   try {
     const result = await executor.execute()
-    logger.info({ jobId: job.id, jobName: job.name }, 'finished job')
+    logger.trace({ jobId: job.id, jobName: job.name }, 'finished job')
     return result
   } catch (e) {
     if (e instanceof WaitingChildrenError) {
-      logger.info({ jobId: job.id, jobName: job.name }, 'job waiting on children')
+      logger.trace({ jobId: job.id, jobName: job.name }, 'job waiting on children')
     } else {
       logger.error({ jobId: job.id, jobName: job.name, error: e }, 'error running job')
     }
@@ -97,10 +101,10 @@ async function main() {
     const worker = new Worker(
       queueConfigurationId,
       async (job) => {
-        logger.info({ jobId: job.id, jobName: job.name }, 'running job')
+        logger.trace({ jobId: job.id, jobName: job.name }, 'running job')
         switch (job.data.type) {
           case 'job':
-            jobCount.add(1)
+            jobStartedCount.add(1)
             const definition = WorkflowJob.fromJson(job.data.job)
             return await runJob(job, definition, activities)
           case 'workflow':
@@ -116,20 +120,26 @@ async function main() {
       }
     )
     worker.on('completed', (job) => {
-      logger.info({ jobId: job.id }, 'job completed')
+      if (job.data.type === 'job') {
+        jobFinishedCount.add(1)
+      }
+      logger.trace({ jobId: job.id }, 'job completed')
     })
     worker.on('failed', (job, err) => {
+      jobFailedCount.add(1)
       logger.error({ jobId: job?.id, error: err }, 'job failed')
     })
 
     const events = new QueueEvents(queueConfigurationId, { connection })
     events.on('added', async (job) => {
-      logger.info({ jobId: job.jobId, jobName: job.name }, 'job added')
+      jobAddedCount.add(1)
+      logger.trace({ jobId: job.jobId, jobName: job.name }, 'job added')
     })
     events.on('error', async (error) => {
       if (error instanceof WaitingChildrenError) {
-        logger.info('job waiting on children')
+        logger.trace('job waiting on children')
       } else {
+        jobErrorCount.add(1)
         logger.error({ error }, 'job error')
       }
     })
@@ -138,9 +148,19 @@ async function main() {
     logger.info({ queue: queueConfigurationId, concurrency: queueConfiguration.maxConcurrency }, 'worker started')
   }
   logger.info('running...')
+
   process.on('SIGTERM', () => {
     workerCount.add(-1)
   })
+
+  const server = fastify({
+    http2: true,
+  })
+  await server.register(fastifyConnectPlugin, {
+    routes,
+    interceptors: [newLoggingInterceptor()],
+  })
+  await server.listen({ host: '0.0.0.0', port: 7800 })
 }
 
 main().catch((e) => {

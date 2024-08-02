@@ -8,9 +8,10 @@
     <node-interpreter value="project" />
     <envs>
       <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:7000" />
-      <env name="BOSCA_WORKFLOW_API_ADDRESS" value="localhost:7100" />
-      <env name="BOSCA_WORKFLOW_QUEUE_API_ADDRESS" value="localhost:7200" />
+      <env name="BOSCA_MEILI_MASTER_KEY" value="p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M" />
+      <env name="BOSCA_MEILISEARCH_API_ADDRESS" value="http://localhost:7700" />
       <env name="BOSCA_QDRANT_API_ADDRESS" value="localhost:6334" />
+      <env name="BOSCA_QDRANT_REST_API_ADDRESS" value="http://localhost:6333" />
       <env name="BOSCA_REDIS_HOST" value="localhost" />
       <env name="BOSCA_REDIS_PORT" value="6379" />
       <env name="BOSCA_SEARCH_ENDPOINT" value="http://localhost:7700" />
@@ -19,6 +20,8 @@
       <env name="BOSCA_SESSION_ENDPOINT" value="http://localhost:4433/sessions/whoami" />
       <env name="BOSCA_STORAGE_TYPE" value="minio" />
       <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
+      <env name="BOSCA_WORKFLOW_API_ADDRESS" value="localhost:7100" />
+      <env name="BOSCA_WORKFLOW_QUEUE_API_ADDRESS" value="localhost:7200" />
     </envs>
     <method v="2" />
   </configuration>

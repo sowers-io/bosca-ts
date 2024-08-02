@@ -15,7 +15,7 @@
  */
 
 import pino from 'pino'
-import { Interceptor } from '@connectrpc/connect'
+import { Code, ConnectError, Interceptor } from '@connectrpc/connect'
 
 export const logger = pino({
   level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
@@ -30,7 +30,15 @@ export function newLoggingInterceptor(): Interceptor {
     try {
       return await next(req)
     } catch (e) {
-      logger.error({ error: e }, 'uncaught error')
+      if (e instanceof ConnectError) {
+        if (e.code == Code.NotFound) {
+          logger.trace({ error: e }, 'connect error')
+        } else {
+          logger.debug({ error: e }, 'connect error')
+        }
+      } else {
+        logger.error({ error: e }, 'uncaught error')
+      }
       throw e
     }
   }

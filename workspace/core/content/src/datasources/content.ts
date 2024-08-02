@@ -319,11 +319,16 @@ export class ContentDataSource extends DataSource {
   }
 
   async getMetadataSupplementary(metadataId: string, key: string): Promise<MetadataSupplementary | null> {
-    return this.queryAndMapFirst(
+    const supplementary = await this.queryAndMapFirst(
       () => new MetadataSupplementary(),
       'select * from metadata_supplementary where metadata_id = $1::uuid and "key" = $2',
       [metadataId, key]
     )
+    if (!supplementary) return null
+    supplementary.traitIds = (
+      await this.query('select trait_id from metadata_supplementary_traits where metadata_id = $1::uuid and "key" = $2', [metadataId, key])
+    ).rows.map((r) => r.trait_id)
+    return supplementary
   }
 
   async getMetadataSupplementaries(metadataId: string): Promise<MetadataSupplementary[]> {

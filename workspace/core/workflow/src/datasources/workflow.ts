@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DataSource, logger } from '@bosca/common'
+import { DataSource, logger, getIStorageSystem } from '@bosca/common'
 import { promisify } from 'node:util'
 import fs from 'node:fs'
 import { parse } from 'yaml'
@@ -74,7 +74,9 @@ export class WorkflowDataSource extends DataSource {
         JSON.stringify(storageSystem.configuration),
       ]
     )
-    return records.rows[0].id
+    storageSystem.id = records.rows[0].id
+    await getIStorageSystem(storageSystem)
+    return storageSystem.id
   }
 
   async getStorageSystemModels(id: string): Promise<StorageSystemModel[]> {
@@ -441,7 +443,7 @@ export class WorkflowDataSource extends DataSource {
             a.queue = workflow.queue
           }
           if (a.configuration) {
-            for (const key of Object.keys(a.configuration)) {
+            for (const key in a.configuration) {
               if (a.configuration[key]) {
                 a.configuration[key] = a.configuration[key].toString()
               } else {

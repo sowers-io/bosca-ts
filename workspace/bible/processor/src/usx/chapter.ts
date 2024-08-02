@@ -41,6 +41,14 @@ export class ChapterVerse {
     this.items = items
     this.raw = raw
   }
+
+  toString(): string {
+    let buf = ''
+    for (const item of this.items) {
+      buf += item.toString()
+    }
+    return buf
+  }
 }
 
 export class Chapter extends UsxItemContainer<ChapterType> {

@@ -38,11 +38,7 @@ export async function createSchemaWithContext<TContext extends GraphQLRequestCon
 }
 
 export async function createAndRunServer<TContext extends GraphQLRequestContext>(port: number) {
-  const server = fastify({
-    logger: {
-      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    },
-  })
+  const server = fastify()
   const schema = createSchemaWithContext<TContext>()
   const yoga = createYoga<TContext>({
     schema: schema,

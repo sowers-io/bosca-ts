@@ -19,12 +19,14 @@ import { execute, toArrayBuffer } from '../../util/http'
 import { Ollama } from '@langchain/community/llms/ollama'
 
 import { ChatOpenAI } from '@langchain/openai'
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai'
 import { ChatPromptTemplate } from '@langchain/core/prompts'
 import { JsonOutputParser } from '@langchain/core/output_parsers'
 import { uploadSupplementary } from '../../util/uploader'
 import { Job } from 'bullmq/dist/esm/classes/job'
 import { ContentService, IdRequest, SupplementaryIdRequest, WorkflowActivityModel, WorkflowJob } from '@bosca/protobufs'
 import { BaseLanguageModel } from '@langchain/core/language_models/base'
+import { logger, useServiceAccountClient } from '@bosca/common'
 
 export class PromptActivity extends Activity {
   get id(): string {
@@ -58,46 +60,69 @@ class Executor extends ActivityJobExecutor<PromptActivity> {
           apiKey: process.env.OPENAI_KEY,
           streaming: false,
         })
+      case 'google-llm':
+        return new ChatGoogleGenerativeAI({
+          model: m.model!.name,
+          temperature: temperature as number,
+          apiKey: process.env.GOOGLE_API_KEY,
+          streaming: false,
+        })
       default:
         throw new Error('unsupported model type: ' + m.model!.type)
     }
   }
 
   async execute() {
-    // const service = useServiceClient(ContentService)
-    // const source = await service.getSource(new IdRequest({ id: 'workflow' }))
-    // const downloadUrl = await service.getMetadataSupplementaryDownloadUrl(
-    //   new SupplementaryIdRequest({
-    //     id: this.definition.metadataId,
-    //     key: this.definition.activity!.inputs!['supplementaryId'],
-    //   })
-    // )
-    // const downloadResponse = await execute(downloadUrl)
-    // const payload = await downloadResponse.json()
-    // const m = this.definition.models[0]
-    //
-    // if (!m) throw new Error('missing model')
-    //
-    // const prompt = this.definition.prompts[0]
-    //
-    // if (!prompt) throw new Error('missing prompt')
-    //
-    // const model = this.getModel(m)
-    // const promptTemplate = ChatPromptTemplate.fromMessages([
-    //   ['system', prompt.prompt!.systemPrompt],
-    //   ['user', prompt.prompt!.userPrompt],
-    // ])
-    // const chain = promptTemplate.pipe(model).pipe(new JsonOutputParser())
-    // const response = await chain.invoke({ input: JSON.stringify(payload) })
-    // const output = JSON.stringify(response)
-    // await uploadSupplementary(
-    //   this.definition.metadataId,
-    //   'Prompt Response',
-    //   'application/json',
-    //   this.definition.activity!.outputs['supplementaryId'],
-    //   source.id,
-    //   undefined,
-    //   toArrayBuffer(output)
-    // )
+    const service = useServiceAccountClient(ContentService)
+    const source = await service.getSource(new IdRequest({ id: 'workflow' }))
+    const key = this.definition.supplementaryId
+        ? this.definition.activity!.inputs!['supplementaryId'] + this.definition.supplementaryId
+        : this.definition.activity!.inputs!['supplementaryId']
+    const downloadUrl = await service.getMetadataSupplementaryDownloadUrl(
+      new SupplementaryIdRequest({
+        id: this.definition.metadataId,
+        key: key,
+      })
+    )
+    const payload = await execute(downloadUrl)
+    const json = JSON.parse(payload.toString())
+
+    const m = this.definition.models[0]
+
+    if (!m) throw new Error('missing model')
+
+    const prompt = this.definition.prompts[0]
+
+    if (!prompt) throw new Error('missing prompt')
+
+    const model = this.getModel(m)
+    const promptTemplate = ChatPromptTemplate.fromMessages([
+      ['system', prompt.prompt!.systemPrompt],
+      ['user', prompt.prompt!.userPrompt],
+    ])
+    const chain = promptTemplate.pipe(model).pipe(new JsonOutputParser())
+    try {
+      const jsonInput = JSON.stringify(json)
+      const response: any = await chain.invoke({ input: jsonInput })
+      logger.debug({ response: response }, 'got response from chain')
+      if (!Array.isArray(response) || response.length != json.length) {
+        throw new Error('invalid response')
+      }
+      await uploadSupplementary(
+        this.definition.metadataId!,
+        'Prompt Response',
+        'application/json',
+        this.definition.supplementaryId
+          ? this.definition.activity!.outputs['supplementaryId'] + this.definition.supplementaryId
+          : this.definition.activity!.outputs['supplementaryId'],
+        source.id,
+        undefined,
+        undefined,
+        toArrayBuffer(JSON.stringify(response))
+      )
+    } catch (e) {
+      logger.error({ error: e }, 'error in chain')
+      throw e
+    }
   }
 }

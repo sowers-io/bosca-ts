@@ -15,48 +15,71 @@
  */
 
 import { PromptActivity } from './prompt'
-import fs from 'node:fs'
+import * as fs from 'node:fs'
 import {
   Model,
   Prompt,
   WorkflowActivity,
   WorkflowActivityModel,
   WorkflowActivityPrompt,
-  WorkflowJob
+  WorkflowJob,
 } from '@bosca/protobufs'
 import { Activity } from '../activity'
 import { Job, Queue, Worker } from 'bullmq'
 
 async function runTest(activity: Activity, definition: WorkflowJob) {
-  const queue = new Queue('test')
-  await queue.add('job', definition.toJson())
-  const worker = new Worker('job', async (job: Job) => {
-    await activity.newJobExecutor(job, definition).execute()
+  const connection = {
+    host: 'localhost',
+    port: 6379,
+  }
+  const queue = new Queue('test', {
+    connection: connection,
   })
-  await worker.close()
+  await queue.add('job', definition.toJson())
+  await new Promise(async (resolve, reject) => {
+    new Worker(
+      'test',
+      async (job: Job) => {
+        try {
+          await activity.newJobExecutor(job, definition).execute()
+          resolve(null)
+        } catch (e) {
+          reject(e)
+        }
+      },
+      {
+        connection: connection,
+      }
+    )
+  })
 }
 
 test('test prompt', async () => {
   const activity = new PromptActivity()
   const definition = new WorkflowJob({
     workflowId: 'wid',
-    metadataId: '540d85d3-7cfe-4b2c-b707-86e5ed2090a8',
+    metadataId: '5323d949-5eda-4edd-802e-ba7a2a886059',
     models: [
       new WorkflowActivityModel({
         model: new Model({
+          // type: 'google-llm',
+          // name: 'gemini-1.5-pro',
           type: 'openai-llm',
+          // name: 'gpt-4o-mini',
           name: 'gpt-4o',
+          // type: 'ollama-llm',
+          // name: 'llama3.1:8b-instruct-q8_0',
           configuration: {
             temperature: '0',
-          }
+          },
         }),
       }),
     ],
     prompts: [
       new WorkflowActivityPrompt({
         prompt: new Prompt({
-          systemPrompt: fs.readFileSync('../prompts/verselabeller/system', 'utf-8').toString(),
-          userPrompt: fs.readFileSync('../prompts/verselabeller/user', 'utf-8').toString(),
+          systemPrompt: fs.readFileSync('../../../example-data/prompts/verselabeller/system', 'utf-8').toString(),
+          userPrompt: fs.readFileSync('../../../example-data/prompts/verselabeller/user', 'utf-8').toString(),
         }),
       }),
     ],

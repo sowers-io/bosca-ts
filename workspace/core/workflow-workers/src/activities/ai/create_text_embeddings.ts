@@ -16,7 +16,9 @@
 
 import { Activity, ActivityJobExecutor } from '../activity'
 import { Job } from 'bullmq'
-import { WorkflowJob } from '@bosca/protobufs'
+import { ContentService, IdRequest, SignedUrl, SupplementaryIdRequest, WorkflowJob } from '@bosca/protobufs'
+import { getIStorageSystem, useServiceAccountClient } from '@bosca/common'
+import { execute } from '../../util/http'
 
 export class CreateTextEmbeddings extends Activity {
   get id(): string {
@@ -29,5 +31,23 @@ export class CreateTextEmbeddings extends Activity {
 }
 
 class Executor extends ActivityJobExecutor<CreateTextEmbeddings> {
-  async execute() {}
+  async execute() {
+    const idRequest = new IdRequest({ id: this.definition.metadataId })
+    const service = useServiceAccountClient(ContentService)
+    const metadata = await service.getMetadata(idRequest)
+    let downloadUrl: SignedUrl
+    if (metadata.contentType === 'text/plain' && !this.definition.activity?.inputs['supplementaryId']) {
+      downloadUrl = await service.getMetadataDownloadUrl(idRequest)
+    } else {
+      downloadUrl = await service.getMetadataSupplementaryDownloadUrl(
+        new SupplementaryIdRequest({
+          id: this.definition.metadataId,
+          key: this.definition.activity?.inputs['supplementaryId'] ?? 'text',
+        })
+      )
+    }
+    const payload = await execute(downloadUrl)
+    const system = await getIStorageSystem(this.definition.storageSystems[0].storageSystem!)
+    await system.storeContent(this.definition, metadata, payload)
+  }
 }

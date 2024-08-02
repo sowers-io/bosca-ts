@@ -13,22 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-syntax = "proto3";
 
-option go_package = "bosca.io/api/protobuf/bosca/workflow";
+import { type ConnectRouter } from '@connectrpc/connect'
+import { health } from '@bosca/common'
 
-package bosca.workflow;
-
-message BeginTransitionWorkflowRequest {
-  string metadata_id = 1;
-  string state_id = 2;
-  string status = 3;
-  bool retry = 4;
-  optional string supplementaryId = 5;
-}
-
-message CompleteTransitionWorkflowRequest {
-  string metadata_id = 1;
-  string status = 2;
-  bool success = 3;
+export default (router: ConnectRouter) => {
+  return health(router)
 }

@@ -16,7 +16,10 @@
 
 import { Activity, ActivityJobExecutor } from '../../activity'
 import { Job } from 'bullmq'
-import { WorkflowJob } from '@bosca/protobufs'
+import { ContentService, IdRequest, WorkflowJob, SignedUrl, SupplementaryIdRequest } from '@bosca/protobufs'
+import { useServiceAccountClient } from '@bosca/common'
+import { execute } from '../../../util/http'
+import { getIStorageSystem } from '@bosca/common'
 
 export class IndexText extends Activity {
   get id(): string {
@@ -29,5 +32,24 @@ export class IndexText extends Activity {
 }
 
 class Executor extends ActivityJobExecutor<IndexText> {
-  async execute() {}
+  async execute() {
+    const idRequest = new IdRequest({ id: this.definition.metadataId })
+    const service = useServiceAccountClient(ContentService)
+    const metadata = await service.getMetadata(idRequest)
+    let downloadUrl: SignedUrl
+    if (metadata.contentType === 'text/plain' && !this.definition.activity?.inputs['supplementaryId']) {
+      downloadUrl = await service.getMetadataDownloadUrl(idRequest)
+    } else {
+      const key = this.definition.activity?.inputs['supplementaryId'] ?? 'text'
+      downloadUrl = await service.getMetadataSupplementaryDownloadUrl(
+        new SupplementaryIdRequest({
+          id: this.definition.metadataId,
+          key: key,
+        })
+      )
+    }
+    const payload = await execute(downloadUrl)
+    const system = await getIStorageSystem(this.definition.storageSystems[0].storageSystem!)
+    await system.storeContent(this.definition, metadata, payload)
+  }
 }

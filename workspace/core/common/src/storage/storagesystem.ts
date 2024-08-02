@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor } from '../activity'
-import { Job } from 'bullmq'
-import { WorkflowJob } from '@bosca/protobufs'
+import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
 
-export class CreatePendingEmbeddingsFromMarkdownTable extends Activity {
-  get id(): string {
-    return 'ai.embeddings.pending.from-markdown-table'
-  }
+export interface IStorageSystem {
+  initialize(): Promise<void>
 
-  newJobExecutor(job: Job, definition: WorkflowJob): ActivityJobExecutor<any> {
-    return new Executor(this, job, definition)
-  }
-}
+  storeContent(definition: WorkflowJob, metadata: Metadata, content: Buffer): Promise<void>
 
-class Executor extends ActivityJobExecutor<CreatePendingEmbeddingsFromMarkdownTable> {
-  async execute() {}
+  storePendingEmbeddings(definition: WorkflowJob, metadata: Metadata, embeddings: PendingEmbeddings): Promise<void>
 }

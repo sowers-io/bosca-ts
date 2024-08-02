@@ -28,9 +28,12 @@ import {
   Workflows,
   WorkflowService,
   WorkflowStates,
+  FindCollectionRequest,
+  FindMetadataRequest,
+  WorkflowEnqueueResponses,
 } from '@bosca/protobufs'
+import { logger, PermissionManager, SubjectKey, SubjectType, useServiceAccountClient } from '@bosca/common'
 import { Code, ConnectError, type ConnectRouter } from '@connectrpc/connect'
-import { PermissionManager, useServiceAccountClient } from '@bosca/common'
 import { WorkflowDataSource } from '../datasources/workflow'
 import {
   completeTransitionWorkflow,
@@ -47,77 +50,139 @@ export function workflow(
   dataSource: WorkflowDataSource
 ): ConnectRouter {
   return router.service(WorkflowService, {
-    async getModels() {
+    async getModels(_, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return new Models({ models: await dataSource.getModels() })
     },
-    async getModel(request) {
+    async getModel(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       const model = await dataSource.getModel(request.id)
       if (!model) {
         throw new ConnectError('missing model', Code.NotFound)
       }
       return model
     },
-    async getPrompts() {
+    async getPrompts(_, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return new Prompts({ prompts: await dataSource.getPrompts() })
     },
-    async getPrompt(request) {
+    async getPrompt(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       const model = await dataSource.getModel(request.id)
       if (!model) {
         throw new ConnectError('missing model', Code.NotFound)
       }
       return model
     },
-    async getStorageSystems() {
+    async getStorageSystems(_, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return new StorageSystems({ systems: await dataSource.getStorageSystems() })
     },
-    async getStorageSystem(request) {
+    async getStorageSystem(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       const system = await dataSource.getStorageSystem(request.id)
       if (!system) {
         throw new ConnectError('missing storage system', Code.NotFound)
       }
       return system
     },
-    async getStorageSystemModels(request) {
+    async getStorageSystemModels(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return new StorageSystemModels({
         models: await dataSource.getStorageSystemModels(request.id),
       })
     },
-    async getWorkflows() {
+    async getWorkflows(_, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return new Workflows({ workflows: await dataSource.getWorkflows() })
     },
-    async getWorkflow(request) {
+    async getWorkflow(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       const workflow = await dataSource.getWorkflow(request.id)
       if (!workflow) {
+        logger.warn({ id: request.id }, 'missing workflow')
         throw new ConnectError('missing workflow', Code.NotFound)
       }
       return workflow
     },
-    async getWorkflowStates() {
+    async getWorkflowStates(_, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return new WorkflowStates({ states: await dataSource.getWorkflowStates() })
     },
-    async getWorkflowState(request) {
+    async getWorkflowState(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       const state = await dataSource.getWorkflowState(request.id)
       if (!state) {
+        logger.warn({ id: request.id }, 'missing workflow state')
         throw new ConnectError('missing workflow state', Code.NotFound)
       }
       return state
     },
-    async getWorkflowActivities(request) {
+    async getWorkflowActivities(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return new WorkflowActivities({
         activities: await dataSource.getWorkflowActivities(request.id),
       })
     },
-    async getWorkflowActivityStorageSystems(request) {
+    async getWorkflowActivityStorageSystems(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return new WorkflowActivityStorageSystems({
         systems: await dataSource.getWorkflowActivityStorageSystems(Number(request.workflowActivityId)),
       })
     },
-    async getWorkflowActivityPrompts(request) {
+    async getWorkflowActivityPrompts(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return new WorkflowActivityPrompts({
         prompts: await dataSource.getWorkflowActivityPrompts(Number(request.workflowActivityId)),
       })
     },
     async beginTransitionWorkflow(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       const metadata = await useServiceAccountClient(ContentService).getMetadata(
         new IdRequest({ id: request.metadataId })
       )
@@ -135,25 +200,76 @@ export function workflow(
       return new Empty()
     },
     async completeTransitionWorkflow(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       const metadata = await useServiceAccountClient(ContentService).getMetadata(
         new IdRequest({ id: request.metadataId })
       )
       if (!metadata) throw new ConnectError('missing metadata', Code.NotFound)
       await completeTransitionWorkflow(metadata, request.status)
     },
-    async executeWorkflow(request) {
+    async executeWorkflow(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
       return await executeWorkflow(
         dataSource,
         request.parent,
         request.metadataId,
+        request.supplementaryId,
         request.collectionId,
         request.workflowId,
         request.context,
         request.waitForCompletion
       )
     },
-    async findAndExecuteWorkflow() {
-      throw new Error('unimplemented')
+    async findAndExecuteWorkflow(request, context) {
+      const subject = context.values.get(SubjectKey)
+      if (subject.type != SubjectType.serviceaccount) {
+        throw new ConnectError('unauthorized', Code.PermissionDenied)
+      }
+      const service = useServiceAccountClient(ContentService)
+      const responses = new WorkflowEnqueueResponses({ responses: [] })
+      const requests = []
+      if (request.metadataId) {
+        requests.push({ collection: null, metadata: request.metadataId })
+      }
+      if (request.collectionId) {
+        requests.push({ collection: request.collectionId, metadata: null })
+      }
+      if (request.collectionAttributes) {
+        const collections = await service.findCollection(
+          new FindCollectionRequest({ attributes: request.collectionAttributes })
+        )
+        for (const collection of collections.collections) {
+          requests.push({ collection: collection.id, metadata: null })
+        }
+      }
+      if (request.metadataAttributes) {
+        const metadatas = await service.findMetadata(
+          new FindMetadataRequest({ attributes: request.metadataAttributes })
+        )
+        for (const metadata of metadatas.metadata) {
+          requests.push({ collection: null, metadata: metadata.id })
+        }
+      }
+      for (const r of requests) {
+        const response = await executeWorkflow(
+          dataSource,
+          null,
+          r.metadata,
+          null,
+          r.collection,
+          request.workflowId,
+          request.context,
+          request.waitForCompletion
+        )
+        responses.responses.push(response)
+      }
+      return responses
     },
   })
 }

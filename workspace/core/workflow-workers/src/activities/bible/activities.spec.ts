@@ -16,7 +16,7 @@
 
 import { Downloader, FileName } from '../../util/downloader'
 import { ProcessBibleActivity } from './process'
-import { CreateVerseMarkdownTable } from './book/verse_table'
+import { CreateVerseJsonTable } from './book/verse_table'
 import { CreateVerses } from './book/verse_create'
 import { WorkflowActivity, WorkflowJob } from '@bosca/protobufs'
 import { Job, Queue, Worker } from 'bullmq'
@@ -54,7 +54,7 @@ test('process bible activity', async () => {
 
 test('create verse tables', async () => {
   const downloader = new DummyDownloader()
-  const activity = new CreateVerseMarkdownTable(downloader)
+  const activity = new CreateVerseJsonTable(downloader)
   const definition = new WorkflowJob({
     workflowId: 'wid',
     metadataId: 'mid',

@@ -23,8 +23,8 @@ import {
   PermissionAction,
   PermissionObjectType,
   PermissionRelation,
-  PermissionSubjectType,
-  WorkflowService,
+  PermissionSubjectType, WorkflowExecutionRequest,
+  WorkflowService
 } from '@bosca/protobufs'
 import { AdministratorGroup } from './permissions'
 import { ContentDataSource } from '../../datasources/content'
@@ -99,6 +99,33 @@ export async function setMetadataReady(
       stateId: StateProcessing,
     })
   )
+}
+
+export async function setMetadataSupplementaryReady(
+  dataSource: ContentDataSource,
+  permissions: PermissionManager,
+  subject: Subject,
+  metadataId: string,
+  supplementaryId: string
+) {
+  const supplementary = await dataSource.getMetadataSupplementary(metadataId, supplementaryId)
+  if (!supplementary) throw new ConnectError('missing metadata supplementary', Code.NotFound)
+  await permissions.checkWithError(subject, PermissionObjectType.metadata_type, supplementary.metadataId, PermissionAction.manage)
+  await dataSource.setMetadataSupplementaryReady(metadataId, supplementaryId)
+  if (!supplementary.traitIds || supplementary.traitIds.length === 0) return
+  const workflowService = useServiceAccountClient(WorkflowService)
+  for (const traitId of supplementary.traitIds) {
+    const workflowIds = await dataSource.getTraitWorkflowIds(traitId)
+    for (const workflowId of workflowIds) {
+      await workflowService.executeWorkflow(
+        new WorkflowExecutionRequest({
+          workflowId: workflowId,
+          metadataId: metadataId,
+          supplementaryId: supplementaryId,
+        })
+      )
+    }
+  }
 }
 
 export async function setWorkflowStateComplete(

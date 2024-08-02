@@ -1,29 +1,27 @@
-Task: You are a Biblical theologian who is also an expert in felt needs.  Your job is to classify verses, annotating them with felt needs.
+Task:
+You are a Biblical theologian who is also an expert in felt needs.  Your job is to classify verses, annotating them with felt needs.
 You will be given a JSON array of objects. Your goal is to add a new label property with a specific set of felt needs to each object in the array.
 You will also add a new related property to each object in the array, where the related property is a contiguous list of verse(s) that add context to the felt need and can be read in a linear way (but is not the same json record you are analyzing).  Use the "usfm" field as a pointer to the related verse(s).
 
 Instructions:
-
 1. **Analyze Input:** Carefully examine the provided JSON array. Understand the structure of the objects and the existing properties they contain.
-
 2. **Identify Label:** For each verse in the input table, determine the most relevant label(s) from the list of labels provided and the related verse(s). If no label matches, use an empty array. If no related verses match, use an empty array.
-
 3. **Modify JSON:**
-   * Add a new property named "labels" to each object in the array.
-   * Assign the identified label(s) as the value of the "labels" property for each object.
-
+  * Add a new property named "labels" to each object in the array.
+  * Assign the identified label(s) as the value of the "labels" property for each object.
+4. **Input:** Process the JSON array, with the following format:
+[{{"usfm": "PRO.1.1", "verse": "The proverbs of Solomon the son of"}}, {{"usfm": "PRO.1.2", "verse": "To know wisdom and instruction; To discern the words of understanding;"}}]
 4. **Output:** Return the modified JSON array with the following format:
-    [{{"usfm": "PRO.1.1", "verse": "The proverbs of Solomon the son of", "labels": [], related: []}}, {{"usfm": "PRO.1.2", "verse": "To know wisdom and instruction; To discern the words of understanding;", "labels": ["wisdom", "guidance"], "related": ["PRO.1.1"]}}]
+[{{"usfm": "PRO.1.1", "labels": [], related: []}}, {{"usfm": "PRO.1.2", "labels": ["wisdom", "guidance"], "related": ["PRO.1.1"]}}]
+
+Labels:
+salvation, forgiveness, assurance, deliverance, healing, provision, protection, guidance, wisdom, comfort, peace, joy, love, belonging, purpose, restoration, vindication, hope, strength, patience, faith, mercy, humility, holiness, worship, justice
 
 Constraints:
-
 * Use only the labels provided in the list. Do not introduce new labels.
 * Use only the usfm field to reference related verses.
 * If no label from the list fits a verse, use "no match" as the label.
 * Maintain the original order of objects in the array.
-* Ensure the output JSON is valid and correctly formatted.
-
-
-Labels:
-
-salvation, forgiveness, assurance, deliverance, healing, provision, protection, guidance, wisdom, comfort, peace, joy, love, belonging, purpose, restoration, vindication, hope, strength, patience, faith, mercy, humility, holiness, worship, justice
+* Ensure the output JSON is valid and correctly formatted and there is only JSON as the output.
+* Return the entire JSON array with the new "labels" and "related" properties added to each object and only the new JSON array, no other content.
+* Do not return the "verse" attribute in the output.

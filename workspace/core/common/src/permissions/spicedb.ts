@@ -97,7 +97,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
           ) {
             ids.push(resourceId[i])
           } else if (item.permissionship == v1.CheckPermissionResponse_Permissionship.NO_PERMISSION) {
-            console.log(
+            logger.warn(
               {
                 resourceId: resourceId[i],
                 subjectId,
@@ -163,11 +163,10 @@ export class SpiceDBPermissionManager implements PermissionManager {
         response.permissionship === v1.CheckPermissionResponse_Permissionship.NO_PERMISSION ||
         response.permissionship === v1.CheckPermissionResponse_Permissionship.UNSPECIFIED
       ) {
-        logger.error({ resourceId, subjectId, action: this.getAction(action) }, 'permission check failed')
         throw new PermissionError('permission check failed')
       }
     } catch (e) {
-      console.error('permission check failed', resourceId, subjectId, this.getAction(action))
+      logger.error({ resourceId, subjectId, action: this.getAction(action) }, 'permission check failed')
       throw new PermissionError('permission check failed')
     }
   }
@@ -205,25 +204,30 @@ export class SpiceDBPermissionManager implements PermissionManager {
     for (const permission of permissions) {
       let tries = 1000
       while (tries-- > 0) {
-        const current = await this.getPermissions(objectType, permission.id)
-        if (current) {
-          let match = false
-          for (const p of current.permissions) {
-            if (
-              permission.id === p.id &&
-              permission.subjectType === p.subjectType &&
-              permission.subject === p.subject &&
-              permission.relation === p.relation
-            ) {
-              match = true
+        try {
+          const current = await this.getPermissions(objectType, permission.id)
+          if (current) {
+            let match = false
+            for (const p of current.permissions) {
+              if (
+                permission.id === p.id &&
+                permission.subjectType === p.subjectType &&
+                permission.subject === p.subject &&
+                permission.relation === p.relation
+              ) {
+                match = true
+                break
+              }
+            }
+            if (match) {
               break
+            } else {
+              await new Promise((resolve) => setTimeout(resolve, 500))
             }
           }
-          if (match) {
-            break
-          } else {
-            await new Promise((resolve) => setTimeout(resolve, 500))
-          }
+        } catch (e) {
+          logger.error({ error: e }, 'failed to get permissions')
+          await new Promise((resolve) => setTimeout(resolve, 500))
         }
       }
       if (tries <= 0) {

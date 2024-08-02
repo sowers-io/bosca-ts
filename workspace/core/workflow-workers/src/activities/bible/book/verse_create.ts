@@ -22,6 +22,7 @@ import { findFirstCollection } from '../../../util/finder'
 import { toArrayBuffer } from '../../../util/http'
 import { AddCollectionRequest, AddMetadataRequest, Collection, Metadata, Source, WorkflowJob } from '@bosca/protobufs'
 import { Job } from 'bullmq/dist/esm/classes/job'
+import { uploadAll, uploadSupplementary } from '../../../util/uploader'
 
 export class CreateVerses extends BookActivity {
   get id(): string {
@@ -65,12 +66,7 @@ class Executor extends BookExecutor {
     return requests
   }
 
-  override async execute(
-    source: Source,
-    systemId: string,
-    metadata: Metadata,
-    book: Book
-  ): Promise<void> {
+  override async execute(source: Source, systemId: string, metadata: Metadata, book: Book): Promise<void> {
     const addCollectionRequests = await this.createVersesCollectionRequests(
       systemId,
       metadata.attributes['bible.abbreviation'],
@@ -79,7 +75,8 @@ class Executor extends BookExecutor {
     const collections = await addCollections(addCollectionRequests)
 
     const addMetadataRequests: AddMetadataRequest[] = []
-    const buffers: ArrayBuffer[] = []
+    const textBuffers: ArrayBuffer[] = []
+    const rawBuffers: ArrayBuffer[] = []
     for (let i = 0; i < book.chapters.length; i++) {
       const chapter = book.chapters[i]
       const verses = chapter.getVerses(book)
@@ -87,7 +84,8 @@ class Executor extends BookExecutor {
       for (let v = 0; v < verses.length; v++) {
         const verse = verses[v]
         const buffer = toArrayBuffer(verse.raw)
-        buffers.push(buffer)
+        rawBuffers.push(buffer)
+        textBuffers.push(toArrayBuffer(verse.toString()))
         addMetadataRequests.push(
           new AddMetadataRequest({
             collection: collection.id,
@@ -112,6 +110,26 @@ class Executor extends BookExecutor {
         )
       }
     }
-    await addMetadatas(addMetadataRequests, buffers)
+    const responses = await addMetadatas(addMetadataRequests)
+
+    for (let i = 0; i < responses.id.length; i++) {
+      if (responses.id[i].id === '') {
+        throw new Error('not all metadata were created')
+      }
+    }
+
+    for (let i = 0; i < responses.id.length; i++) {
+      await uploadSupplementary(
+        responses.id[i].id,
+        'Verse Text',
+        'text/plain',
+        'text',
+        source.id,
+        undefined,
+        undefined,
+        textBuffers[i]
+      )
+    }
+    await uploadAll(responses, rawBuffers)
   }
 }

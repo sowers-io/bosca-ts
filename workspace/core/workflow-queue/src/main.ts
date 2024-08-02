@@ -22,9 +22,6 @@ import { logger, newLoggingInterceptor } from "@bosca/common";
 async function main() {
   const server = fastify({
     http2: true,
-    logger: {
-      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    },
   });
   server.setErrorHandler((error, request, reply) => {
     logger.error({ error, request }, "uncaught error");

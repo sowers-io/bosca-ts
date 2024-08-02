@@ -34,6 +34,7 @@ export async function executeWorkflow(
   workflowDataSource: WorkflowDataSource,
   parent: WorkflowParentJobId | undefined | null,
   metadataId: string | undefined | null,
+  supplementaryId: string | undefined | null,
   collectionId: string | undefined | null,
   workflowId: string,
   context: { [key: string]: string } | undefined | null,
@@ -53,6 +54,7 @@ export async function executeWorkflow(
       new WorkflowJob({
         workflowId: workflow.id,
         metadataId: metadataId || undefined,
+        supplementaryId: supplementaryId || undefined,
         activity: activity,
         prompts: prompts,
         models: models,
@@ -65,6 +67,7 @@ export async function executeWorkflow(
     new WorkflowEnqueueRequest({
       parent: parent || undefined,
       metadataId: metadataId || undefined,
+      supplementaryId: supplementaryId || undefined,
       collectionId: collectionId || undefined,
       workflow: workflow,
       jobs: jobs,
@@ -95,7 +98,7 @@ export async function verifyExitTransitionExecution(
     throw new ConnectError('missing next state', Code.NotFound)
   }
   if (nextState.exitWorkflowId) {
-    await executeWorkflow(dataSource, null, metadata.id, null, nextState.exitWorkflowId, null, true)
+    await executeWorkflow(dataSource, null, metadata.id, null, null, nextState.exitWorkflowId, null, true)
   }
 }
 
@@ -109,7 +112,7 @@ export async function verifyEnterTransitionExecution(
     throw new ConnectError('missing next state', Code.NotFound)
   }
   if (nextState.entryWorkflowId) {
-    await executeWorkflow(dataSource, null, metadata.id, null, nextState.entryWorkflowId, null, true)
+    await executeWorkflow(dataSource, null, metadata.id, null, null, nextState.entryWorkflowId, null, true)
   }
   return nextState
 }
@@ -129,7 +132,7 @@ export async function transition(
         stateId: nextState.id,
       })
     )
-    await executeWorkflow(workflowDataSource, null, metadata.id, null, nextState.workflowId, null, waitForCompletion)
+    await executeWorkflow(workflowDataSource, null, metadata.id, null, null, nextState.workflowId, null, waitForCompletion)
   } else {
     await useServiceAccountClient(ContentService).setWorkflowStateComplete(
       new SetWorkflowStateCompleteRequest({

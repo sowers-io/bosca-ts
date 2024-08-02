@@ -22,7 +22,7 @@ import { BookActivity, BookExecutor } from './book_activity'
 import { Metadata, Source, WorkflowJob } from '@bosca/protobufs'
 import { Job } from 'bullmq/dist/esm/classes/job'
 
-export class CreateVerseMarkdownTable extends BookActivity {
+export class CreateVerseJsonTable extends BookActivity {
   get id(): string {
     return 'bible.book.verse.table.create'
   }
@@ -33,36 +33,32 @@ export class CreateVerseMarkdownTable extends BookActivity {
 }
 
 class Executor extends BookExecutor {
-  async execute(
-    source: Source,
-    systemId: string,
-    metadata: Metadata,
-    book: Book
-  ): Promise<void> {
-    const verses = []
+  async execute(source: Source, systemId: string, metadata: Metadata, book: Book): Promise<void> {
     const bookMetadata = await findFirstMetadata({
       'bible.type': 'book',
       'bible.system.id': systemId,
       'bible.book.usfm': book.usfm,
     })
     for (const chapter of book.chapters) {
+      const verses = []
       for (const verse of chapter.getVerses(book)) {
         verses.push({
           usfm: verse.usfm,
           verse: verse.items.map((item) => item.toString().trim().replace('\r', '').replace('\n', '')).join(' '),
         })
       }
+      const key = this.definition.activity!.outputs['supplementaryId'] + '-' + chapter.usfm
+      const buffer = toArrayBuffer(JSON.stringify(verses))
+      await uploadSupplementary(
+        bookMetadata.id,
+        'Verse JSON Table',
+        'application/json',
+        key,
+        source.id,
+        undefined,
+        ['bible.usx.chapter.verse.table'],
+        buffer
+      )
     }
-    const key = this.definition.activity!.outputs['supplementaryId']
-    const buffer = toArrayBuffer(JSON.stringify(verses))
-    await uploadSupplementary(
-      bookMetadata.id,
-      'Verse Markdown Table',
-      'text/markdown',
-      key,
-      source.id,
-      undefined,
-      buffer
-    )
   }
 }

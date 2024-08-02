@@ -17,19 +17,20 @@
 import { IStorageSystem } from './storagesystem'
 import { MeilisearchStorageSystem } from './meilisearch'
 import { QdrantStorageSystem } from './qdrant'
+import { StorageSystem } from '@bosca/protobufs'
 
-export async function getStorageSystem(configuration: { [key: string]: string }): Promise<IStorageSystem> {
-  let system: IStorageSystem
-  switch (configuration.type) {
+export async function getIStorageSystem(system: StorageSystem): Promise<IStorageSystem> {
+  let s: IStorageSystem
+  switch (system.configuration.type) {
     case 'meilisearch':
-      system = new MeilisearchStorageSystem(configuration)
+      s = new MeilisearchStorageSystem(system.configuration)
       break
     case 'qdrant':
-      system = new QdrantStorageSystem(configuration)
+      s = new QdrantStorageSystem(system.configuration)
       break
     default:
-      throw new Error('unsupported storage system: ' + configuration.type)
+      throw new Error('unsupported storage system: ' + system.configuration.type)
   }
-  await system.initialize()
-  return system
+  await s.initialize()
+  return s
 }

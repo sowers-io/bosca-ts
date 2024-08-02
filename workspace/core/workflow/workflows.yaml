@@ -8,27 +8,39 @@ traits:
     workflowIds:
       - bible.usx.book
   bible.usx.chapter: { }
+  bible.usx.chapter.verse.table:
+    workflowIds:
+      - bible.usx.chapter.ai
   bible.usx.verse:
     workflowIds:
       - bible.usx.verse
   common.temporary: { }
 
 models:
+  default:
+    type: openai-llm
+    name: gpt-4o
+    configuration:
+      temperature: 0
+      vectorSize: 1536
   phi3:medium-128k:
     type: ollama-llm
     name: phi3:medium-128k
     configuration:
-      vectorSize: 5120
-      contextWindow: 120000
+      temperature: 0
   phi3:mini:
     type: ollama-llm
     name: phi3:mini
     configuration:
-      vectorSize: 3072
-      contextWindow: 8000
+      temperature: 0
   gpt-4o:
     type: openai-llm
     name: gpt-4o
+    configuration:
+      temperature: 0
+  gemini-1.5-pro:
+    type: google-llm
+    name: gemini-1.5-pro
     configuration:
       temperature: 0
 
@@ -38,33 +50,40 @@ storageSystems:
     configuration:
       indexName: metadata
       type: meilisearch
+      primaryKey: id
+  bible.verse.search.index:
+    type: search
+    configuration:
+      indexName: bibleverses
+      type: meilisearch
+      primaryKey: id
   bible.chapter.vector.index:
     type: vector
     models:
-      phi3:mini:
+      default:
         configuration: { }
     configuration:
       indexName: biblechapters
       type: qdrant
-      vectorSize: 3072
+      vectorSize: 1536
   bible.verse.vector.index:
     type: vector
     models:
-      phi3:mini:
+      default:
         configuration: { }
     configuration:
       indexName: bibleverses
       type: qdrant
-      vectorSize: 3072
+      vectorSize: 1536
   bible.verse.label.vector.index:
     type: vector
     models:
-      phi3:mini:
+      default:
         configuration: { }
     configuration:
       indexName: bibleverselabels
       type: qdrant
-      vectorSize: 3072
+      vectorSize: 1536
 
 workflows:
   states:
@@ -126,15 +145,15 @@ workflows:
       description: Generate embeddings from the supplied supplementary data using the supplied model.  Store the embeddings in the specified storage system.
       inputs:
         supplementaryId: supplementary
-    ai.embeddings.pending.from-markdown-table:
-      description: Generate pending embeddings (which is a proto structure) from the supplied supplementary data, which should be a markdown table.  The specified columns will be used to construct the pending embedding.
+    ai.embeddings.pending.from-json-table:
+      description: Generate pending embeddings (which is a proto structure) from the supplied supplementary data, which should be a json table.  The specified columns will be used to construct the pending embedding.
       inputs:
         supplementaryId: supplementary
       outputs:
         supplementaryId: supplementary
       configuration:
-        idColumn: Metadata ID
-        contentColumn: Labels
+        idColumn: usfm
+        contentColumn: labels
     ai.embeddings.pending.index:
       description: Generate embeddings from the supplied supplementary data (which is expected to be pending embeddings).
       inputs:
@@ -202,12 +221,8 @@ workflows:
         bible.chapter.verses.create:
           queue: bible-verse
           executionGroup: 1
-        metadata.child.workflow:
-          executionGroup: 2
-          configuration:
-            workflowId: bible.usx.book.ai
-    ## bible book ai workflow
-    bible.usx.book.ai:
+    ## bible chapter ai workflow
+    bible.usx.chapter.ai:
       queue: bible-ai
       activities:
         ai.prompt:
@@ -215,35 +230,37 @@ workflows:
           prompts:
             verse.labeller: { }
           models:
-            gpt-4o: { }
+            default: { }
           inputs:
-            supplementaryId: chapter-verse-table
+            supplementaryId: ""
           outputs:
             supplementaryId: chapter-verse-table-prompted
-        ai.embeddings.pending.from-markdown-table:
+        ai.embeddings.pending.from-json-table:
           executionGroup: 2
           models:
-            phi3:mini: { }
+            default: { }
           inputs:
             supplementaryId: chapter-verse-table-prompted
           outputs:
             supplementaryId: chapter-verse-pending-embeddings
           configuration:
-            idColumn: Metadata ID
-            contentColumn: Labels
+            idColumn: usfm
+            contentColumn: labels
         ai.embeddings.pending.index:
           executionGroup: 3
           inputs:
             supplementaryId: chapter-verse-pending-embeddings
           models:
-            phi3:mini: { }
+            default: { }
           storageSystems:
             bible.verse.label.vector.index: { }
     ## bible verse workflow
     bible.usx.verse:
       queue: search-index
       activities:
-        metadata.text.index: { }
+        metadata.text.index:
+          storageSystems:
+            bible.verse.search.index: { }
 
 prompts:
   verse.labeller:
@@ -262,15 +279,16 @@ prompts:
       4. **Output:** Return the modified JSON array with the following format:
         [{{"usfm": "PRO.1.1", "verse": "The proverbs of Solomon the son of", "labels": [], related: []}}, {{"usfm": "PRO.1.2", "verse": "To know wisdom and instruction; To discern the words of understanding;", "labels": ["wisdom", "guidance"], "related": ["PRO.1.1"]}}]
       
+      Labels:
+      salvation, forgiveness, assurance, deliverance, healing, provision, protection, guidance, wisdom, comfort, peace, joy, love, belonging, purpose, restoration, vindication, hope, strength, patience, faith, mercy, humility, holiness, worship, justice
+      
       Constraints:
       * Use only the labels provided in the list. Do not introduce new labels.
       * Use only the usfm field to reference related verses.
       * If no label from the list fits a verse, use "no match" as the label.
       * Maintain the original order of objects in the array.
-      * Ensure the output JSON is valid and correctly formatted.
-      
-      Labels:
-      salvation, forgiveness, assurance, deliverance, healing, provision, protection, guidance, wisdom, comfort, peace, joy, love, belonging, purpose, restoration, vindication, hope, strength, patience, faith, mercy, humility, holiness, worship, justice
+      * Ensure the output JSON is valid and correctly formatted and there is only JSON as the output.
+      * Return the entire JSON array with the new "labels" and "related" properties added to each object and only the new JSON array, no other content.
     userPrompt: |
       JSON Array:
       {input}

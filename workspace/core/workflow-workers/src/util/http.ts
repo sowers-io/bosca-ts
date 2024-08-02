@@ -36,7 +36,7 @@ export async function execute(signedUrl: SignedUrl, body?: ArrayBuffer | null): 
   }
   executing++
   try {
-    logger.info({ url, executing }, 'executing request')
+    logger.trace({ url, executing }, 'executing request')
     const buffer = await new Promise<Buffer>((resolve, reject) => {
       const options = {
         method: signedUrl.method,
@@ -75,7 +75,7 @@ export async function execute(signedUrl: SignedUrl, body?: ArrayBuffer | null): 
       }, 15000)
     })
     executing--
-    logger.info({ url, executing }, 'request complete')
+    logger.trace({ url, executing }, 'request complete')
     return buffer
   } catch (e) {
     executing--

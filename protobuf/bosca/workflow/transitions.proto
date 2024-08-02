@@ -24,6 +24,7 @@ message BeginTransitionWorkflowRequest {
   string state_id = 2;
   string status = 3;
   bool retry = 4;
+  optional string supplementaryId = 5;
 }
 
 message CompleteTransitionWorkflowRequest {

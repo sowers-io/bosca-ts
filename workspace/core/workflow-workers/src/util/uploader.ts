@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { getMetadataUploadUrl } from './service'
 import { execute } from './http'
 import { Retry } from './retry'
 import { protoInt64 } from '@bufbuild/protobuf'
@@ -49,24 +48,31 @@ export async function uploadAll(response: IdResponses, buffers: ArrayBuffer[]) {
 export async function upload(id: string, buffer: ArrayBuffer) {
   return Retry.execute(10, async () => {
     uploading++
-    logger.info({ id, uploading, length: buffer.byteLength }, 'starting upload')
+    logger.trace({ id, uploading, length: buffer.byteLength }, 'starting upload')
     try {
       const idRequest = new IdRequest({ id: id })
-      const uploadUrl = await getMetadataUploadUrl(idRequest)
-      logger.info({ id, uploading, length: buffer.byteLength, headers: uploadUrl.headers }, 'starting upload')
+      const uploadUrl = await useServiceAccountClient(ContentService).getMetadataUploadUrl(idRequest)
+      logger.trace({ id, uploading, length: buffer.byteLength, headers: uploadUrl.headers }, 'starting upload')
       await execute(uploadUrl, buffer)
       try {
         await useServiceAccountClient(ContentService).setMetadataReady(idRequest)
       } catch (e) {
         if (e instanceof ConnectError) {
           if (e.message === '[failed_precondition] workflow already in state') {
-            logger.warn({ id, uploading, length: buffer.byteLength }, 'finished upload, metadata workflow state was already set')
+            logger.warn(
+              {
+                id,
+                uploading,
+                length: buffer.byteLength,
+              },
+              'finished upload, metadata workflow state was already set'
+            )
             return
           }
         }
         throw e
       }
-      logger.info({ id, uploading, length: buffer.byteLength }, 'finished upload')
+      logger.trace({ id, uploading, length: buffer.byteLength }, 'finished upload')
     } catch (e) {
       logger.error({ id, uploading, error: e, length: buffer.byteLength }, 'upload error')
       throw e
@@ -100,6 +106,7 @@ export async function uploadSupplementary(
   key: string,
   sourceId: string | undefined,
   sourceIdentifier: string | undefined,
+  traitIds: string[] | undefined,
   buffer: ArrayBuffer
 ) {
   const supplementary = await Retry.execute(10, async () => {
@@ -126,12 +133,10 @@ export async function uploadSupplementary(
       key: key,
       sourceId: sourceId,
       sourceIdentifier: sourceIdentifier,
+      traitIds: traitIds,
     }
-    logger.error(request)
     try {
-      const result = await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
-      logger.error(result)
-      return result
+      return await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
     } catch (e: any) {
       if (
         e.toString() ===

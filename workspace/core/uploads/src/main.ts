@@ -25,11 +25,7 @@ import { Code, ConnectError } from '@connectrpc/connect'
 import http, { ServerResponse } from 'node:http'
 
 async function main() {
-  const server = fastify({
-    logger: {
-      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    },
-  })
+  const server = fastify()
   server.setErrorHandler((error, request, reply) => {
     logger.error({ error, request }, 'uncaught error')
     reply.status(500).send({ ok: false })

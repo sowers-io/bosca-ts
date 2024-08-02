@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor } from '../activity'
-import { Job } from 'bullmq'
-import { WorkflowJob } from '@bosca/protobufs'
+import { type ConnectRouter } from '@connectrpc/connect'
+import { health } from '@bosca/common'
 
-export class CreatePendingEmbeddingsFromMarkdownTable extends Activity {
-  get id(): string {
-    return 'ai.embeddings.pending.from-markdown-table'
-  }
-
-  newJobExecutor(job: Job, definition: WorkflowJob): ActivityJobExecutor<any> {
-    return new Executor(this, job, definition)
-  }
-}
-
-class Executor extends ActivityJobExecutor<CreatePendingEmbeddingsFromMarkdownTable> {
-  async execute() {}
+export default (router: ConnectRouter) => {
+  return health(router)
 }

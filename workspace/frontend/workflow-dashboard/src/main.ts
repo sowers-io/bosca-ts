@@ -16,11 +16,7 @@ async function main() {
     "bible-ai",
     "search-index",
   ];
-  const app = fastify({
-    logger: {
-      level: "debug",
-    },
-  });
+  const app = fastify();
   const serverAdapter = new FastifyAdapter();
   createBullBoard({
     queues: queueNames.map(

@@ -32,8 +32,9 @@ message WorkflowExecutionRequest {
   string workflow_id = 2;
   optional string metadata_id = 3;
   optional string collection_id = 4;
-  bool wait_for_completion = 5;
-  map<string, string> context = 6;
+  optional string supplementary_id = 5;
+  bool wait_for_completion = 6;
+  map<string, string> context = 7;
 }
 
 message FindAndWorkflowExecutionRequest {
@@ -53,8 +54,9 @@ message WorkflowEnqueueRequest {
   repeated WorkflowJob jobs = 3;
   optional string metadata_id = 4;
   optional string collection_id = 5;
-  map<string, string> context = 6;
-  bool wait_for_completion = 7;
+  optional string supplementary_id = 6;
+  map<string, string> context = 7;
+  bool wait_for_completion = 8;
 }
 
 message WorkflowEnqueueResponses {
@@ -73,9 +75,10 @@ message WorkflowJob {
   string workflow_id = 1;
   optional string collection_id = 2;
   optional string metadata_id = 3;
-  WorkflowActivity activity = 6;
-  repeated WorkflowActivityPrompt prompts = 7;
-  repeated WorkflowActivityStorageSystem storage_systems = 8;
-  repeated WorkflowActivityModel models = 9;
-  map<string, string> context = 10;
+  optional string supplementary_id = 4;
+  WorkflowActivity activity = 5;
+  repeated WorkflowActivityPrompt prompts = 6;
+  repeated WorkflowActivityStorageSystem storage_systems = 7;
+  repeated WorkflowActivityModel models = 8;
+  map<string, string> context = 9;
 }

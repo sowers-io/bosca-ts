@@ -15,11 +15,16 @@
  */
 
 import { IStorageSystem } from './storagesystem'
-import { Metadata } from '@bosca/protobufs'
-import { QdrantClient } from '@qdrant/js-client-rest'
+import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
+import { QdrantClient, GetCollectionInfoRequest, CreateCollection, Distance } from '@qdrant/js-client-grpc'
+import { OllamaEmbeddings } from '@langchain/community/embeddings/ollama'
+import { protoInt64 } from '@bufbuild/protobuf'
+import { Document } from 'langchain/document'
+import { QdrantVectorStore } from '@langchain/qdrant'
+import { OpenAIEmbeddings } from '@langchain/openai'
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
 
 export class QdrantStorageSystem implements IStorageSystem {
-  private readonly client = new QdrantClient({ url: process.env.BOSCA_QDRANT_API_ADDRESS! })
   private readonly indexName: string
   private readonly vectorSize: number
 
@@ -28,23 +33,74 @@ export class QdrantStorageSystem implements IStorageSystem {
     this.vectorSize = parseInt(configuration.vectorSize)
   }
 
-  async register(): Promise<void> {
-    const collection = await this.client.getCollection(this.indexName)
-    if (collection) return
-    await this.client.createCollection(
-      this.indexName,
-      {
-        vectors: {
-          size: this.vectorSize,
-          distance: 'Cosine'
-        }
-      })
-  }
-
   async initialize(): Promise<void> {
+    const client = new QdrantClient({
+      host: process.env.BOSCA_QDRANT_API_ADDRESS!.split(':')[0],
+      port: parseInt(process.env.BOSCA_QDRANT_API_ADDRESS!.split(':')[1]),
+    })
+    try {
+      await client.api('collections').get(new GetCollectionInfoRequest({ collectionName: this.indexName }))
+    } catch (e) {
+      await client.api('collections').create(
+        new CreateCollection({
+          collectionName: this.indexName,
+          vectorsConfig: {
+            config: {
+              case: 'params',
+              value: {
+                size: protoInt64.parse(this.vectorSize),
+                distance: Distance.Cosine,
+              },
+            },
+          },
+        })
+      )
+    }
   }
 
-  async store(metadata: Metadata, content: Buffer): Promise<void> {
-    throw new Error('unsupported')
+  async storeContent(definition: WorkflowJob, metadata: Metadata, content: Buffer): Promise<void> {
+    const document = new Document({
+      pageContent: content.toString(),
+      metadata: { metadataId: metadata.id, ...metadata.attributes },
+    })
+    const embeddings = new OpenAIEmbeddings({
+      apiKey: process.env.OPENAI_KEY!,
+    })
+    const store = await QdrantVectorStore.fromExistingCollection(embeddings, {
+      url: process.env.BOSCA_QDRANT_REST_API_ADDRESS,
+      collectionName: this.indexName,
+    })
+    const textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 1000,
+      chunkOverlap: 200,
+    })
+    const chunks = await textSplitter.splitDocuments([document])
+    await store.addDocuments(chunks)
+  }
+
+  async storePendingEmbeddings(
+    definition: WorkflowJob,
+    metadata: Metadata,
+    embeddings: PendingEmbeddings
+  ): Promise<void> {
+    const documents = embeddings.embedding.map((e) => {
+      return new Document({
+        pageContent: e.content || '',
+        metadata: { embeddingId: e.id, metadataId: metadata.id, ...metadata.attributes },
+      })
+    })
+    const vectorEmbeddings = new OpenAIEmbeddings({
+      apiKey: process.env.OPENAI_KEY!,
+    })
+    const store = await QdrantVectorStore.fromExistingCollection(vectorEmbeddings, {
+      url: process.env.BOSCA_QDRANT_REST_API_ADDRESS,
+      collectionName: this.indexName,
+    })
+    const textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 1000,
+      chunkOverlap: 200,
+    })
+    const chunks = await textSplitter.splitDocuments(documents)
+    await store.addDocuments(chunks)
   }
 }

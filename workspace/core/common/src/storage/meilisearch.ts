@@ -15,14 +15,13 @@
  */
 
 import { IStorageSystem } from './storagesystem'
-import { Metadata } from '@bosca/protobufs'
+import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
 import { MeiliSearch, Index } from 'meilisearch'
 
 export class MeilisearchStorageSystem implements IStorageSystem {
-
   private readonly client = new MeiliSearch({
     host: process.env.BOSCA_MEILISEARCH_API_ADDRESS!,
-    apiKey: process.env.BOSCA_MEILISEARCH_KEY!
+    apiKey: process.env.BOSCA_MEILI_MASTER_KEY!,
   })
   private readonly indexName: string
   private readonly primaryKey: string
@@ -34,26 +33,57 @@ export class MeilisearchStorageSystem implements IStorageSystem {
   }
 
   async register(): Promise<void> {
-    const index = await this.client.getIndex(this.indexName)
-    if (index) return
-    await this.client.createIndex(
-      this.indexName,
-      {
-        primaryKey: this.primaryKey
+    try {
+      await this.client.getIndex(this.indexName)
+    } catch (e: any) {
+      if (e.message === 'Index `metadata` not found.') {
+        await this.client.createIndex(this.indexName, {
+          primaryKey: this.primaryKey,
+        })
+      } else {
+        throw e
       }
-    )
+    }
   }
 
   async initialize(): Promise<void> {
-    this.index = await this.client.getIndex(this.indexName)
+    try {
+      this.index = await this.client.getIndex(this.indexName)
+    } catch (e: any) {
+      if (e.message === 'Index `' + this.indexName + '` not found.') {
+        const task = await this.client.createIndex(this.indexName, {
+          primaryKey: this.primaryKey,
+        })
+        for (let tries = 0; tries < 10; tries++) {
+          try {
+            await this.client.tasks.waitForTask(task.taskUid)
+            this.index = await this.client.getIndex(this.indexName)
+            return
+          } catch (e: any) {}
+        }
+        this.index = await this.client.getIndex(this.indexName)
+      } else {
+        throw e
+      }
+    }
   }
 
-  async store(metadata: Metadata, content: Buffer): Promise<void> {
+  async storeContent(definition: WorkflowJob, metadata: Metadata, content: Buffer): Promise<void> {
     const document: Record<string, any> = {
-      'content': content.toString(),
-      ...metadata.attributes
+      content: content.toString(),
+    }
+    for (const key in metadata.attributes) {
+      document[key.replace(/\./gi, '_')] = metadata.attributes[key]
     }
     document[this.primaryKey] = metadata.id
     await this.index.addDocuments([document])
+  }
+
+  async storePendingEmbeddings(
+    definition: WorkflowJob,
+    metadata: Metadata,
+    embeddings: PendingEmbeddings
+  ): Promise<void> {
+    throw new Error('unsupported')
   }
 }

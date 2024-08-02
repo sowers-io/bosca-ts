@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { Metadata } from '@bosca/protobufs'
+import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
 
 export interface IStorageSystem {
-
-  register(): Promise<void>
   initialize(): Promise<void>
-  store(metadata: Metadata, content: Buffer): Promise<void>
-}
 
+  storeContent(definition: WorkflowJob, metadata: Metadata, content: Buffer): Promise<void>
+
+  storePendingEmbeddings(definition: WorkflowJob, metadata: Metadata, embeddings: PendingEmbeddings): Promise<void>
+}

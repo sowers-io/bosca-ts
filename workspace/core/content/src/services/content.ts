@@ -408,6 +408,7 @@ export function content(
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
+        logger.error({ metadataId: request.id, key: request.key }, 'missing supplementary, cannot create upload url')
         throw new ConnectError('missing supplementary', Code.NotFound)
       }
       return objectStore.createUploadUrl(supplementary)
@@ -422,6 +423,7 @@ export function content(
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
+        logger.error({ metadataId: request.id, key: request.key }, 'missing supplementary, cannot create download url')
         throw new ConnectError('missing supplementary', Code.NotFound)
       }
       return objectStore.createDownloadUrl(supplementary)
@@ -436,6 +438,7 @@ export function content(
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
+        logger.error({ metadataId: request.id, key: request.key }, 'missing supplementary, cannot delete')
         throw new ConnectError('missing supplementary', Code.NotFound)
       }
       await objectStore.delete(supplementary)
@@ -461,6 +464,7 @@ export function content(
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
+        logger.error({ metadataId: request.id, key: request.key }, 'missing supplementary')
         throw new ConnectError('missing metadata supplementary', Code.NotFound)
       }
       return supplementary

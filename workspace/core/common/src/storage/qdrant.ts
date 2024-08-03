@@ -17,9 +17,8 @@
 import { IStorageSystem } from './storagesystem'
 import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
 import { QdrantClient, GetCollectionInfoRequest, CreateCollection, Distance } from '@qdrant/js-client-grpc'
-import { OllamaEmbeddings } from '@langchain/community/embeddings/ollama'
 import { protoInt64 } from '@bufbuild/protobuf'
-import { Document } from 'langchain/document'
+import { Document } from "@langchain/core/documents";
 import { QdrantVectorStore } from '@langchain/qdrant'
 import { OpenAIEmbeddings } from '@langchain/openai'
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'

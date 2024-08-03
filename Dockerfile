@@ -10,7 +10,7 @@ COPY . /usr/src/app
 RUN mv /usr/src/app/.npmrc-docker /usr/src/app/.npmrc
 WORKDIR /usr/src/app
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --shamefully-hoist
 
 RUN pnpm run --filter=protobufs build
 RUN pnpm run --filter=common build

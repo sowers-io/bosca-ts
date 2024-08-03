@@ -33,10 +33,11 @@ export class CreateVerseJsonTable extends BookActivity {
 }
 
 class Executor extends BookExecutor {
-  async execute(source: Source, systemId: string, metadata: Metadata, book: Book): Promise<void> {
+  async execute(source: Source, systemId: string, version: string, metadata: Metadata, book: Book): Promise<void> {
     const bookMetadata = await findFirstMetadata({
       'bible.type': 'book',
       'bible.system.id': systemId,
+      'bible.version': version,
       'bible.book.usfm': book.usfm,
     })
     for (const chapter of book.chapters) {

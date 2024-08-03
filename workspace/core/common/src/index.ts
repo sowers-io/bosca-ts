@@ -32,5 +32,6 @@ export * from './storage/meilisearch'
 export * from './storage/qdrant'
 export * from './storage/storagesystem'
 export * from './storage/systems'
+export * from './http'
 
 export { Pool } from 'pg'

@@ -16,51 +16,54 @@
 
 extend type Query {
 
-    bibles: [Bible!]!
+    bibles: [BibleMetadata!]!
 
     verse(systemId: ID!, version: String!, usfm: String!): Verse
+    verses(systemId: ID!, version: String!, usfm: [String!]!): [Verse]
+    chapter(systemId: ID!, version: String!, usfm: String!): Chapter
 }
 
 type BibleMetadata {
     systemId: ID!,
     version: String!
     language: String!
-}
-
-type Bible {
-    metadata: BibleMetadata!
 
     id: ID!
     abbreviation: String!
     name: String!
 
-    books: [Book!]!
+    books: [BookMetadata!]!
 }
 
-type Book {
-    metadata: BibleMetadata!
-
+type BookMetadata {
     id: ID!
     usfm: String!
     name: String!
 
-    chapters: [Chapter!]!
+    chapters: [ChapterMetadata!]!
+}
+
+type ChapterMetadata {
+    id: ID!
+    usfm: String!
+    name: String!
 }
 
 type Chapter {
-    metadata: BibleMetadata!
-
     id: ID!
     usfm: String!
     name: String!
+    number: String
+
+    usx: String
 }
 
 type Verse {
-    metadata: BibleMetadata!
-
     id: ID!
     usfm: String!
     name: String!
+    number: String
 
+    text: String
     usx: String
 }

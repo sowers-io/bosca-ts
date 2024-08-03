@@ -19,6 +19,7 @@ import { loadFiles, LoadFilesOptions } from '@graphql-tools/load-files'
 
 import { fastify, FastifyRequest, FastifyReply } from 'fastify'
 import { createYoga } from 'graphql-yoga'
+import { logger } from '../logger'
 
 export interface GraphQLRequestContext extends YogaInitialContext {
   request: FastifyRequest & Request
@@ -84,4 +85,5 @@ export async function createAndRunServer<TContext extends GraphQLRequestContext>
     },
   })
   await server.listen({ host: '0.0.0.0', port: port })
+  logger.info(`Server running on 0.0.0.0:${port}`)
 }

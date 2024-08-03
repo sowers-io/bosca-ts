@@ -16,27 +16,21 @@ export interface Scalars {
   Float: { input: number; output: number; }
 }
 
-export interface Bible {
-  __typename?: 'Bible';
-  abbreviation: Scalars['String']['output'];
-  books: Array<Book>;
-  id: Scalars['ID']['output'];
-  metadata: BibleMetadata;
-  name: Scalars['String']['output'];
-}
-
 export interface BibleMetadata {
   __typename?: 'BibleMetadata';
+  abbreviation: Scalars['String']['output'];
+  books: Array<BookMetadata>;
+  id: Scalars['ID']['output'];
   language: Scalars['String']['output'];
+  name: Scalars['String']['output'];
   systemId: Scalars['ID']['output'];
   version: Scalars['String']['output'];
 }
 
-export interface Book {
-  __typename?: 'Book';
-  chapters: Array<Chapter>;
+export interface BookMetadata {
+  __typename?: 'BookMetadata';
+  chapters: Array<ChapterMetadata>;
   id: Scalars['ID']['output'];
-  metadata: BibleMetadata;
   name: Scalars['String']['output'];
   usfm: Scalars['String']['output'];
 }
@@ -44,15 +38,32 @@ export interface Book {
 export interface Chapter {
   __typename?: 'Chapter';
   id: Scalars['ID']['output'];
-  metadata: BibleMetadata;
+  name: Scalars['String']['output'];
+  number?: Maybe<Scalars['String']['output']>;
+  usfm: Scalars['String']['output'];
+  usx?: Maybe<Scalars['String']['output']>;
+}
+
+export interface ChapterMetadata {
+  __typename?: 'ChapterMetadata';
+  id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   usfm: Scalars['String']['output'];
 }
 
 export interface Query {
   __typename?: 'Query';
-  bibles: Array<Bible>;
+  bibles: Array<BibleMetadata>;
+  chapter?: Maybe<Chapter>;
   verse?: Maybe<Verse>;
+  verses?: Maybe<Array<Maybe<Verse>>>;
+}
+
+
+export interface QueryChapterArgs {
+  systemId: Scalars['ID']['input'];
+  usfm: Scalars['String']['input'];
+  version: Scalars['String']['input'];
 }
 
 
@@ -62,11 +73,19 @@ export interface QueryVerseArgs {
   version: Scalars['String']['input'];
 }
 
+
+export interface QueryVersesArgs {
+  systemId: Scalars['ID']['input'];
+  usfm: Array<Scalars['String']['input']>;
+  version: Scalars['String']['input'];
+}
+
 export interface Verse {
   __typename?: 'Verse';
   id: Scalars['ID']['output'];
-  metadata: BibleMetadata;
   name: Scalars['String']['output'];
+  number?: Maybe<Scalars['String']['output']>;
+  text?: Maybe<Scalars['String']['output']>;
   usfm: Scalars['String']['output'];
   usx?: Maybe<Scalars['String']['output']>;
 }
@@ -143,11 +162,11 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  Bible: ResolverTypeWrapper<Bible>;
   BibleMetadata: ResolverTypeWrapper<BibleMetadata>;
-  Book: ResolverTypeWrapper<Book>;
+  BookMetadata: ResolverTypeWrapper<BookMetadata>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Chapter: ResolverTypeWrapper<Chapter>;
+  ChapterMetadata: ResolverTypeWrapper<ChapterMetadata>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -156,37 +175,31 @@ export type ResolversTypes = ResolversObject<{
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  Bible: Bible;
   BibleMetadata: BibleMetadata;
-  Book: Book;
+  BookMetadata: BookMetadata;
   Boolean: Scalars['Boolean']['output'];
   Chapter: Chapter;
+  ChapterMetadata: ChapterMetadata;
   ID: Scalars['ID']['output'];
   Query: {};
   String: Scalars['String']['output'];
   Verse: Verse;
 }>;
 
-export type BibleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Bible'] = ResolversParentTypes['Bible']> = ResolversObject<{
-  abbreviation?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  books?: Resolver<Array<ResolversTypes['Book']>, ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  metadata?: Resolver<ResolversTypes['BibleMetadata'], ParentType, ContextType>;
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export type BibleMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['BibleMetadata'] = ResolversParentTypes['BibleMetadata']> = ResolversObject<{
+  abbreviation?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  books?: Resolver<Array<ResolversTypes['BookMetadata']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   language?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   systemId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   version?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type BookResolvers<ContextType = any, ParentType extends ResolversParentTypes['Book'] = ResolversParentTypes['Book']> = ResolversObject<{
-  chapters?: Resolver<Array<ResolversTypes['Chapter']>, ParentType, ContextType>;
+export type BookMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['BookMetadata'] = ResolversParentTypes['BookMetadata']> = ResolversObject<{
+  chapters?: Resolver<Array<ResolversTypes['ChapterMetadata']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  metadata?: Resolver<ResolversTypes['BibleMetadata'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   usfm?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -194,31 +207,42 @@ export type BookResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type ChapterResolvers<ContextType = any, ParentType extends ResolversParentTypes['Chapter'] = ResolversParentTypes['Chapter']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  metadata?: Resolver<ResolversTypes['BibleMetadata'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  number?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  usfm?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  usx?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type ChapterMetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChapterMetadata'] = ResolversParentTypes['ChapterMetadata']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   usfm?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  bibles?: Resolver<Array<ResolversTypes['Bible']>, ParentType, ContextType>;
+  bibles?: Resolver<Array<ResolversTypes['BibleMetadata']>, ParentType, ContextType>;
+  chapter?: Resolver<Maybe<ResolversTypes['Chapter']>, ParentType, ContextType, RequireFields<QueryChapterArgs, 'systemId' | 'usfm' | 'version'>>;
   verse?: Resolver<Maybe<ResolversTypes['Verse']>, ParentType, ContextType, RequireFields<QueryVerseArgs, 'systemId' | 'usfm' | 'version'>>;
+  verses?: Resolver<Maybe<Array<Maybe<ResolversTypes['Verse']>>>, ParentType, ContextType, RequireFields<QueryVersesArgs, 'systemId' | 'usfm' | 'version'>>;
 }>;
 
 export type VerseResolvers<ContextType = any, ParentType extends ResolversParentTypes['Verse'] = ResolversParentTypes['Verse']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  metadata?: Resolver<ResolversTypes['BibleMetadata'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  number?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   usfm?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   usx?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
-  Bible?: BibleResolvers<ContextType>;
   BibleMetadata?: BibleMetadataResolvers<ContextType>;
-  Book?: BookResolvers<ContextType>;
+  BookMetadata?: BookMetadataResolvers<ContextType>;
   Chapter?: ChapterResolvers<ContextType>;
+  ChapterMetadata?: ChapterMetadataResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Verse?: VerseResolvers<ContextType>;
 }>;

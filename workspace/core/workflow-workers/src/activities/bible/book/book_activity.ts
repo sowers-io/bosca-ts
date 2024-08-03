@@ -49,6 +49,7 @@ export abstract class BookExecutor {
   abstract execute(
     source: Source,
     systemId: string,
+    version: string,
     metadata: Metadata,
     book: Book
   ): Promise<void>
@@ -66,6 +67,7 @@ class Executor extends ActivityJobExecutor<BookActivity> {
     const contentService = useServiceAccountClient(ContentService)
     const metadata = await contentService.getMetadata(new IdRequest({ id: this.definition.metadataId }))
     const systemId = metadata.attributes['bible.system.id']
+    const version = metadata.attributes['bible.version']
     const file = await this.activity.downloader.download(this.definition)
     try {
       const source = await contentService.getSource(new IdRequest({ id: 'workflow' }))
@@ -73,7 +75,7 @@ class Executor extends ActivityJobExecutor<BookActivity> {
       const name = new ManifestName({ short: metadata.name })
       const content = new PublicationContent({ $: { role: metadata.attributes['bible.book.usfm'] } })
       const book = await processor.processBook(name, content, file)
-      await this.executor.execute(source, systemId, metadata, book)
+      await this.executor.execute(source, systemId, version, metadata, book)
     } catch (e) {
       throw e
     } finally {

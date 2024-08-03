@@ -37,12 +37,14 @@ export class CreateVerses extends BookActivity {
 class Executor extends BookExecutor {
   private async createVersesCollectionRequests(
     systemId: string,
+    version: string,
     abbreviation: string,
     book: Book
   ): Promise<AddCollectionRequest[]> {
     const requests: AddCollectionRequest[] = []
     const bookCollection = await findFirstCollection({
       'bible.type': 'book',
+      'bible.version': version,
       'bible.system.id': systemId,
       'bible.book.usfm': book.usfm,
     })
@@ -55,6 +57,7 @@ class Executor extends BookExecutor {
             attributes: {
               'bible.type': 'verses',
               'bible.system.id': systemId,
+              'bible.version': version,
               'bible.abbreviation': abbreviation,
               'bible.book.usfm': book.usfm,
               'bible.chapter.usfm': chapter.usfm,
@@ -66,9 +69,10 @@ class Executor extends BookExecutor {
     return requests
   }
 
-  override async execute(source: Source, systemId: string, metadata: Metadata, book: Book): Promise<void> {
+  override async execute(source: Source, systemId: string, version: string, metadata: Metadata, book: Book): Promise<void> {
     const addCollectionRequests = await this.createVersesCollectionRequests(
       systemId,
+      version,
       metadata.attributes['bible.abbreviation'],
       book
     )
@@ -99,6 +103,7 @@ class Executor extends BookExecutor {
               attributes: {
                 'bible.type': 'verse',
                 'bible.system.id': systemId,
+                'bible.version': version,
                 'bible.abbreviation': metadata.attributes['bible.abbreviation'],
                 'bible.book.usfm': book.usfm,
                 'bible.chapter.usfm': chapter.usfm,

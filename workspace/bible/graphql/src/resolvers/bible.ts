@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-import { Resolvers } from '../generated/resolvers'
-import { executeGraphQL, getGraphQLHeaders, GraphQLRequestContext, useClient } from '@bosca/common'
-import { ContentService, FindCollectionRequest, FindMetadataRequest } from '@bosca/protobufs'
+import { Resolvers, Verse } from '../generated/resolvers'
+import { executeGraphQL, executeHttpRequest, getGraphQLHeaders, GraphQLRequestContext, useClient } from '@bosca/common'
+import {
+  ContentService,
+  FindCollectionRequest,
+  FindMetadataRequest,
+  IdRequest,
+  SupplementaryIdRequest,
+} from '@bosca/protobufs'
 
-export const resolvers: Resolvers<GraphQLRequestContext> = {
+interface BibleRequestContext extends GraphQLRequestContext {
+  systemId: string
+  version: string
+  language: string
+}
+
+export const resolvers: Resolvers<BibleRequestContext> = {
   Query: {
     bibles: async (_, __, context) => {
       return await executeGraphQL(async () => {
@@ -35,17 +47,79 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         )
         return bibles.collections.map((collection) => {
           return {
-            metadata: {
-              systemId: collection.attributes['bible.system.id'],
-              version: collection.attributes['bible.version'],
-              language: collection.attributes['bible.language'],
-            },
+            systemId: collection.attributes['bible.system.id'],
+            version: collection.attributes['bible.version'],
+            language: collection.attributes['bible.language'],
             id: collection.id,
             abbreviation: collection.attributes['bible.abbreviation'],
             name: collection.name,
             books: [],
           }
         })
+      })
+    },
+    chapter: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const chapters = await service.findMetadata(
+          new FindMetadataRequest({
+            attributes: {
+              'bible.type': 'chapter',
+              'bible.system.id': args.systemId,
+              // 'bible.version': args.version,
+              'bible.chapter.usfm': args.usfm,
+            },
+          }),
+          {
+            headers: getGraphQLHeaders(context),
+          }
+        )
+        if (chapters.metadata.length === 0) {
+          return null
+        }
+        return chapters.metadata.map((metadata) => {
+          return {
+            id: metadata.id,
+            usfm: metadata.attributes['bible.chapter.usfm'],
+            name: metadata.name,
+            number: metadata.attributes['bible.chapter.usfm'].split('.')[1],
+          }
+        })[0]
+      })
+    },
+    verses: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const allVerses: Verse[] = []
+        for (const usfm of args.usfm) {
+          const verses = await service.findMetadata(
+            new FindMetadataRequest({
+              attributes: {
+                'bible.type': 'verse',
+                'bible.system.id': args.systemId,
+                // 'bible.version': args.version,
+                'bible.verse.usfm': usfm,
+              },
+            }),
+            {
+              headers: getGraphQLHeaders(context),
+            }
+          )
+          if (verses.metadata.length === 0) {
+            return null
+          }
+          allVerses.push(
+            verses.metadata.map((metadata) => {
+              return {
+                id: metadata.id,
+                usfm: metadata.attributes['bible.verse.usfm'],
+                name: metadata.name,
+                number: metadata.attributes['bible.verse.usfm'].split('.')[2],
+              }
+            })[0]
+          )
+        }
+        return allVerses
       })
     },
     verse: async (_, args, context) => {
@@ -69,47 +143,90 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         }
         return verses.metadata.map((metadata) => {
           return {
-            metadata: {
-              systemId: metadata.attributes['bible.system.id'],
-              version: metadata.attributes['bible.version'],
-              language: metadata.attributes['bible.language'],
-            },
             id: metadata.id,
             usfm: metadata.attributes['bible.verse.usfm'],
             name: metadata.name,
+            number: metadata.attributes['bible.verse.usfm'].split('.')[2],
           }
         })[0]
       })
-    }
+    },
   },
-  Bible: {
-    books: async (bible, _, context) => {
+  Chapter: {
+    usx: async (verse, args, context) => {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
-        const books = await service.findCollection(
-          new FindCollectionRequest({
+        const url = await service.getMetadataDownloadUrl(
+          new IdRequest({
+            id: verse.id,
+          }),
+          {
+            headers: getGraphQLHeaders(context),
+          }
+        )
+        const response = await executeHttpRequest(url)
+        return response.toString()
+      })
+    },
+  },
+  Verse: {
+    text: async (verse, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const url = await service.getMetadataSupplementaryDownloadUrl(
+          new SupplementaryIdRequest({
+            id: verse.id,
+            key: 'text',
+          }),
+          {
+            headers: getGraphQLHeaders(context),
+          }
+        )
+        const response = await executeHttpRequest(url)
+        return response.toString()
+      })
+    },
+    usx: async (verse, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const url = await service.getMetadataDownloadUrl(
+          new IdRequest({
+            id: verse.id,
+          }),
+          {
+            headers: getGraphQLHeaders(context),
+          }
+        )
+        const response = await executeHttpRequest(url)
+        return response.toString()
+      })
+    },
+  },
+  BibleMetadata: {
+    books: async (bible, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const books = await service.findMetadata(
+          new FindMetadataRequest({
             attributes: {
               'bible.type': 'book',
-              'bible.system.id': bible.metadata.systemId,
-              'bible.version': bible.metadata.version,
+              'bible.system.id': bible.systemId,
+              'bible.version': bible.version,
             },
           }),
           {
             headers: getGraphQLHeaders(context),
           }
         )
-        books.collections.sort((a, b) => {
+        books.metadata.sort((a, b) => {
           const a1 = parseInt(a.attributes['bible.book.order'])
           const b1 = parseInt(b.attributes['bible.book.order'])
           return a1 - b1
         })
-        return books.collections.map((collection) => {
+        context.systemId = bible.systemId
+        context.version = bible.version
+        return books.metadata.map((collection) => {
           return {
-            metadata: {
-              systemId: collection.attributes['bible.system.id'],
-              version: collection.attributes['bible.version'],
-              language: collection.attributes['bible.language'],
-            },
             id: collection.id,
             usfm: collection.attributes['bible.book.usfm'],
             name: collection.name,
@@ -119,16 +236,16 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       })
     },
   },
-  Book: {
-    chapters: async (book, _, context) => {
+  BookMetadata: {
+    chapters: async (book, args, context) => {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const books = await service.findMetadata(
           new FindMetadataRequest({
             attributes: {
               'bible.type': 'chapter',
-              'bible.system.id': book.metadata.systemId,
-              'bible.version': book.metadata.version,
+              'bible.system.id': context.systemId,
+              'bible.version': context.version,
               'bible.book.usfm': book.usfm,
             },
           }),
@@ -143,11 +260,6 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         })
         return books.metadata.map((metadata) => {
           return {
-            metadata: {
-              systemId: metadata.attributes['bible.system.id'],
-              version: metadata.attributes['bible.version'],
-              language: metadata.attributes['bible.language'],
-            },
             id: metadata.id,
             usfm: metadata.attributes['bible.chapter.usfm'],
             name: metadata.name,

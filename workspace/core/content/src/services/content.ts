@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 /*
  * Copyright 2024 Sowers, LLC
  *
@@ -92,8 +94,14 @@ export function content(
       const ids: IdResponsesId[] = []
       for (const addRequest of request.collections) {
         try {
-          if (!addRequest.collection) throw new ConnectError('missing collection', Code.InvalidArgument)
-          if (!validIdsMap[addRequest.parent]) throw new ConnectError('permission check failed', Code.PermissionDenied)
+          if (!addRequest.collection) {
+            // noinspection ExceptionCaughtLocallyJS
+            throw new ConnectError('missing collection', Code.InvalidArgument)
+          }
+          if (!validIdsMap[addRequest.parent]) {
+            // noinspection ExceptionCaughtLocallyJS
+            throw new ConnectError('permission check failed', Code.PermissionDenied)
+          }
           ids.push(
             await addCollection(
               dataSource,
@@ -262,7 +270,10 @@ export function content(
           if (addRequest.collection && addRequest.collection.length > 0) {
             collection = addRequest.collection
           }
-          if (!validIdsMap[collection]) throw new ConnectError('permission check failed', Code.PermissionDenied)
+          if (!validIdsMap[collection]) {
+            // noinspection ExceptionCaughtLocallyJS
+            throw new ConnectError('permission check failed', Code.PermissionDenied)
+          }
           ids.push(
             await addMetadata(dataSource, permissions, serviceAccountId, subject, collection, addRequest.metadata)
           )
@@ -414,12 +425,7 @@ export function content(
     },
     async getMetadataSupplementaryDownloadUrl(request, context) {
       const subject = context.values.get(SubjectKey)
-      await permissions.checkWithError(
-        subject,
-        PermissionObjectType.metadata_type,
-        request.id,
-        PermissionAction.view
-      )
+      await permissions.checkWithError(subject, PermissionObjectType.metadata_type, request.id, PermissionAction.view)
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
         throw new ConnectError('missing supplementary', Code.NotFound)

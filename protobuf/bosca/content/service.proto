@@ -143,9 +143,22 @@ service ContentService {
     };
   }
 
+  rpc GetMetadataVersion(bosca.IdAndVersionRequest) returns (Metadata) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/{version}"
+    };
+  }
+
   rpc GetMetadatas(bosca.IdsRequest) returns (Metadatas) {
     option (google.api.http) = {
       get: "/v1/content/metadata"
+    };
+  }
+
+  rpc SetMetadataActiveVersion(IdAndVersionRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/{version}"
+      body: "*"
     };
   }
 

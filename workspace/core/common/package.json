@@ -38,20 +38,6 @@
     "pino": "^9.3.2"
   },
   "devDependencies": {
-    "@tsconfig/node18": "^18.2.4",
-    "@types/node": "^20.14.13",
-    "@types/pg": "^8.11.6",
-    "@typescript-eslint/eslint-plugin": "^7.17.0",
-    "@typescript-eslint/parser": "^7.17.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^8.10.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-deprecation": "^1.5.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.6.0",
-    "prettier": "^2.8.8",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "@types/pg": "^8.11.6"
   }
 }

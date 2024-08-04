@@ -53,7 +53,9 @@ const (
 	ContentService_FindCollection_FullMethodName                      = "/bosca.content.ContentService/FindCollection"
 	ContentService_FindMetadata_FullMethodName                        = "/bosca.content.ContentService/FindMetadata"
 	ContentService_GetMetadata_FullMethodName                         = "/bosca.content.ContentService/GetMetadata"
+	ContentService_GetMetadataVersion_FullMethodName                  = "/bosca.content.ContentService/GetMetadataVersion"
 	ContentService_GetMetadatas_FullMethodName                        = "/bosca.content.ContentService/GetMetadatas"
+	ContentService_SetMetadataActiveVersion_FullMethodName            = "/bosca.content.ContentService/SetMetadataActiveVersion"
 	ContentService_AddMetadata_FullMethodName                         = "/bosca.content.ContentService/AddMetadata"
 	ContentService_AddMetadatas_FullMethodName                        = "/bosca.content.ContentService/AddMetadatas"
 	ContentService_AddMetadataTrait_FullMethodName                    = "/bosca.content.ContentService/AddMetadataTrait"
@@ -99,7 +101,9 @@ type ContentServiceClient interface {
 	FindCollection(ctx context.Context, in *FindCollectionRequest, opts ...grpc.CallOption) (*Collections, error)
 	FindMetadata(ctx context.Context, in *FindMetadataRequest, opts ...grpc.CallOption) (*Metadatas, error)
 	GetMetadata(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Metadata, error)
+	GetMetadataVersion(ctx context.Context, in *bosca.IdAndVersionRequest, opts ...grpc.CallOption) (*Metadata, error)
 	GetMetadatas(ctx context.Context, in *bosca.IdsRequest, opts ...grpc.CallOption) (*Metadatas, error)
+	SetMetadataActiveVersion(ctx context.Context, in *bosca.IdAndVersionRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*bosca.IdResponse, error)
 	AddMetadatas(ctx context.Context, in *AddMetadatasRequest, opts ...grpc.CallOption) (*bosca.IdResponses, error)
 	AddMetadataTrait(ctx context.Context, in *AddMetadataTraitRequest, opts ...grpc.CallOption) (*Metadata, error)
@@ -311,10 +315,30 @@ func (c *contentServiceClient) GetMetadata(ctx context.Context, in *bosca.IdRequ
 	return out, nil
 }
 
+func (c *contentServiceClient) GetMetadataVersion(ctx context.Context, in *bosca.IdAndVersionRequest, opts ...grpc.CallOption) (*Metadata, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Metadata)
+	err := c.cc.Invoke(ctx, ContentService_GetMetadataVersion_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) GetMetadatas(ctx context.Context, in *bosca.IdsRequest, opts ...grpc.CallOption) (*Metadatas, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Metadatas)
 	err := c.cc.Invoke(ctx, ContentService_GetMetadatas_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) SetMetadataActiveVersion(ctx context.Context, in *bosca.IdAndVersionRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_SetMetadataActiveVersion_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -553,7 +577,9 @@ type ContentServiceServer interface {
 	FindCollection(context.Context, *FindCollectionRequest) (*Collections, error)
 	FindMetadata(context.Context, *FindMetadataRequest) (*Metadatas, error)
 	GetMetadata(context.Context, *bosca.IdRequest) (*Metadata, error)
+	GetMetadataVersion(context.Context, *bosca.IdAndVersionRequest) (*Metadata, error)
 	GetMetadatas(context.Context, *bosca.IdsRequest) (*Metadatas, error)
+	SetMetadataActiveVersion(context.Context, *bosca.IdAndVersionRequest) (*bosca.Empty, error)
 	AddMetadata(context.Context, *AddMetadataRequest) (*bosca.IdResponse, error)
 	AddMetadatas(context.Context, *AddMetadatasRequest) (*bosca.IdResponses, error)
 	AddMetadataTrait(context.Context, *AddMetadataTraitRequest) (*Metadata, error)
@@ -636,8 +662,14 @@ func (UnimplementedContentServiceServer) FindMetadata(context.Context, *FindMeta
 func (UnimplementedContentServiceServer) GetMetadata(context.Context, *bosca.IdRequest) (*Metadata, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMetadata not implemented")
 }
+func (UnimplementedContentServiceServer) GetMetadataVersion(context.Context, *bosca.IdAndVersionRequest) (*Metadata, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataVersion not implemented")
+}
 func (UnimplementedContentServiceServer) GetMetadatas(context.Context, *bosca.IdsRequest) (*Metadatas, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMetadatas not implemented")
+}
+func (UnimplementedContentServiceServer) SetMetadataActiveVersion(context.Context, *bosca.IdAndVersionRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetMetadataActiveVersion not implemented")
 }
 func (UnimplementedContentServiceServer) AddMetadata(context.Context, *AddMetadataRequest) (*bosca.IdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadata not implemented")
@@ -1039,6 +1071,24 @@ func _ContentService_GetMetadata_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_GetMetadataVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdAndVersionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetMetadataVersion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetMetadataVersion_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetMetadataVersion(ctx, req.(*bosca.IdAndVersionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_GetMetadatas_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(bosca.IdsRequest)
 	if err := dec(in); err != nil {
@@ -1053,6 +1103,24 @@ func _ContentService_GetMetadatas_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).GetMetadatas(ctx, req.(*bosca.IdsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_SetMetadataActiveVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdAndVersionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).SetMetadataActiveVersion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_SetMetadataActiveVersion_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).SetMetadataActiveVersion(ctx, req.(*bosca.IdAndVersionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1515,8 +1583,16 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_GetMetadata_Handler,
 		},
 		{
+			MethodName: "GetMetadataVersion",
+			Handler:    _ContentService_GetMetadataVersion_Handler,
+		},
+		{
 			MethodName: "GetMetadatas",
 			Handler:    _ContentService_GetMetadatas_Handler,
+		},
+		{
+			MethodName: "SetMetadataActiveVersion",
+			Handler:    _ContentService_SetMetadataActiveVersion_Handler,
 		},
 		{
 			MethodName: "AddMetadata",

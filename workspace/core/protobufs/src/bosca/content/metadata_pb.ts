@@ -19,7 +19,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, protoInt64, Struct, Timestamp } from "@bufbuild/protobuf";
+import { Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
 
 /**
  * @generated from message bosca.content.Metadata
@@ -111,9 +111,14 @@ export class Metadata extends Message<Metadata> {
   deleteWorkflowId?: string;
 
   /**
-   * @generated from field: google.protobuf.Struct metadata = 34;
+   * @generated from field: int32 version = 40;
    */
-  metadata?: Struct;
+  version = 0;
+
+  /**
+   * @generated from field: int32 active_version = 41;
+   */
+  activeVersion = 0;
 
   constructor(data?: PartialMessage<Metadata>) {
     super();
@@ -140,7 +145,8 @@ export class Metadata extends Message<Metadata> {
     { no: 31, name: "workflow_state_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 32, name: "workflow_state_pending_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
     { no: 33, name: "delete_workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
-    { no: 34, name: "metadata", kind: "message", T: Struct },
+    { no: 40, name: "version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 41, name: "active_version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Metadata {

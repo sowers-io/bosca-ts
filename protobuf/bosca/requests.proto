@@ -27,6 +27,11 @@ message IdRequest {
   string id = 1;
 }
 
+message IdAndVersionRequest {
+  string id = 1;
+  int32 version = 2;
+}
+
 message SupplementaryIdRequest {
   string id = 1;
   string key = 2;

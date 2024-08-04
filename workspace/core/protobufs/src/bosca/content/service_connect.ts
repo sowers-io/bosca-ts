@@ -21,7 +21,7 @@
 import { Empty } from "../empty_pb";
 import { Source, Sources } from "./sources_pb";
 import { MethodKind } from "@bufbuild/protobuf";
-import { IdRequest, IdResponse, IdResponses, IdsRequest, SupplementaryIdRequest } from "../requests_pb";
+import { IdAndVersionRequest, IdRequest, IdResponse, IdResponses, IdsRequest, SupplementaryIdRequest } from "../requests_pb";
 import { Trait, Traits } from "./traits_pb";
 import { AddCollectionItemRequest, AddCollectionRequest, AddCollectionsRequest, Collection, CollectionItems, Collections, FindCollectionRequest } from "./collections_pb";
 import { Permission, PermissionCheckRequest, PermissionCheckResponse, Permissions } from "./permissions_pb";
@@ -198,12 +198,30 @@ export const ContentService = {
       kind: MethodKind.Unary,
     },
     /**
+     * @generated from rpc bosca.content.ContentService.GetMetadataVersion
+     */
+    getMetadataVersion: {
+      name: "GetMetadataVersion",
+      I: IdAndVersionRequest,
+      O: Metadata,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc bosca.content.ContentService.GetMetadatas
      */
     getMetadatas: {
       name: "GetMetadatas",
       I: IdsRequest,
       O: Metadatas,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.SetMetadataActiveVersion
+     */
+    setMetadataActiveVersion: {
+      name: "SetMetadataActiveVersion",
+      I: IdAndVersionRequest,
+      O: Empty,
       kind: MethodKind.Unary,
     },
     /**

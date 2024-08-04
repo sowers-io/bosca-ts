@@ -47,7 +47,8 @@ message Metadata {
   optional string workflow_state_pending_id = 32;
   optional string delete_workflow_id = 33;
 
-  google.protobuf.Struct metadata = 34;
+  int32 version = 40;
+  int32 active_version = 41;
 }
 
 message MetadataSupplementaries {

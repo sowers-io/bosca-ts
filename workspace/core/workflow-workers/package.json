@@ -28,24 +28,6 @@
     "fastify-plugin": "^4.5.1",
     "zod-to-json-schema": "^3.23.1"
   },
-  "devDependencies": {
-    "@aws-sdk/client-sso-oidc": "^3.614.0",
-    "@tsconfig/node18": "^18.2.4",
-    "@types/node": "^20.14.10",
-    "@typescript-eslint/eslint-plugin": "^7.16.1",
-    "@typescript-eslint/parser": "^7.16.1",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-deprecation": "^1.2.1",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.5.1",
-    "prettier": "^2.8.8",
-    "ts-node": "^10.2.1",
-    "typescript": "^5.5.3",
-    "vitest": "^1.6.0"
-  },
   "peerDependencies": {
     "@aws-sdk/client-sso-oidc": "^3.614.0"
   }

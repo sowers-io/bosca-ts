@@ -31,22 +31,27 @@ export class BeginTransitionWorkflowRequest extends Message<BeginTransitionWorkf
   metadataId = "";
 
   /**
-   * @generated from field: string state_id = 2;
+   * @generated from field: int32 version = 2;
+   */
+  version = 0;
+
+  /**
+   * @generated from field: string state_id = 3;
    */
   stateId = "";
 
   /**
-   * @generated from field: string status = 3;
+   * @generated from field: string status = 4;
    */
   status = "";
 
   /**
-   * @generated from field: bool retry = 4;
+   * @generated from field: bool retry = 5;
    */
   retry = false;
 
   /**
-   * @generated from field: optional string supplementaryId = 5;
+   * @generated from field: optional string supplementaryId = 6;
    */
   supplementaryId?: string;
 
@@ -59,10 +64,11 @@ export class BeginTransitionWorkflowRequest extends Message<BeginTransitionWorkf
   static readonly typeName = "bosca.workflow.BeginTransitionWorkflowRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "state_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "retry", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 5, name: "supplementaryId", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 2, name: "version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "state_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "retry", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "supplementaryId", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BeginTransitionWorkflowRequest {
@@ -92,12 +98,17 @@ export class CompleteTransitionWorkflowRequest extends Message<CompleteTransitio
   metadataId = "";
 
   /**
-   * @generated from field: string status = 2;
+   * @generated from field: int32 version = 2;
+   */
+  version = 0;
+
+  /**
+   * @generated from field: string status = 3;
    */
   status = "";
 
   /**
-   * @generated from field: bool success = 3;
+   * @generated from field: bool success = 4;
    */
   success = false;
 
@@ -110,8 +121,9 @@ export class CompleteTransitionWorkflowRequest extends Message<CompleteTransitio
   static readonly typeName = "bosca.workflow.CompleteTransitionWorkflowRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CompleteTransitionWorkflowRequest {

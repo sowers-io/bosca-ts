@@ -19,7 +19,7 @@ import { Message } from '@bufbuild/protobuf'
 
 export function createPool(connectionString: string): Pool {
   return new Pool({
-    connectionString: connectionString,
+    connectionString,
   })
 }
 
@@ -60,7 +60,7 @@ export class DataSource {
     factory: () => T,
     sql: string,
     values: any[] = [],
-    mapper: ((row: any) => void) | undefined = undefined
+    mapper: ((row: any) => void) | undefined = undefined,
   ): Promise<T[]> {
     const client = await this.pool.connect()
     try {
@@ -81,7 +81,7 @@ export class DataSource {
     factory: () => T,
     sql: string,
     values: any[] = [],
-    mapper: ((row: any) => void) | undefined = undefined
+    mapper: ((row: any) => void) | undefined = undefined,
   ): Promise<T | null> {
     const client = await this.pool.connect()
     try {

@@ -31,21 +31,23 @@ message WorkflowExecutionRequest {
   optional WorkflowParentJobId parent = 1;
   string workflow_id = 2;
   optional string metadata_id = 3;
-  optional string collection_id = 4;
-  optional string supplementary_id = 5;
-  bool wait_for_completion = 6;
-  map<string, string> context = 7;
+  optional int32 version = 4;
+  optional string collection_id = 5;
+  optional string supplementary_id = 6;
+  bool wait_for_completion = 7;
+  map<string, string> context = 8;
 }
 
 message FindAndWorkflowExecutionRequest {
   optional WorkflowParentJobId parent = 1;
   string workflow_id = 2;
   optional string metadata_id = 3;
-  optional string collection_id = 4;
-  bool wait_for_completion = 5;
-  map<string, string> context = 6;
-  map<string, string> metadata_attributes = 7;
-  map<string, string> collection_attributes = 8;
+  optional int32 version = 4;
+  optional string collection_id = 5;
+  bool wait_for_completion = 6;
+  map<string, string> context = 7;
+  map<string, string> metadata_attributes = 8;
+  map<string, string> collection_attributes = 9;
 }
 
 message WorkflowEnqueueRequest {
@@ -53,10 +55,11 @@ message WorkflowEnqueueRequest {
   Workflow workflow = 2;
   repeated WorkflowJob jobs = 3;
   optional string metadata_id = 4;
-  optional string collection_id = 5;
-  optional string supplementary_id = 6;
-  map<string, string> context = 7;
-  bool wait_for_completion = 8;
+  optional int32 version = 5;
+  optional string collection_id = 6;
+  optional string supplementary_id = 7;
+  map<string, string> context = 8;
+  bool wait_for_completion = 9;
 }
 
 message WorkflowEnqueueResponses {
@@ -75,10 +78,11 @@ message WorkflowJob {
   string workflow_id = 1;
   optional string collection_id = 2;
   optional string metadata_id = 3;
-  optional string supplementary_id = 4;
-  WorkflowActivity activity = 5;
-  repeated WorkflowActivityPrompt prompts = 6;
-  repeated WorkflowActivityStorageSystem storage_systems = 7;
-  repeated WorkflowActivityModel models = 8;
-  map<string, string> context = 9;
+  optional int32 version = 4;
+  optional string supplementary_id = 5;
+  WorkflowActivity activity = 6;
+  repeated WorkflowActivityPrompt prompts = 7;
+  repeated WorkflowActivityStorageSystem storage_systems = 8;
+  repeated WorkflowActivityModel models = 9;
+  map<string, string> context = 10;
 }

@@ -57,7 +57,7 @@ export function content(
   serviceAccountId: string,
   permissions: PermissionManager,
   dataSource: ContentDataSource,
-  objectStore: ObjectStore
+  objectStore: ObjectStore,
 ): ConnectRouter {
   return router.service(ContentService, {
     async getSources() {
@@ -109,8 +109,8 @@ export function content(
               serviceAccountId,
               subject,
               addRequest.parent,
-              addRequest.collection
-            )
+              addRequest.collection,
+            ),
           )
         } catch (error: any) {
           logger.error({ error }, 'error adding collection')
@@ -133,7 +133,7 @@ export function content(
         serviceAccountId,
         subject,
         request.parent,
-        request.collection
+        request.collection,
       )
       return new IdResponse({ id: id.id })
     },
@@ -143,7 +143,7 @@ export function content(
         subject,
         PermissionObjectType.collection_type,
         request.id,
-        PermissionAction.delete
+        PermissionAction.delete,
       )
       await dataSource.deleteCollection(request.id)
       return new Empty()
@@ -154,7 +154,7 @@ export function content(
         subject,
         PermissionObjectType.collection_type,
         request.id,
-        PermissionAction.manage
+        PermissionAction.manage,
       )
       return await permissions.getPermissions(PermissionObjectType.collection_type, request.id)
     },
@@ -164,7 +164,7 @@ export function content(
         subject,
         PermissionObjectType.collection_type,
         request.id,
-        PermissionAction.manage
+        PermissionAction.manage,
       )
       await permissions.createRelationship(
         PermissionObjectType.collection_type,
@@ -173,7 +173,7 @@ export function content(
           subject: request.subject,
           relation: request.relation,
           subjectType: request.subjectType,
-        })
+        }),
       )
       return new Empty()
     },
@@ -183,15 +183,15 @@ export function content(
         subject,
         PermissionObjectType.collection_type,
         request.collectionId,
-        PermissionAction.manage
+        PermissionAction.manage,
       )
       switch (request.itemId.case) {
-        case 'childCollectionId':
-          await dataSource.addCollectionCollectionItem(request.collectionId, request.itemId.value)
-          break
-        case 'childMetadataId':
-          await dataSource.addCollectionMetadataItem(request.collectionId, request.itemId.value)
-          break
+      case 'childCollectionId':
+        await dataSource.addCollectionCollectionItem(request.collectionId, request.itemId.value)
+        break
+      case 'childMetadataId':
+        await dataSource.addCollectionMetadataItem(request.collectionId, request.itemId.value)
+        break
       }
     },
     async setCollectionReady(request, context) {
@@ -207,7 +207,7 @@ export function content(
         subject,
         PermissionObjectType.collection_type,
         collection.id,
-        PermissionAction.view
+        PermissionAction.view,
       )
       return collection
     },
@@ -219,7 +219,7 @@ export function content(
         subject,
         PermissionObjectType.collection_type,
         collectionIds,
-        PermissionAction.view
+        PermissionAction.view,
       )
       const validIdsMap: { [key: string]: boolean } = {}
       for (const id of validIds) {
@@ -232,19 +232,19 @@ export function content(
     async checkPermission(request) {
       try {
         let type = SubjectType.user
-        if (request.subjectType == PermissionSubjectType.service_account) {
+        if (request.subjectType === PermissionSubjectType.service_account) {
           type = SubjectType.serviceaccount
-        } else if (request.subjectType == PermissionSubjectType.group) {
+        } else if (request.subjectType === PermissionSubjectType.group) {
           type = SubjectType.group
         }
         await permissions.checkWithError(
           {
             id: request.subject,
-            type: type,
+            type,
           },
           request.objectType,
           request.object,
-          request.action
+          request.action,
         )
         return new PermissionCheckResponse({ allowed: true })
       } catch (e) {
@@ -275,7 +275,7 @@ export function content(
             throw new ConnectError('permission check failed', Code.PermissionDenied)
           }
           ids.push(
-            await addMetadata(dataSource, permissions, serviceAccountId, subject, collection, addRequest.metadata)
+            await addMetadata(dataSource, permissions, serviceAccountId, subject, collection, addRequest.metadata),
           )
         } catch (error: any) {
           logger.error({ error }, 'error adding metadata')
@@ -290,7 +290,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.metadataId,
-        PermissionAction.manage
+        PermissionAction.manage,
       )
       const metadata = await dataSource.getMetadata(request.metadataId)
       if (!metadata) {
@@ -303,7 +303,7 @@ export function content(
           metadataId: request.metadataId,
           status: 'adding trait: ' + request.traitId,
           stateId: StateProcessing,
-        })
+        }),
       )
       return metadata
     },
@@ -347,7 +347,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         metadataIds,
-        PermissionAction.view
+        PermissionAction.view,
       )
       const validIdsMap: { [key: string]: boolean } = {}
       for (const id of validIds) {
@@ -381,7 +381,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.metadataId,
-        PermissionAction.service
+        PermissionAction.service,
       )
       await dataSource.addMetadataSupplementary(
         request.metadataId,
@@ -391,7 +391,7 @@ export function content(
         Number(request.contentLength),
         request.traitIds,
         request.sourceId || null,
-        request.sourceIdentifier || null
+        request.sourceIdentifier || null,
       )
       return new MetadataSupplementary({
         metadataId: request.metadataId,
@@ -415,7 +415,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.id,
-        PermissionAction.service
+        PermissionAction.service,
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
@@ -438,7 +438,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.id,
-        PermissionAction.service
+        PermissionAction.service,
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
@@ -453,7 +453,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.id,
-        PermissionAction.service
+        PermissionAction.service,
       )
       return new MetadataSupplementaries({ supplementaries: await dataSource.getMetadataSupplementaries(request.id) })
     },
@@ -463,7 +463,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.id,
-        PermissionAction.service
+        PermissionAction.service,
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
@@ -499,7 +499,7 @@ export function content(
           subject: request.subject,
           relation: request.relation,
           subjectType: request.subjectType,
-        })
+        }),
       )
       return new Empty()
     },
@@ -509,7 +509,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.metadataId,
-        PermissionAction.service
+        PermissionAction.service,
       )
       const metadata = await dataSource.getMetadata(request.metadataId)
       if (!metadata) {
@@ -522,7 +522,7 @@ export function content(
         request.stateId,
         request.status,
         true,
-        request.immediate
+        request.immediate,
       )
     },
     async setWorkflowStateComplete(request, context) {
@@ -531,7 +531,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.metadataId,
-        PermissionAction.service
+        PermissionAction.service,
       )
       await setWorkflowStateComplete(subject, dataSource, request.metadataId, request.status)
     },
@@ -541,13 +541,13 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.metadataId1,
-        PermissionAction.manage
+        PermissionAction.manage,
       )
       await permissions.checkWithError(
         subject,
         PermissionObjectType.metadata_type,
         request.metadataId2,
-        PermissionAction.manage
+        PermissionAction.manage,
       )
       await dataSource.addMetadataRelationship(request.metadataId1, request.metadataId2, request.relationship)
       return new Empty()

@@ -96,6 +96,49 @@ export class IdRequest extends Message<IdRequest> {
 }
 
 /**
+ * @generated from message bosca.IdAndVersionRequest
+ */
+export class IdAndVersionRequest extends Message<IdAndVersionRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: int32 version = 2;
+   */
+  version = 0;
+
+  constructor(data?: PartialMessage<IdAndVersionRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.IdAndVersionRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IdAndVersionRequest {
+    return new IdAndVersionRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): IdAndVersionRequest {
+    return new IdAndVersionRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): IdAndVersionRequest {
+    return new IdAndVersionRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: IdAndVersionRequest | PlainMessage<IdAndVersionRequest> | undefined, b: IdAndVersionRequest | PlainMessage<IdAndVersionRequest> | undefined): boolean {
+    return proto3.util.equals(IdAndVersionRequest, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.SupplementaryIdRequest
  */
 export class SupplementaryIdRequest extends Message<SupplementaryIdRequest> {

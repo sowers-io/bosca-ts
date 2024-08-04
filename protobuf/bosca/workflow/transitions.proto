@@ -21,14 +21,16 @@ package bosca.workflow;
 
 message BeginTransitionWorkflowRequest {
   string metadata_id = 1;
-  string state_id = 2;
-  string status = 3;
-  bool retry = 4;
-  optional string supplementaryId = 5;
+  int32 version = 2;
+  string state_id = 3;
+  string status = 4;
+  bool retry = 5;
+  optional string supplementaryId = 6;
 }
 
 message CompleteTransitionWorkflowRequest {
   string metadata_id = 1;
-  string status = 2;
-  bool success = 3;
+  int32 version = 2;
+  string status = 3;
+  bool success = 4;
 }

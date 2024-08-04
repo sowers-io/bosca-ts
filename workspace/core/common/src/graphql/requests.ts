@@ -38,7 +38,7 @@ export async function executeGraphQL<T>(fn: () => Promise<T>): Promise<T> {
       }
     }
     throw new GraphQLError(e.message, {
-      originalError: e
+      originalError: e,
     })
   }
 }

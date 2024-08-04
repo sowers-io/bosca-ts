@@ -24,7 +24,7 @@ import {
   ContentService,
   IdRequest,
   Source,
-  WorkflowJob, FindCollectionRequest
+  WorkflowJob, FindCollectionRequest,
 } from '@bosca/protobufs'
 import { Activity, ActivityJobExecutor } from '../activity'
 import { Downloader } from '../../util/downloader'
@@ -68,7 +68,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
             'bible.version': version.toString(),
           },
         }),
-      })
+      }),
     )
     return getCollection(new IdRequest({ id: addResponse.id }))
   }
@@ -77,7 +77,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
     source: Source,
     metadata: BibleMetadata,
     bible: Collection,
-    books: Book[]
+    books: Book[],
   ): Promise<Collection[]> {
     const addCollectionRequests: AddCollectionRequest[] = []
     const addMetadatasRequests: AddMetadataRequest[] = []
@@ -102,7 +102,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
             name: book.name.short + ' Chapters',
             attributes: attributes,
           }),
-        })
+        }),
       )
       const buffer = toArrayBuffer(book.raw)
       buffers.push(buffer)
@@ -118,7 +118,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
             sourceId: source.id,
             traitIds: ['bible.usx.book'],
           }),
-        })
+        }),
       )
       order++
     }
@@ -171,7 +171,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
             sourceId: source.id,
             traitIds: ['bible.usx.chapter'],
           }),
-        })
+        }),
       )
     }
 
@@ -186,7 +186,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
           'bible.type': 'bible',
           'bible.system.id': metadata.identification.systemId.id,
         },
-      })
+      }),
     )
     for (const collection of collections.collections) {
       version = Math.max(parseInt(collection.attributes['bible.version']), version)

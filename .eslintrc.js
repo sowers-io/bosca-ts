@@ -4,8 +4,14 @@ module.exports = {
     node: true,
   },
   extends: [
-    'standard',
+    'eslint:recommended',
   ],
+  overrides: [
+    {
+      'files': ['*.ts', '*.tsx'],
+    },
+  ],
+  ignorePatterns: ['node_modules', 'lib'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 12,
@@ -13,16 +19,24 @@ module.exports = {
   },
   plugins: [
     '@typescript-eslint',
+    '@stylistic/ts',
   ],
   rules: {
-    'space-before-function-paren': ['error', {
+    '@stylistic/ts/quotes': ['error', 'single'],
+    '@stylistic/ts/object-curly-spacing': ['error', 'always'],
+    '@stylistic/ts/space-before-function-paren': ['error', {
       anonymous: 'always',
       named: 'never',
       asyncArrow: 'always',
     }],
-    'comma-dangle': ['error', 'always-multiline'],
-    indent: ['error', 2],
-    'keyword-spacing': ['error', { before: true, after: true }],
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    '@stylistic/ts/comma-dangle': ['error', 'always-multiline'],
+    '@stylistic/ts/indent': ['error', 2],
+    '@stylistic/ts/keyword-spacing': ['error', { before: true, after: true }],
+    '@typescript-eslint/no-unused-vars': ['error', {
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+      caughtErrorsIgnorePattern: '^_',
+    }],
+    'no-unused-vars': 'off',
   },
 }

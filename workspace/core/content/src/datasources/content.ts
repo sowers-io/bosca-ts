@@ -30,8 +30,8 @@ import { QueryResult } from 'pg'
 export const RootCollectionId = '00000000-0000-0000-0000-000000000000'
 
 export interface IdName {
-    id: string
-    name: string
+  id: string
+  name: string
 }
 
 export class ContentDataSource extends DataSource {
@@ -43,7 +43,8 @@ export class ContentDataSource extends DataSource {
     try {
       const source = await this.queryAndMapFirst(() => new Source(), 'select * from sources where id = $1::uuid', [id])
       if (source) return source
-    } catch (ignore) {
+    } catch (_) {
+      // ignore
     }
     return await this.queryAndMapFirst(() => new Source(), 'select * from sources where name = $1', [id])
   }
@@ -210,7 +211,7 @@ export class ContentDataSource extends DataSource {
     const root = await this.getCollection(RootCollectionId)
     if (root) return false
     await this.query(
-      "insert into collections (id, name, type, workflow_state_id) values ($1, 'Root', 'root', 'published')",
+      'insert into collections (id, name, type, workflow_state_id) values ($1, \'Root\', \'root\', \'published\')',
       [RootCollectionId],
     )
     return true

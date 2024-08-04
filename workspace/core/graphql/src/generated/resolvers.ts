@@ -50,7 +50,7 @@ export type CollectionItem = Collection | Metadata;
 export enum CollectionType {
   Folder = 'folder',
   Root = 'root',
-  Standard = 'standard'
+  Standard = 'standard',
 }
 
 export interface Find {

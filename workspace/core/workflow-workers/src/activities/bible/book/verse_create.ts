@@ -39,7 +39,7 @@ class Executor extends BookExecutor {
     systemId: string,
     version: string,
     abbreviation: string,
-    book: Book
+    book: Book,
   ): Promise<AddCollectionRequest[]> {
     const requests: AddCollectionRequest[] = []
     const bookCollection = await findFirstCollection({
@@ -63,7 +63,7 @@ class Executor extends BookExecutor {
               'bible.chapter.usfm': chapter.usfm,
             },
           }),
-        })
+        }),
       )
     }
     return requests
@@ -74,7 +74,7 @@ class Executor extends BookExecutor {
       systemId,
       version,
       metadata.attributes['bible.abbreviation'],
-      book
+      book,
     )
     const collections = await addCollections(addCollectionRequests)
 
@@ -111,7 +111,7 @@ class Executor extends BookExecutor {
                 'bible.verse.order': v.toString(),
               },
             }),
-          })
+          }),
         )
       }
     }
@@ -132,7 +132,7 @@ class Executor extends BookExecutor {
         source.id,
         undefined,
         undefined,
-        textBuffers[i]
+        textBuffers[i],
       )
     }
     await uploadAll(responses, rawBuffers)

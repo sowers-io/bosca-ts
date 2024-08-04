@@ -6,6 +6,7 @@
     "build": "tsc --build",
     "build.watch": "tsc --build --watch",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "dev": "DISABLE_OTEL=true BOSCA_REDIS_HOST=localhost BOSCA_REDIS_PORT=6379 ts-node --require ./src/instrumentation.ts src/main.ts",
     "start": "node --require ./lib/instrumentation.js ./lib/main.js"
   },

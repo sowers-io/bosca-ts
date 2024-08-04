@@ -43,7 +43,7 @@ class Executor extends ActivityJobExecutor<CreateTextEmbeddings> {
         new SupplementaryIdRequest({
           id: this.definition.metadataId,
           key: this.definition.activity?.inputs['supplementaryId'] ?? 'text',
-        })
+        }),
       )
     }
     const payload = await execute(downloadUrl)

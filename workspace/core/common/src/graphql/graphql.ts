@@ -15,7 +15,7 @@
  */
 
 import { createSchema, GraphQLSchemaWithContext, YogaInitialContext } from 'graphql-yoga'
-import { loadFiles, LoadFilesOptions } from '@graphql-tools/load-files'
+import { loadFiles } from '@graphql-tools/load-files'
 
 import { fastify, FastifyRequest, FastifyReply } from 'fastify'
 import { createYoga } from 'graphql-yoga'

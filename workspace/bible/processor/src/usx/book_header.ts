@@ -15,7 +15,7 @@
  */
 
 import { BookHeaderStyle } from './styles'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
 import { Text, TextFactory } from './text'
 import { BookHeaderStyles } from './styles'
 

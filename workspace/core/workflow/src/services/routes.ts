@@ -23,7 +23,7 @@ export default (router: ConnectRouter) => {
   const pool = createPool(process.env.BOSCA_WORKFLOW_CONNECTION_STRING!)
   const permissions: PermissionManager = new SpiceDBPermissionManager(
     process.env.BOSCA_PERMISSIONS_ENDPOINT!,
-    process.env.BOSCA_PERMISSIONS_SHARED_TOKEN!
+    process.env.BOSCA_PERMISSIONS_SHARED_TOKEN!,
   )
   const workflowDataSource = new WorkflowDataSource(pool)
   workflowDataSource.initialize().catch((error) => {

@@ -39,7 +39,7 @@ export class VerseStart implements UsxItem {
   }
 
   toString(): string {
-    return this.number + ". "
+    return this.number + '. '
   }
 }
 

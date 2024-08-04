@@ -81,7 +81,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
               name: args.metadata.name,
               // todo
             },
-          })
+          }),
         )
         const metadata = await service.getMetadata(new IdRequest({ id: response.id }), {
           headers: getGraphQLHeaders(context),

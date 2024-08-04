@@ -30,8 +30,6 @@ import { Code, ConnectError } from '@connectrpc/connect'
 
 let uploading = 0
 
-export function initializeUploadLimiter(concurrency: number) {}
-
 export async function uploadAll(response: IdResponses, buffers: ArrayBuffer[]) {
   for (let ix = 0; ix < response.id.length; ix++) {
     const addResponse = response.id[ix]
@@ -65,7 +63,7 @@ export async function upload(id: string, buffer: ArrayBuffer) {
                 uploading,
                 length: buffer.byteLength,
               },
-              'finished upload, metadata workflow state was already set'
+              'finished upload, metadata workflow state was already set',
             )
             return
           }
@@ -107,7 +105,7 @@ export async function uploadSupplementary(
   sourceId: string | undefined,
   sourceIdentifier: string | undefined,
   traitIds: string[] | undefined,
-  buffer: ArrayBuffer
+  buffer: ArrayBuffer,
 ) {
   const supplementary = await Retry.execute(10, async () => {
     const service = useServiceAccountClient(ContentService)

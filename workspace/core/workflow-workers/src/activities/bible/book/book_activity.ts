@@ -76,8 +76,6 @@ class Executor extends ActivityJobExecutor<BookActivity> {
       const content = new PublicationContent({ $: { role: metadata.attributes['bible.book.usfm'] } })
       const book = await processor.processBook(name, content, file)
       await this.executor.execute(source, systemId, version, metadata, book)
-    } catch (e) {
-      throw e
     } finally {
       await this.activity.downloader.cleanup(file)
     }

@@ -26,6 +26,7 @@ import {
 } from '@bosca/protobufs'
 import { Activity } from '../activity'
 import { Job, Queue, Worker } from 'bullmq'
+import { test } from 'vitest';
 
 async function runTest(activity: Activity, definition: WorkflowJob) {
   const connection = {
@@ -36,7 +37,7 @@ async function runTest(activity: Activity, definition: WorkflowJob) {
     connection: connection,
   })
   await queue.add('job', definition.toJson())
-  await new Promise(async (resolve, reject) => {
+  await new Promise((resolve, reject) => {
     new Worker(
       'test',
       async (job: Job) => {
@@ -49,7 +50,7 @@ async function runTest(activity: Activity, definition: WorkflowJob) {
       },
       {
         connection: connection,
-      }
+      },
     )
   })
 }

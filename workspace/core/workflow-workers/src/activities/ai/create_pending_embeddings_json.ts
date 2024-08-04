@@ -43,13 +43,13 @@ class Executor extends ActivityJobExecutor<CreatePendingEmbeddingsFromJsonTable>
     const service = useServiceAccountClient(ContentService)
     const source = await service.getSource(new IdRequest({ id: 'workflow' }))
     const key = this.definition.supplementaryId
-        ? this.definition.activity!.inputs!['supplementaryId'] + this.definition.supplementaryId
-        : this.definition.activity!.inputs!['supplementaryId']
+      ? this.definition.activity!.inputs!['supplementaryId'] + this.definition.supplementaryId
+      : this.definition.activity!.inputs!['supplementaryId']
     const signedUrl = await service.getMetadataSupplementaryDownloadUrl(
       new SupplementaryIdRequest({
         id: this.definition.metadataId,
         key: key,
-      })
+      }),
     )
     const payload = await execute(signedUrl)
     const table = JSON.parse(payload.toString())
@@ -68,7 +68,7 @@ class Executor extends ActivityJobExecutor<CreatePendingEmbeddingsFromJsonTable>
         new PendingEmbedding({
           id: row[idColumn],
           content: content,
-        })
+        }),
       )
     }
     const buffer = new PendingEmbeddings({ embedding: embeddings }).toBinary()
@@ -82,7 +82,7 @@ class Executor extends ActivityJobExecutor<CreatePendingEmbeddingsFromJsonTable>
       source.id,
       undefined,
       undefined,
-      buffer
+      buffer,
     )
   }
 }

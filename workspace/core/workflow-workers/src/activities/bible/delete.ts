@@ -49,16 +49,16 @@ class Executor extends ActivityJobExecutor<DeleteBibleActivity> {
       const contentService = useServiceAccountClient(ContentService)
       const metadatas = await contentService.findMetadata(new FindMetadataRequest({
         attributes: {
-          'bible.system.id': metadata.identification.systemId.id
-        }
+          'bible.system.id': metadata.identification.systemId.id,
+        },
       }))
       for (const metadata of metadatas.metadata) {
         await contentService.deleteMetadata(new IdRequest({ id: metadata.id }))
       }
       const collections = await contentService.findCollection(new FindMetadataRequest({
         attributes: {
-          'bible.system.id': metadata.identification.systemId.id
-        }
+          'bible.system.id': metadata.identification.systemId.id,
+        },
       }))
       for (const collection of collections.collections) {
         await contentService.deleteCollection(new IdRequest({ id: collection.id }))

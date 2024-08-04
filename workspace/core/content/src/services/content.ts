@@ -186,12 +186,12 @@ export function content(
         PermissionAction.manage,
       )
       switch (request.itemId.case) {
-      case 'childCollectionId':
-        await dataSource.addCollectionCollectionItem(request.collectionId, request.itemId.value)
-        break
-      case 'childMetadataId':
-        await dataSource.addCollectionMetadataItem(request.collectionId, request.itemId.value)
-        break
+        case 'childCollectionId':
+          await dataSource.addCollectionCollectionItem(request.collectionId, request.itemId.value)
+          break
+        case 'childMetadataId':
+          await dataSource.addCollectionMetadataItem(request.collectionId, request.itemId.value)
+          break
       }
     },
     async setCollectionReady(request, context) {
@@ -247,7 +247,7 @@ export function content(
           request.action,
         )
         return new PermissionCheckResponse({ allowed: true })
-      } catch (e) {
+      } catch (_) {
         return new PermissionCheckResponse({ allowed: false })
       }
     },

@@ -38,7 +38,7 @@ export async function executeWorkflow(
   collectionId: string | undefined | null,
   workflowId: string,
   context: { [key: string]: string } | undefined | null,
-  waitForCompletion: boolean
+  waitForCompletion: boolean,
 ): Promise<WorkflowEnqueueResponse> {
   const workflow = await workflowDataSource.getWorkflow(workflowId)
   if (!workflow) throw new ConnectError('missing workflow', Code.NotFound)
@@ -47,7 +47,7 @@ export async function executeWorkflow(
   for (const activity of activities) {
     const prompts = await workflowDataSource.getWorkflowActivityPrompts(Number(activity.workflowActivityId))
     const storageSystems = await workflowDataSource.getWorkflowActivityStorageSystems(
-      Number(activity.workflowActivityId)
+      Number(activity.workflowActivityId),
     )
     const models = await workflowDataSource.getWorkflowActivityModels(Number(activity.workflowActivityId))
     jobs.push(
@@ -60,7 +60,7 @@ export async function executeWorkflow(
         models: models,
         storageSystems: storageSystems,
         context: context || undefined,
-      })
+      }),
     )
   }
   return useServiceAccountClient(WorkflowQueueService).enqueue(
@@ -73,14 +73,14 @@ export async function executeWorkflow(
       jobs: jobs,
       context: context || undefined,
       waitForCompletion: waitForCompletion,
-    })
+    }),
   )
 }
 
 export async function verifyTransitionExists(
   dataSource: WorkflowDataSource,
   metadata: Metadata,
-  nextStateId: string
+  nextStateId: string,
 ): Promise<void> {
   const transition = await dataSource.getWorkflowTransition(metadata.workflowStateId, nextStateId)
   if (!transition) {
@@ -91,7 +91,7 @@ export async function verifyTransitionExists(
 export async function verifyExitTransitionExecution(
   dataSource: WorkflowDataSource,
   metadata: Metadata,
-  nextStateId: string
+  nextStateId: string,
 ): Promise<void> {
   const nextState = await dataSource.getWorkflowState(nextStateId)
   if (!nextState) {
@@ -105,7 +105,7 @@ export async function verifyExitTransitionExecution(
 export async function verifyEnterTransitionExecution(
   dataSource: WorkflowDataSource,
   metadata: Metadata,
-  nextStateId: string
+  nextStateId: string,
 ): Promise<WorkflowState | null> {
   const nextState = await dataSource.getWorkflowState(nextStateId)
   if (!nextState) {
@@ -122,7 +122,7 @@ export async function transition(
   metadata: Metadata,
   nextState: WorkflowState,
   status: string,
-  waitForCompletion: boolean
+  waitForCompletion: boolean,
 ): Promise<void> {
   if (nextState.workflowId) {
     await useServiceAccountClient(ContentService).setWorkflowState(
@@ -130,7 +130,7 @@ export async function transition(
         metadataId: metadata.id,
         status: status,
         stateId: nextState.id,
-      })
+      }),
     )
     await executeWorkflow(workflowDataSource, null, metadata.id, null, null, nextState.workflowId, null, waitForCompletion)
   } else {
@@ -138,7 +138,7 @@ export async function transition(
       new SetWorkflowStateCompleteRequest({
         metadataId: metadata.id,
         status: status,
-      })
+      }),
     )
   }
 }
@@ -151,6 +151,6 @@ export async function completeTransitionWorkflow(metadata: Metadata, status: str
     new SetWorkflowStateCompleteRequest({
       metadataId: metadata.id,
       status: status,
-    })
+    }),
   )
 }

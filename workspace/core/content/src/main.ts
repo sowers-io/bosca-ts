@@ -24,13 +24,11 @@ import {
   openTelemetryPlugin,
 } from '@bosca/common'
 import routes from './services/routes'
-import { logger } from '@bosca/common'
-
+import { logger } from '@bosca/common' 
+ 
 async function main() {
-  const grpcServer = fastify({
-    http2: true,
-  })
-  grpcServer.setErrorHandler((error, request, reply) => {
+  const server = fastify({ http2: true })
+  server.setErrorHandler((error, request, reply) => {
     logger.error({ error, request }, 'uncaught error')
     reply.status(500).send({ ok: false })
   })
@@ -39,14 +37,15 @@ async function main() {
     process.env.BOSCA_SESSION_ENDPOINT!,
     process.env.BOSCA_SERVICE_ACCOUNT_ID!,
     process.env.BOSCA_SERVICE_ACCOUNT_TOKEN!,
-    sessionInterceptor
+    sessionInterceptor,
   )
-  await grpcServer.register(openTelemetryPlugin)
-  await grpcServer.register(fastifyConnectPlugin, {
+  await server.register(openTelemetryPlugin)
+  await server.register(fastifyConnectPlugin, {
     routes,
     interceptors: [newLoggingInterceptor(), newAuthenticationInterceptor(subjectFinder)],
   })
-  await grpcServer.listen({ host: '0.0.0.0', port: 7000 })
+  await server.listen({ host: '0.0.0.0', port: 7000 })
+  logger.info('server listening on 0.0.0.0:7000')
 }
 
 void main()

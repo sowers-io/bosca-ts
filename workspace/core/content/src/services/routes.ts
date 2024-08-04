@@ -40,7 +40,7 @@ export default (router: ConnectRouter) => {
   const objectStore: ObjectStore = new S3ObjectStore()
   const permissions: PermissionManager = new SpiceDBPermissionManager(
     process.env.BOSCA_PERMISSIONS_ENDPOINT!,
-    process.env.BOSCA_PERMISSIONS_SHARED_TOKEN!
+    process.env.BOSCA_PERMISSIONS_SHARED_TOKEN!,
   )
   const dataSource = new ContentDataSource(pool)
   void initialize(dataSource)

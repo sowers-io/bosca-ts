@@ -39,7 +39,7 @@ export class BreakFactory extends UsxItemFactory<Break> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): Break {
+  create(context: UsxContext, _: Attributes): Break {
     return new Break(context)
   }
 }

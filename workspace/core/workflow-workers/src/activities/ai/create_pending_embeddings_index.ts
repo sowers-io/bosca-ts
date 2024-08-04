@@ -42,7 +42,7 @@ class Executor extends ActivityJobExecutor<CreatePendingEmbeddingsIndex> {
       new SupplementaryIdRequest({
         id: this.definition.metadataId,
         key: key,
-      })
+      }),
     )
     const payload = await execute(downloadUrl)
     const pendingEmbeddings = PendingEmbeddings.fromBinary(payload)

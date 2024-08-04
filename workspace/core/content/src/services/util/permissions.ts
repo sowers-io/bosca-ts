@@ -24,14 +24,14 @@ export type ValidIdMap = { [key: string]: boolean }
 export async function toValidIds(
   subject: Subject,
   permissions: PermissionManager,
-  resourceIdMap: ValidIdMap
+  resourceIdMap: ValidIdMap,
 ): Promise<ValidIdMap> {
   const resourceIds = Object.keys(resourceIdMap)
   const validIds = await permissions.bulkCheck(
     subject,
     PermissionObjectType.collection_type,
     resourceIds,
-    PermissionAction.edit
+    PermissionAction.edit,
   )
   const validIdsMap: { [key: string]: boolean } = {}
   for (const validId of validIds) {

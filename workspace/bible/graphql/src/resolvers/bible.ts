@@ -43,7 +43,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
           }),
           {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         return bibles.collections.map((collection) => {
           return {
@@ -72,7 +72,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
           }),
           {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         if (chapters.metadata.length === 0) {
           return null
@@ -103,7 +103,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
             }),
             {
               headers: getGraphQLHeaders(context),
-            }
+            },
           )
           if (verses.metadata.length === 0) {
             return null
@@ -116,7 +116,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
                 name: metadata.name,
                 number: metadata.attributes['bible.verse.usfm'].split('.')[2],
               }
-            })[0]
+            })[0],
           )
         }
         return allVerses
@@ -136,7 +136,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
           }),
           {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         if (verses.metadata.length === 0) {
           return null
@@ -162,7 +162,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
           }),
           {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         const response = await executeHttpRequest(url)
         return response.toString()
@@ -180,7 +180,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
           }),
           {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         const response = await executeHttpRequest(url)
         return response.toString()
@@ -195,7 +195,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
           }),
           {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         const response = await executeHttpRequest(url)
         return response.toString()
@@ -216,7 +216,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
           }),
           {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         books.metadata.sort((a, b) => {
           const a1 = parseInt(a.attributes['bible.book.order'])
@@ -251,7 +251,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
           }),
           {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         books.metadata.sort((a, b) => {
           const a1 = parseInt(a.attributes['bible.chapter.order'])

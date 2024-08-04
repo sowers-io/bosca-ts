@@ -32,7 +32,7 @@ import {
   WorkflowActivityPrompt,
   WorkflowActivityStorageSystem,
   WorkflowState, WorkflowStateTransition,
-  WorkflowStateType
+  WorkflowStateType,
 } from '@bosca/protobufs'
 import { proto3 } from '@bufbuild/protobuf'
 
@@ -50,7 +50,7 @@ export class WorkflowDataSource extends DataSource {
   async addModel(model: Model): Promise<string> {
     const records = await this.query(
       'insert into models (type, name, description, configuration) values ($1, $2, $3, ($4)::jsonb) returning id::varchar',
-      [model.type, model.name, model.description, JSON.stringify(model.configuration)]
+      [model.type, model.name, model.description, JSON.stringify(model.configuration)],
     )
     return records.rows[0].id
   }
@@ -72,7 +72,7 @@ export class WorkflowDataSource extends DataSource {
         storageSystem.name,
         storageSystem.description,
         JSON.stringify(storageSystem.configuration),
-      ]
+      ],
     )
     storageSystem.id = records.rows[0].id
     await getIStorageSystem(storageSystem)
@@ -91,7 +91,7 @@ export class WorkflowDataSource extends DataSource {
         new StorageSystemModel({
           model: model,
           configuration: record.configuration,
-        })
+        }),
       )
     }
     return models
@@ -100,7 +100,7 @@ export class WorkflowDataSource extends DataSource {
   async addStorageSystemModel(systemId: string, model: StorageSystemModel) {
     await this.query(
       'insert into storage_system_models (system_id, model_id, configuration) values ($1, $2, ($3)::jsonb)',
-      [systemId, model.model!.id, JSON.stringify(model.configuration)]
+      [systemId, model.model!.id, JSON.stringify(model.configuration)],
     )
   }
 
@@ -126,7 +126,7 @@ export class WorkflowDataSource extends DataSource {
   async addPrompt(prompt: Prompt): Promise<string> {
     const records = await this.query(
       'insert into prompts (name, description, system_prompt, user_prompt) values ($1, $2, $3, $4) returning id::varchar',
-      [prompt.name, prompt.description, prompt.systemPrompt, prompt.userPrompt]
+      [prompt.name, prompt.description, prompt.systemPrompt, prompt.userPrompt],
     )
     return records.rows[0].id
   }
@@ -140,7 +140,7 @@ export class WorkflowDataSource extends DataSource {
         activity.description,
         activity.childWorkflowId,
         JSON.stringify(activity.configuration),
-      ]
+      ],
     )
 
     const WorkflowActivityParameterTypeEnum = proto3.getEnumType(WorkflowActivityParameterType)
@@ -183,7 +183,7 @@ export class WorkflowDataSource extends DataSource {
   async addWorkflow(workflow: Workflow) {
     await this.query(
       'insert into workflows (id, name, description, queue, configuration) values ($1, $2, $3, $4, ($5)::jsonb)',
-      [workflow.id, workflow.name, workflow.description, workflow.queue, JSON.stringify(workflow.configuration)]
+      [workflow.id, workflow.name, workflow.description, workflow.queue, JSON.stringify(workflow.configuration)],
     )
   }
 
@@ -208,7 +208,7 @@ export class WorkflowDataSource extends DataSource {
     const activities = await this.queryAndMap(
       () => new WorkflowActivity(),
       'select id as workflow_activity_id, * from workflow_activities where workflow_id = $1 order by execution_group asc',
-      [workflowId]
+      [workflowId],
     )
     for (const activity of activities) {
       await this.processActivity(activity)
@@ -220,7 +220,7 @@ export class WorkflowDataSource extends DataSource {
     const activity = await this.queryAndMapFirst(
       () => new WorkflowActivity(),
       'select id as workflow_activity_id, * from workflow_activities where id = $1',
-      [id]
+      [id],
     )
     if (activity) {
       await this.processActivity(activity)
@@ -231,7 +231,7 @@ export class WorkflowDataSource extends DataSource {
   async addWorkflowActivity(workflowId: string, activity: WorkflowActivity): Promise<number> {
     const records = await this.query(
       'insert into workflow_activities (workflow_id, activity_id, execution_group, queue, configuration) values ($1, $2, $3, $4, ($5)::jsonb) returning id',
-      [workflowId, activity.activityId, activity.executionGroup, activity.queue, JSON.stringify(activity.configuration)]
+      [workflowId, activity.activityId, activity.executionGroup, activity.queue, JSON.stringify(activity.configuration)],
     )
     for (const inputKey in activity.inputs) {
       await this.query('insert into workflow_activity_inputs (activity_id, name, value) values ($1, $2, $3)', [
@@ -261,7 +261,7 @@ export class WorkflowDataSource extends DataSource {
           storageSystem: (await this.getStorageSystem(record.storage_system_id))!,
           models: await this.getStorageSystemModels(record.storage_system_id),
           configuration: record.configuration,
-        })
+        }),
       )
     }
     return storageSystems
@@ -272,11 +272,11 @@ export class WorkflowDataSource extends DataSource {
     storageSystemId: string,
     configuration: {
       [key: string]: string
-    }
+    },
   ) {
     await this.query(
       'insert into workflow_activity_storage_systems (activity_id, storage_system_id, configuration) values ($1, $2, ($3)::jsonb)',
-      [activityId, storageSystemId, JSON.stringify(configuration || '{}')]
+      [activityId, storageSystemId, JSON.stringify(configuration || '{}')],
     )
   }
 
@@ -288,7 +288,7 @@ export class WorkflowDataSource extends DataSource {
         new WorkflowActivityPrompt({
           prompt: (await this.getPrompt(record.prompt_id))!,
           configuration: record.configuration,
-        })
+        }),
       )
     }
     return prompts
@@ -299,11 +299,11 @@ export class WorkflowDataSource extends DataSource {
     promptId: string,
     configuration: {
       [key: string]: string
-    }
+    },
   ) {
     await this.query(
       'insert into workflow_activity_prompts (activity_id, prompt_id, configuration) values ($1, $2, ($3)::jsonb)',
-      [activityId, promptId, JSON.stringify(configuration || '{}')]
+      [activityId, promptId, JSON.stringify(configuration || '{}')],
     )
   }
 
@@ -317,7 +317,7 @@ export class WorkflowDataSource extends DataSource {
         new WorkflowActivityModel({
           model: (await this.getModel(record.model_id))!,
           configuration: record.configuration,
-        })
+        }),
       )
     }
     return models
@@ -328,11 +328,11 @@ export class WorkflowDataSource extends DataSource {
     modelId: string,
     configuration: {
       [key: string]: string
-    }
+    },
   ) {
     await this.query(
       'insert into workflow_activity_models (activity_id, model_id, configuration) values ($1, $2, ($3)::jsonb)',
-      [activityId, modelId, JSON.stringify(configuration || '{}')]
+      [activityId, modelId, JSON.stringify(configuration || '{}')],
     )
   }
 
@@ -340,14 +340,14 @@ export class WorkflowDataSource extends DataSource {
     return await this.queryAndMapFirst(
       () => new WorkflowStateTransition(),
       'select * from workflow_state_transitions where from_state_id = $1 and to_state_id = $2',
-      [fromStateId, toStateId]
+      [fromStateId, toStateId],
     )
   }
 
   async addTransition(fromStateId: string, toStateId: string, description: string) {
     await this.query(
       'insert into workflow_state_transitions (from_state_id, to_state_id, description) values ($1, $2, $3)',
-      [fromStateId, toStateId, description]
+      [fromStateId, toStateId, description],
     )
   }
 
@@ -364,7 +364,7 @@ export class WorkflowDataSource extends DataSource {
         state.workflowId,
         state.exitWorkflowId,
         state.entryWorkflowId,
-      ]
+      ],
     )
   }
 
@@ -465,7 +465,7 @@ export class WorkflowDataSource extends DataSource {
               await this.addWorkflowActivityStorageSystem(
                 workflowActivityId,
                 storageSystemIds[storageSystemId],
-                s.configuration
+                s.configuration,
               )
             }
           }

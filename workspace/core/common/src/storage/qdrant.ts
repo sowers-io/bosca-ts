@@ -17,7 +17,6 @@
 import { IStorageSystem } from './storagesystem'
 import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
 import { QdrantClient, GetCollectionInfoRequest, CreateCollection, Distance } from '@qdrant/js-client-grpc'
-import { OllamaEmbeddings } from '@langchain/community/embeddings/ollama'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { Document } from 'langchain/document'
 import { QdrantVectorStore } from '@langchain/qdrant'
@@ -40,7 +39,7 @@ export class QdrantStorageSystem implements IStorageSystem {
     })
     try {
       await client.api('collections').get(new GetCollectionInfoRequest({ collectionName: this.indexName }))
-    } catch (e) {
+    } catch (_) {
       await client.api('collections').create(
         new CreateCollection({
           collectionName: this.indexName,
@@ -53,7 +52,7 @@ export class QdrantStorageSystem implements IStorageSystem {
               },
             },
           },
-        })
+        }),
       )
     }
   }
@@ -81,7 +80,7 @@ export class QdrantStorageSystem implements IStorageSystem {
   async storePendingEmbeddings(
     definition: WorkflowJob,
     metadata: Metadata,
-    embeddings: PendingEmbeddings
+    embeddings: PendingEmbeddings,
   ): Promise<void> {
     const documents = embeddings.embedding.map((e) => {
       return new Document({

@@ -27,7 +27,7 @@ export class HttpSubjectFinder implements SubjectFinder {
     endpoint: string,
     serviceAccountId: string,
     serviceAccountToken: string,
-    interceptor: SessionInterceptor
+    interceptor: SessionInterceptor,
   ) {
     this.endpoint = endpoint
     this.serviceAccountId = serviceAccountId

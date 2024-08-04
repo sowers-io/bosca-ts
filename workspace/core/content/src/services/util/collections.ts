@@ -36,7 +36,7 @@ export async function getCollectionItems(
   dataSource: ContentDataSource,
   permissions: PermissionManager,
   subject: Subject,
-  collectionId: string
+  collectionId: string,
 ): Promise<CollectionItems> {
   // TODO: paging?
   let collectionItemIds = await dataSource.getCollectionCollectionItemIds(collectionId)
@@ -44,14 +44,14 @@ export async function getCollectionItems(
     subject,
     PermissionObjectType.collection_type,
     collectionItemIds,
-    PermissionAction.view
+    PermissionAction.view,
   )
   let metadataItemIds = await dataSource.getCollectionMetadataItemIds(collectionId)
   metadataItemIds = await permissions.bulkCheck(
     subject,
     PermissionObjectType.metadata_type,
     metadataItemIds,
-    PermissionAction.view
+    PermissionAction.view,
   )
   const items: CollectionItem[] = []
   for (const id of collectionItemIds) {
@@ -76,7 +76,7 @@ export async function getCollectionItems(
 export async function findNonUniqueId(
   dataSource: ContentDataSource,
   parentId: string,
-  name: string
+  name: string,
 ): Promise<string | null> {
   let found: IdName[]
   found = await dataSource.getCollectionIdName(parentId, name)
@@ -96,7 +96,7 @@ export async function addCollection(
   serviceAccountId: string,
   subject: Subject,
   parentId: string,
-  collection: Collection
+  collection: Collection,
 ): Promise<IdResponse> {
   if (collection.name.trim().length === 0) {
     throw new ConnectError('name must not be empty', Code.InvalidArgument)
@@ -144,7 +144,7 @@ export async function setCollectionReady(
   dataSource: ContentDataSource,
   permissions: PermissionManager,
   subject: Subject,
-  collectionId: string
+  collectionId: string,
 ) {
   const collection = await dataSource.getCollection(collectionId)
   if (!collection) throw new ConnectError('missing collection', Code.NotFound)
@@ -152,7 +152,7 @@ export async function setCollectionReady(
     subject,
     PermissionObjectType.collection_type,
     collection.id,
-    PermissionAction.manage
+    PermissionAction.manage,
   )
   if (!collection.traitIds || collection.traitIds.length === 0) return
   const workflowService = useServiceAccountClient(WorkflowService)
@@ -163,7 +163,7 @@ export async function setCollectionReady(
         new WorkflowExecutionRequest({
           collectionId: collection.id,
           workflowId: workflowId,
-        })
+        }),
       )
     }
   }

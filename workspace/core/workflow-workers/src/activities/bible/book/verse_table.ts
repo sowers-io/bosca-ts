@@ -58,7 +58,7 @@ class Executor extends BookExecutor {
         source.id,
         undefined,
         ['bible.usx.chapter.verse.table'],
-        buffer
+        buffer,
       )
     }
   }

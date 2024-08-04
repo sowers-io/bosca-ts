@@ -76,13 +76,13 @@ class Executor extends ActivityJobExecutor<PromptActivity> {
     const service = useServiceAccountClient(ContentService)
     const source = await service.getSource(new IdRequest({ id: 'workflow' }))
     const key = this.definition.supplementaryId
-        ? this.definition.activity!.inputs!['supplementaryId'] + this.definition.supplementaryId
-        : this.definition.activity!.inputs!['supplementaryId']
+      ? this.definition.activity!.inputs!['supplementaryId'] + this.definition.supplementaryId
+      : this.definition.activity!.inputs!['supplementaryId']
     const downloadUrl = await service.getMetadataSupplementaryDownloadUrl(
       new SupplementaryIdRequest({
         id: this.definition.metadataId,
         key: key,
-      })
+      }),
     )
     const payload = await execute(downloadUrl)
     const json = JSON.parse(payload.toString())
@@ -118,7 +118,7 @@ class Executor extends ActivityJobExecutor<PromptActivity> {
         source.id,
         undefined,
         undefined,
-        toArrayBuffer(JSON.stringify(response))
+        toArrayBuffer(JSON.stringify(response)),
       )
     } catch (e) {
       logger.error({ error: e }, 'error in chain')

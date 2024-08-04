@@ -47,7 +47,7 @@ import {
 export function workflow(
   router: ConnectRouter,
   permissions: PermissionManager,
-  dataSource: WorkflowDataSource
+  dataSource: WorkflowDataSource,
 ): ConnectRouter {
   return router.service(WorkflowService, {
     async getModels(_, context) {
@@ -184,7 +184,7 @@ export function workflow(
         throw new ConnectError('unauthorized', Code.PermissionDenied)
       }
       const metadata = await useServiceAccountClient(ContentService).getMetadata(
-        new IdRequest({ id: request.metadataId })
+        new IdRequest({ id: request.metadataId }),
       )
       if (!metadata) throw new ConnectError('missing metadata', Code.NotFound)
       if (metadata.workflowStateId === request.stateId) {
@@ -205,7 +205,7 @@ export function workflow(
         throw new ConnectError('unauthorized', Code.PermissionDenied)
       }
       const metadata = await useServiceAccountClient(ContentService).getMetadata(
-        new IdRequest({ id: request.metadataId })
+        new IdRequest({ id: request.metadataId }),
       )
       if (!metadata) throw new ConnectError('missing metadata', Code.NotFound)
       await completeTransitionWorkflow(metadata, request.status)
@@ -223,7 +223,7 @@ export function workflow(
         request.collectionId,
         request.workflowId,
         request.context,
-        request.waitForCompletion
+        request.waitForCompletion,
       )
     },
     async findAndExecuteWorkflow(request, context) {
@@ -242,7 +242,7 @@ export function workflow(
       }
       if (request.collectionAttributes) {
         const collections = await service.findCollection(
-          new FindCollectionRequest({ attributes: request.collectionAttributes })
+          new FindCollectionRequest({ attributes: request.collectionAttributes }),
         )
         for (const collection of collections.collections) {
           requests.push({ collection: collection.id, metadata: null })
@@ -250,7 +250,7 @@ export function workflow(
       }
       if (request.metadataAttributes) {
         const metadatas = await service.findMetadata(
-          new FindMetadataRequest({ attributes: request.metadataAttributes })
+          new FindMetadataRequest({ attributes: request.metadataAttributes }),
         )
         for (const metadata of metadatas.metadata) {
           requests.push({ collection: null, metadata: metadata.id })
@@ -265,7 +265,7 @@ export function workflow(
           r.collection,
           request.workflowId,
           request.context,
-          request.waitForCompletion
+          request.waitForCompletion,
         )
         responses.responses.push(response)
       }

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-export const StatePending = "pending"
-export const StateProcessing = "processing"
-export const StateDraft = "draft"
-export const StatePublished = "published"
-export const StateFailed = "failed"
+export const StatePending = 'pending'
+export const StateProcessing = 'processing'
+export const StateDraft = 'draft'
+export const StatePublished = 'published'
+export const StateFailed = 'failed'

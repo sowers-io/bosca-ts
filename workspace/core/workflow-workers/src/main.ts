@@ -34,7 +34,6 @@ import { CreatePendingEmbeddingsFromJsonTable } from './activities/ai/create_pen
 import { CreateTextEmbeddings } from './activities/ai/create_text_embeddings'
 import { CreatePendingEmbeddingsIndex } from './activities/ai/create_pending_embeddings_index'
 import { IndexText } from './activities/metadata/text'
-import { initializeUploadLimiter } from './util/uploader'
 import { logger } from '@bosca/common/lib/logger'
 import { Job } from 'bullmq/dist/esm/classes/job'
 import { jobStartedCount, jobErrorCount, jobFinishedCount, jobAddedCount, jobFailedCount, workerCount } from './metrics'
@@ -89,8 +88,6 @@ async function main() {
   const configuration = getConfiguration()
   const activities = getAvailableActivities()
 
-  initializeUploadLimiter(configuration.maxUploadConcurrency)
-
   const connection: ConnectionOptions = {
     host: process.env.BOSCA_REDIS_HOST!,
     port: parseInt(process.env.BOSCA_REDIS_PORT!),
@@ -103,10 +100,11 @@ async function main() {
       async (job) => {
         logger.trace({ jobId: job.id, jobName: job.name }, 'running job')
         switch (job.data.type) {
-          case 'job':
+          case 'job': {
             jobStartedCount.add(1)
             const definition = WorkflowJob.fromJson(job.data.job)
             return await runJob(job, definition, activities)
+          }
           case 'workflow':
             break
         }
@@ -117,7 +115,7 @@ async function main() {
         stalledInterval: 60000,
         lockDuration: 60000,
         maxStalledCount: 50,
-      }
+      },
     )
     worker.on('completed', (job) => {
       if (job.data.type === 'job') {

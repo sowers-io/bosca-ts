@@ -105,7 +105,7 @@ export class Chapter extends UsxItemContainer<ChapterType> {
         this.number,
         usfmParts[usfmParts.length - 1],
         items,
-        raw
+        raw,
       ))
     }
 

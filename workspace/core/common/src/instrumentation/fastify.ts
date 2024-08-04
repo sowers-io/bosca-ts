@@ -206,5 +206,5 @@ export const openTelemetryPlugin: FastifyPluginCallback<FastifyOpenTelemtryOptio
   {
     fastify: '4.x',
     name: 'fastify-opentelemetry-ts',
-  }
+  },
 )

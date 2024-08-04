@@ -32,6 +32,7 @@ export class ChildWorkflow extends Activity {
 
 class Executor extends ActivityJobExecutor<ChildWorkflow> {
   async execute() {
+    // eslint-disable-next-line no-prototype-builtins
     if (this.job.data.hasOwnProperty('executed') && this.job.data.executed) {
       return
     }
@@ -47,7 +48,7 @@ class Executor extends ActivityJobExecutor<ChildWorkflow> {
         }),
         workflowId: workflowId,
         metadataId: this.definition.metadataId,
-      })
+      }),
     )
 
     this.job.data.executed = true

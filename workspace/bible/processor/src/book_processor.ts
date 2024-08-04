@@ -51,7 +51,7 @@ enum BookSections {
   titles,
   introduction,
   endTitles,
-  label
+  label,
 }
 
 class BookProcessorContext extends UsxContext {

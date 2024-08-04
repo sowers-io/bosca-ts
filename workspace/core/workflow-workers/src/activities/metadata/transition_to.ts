@@ -38,7 +38,7 @@ class Executor extends ActivityJobExecutor<TransitionToActivity> {
       new SetWorkflowStateCompleteRequest({
         metadataId: this.definition.metadataId,
         status: status,
-      })
+      }),
     )
     await contentService.setWorkflowState(
       new SetWorkflowStateRequest({
@@ -46,7 +46,7 @@ class Executor extends ActivityJobExecutor<TransitionToActivity> {
         stateId: state,
         status: status,
         immediate: true,
-      })
+      }),
     )
   }
 }

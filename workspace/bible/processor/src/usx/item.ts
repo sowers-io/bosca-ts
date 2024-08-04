@@ -35,7 +35,7 @@ export abstract class UsxItemContainer<T extends UsxItem> implements UsxItem {
   readonly position: Position
   readonly verse: string | null
 
-  protected constructor(context: UsxContext, attributes: Attributes) {
+  protected constructor(context: UsxContext, _: Attributes) {
     this.position = context.position
     this.verse = context.addVerseItem(this)
   }

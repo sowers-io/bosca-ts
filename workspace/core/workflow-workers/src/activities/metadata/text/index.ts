@@ -45,7 +45,7 @@ class Executor extends ActivityJobExecutor<IndexText> {
         new SupplementaryIdRequest({
           id: this.definition.metadataId,
           key: key,
-        })
+        }),
       )
     }
     const payload = await execute(downloadUrl)

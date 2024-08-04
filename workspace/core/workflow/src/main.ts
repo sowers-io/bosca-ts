@@ -38,7 +38,7 @@ async function main() {
     process.env.BOSCA_SESSION_ENDPOINT!,
     process.env.BOSCA_SERVICE_ACCOUNT_ID!,
     process.env.BOSCA_SERVICE_ACCOUNT_TOKEN!,
-    sessionInterceptor
+    sessionInterceptor,
   )
   await grpcServer.register(fastifyConnectPlugin, {
     routes,

@@ -44,7 +44,7 @@ export class TextFactory extends UsxItemFactory<Text> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): Text {
+  create(context: UsxContext, _: Attributes): Text {
     return new Text(context)
   }
 }

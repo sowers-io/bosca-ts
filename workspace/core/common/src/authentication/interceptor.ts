@@ -24,14 +24,14 @@ export const SubjectKey = createContextKey<Subject>(
   {
     id: 'anonymous',
     type: SubjectType.user,
-  } // Default value
+  }, // Default value
 )
 
 export function newAuthenticationInterceptor(subjectFinder: SubjectFinder): Interceptor {
   async function authenticate(
     req: UnaryRequest | StreamRequest,
     fromCookie: boolean,
-    authorization: string | null
+    authorization: string | null,
   ): Promise<boolean> {
     if (authorization && authorization.length > 0) {
       const subject = await subjectFinder.findSubject(fromCookie, authorization)

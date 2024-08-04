@@ -36,7 +36,7 @@ async function main() {
     process.env.BOSCA_SESSION_ENDPOINT!,
     process.env.BOSCA_SERVICE_ACCOUNT_ID!,
     process.env.BOSCA_SERVICE_ACCOUNT_TOKEN!,
-    sessionInterceptor
+    sessionInterceptor,
   )
 
   function onError(res: ServerResponse<http.IncomingMessage>, e: any, rethrow: boolean) {

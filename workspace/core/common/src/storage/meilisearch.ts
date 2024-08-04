@@ -17,6 +17,7 @@
 import { IStorageSystem } from './storagesystem'
 import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
 import { MeiliSearch, Index } from 'meilisearch'
+import { logger } from '../logger';
 
 export class MeilisearchStorageSystem implements IStorageSystem {
   private readonly client = new MeiliSearch({
@@ -59,7 +60,9 @@ export class MeilisearchStorageSystem implements IStorageSystem {
             await this.client.tasks.waitForTask(task.taskUid)
             this.index = await this.client.getIndex(this.indexName)
             return
-          } catch (e: any) {}
+          } catch (e) {
+            logger.warn({ error: e }, 'failed to create index')
+          }
         }
         this.index = await this.client.getIndex(this.indexName)
       } else {
@@ -80,9 +83,9 @@ export class MeilisearchStorageSystem implements IStorageSystem {
   }
 
   async storePendingEmbeddings(
-    definition: WorkflowJob,
-    metadata: Metadata,
-    embeddings: PendingEmbeddings
+    _: WorkflowJob,
+    __: Metadata,
+    ___: PendingEmbeddings,
   ): Promise<void> {
     throw new Error('unsupported')
   }

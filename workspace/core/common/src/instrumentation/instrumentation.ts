@@ -21,14 +21,14 @@ export function initializeInstrumentation(serviceName: string) {
 
   const traceExporter: SpanExporter = process.env.OTLP_TRACE_ENDPOINT
     ? new OTLPTraceExporter({
-        url: process.env.OTLP_TRACE_ENDPOINT + '/v1/traces',
-      })
+      url: process.env.OTLP_TRACE_ENDPOINT + '/v1/traces',
+    })
     : new ConsoleSpanExporter()
 
   const metricExporter: PushMetricExporter = process.env.OTLP_METRICS_ENDPOINT
     ? new OTLPMetricExporter({
-        url: process.env.OTLP_METRICS_ENDPOINT + '/v1/metrics',
-      })
+      url: process.env.OTLP_METRICS_ENDPOINT + '/v1/metrics',
+    })
     : new ConsoleMetricExporter()
 
   const metricReader = new PeriodicExportingMetricReader({

@@ -38,7 +38,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
       endpoint,
       v1.ClientSecurity.INSECURE_PLAINTEXT_CREDENTIALS,
       1,
-      grpc.ServerCredentials.createInsecure()
+      grpc.ServerCredentials.createInsecure(),
     )
     this.client = client.promises
   }
@@ -47,7 +47,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
     subject: Subject,
     objectType: PermissionObjectType,
     resourceId: string[],
-    action: PermissionAction
+    action: PermissionAction,
   ): Promise<string[]> {
     const subjectId = subject.id
     let subjectType = PermissionSubjectType.user
@@ -69,7 +69,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
             objectId: id,
           }),
           permission: this.getAction(action),
-        })
+        }),
       )
     }
     const check = v1.CheckBulkPermissionsRequest.create({ items: items })
@@ -88,12 +88,11 @@ export class SpiceDBPermissionManager implements PermissionManager {
       const pair = responses.pairs[i]
       const response = pair.response
       switch (response.oneofKind) {
-        case 'item':
-          // @ts-ignore
+        case 'item': {
           const item = response.item
           if (
             item.permissionship == v1.CheckPermissionResponse_Permissionship.HAS_PERMISSION ||
-            item.permissionship == v1.CheckPermissionResponse_Permissionship.CONDITIONAL_PERMISSION
+              item.permissionship == v1.CheckPermissionResponse_Permissionship.CONDITIONAL_PERMISSION
           ) {
             ids.push(resourceId[i])
           } else if (item.permissionship == v1.CheckPermissionResponse_Permissionship.NO_PERMISSION) {
@@ -103,10 +102,11 @@ export class SpiceDBPermissionManager implements PermissionManager {
                 subjectId,
                 action: this.getAction(action),
               },
-              'permission check failed'
+              'permission check failed',
             )
           }
           break
+        }
         case 'error':
           throw new PermissionError('check failed')
       }
@@ -118,7 +118,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
     subject: Subject,
     objectType: PermissionObjectType,
     resourceId: string,
-    action: PermissionAction
+    action: PermissionAction,
   ): Promise<void> {
     const subjectId = subject.id
     let subjectType = PermissionSubjectType.user
@@ -133,7 +133,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
     subjectId: string,
     objectType: PermissionObjectType,
     resourceId: string,
-    action: PermissionAction
+    action: PermissionAction,
   ): Promise<void> {
     const request = v1.CheckPermissionRequest.create({
       resource: v1.ObjectReference.create({
@@ -166,7 +166,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
         throw new PermissionError('permission check failed')
       }
     } catch (e) {
-      logger.error({ resourceId, subjectId, action: this.getAction(action) }, 'permission check failed')
+      logger.error({ resourceId, subjectId, action: this.getAction(action), error: e }, 'permission check failed')
       throw new PermissionError('permission check failed')
     }
   }
@@ -190,7 +190,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
               }),
             }),
           }),
-        })
+        }),
       )
     }
     await this.client.writeRelationships(v1.WriteRelationshipsRequest.create({ updates: updates }))
@@ -244,7 +244,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
           optionalResourceId: resourceId,
         },
         consistency: v1.Consistency.create({ requirement: { oneofKind: 'fullyConsistent', fullyConsistent: true } }),
-      })
+      }),
     )
 
     const permissions = []

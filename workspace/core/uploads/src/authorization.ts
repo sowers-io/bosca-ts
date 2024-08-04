@@ -30,7 +30,7 @@ export async function verifyPermissions(
   fromCookie: boolean,
   authorization: string,
   collection: string,
-  subjectFinder: SubjectFinder
+  subjectFinder: SubjectFinder,
 ) {
   const subject = await subjectFinder.findSubject(fromCookie, authorization)
   let subjectPermissionType = PermissionSubjectType.user
@@ -44,7 +44,7 @@ export async function verifyPermissions(
       object: collection,
       objectType: PermissionObjectType.collection_type,
       action: PermissionAction.edit,
-    })
+    }),
   )
   if (result == null || !result.allowed) {
     throw new ConnectError('unauthorized', Code.PermissionDenied)

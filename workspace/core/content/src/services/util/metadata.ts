@@ -24,7 +24,7 @@ import {
   PermissionObjectType,
   PermissionRelation,
   PermissionSubjectType, WorkflowExecutionRequest,
-  WorkflowService
+  WorkflowService,
 } from '@bosca/protobufs'
 import { AdministratorGroup } from './permissions'
 import { ContentDataSource } from '../../datasources/content'
@@ -38,7 +38,7 @@ export async function addMetadata(
   serviceAccountId: string,
   subject: Subject,
   parentId: string,
-  metadata: Metadata
+  metadata: Metadata,
 ): Promise<IdResponse> {
   if (metadata.name.trim().length === 0) {
     throw new ConnectError('name must not be empty', Code.InvalidArgument)
@@ -86,7 +86,7 @@ export async function setMetadataReady(
   dataSource: ContentDataSource,
   permissions: PermissionManager,
   subject: Subject,
-  metadataId: string
+  metadataId: string,
 ) {
   const metadata = await dataSource.getMetadata(metadataId)
   if (!metadata) throw new ConnectError('missing metadata', Code.NotFound)
@@ -97,7 +97,7 @@ export async function setMetadataReady(
     new BeginTransitionWorkflowRequest({
       metadataId: metadataId,
       stateId: StateProcessing,
-    })
+    }),
   )
 }
 
@@ -106,7 +106,7 @@ export async function setMetadataSupplementaryReady(
   permissions: PermissionManager,
   subject: Subject,
   metadataId: string,
-  supplementaryId: string
+  supplementaryId: string,
 ) {
   const supplementary = await dataSource.getMetadataSupplementary(metadataId, supplementaryId)
   if (!supplementary) throw new ConnectError('missing metadata supplementary', Code.NotFound)
@@ -122,7 +122,7 @@ export async function setMetadataSupplementaryReady(
           workflowId: workflowId,
           metadataId: metadataId,
           supplementaryId: supplementaryId,
-        })
+        }),
       )
     }
   }
@@ -132,7 +132,7 @@ export async function setWorkflowStateComplete(
   subject: Subject,
   dataSource: ContentDataSource,
   metadataId: string,
-  status: string
+  status: string,
 ) {
   const metadata = await dataSource.getMetadata(metadataId)
   if (!metadata) {

@@ -52,7 +52,7 @@ class Executor extends ActivityJobExecutor<ProcessTraitsActivity> {
           }),
           workflowId: workflowId,
           metadataId: this.definition.metadataId,
-        })
+        }),
       )
     })
   }
@@ -61,7 +61,7 @@ class Executor extends ActivityJobExecutor<ProcessTraitsActivity> {
     const contentService = useServiceAccountClient(ContentService)
     const metadata = await Retry.execute(
       10,
-      async () => await contentService.getMetadata(new IdRequest({ id: this.definition.metadataId }))
+      async () => await contentService.getMetadata(new IdRequest({ id: this.definition.metadataId })),
     )
     if (!metadata.traitIds || metadata.traitIds.length === 0) return
 
@@ -71,6 +71,7 @@ class Executor extends ActivityJobExecutor<ProcessTraitsActivity> {
       traitsById[trait.id] = trait
     }
 
+    // eslint-disable-next-line no-prototype-builtins
     if (!this.job.data.hasOwnProperty('executed')) {
       this.job.data.executed = []
     }

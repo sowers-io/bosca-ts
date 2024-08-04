@@ -21,13 +21,14 @@ import { CreateVerses } from './book/verse_create'
 import { WorkflowActivity, WorkflowJob } from '@bosca/protobufs'
 import { Job, Queue, Worker } from 'bullmq'
 import { Activity } from '../activity'
+import { test } from 'vitest';
 
 class DummyDownloader implements Downloader {
-  async download(activity: WorkflowJob): Promise<FileName> {
+  async download(_: WorkflowJob): Promise<FileName> {
     return '../example-data/asv.zip'
   }
 
-  async cleanup(file: FileName): Promise<void> {}
+  async cleanup(_: FileName): Promise<void> {}
 }
 
 async function runTest(activity: Activity, definition: WorkflowJob) {

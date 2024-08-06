@@ -57,7 +57,7 @@ var Command = &cobra.Command{
 		}
 
 		tbl := table.NewWriter()
-		tbl.AppendHeader(table.Row{"ID", "Name", "Type", "State", "Language"})
+		tbl.AppendHeader(table.Row{"ID", "Name", "Version", "Active Version", "Latest Version", "Type", "State", "Language"})
 
 		for _, item := range items.Items {
 			collection := item.GetCollection()
@@ -65,6 +65,7 @@ var Command = &cobra.Command{
 				tbl.AppendRow(table.Row{
 					collection.Id,
 					collection.Name,
+					"--",
 					"collection: " + collection.Type.String(),
 					"--",
 					"--",
@@ -75,6 +76,9 @@ var Command = &cobra.Command{
 				tbl.AppendRow(table.Row{
 					metadata.Id,
 					metadata.Name,
+					metadata.Version,
+					metadata.ActiveVersion,
+					metadata.LatestVersion,
 					metadata.ContentType,
 					metadata.WorkflowStateId,
 					metadata.LanguageTag,

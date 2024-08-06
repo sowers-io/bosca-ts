@@ -106,6 +106,7 @@ async function main() {
         const source = await service.getSource(new IdRequest({ id: 'uploader' }))
         let traits = upload.metadata!['traits']?.split(',') || []
         const metadata = new Metadata({
+          id: upload.metadata!['id'] || '',
           name: upload.metadata!['name']!,
           contentType: upload.metadata!['filetype']!,
           traitIds: traits,

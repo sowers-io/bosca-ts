@@ -221,11 +221,9 @@ export class ContentDataSource extends DataSource {
     await this.query('update metadata set active_version = $1 where id = $2::uuid', [version, id])
   }
 
-  async addMetadata(metadata: Metadata): Promise<string> {
+  async addMetadata(metadata: Metadata): Promise<{ metadataId: string, version: number }> {
     let record: QueryResult
-    let metadataId: string
     const values = [
-      metadata.id,
       metadata.name,
       metadata.contentType,
       metadata.contentLength ? Number(metadata.contentLength) : null,
@@ -236,25 +234,26 @@ export class ContentDataSource extends DataSource {
       metadata.languageTag,
     ]
     if (metadata.id && metadata.id !== '') {
+      values.unshift(metadata.id)
       record = await this.query(
-        'insert into metadata (id, name, content_type, content_length, labels, attributes, source_id, source_identifier, language_tag) values ($1, $2, $3, $4, ($5)::jsonb, $6, $7, $8, $9) on conflict do update set name = $2, version = version + 1, modified = now(), content_type = $3, content_length = $4, labels = $5, attributes = $6, source_id = $7, source_identifier = $8, language_tag = $9, workflow_state_id = \'pending\', workflow_state_pending_id = null',
+        'insert into metadata (id, name, content_type, content_length, labels, attributes, source_id, source_identifier, language_tag) values ($1, $2, $3, $4, $5, ($6)::jsonb, $7, $8, $9) on conflict (id) do update set name = $2, version = (metadata.version + 1), modified = now(), content_type = $3, content_length = $4, labels = $5, attributes = $6, source_id = $7, source_identifier = $8, language_tag = $9, workflow_state_id = \'pending\', workflow_state_pending_id = null returning id, version',
         values,
       )
-      metadataId = metadata.id
     } else {
       record = await this.query(
-        'insert into metadata (name, content_type, content_length, labels, attributes, source_id, source_identifier, language_tag) values ($1, $2, $3, $4, ($5)::jsonb, $6, $7, $8) returning id',
+        'insert into metadata (name, content_type, content_length, labels, attributes, source_id, source_identifier, language_tag) values ($1, $2, $3, $4, ($5)::jsonb, $6, $7, $8) returning id, version',
         values,
       )
-      metadataId = record.rows[0].id
     }
+    const metadataId = record.rows[0].id
+    const version = record.rows[0].version
     for (const traitId of metadata.traitIds) {
       await this.addMetadataTrait(metadataId, traitId)
     }
     for (const categoryId of metadata.categoryIds) {
       await this.addMetadataCategory(metadataId, categoryId)
     }
-    return metadataId
+    return { metadataId, version }
   }
 
   async addMetadataTrait(metadataId: string, traitId: string): Promise<void> {
@@ -276,7 +275,7 @@ export class ContentDataSource extends DataSource {
     }
     return await this.queryAndMap(
       () => new Metadata(),
-      'select * from metadata where ' + this.buildFindWhere(attributes),
+      'select *, version as latest_version from metadata where ' + this.buildFindWhere(attributes),
       args,
       (r) => {
         r.modified = r.modified.toISOString()
@@ -289,7 +288,12 @@ export class ContentDataSource extends DataSource {
     const metadata = await this.getMetadataLatestVersion(id)
     if (!metadata) return null
     if (metadata.version !== metadata.activeVersion) {
-      return this.getMetadataVersion(id, metadata.activeVersion)
+      const active = await this.getMetadataVersion(id, metadata.activeVersion)
+      if (active) {
+        active.activeVersion = active.version
+        active.latestVersion = metadata.version
+      }
+      return active
     }
     return metadata
   }
@@ -297,7 +301,7 @@ export class ContentDataSource extends DataSource {
   async getMetadataLatestVersion(id: string): Promise<Metadata | null> {
     const metadata = await this.queryAndMapFirst(
       () => new Metadata(),
-      'select * from metadata where id = $1::uuid',
+      'select *, version as latest_version from metadata where id = $1::uuid',
       [id],
       (r) => {
         r.modified = r.modified.toISOString()
@@ -317,7 +321,7 @@ export class ContentDataSource extends DataSource {
   async getMetadataVersion(id: string, version: number): Promise<Metadata | null> {
     const metadata = await this.queryAndMapFirst(
       () => new Metadata(),
-      'select * from metadata_versions where id = $1::uuid and version = $2',
+      'select *, (select version from metadata where id = $1) as latest_version from metadata_versions where id = $1::uuid and version = $2',
       [id, version],
       (r) => {
         r.modified = r.modified.toISOString()

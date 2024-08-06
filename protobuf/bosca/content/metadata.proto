@@ -49,6 +49,7 @@ message Metadata {
 
   int32 version = 40;
   int32 active_version = 41;
+  int32 latest_version = 42;
 }
 
 message MetadataSupplementaries {

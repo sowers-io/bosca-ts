@@ -120,6 +120,11 @@ export class Metadata extends Message<Metadata> {
    */
   activeVersion = 0;
 
+  /**
+   * @generated from field: int32 latest_version = 42;
+   */
+  latestVersion = 0;
+
   constructor(data?: PartialMessage<Metadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -147,6 +152,7 @@ export class Metadata extends Message<Metadata> {
     { no: 33, name: "delete_workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
     { no: 40, name: "version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 41, name: "active_version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 42, name: "latest_version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Metadata {

@@ -45,18 +45,20 @@ export async function addMetadata(
   }
   if (parentId && parentId.length > 0) {
     const id = await findNonUniqueId(dataSource, parentId, metadata.name)
-    if (id) {
+    if (id && id != metadata.id) {
       return new IdResponsesId({ id: id, error: 'name must be unique' })
     }
   }
-  const id = await dataSource.addMetadata(metadata)
-  const newPermissions = newMetadataPermissions(serviceAccountId, subject.id, id)
-  await permissions.createRelationships(PermissionObjectType.metadata_type, newPermissions)
-  if (parentId && parentId.length > 0) {
-    await dataSource.addCollectionMetadataItem(parentId, id)
+  const { metadataId, version } = await dataSource.addMetadata(metadata)
+  if (version === 1) {
+    const newPermissions = newMetadataPermissions(serviceAccountId, subject.id, metadataId)
+    await permissions.createRelationships(PermissionObjectType.metadata_type, newPermissions)
+    if (parentId && parentId.length > 0) {
+      await dataSource.addCollectionMetadataItem(parentId, metadataId)
+    }
+    await permissions.waitForPermissions(PermissionObjectType.metadata_type, newPermissions)
   }
-  await permissions.waitForPermissions(PermissionObjectType.metadata_type, newPermissions)
-  return new IdResponsesId({ id: id })
+  return new IdResponsesId({ id: metadataId })
 }
 
 export function newMetadataPermissions(serviceAccountId: string, userId: string, metadataId: string): Permission[] {

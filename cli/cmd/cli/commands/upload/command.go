@@ -23,12 +23,13 @@ import (
 	"github.com/spf13/cobra"
 	"net/http"
 	"os"
+	"strings"
 )
 
 var Command = &cobra.Command{
 	Use:   "upload [file]",
 	Short: "Upload a file",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		f, err := os.Open(args[0])
 		if err != nil {
@@ -59,7 +60,11 @@ var Command = &cobra.Command{
 		f.Read(buf)
 		f.Seek(0, 0)
 
-		upload.Metadata["name"] = f.Name()
+		parts := strings.Split(f.Name(), string(os.PathSeparator))
+		if len(args) == 2 {
+			upload.Metadata["id"] = args[1]
+		}
+		upload.Metadata["name"] = parts[len(parts)-1]
 		upload.Metadata["filetype"] = http.DetectContentType(buf)
 		upload.Metadata["traits"] = cmd.Flag(flags.TraitFlag).Value.String()
 		uploader, err := client.CreateUpload(upload)

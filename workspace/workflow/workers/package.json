@@ -13,8 +13,9 @@
   "dependencies": {
     "@bosca/workflow-activities-api": "workspace:*",
     "@bosca/bible-processor": "workspace:*",
-    "@bosca/bible-workflow-activities": "workspace:*",
+    "@bosca/workflow-bible-activities": "workspace:*",
     "@bosca/workflow-ai-activities": "workspace:*",
+    "@bosca/workflow-video-activities": "workspace:*",
     "@bosca/common": "workspace:*",
     "@bosca/protobufs": "workspace:*",
     "@bufbuild/protobuf": "^1.10.0",

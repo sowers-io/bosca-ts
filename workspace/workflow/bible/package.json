@@ -1,5 +1,5 @@
 {
-  "name": "@bosca/bible-workflow-activities",
+  "name": "@bosca/workflow-bible-activities",
   "version": "0.0.0",
   "private": true,
   "main": "lib/index.js",

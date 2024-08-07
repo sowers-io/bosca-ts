@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { Downloader, FileName } from '../../util/downloader'
+import { Activity, Downloader, FileName } from '@bosca/workflow-activities-api'
 import { ProcessBibleActivity } from './process'
 import { CreateVerseJsonTable } from './book/verse_table'
 import { CreateVerses } from './book/verse_create'
 import { WorkflowActivity, WorkflowJob } from '@bosca/protobufs'
 import { Job, Queue, Worker } from 'bullmq'
-import { Activity } from '../activity'
 import { test } from 'vitest';
 
 class DummyDownloader implements Downloader {

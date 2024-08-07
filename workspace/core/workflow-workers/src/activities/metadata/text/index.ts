@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor } from '../../activity'
+import { Activity, ActivityJobExecutor, execute } from '@bosca/workflow-activities-api'
 import { Job } from 'bullmq'
 import { ContentService, IdRequest, WorkflowJob, SignedUrl, SupplementaryIdRequest } from '@bosca/protobufs'
 import { useServiceAccountClient } from '@bosca/common'
-import { execute } from '../../../util/http'
 import { getIStorageSystem } from '@bosca/common'
 
 export class IndexText extends Activity {

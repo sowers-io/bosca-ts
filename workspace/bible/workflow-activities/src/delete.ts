@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor } from '../activity'
+import { Activity, ActivityJobExecutor, Downloader } from '@bosca/workflow-activities-api'
 import { USXProcessor } from '@bosca/bible-processor'
-import { Downloader } from '../../util/downloader'
-import { Job } from 'bullmq/dist/esm/classes/job'
+import { Job } from 'bullmq'
 import { ContentService, FindMetadataRequest, IdRequest, WorkflowJob } from '@bosca/protobufs'
 import { useServiceAccountClient } from '@bosca/common'
 

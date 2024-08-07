@@ -15,12 +15,10 @@
  */
 
 import { Book } from '@bosca/bible-processor'
-import { toArrayBuffer } from '../../../util/http'
-import { findFirstMetadata } from '../../../util/finder'
-import { uploadSupplementary } from '../../../util/uploader'
+import { toArrayBuffer, findFirstMetadata, uploadSupplementary } from '@bosca/workflow-activities-api'
 import { BookActivity, BookExecutor } from './book_activity'
 import { Metadata, Source, WorkflowJob } from '@bosca/protobufs'
-import { Job } from 'bullmq/dist/esm/classes/job'
+import { Job } from 'bullmq'
 
 export class CreateVerseJsonTable extends BookActivity {
   get id(): string {

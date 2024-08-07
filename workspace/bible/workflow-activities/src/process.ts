@@ -26,12 +26,16 @@ import {
   Source,
   WorkflowJob, FindCollectionRequest,
 } from '@bosca/protobufs'
-import { Activity, ActivityJobExecutor } from '../activity'
-import { Downloader } from '../../util/downloader'
-import { getCollection } from '../../util/service'
-import { toArrayBuffer } from '../../util/http'
+import {
+  Activity,
+  ActivityJobExecutor,
+  Downloader,
+  getCollection,
+  toArrayBuffer,
+  addCollections,
+  addMetadatas,
+} from '@bosca/workflow-activities-api'
 import { protoInt64 } from '@bufbuild/protobuf'
-import { addCollections, addMetadatas } from '../../util/adder'
 import { useServiceAccountClient } from '@bosca/common'
 
 export class ProcessBibleActivity extends Activity {

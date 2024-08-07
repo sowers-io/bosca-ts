@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor } from '../activity'
+import { Activity, ActivityJobExecutor } from '@bosca/workflow-activities-api'
 
 import { WorkflowExecutionRequest, WorkflowJob, WorkflowParentJobId, WorkflowService } from '@bosca/protobufs'
 import { Job, WaitingChildrenError } from 'bullmq'

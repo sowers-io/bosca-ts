@@ -16,13 +16,17 @@
 
 import { BookActivity, BookExecutor } from './book_activity'
 import { Book } from '@bosca/bible-processor'
-import { addCollections, addMetadatas } from '../../../util/adder'
-import { protoInt64 } from '@bufbuild/protobuf'
-import { findFirstCollection } from '../../../util/finder'
-import { toArrayBuffer } from '../../../util/http'
+import {
+  addCollections,
+  addMetadatas,
+  findFirstCollection,
+  toArrayBuffer,
+  uploadAll,
+  uploadSupplementary,
+} from '@bosca/workflow-activities-api'
 import { AddCollectionRequest, AddMetadataRequest, Collection, Metadata, Source, WorkflowJob } from '@bosca/protobufs'
 import { Job } from 'bullmq/dist/esm/classes/job'
-import { uploadAll, uploadSupplementary } from '../../../util/uploader'
+import { protoInt64 } from '@bufbuild/protobuf';
 
 export class CreateVerses extends BookActivity {
   get id(): string {

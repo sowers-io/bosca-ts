@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor } from '../../activity'
-import { Retry } from '../../../util/retry'
+import { Activity, ActivityJobExecutor, Retry } from '@bosca/workflow-activities-api'
 import {
   ContentService,
   Empty,
@@ -26,7 +25,7 @@ import {
   WorkflowParentJobId,
   WorkflowService,
 } from '@bosca/protobufs'
-import { Job } from 'bullmq/dist/esm/classes/job'
+import { Job } from 'bullmq'
 import { useServiceAccountClient } from '@bosca/common'
 import { WaitingChildrenError } from 'bullmq'
 

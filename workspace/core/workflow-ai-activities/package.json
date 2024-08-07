@@ -1,20 +1,16 @@
 {
-  "name": "@bosca/workflow-workers",
+  "name": "@bosca/workflow-ai-activities",
   "version": "0.0.0",
   "private": true,
+  "main": "lib/index.js",
   "scripts": {
     "build": "tsc --build",
     "build.watch": "tsc --build --watch",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "dev": "DISABLE_OTEL=true ts-node --require ./src/instrumentation.ts src/main.ts",
-    "start": "node --require ./lib/instrumentation.js ./lib/main.js"
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@bosca/workflow-activities-api": "workspace:*",
-    "@bosca/bible-processor": "workspace:*",
-    "@bosca/bible-workflow-activities": "workspace:*",
-    "@bosca/workflow-ai-activities": "workspace:*",
     "@bosca/common": "workspace:*",
     "@bosca/protobufs": "workspace:*",
     "@bufbuild/protobuf": "^1.10.0",

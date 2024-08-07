@@ -16,12 +16,17 @@
 
 import { IStorageSystem } from './storagesystem'
 import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
-import { QdrantClient, GetCollectionInfoRequest, CreateCollection, Distance } from '@qdrant/js-client-grpc'
 import { protoInt64 } from '@bufbuild/protobuf'
-import { Document } from 'langchain/document'
-import { QdrantVectorStore } from '@langchain/qdrant'
-import { OpenAIEmbeddings } from '@langchain/openai'
-import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
+import {
+  Document,
+  QdrantVectorStore,
+  OpenAIEmbeddings,
+  RecursiveCharacterTextSplitter,
+  QdrantClient,
+  GetCollectionInfoRequest,
+  CreateCollection,
+  Distance,
+} from '@bosca/ai'
 
 export class QdrantStorageSystem implements IStorageSystem {
   private readonly indexName: string

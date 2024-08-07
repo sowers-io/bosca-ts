@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor } from '@bosca/workflow-activities-api'
+import { Activity, ActivityJobExecutor, execute } from '@bosca/workflow-activities-api'
 import { Job } from 'bullmq'
 import { WorkflowJob, PendingEmbeddings, IdRequest, ContentService, SupplementaryIdRequest } from '@bosca/protobufs'
 import { getIStorageSystem, useServiceAccountClient } from '@bosca/common'
-import { execute } from '../../util/http'
 
 export class CreatePendingEmbeddingsIndex extends Activity {
   get id(): string {

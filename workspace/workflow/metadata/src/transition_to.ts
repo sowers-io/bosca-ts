@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor } from '@bosca/workflow-activities-api'
-import { Job } from 'bullmq/dist/esm/classes/job'
+import { Activity, ActivityJobExecutor, Job } from '@bosca/workflow-activities-api'
 import { ContentService, SetWorkflowStateCompleteRequest, SetWorkflowStateRequest, WorkflowJob } from '@bosca/protobufs'
 import { useServiceAccountClient } from '@bosca/common'
 

@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor, Downloader } from '@bosca/workflow-activities-api'
+import { Activity, ActivityJobExecutor, Downloader, Job } from '@bosca/workflow-activities-api'
 import { Book, ManifestName, PublicationContent, USXProcessor } from '@bosca/bible-processor'
 import { ContentService, IdRequest, Metadata, Source, WorkflowJob } from '@bosca/protobufs'
-import { Job } from 'bullmq'
 import { useServiceAccountClient } from '@bosca/common'
 
 export abstract class BookActivity extends Activity {

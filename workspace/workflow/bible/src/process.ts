@@ -15,7 +15,6 @@
  */
 
 import { USXProcessor, BibleMetadata, Book } from '@bosca/bible-processor'
-import { Job } from 'bullmq/dist/esm/classes/job'
 import {
   AddCollectionRequest,
   AddMetadataRequest,
@@ -27,6 +26,7 @@ import {
   WorkflowJob, FindCollectionRequest,
 } from '@bosca/protobufs'
 import {
+  Job,
   Activity,
   ActivityJobExecutor,
   Downloader,

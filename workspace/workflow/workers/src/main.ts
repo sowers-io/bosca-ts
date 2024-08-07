@@ -16,52 +16,14 @@
 
 import { fastify } from 'fastify'
 import { fastifyConnectPlugin } from '@connectrpc/connect-fastify'
-import { newLoggingInterceptor } from '@bosca/common'
-import { ProcessBibleActivity } from './activities/bible/process'
-import { DefaultDownloader } from './util/downloader'
-import { Activity } from '@bosca/workflow-activities-api'
-import { ProcessTraitsActivity } from './activities/metadata/traits/process'
-import { DeleteBibleActivity } from './activities/bible/delete'
-import { TransitionToActivity } from './activities/metadata/transition_to'
+import { newLoggingInterceptor, logger } from '@bosca/common'
+import { Activity, Job } from '@bosca/workflow-activities-api'
 import { getConfiguration } from './configuration'
-import { CreateVerseJsonTable } from './activities/bible/book/verse_table'
-import { CreateVerses } from './activities/bible/book/verse_create'
-import { PromptActivity } from './activities/ai/prompt'
-import { ChildWorkflow } from './activities/metadata/child_workflow'
 import { ConnectionOptions, QueueEvents, WaitingChildrenError, Worker } from 'bullmq'
 import { WorkflowJob } from '@bosca/protobufs'
-import { CreatePendingEmbeddingsFromJsonTable } from './activities/ai/create_pending_embeddings_json'
-import { CreateTextEmbeddings } from './activities/ai/create_text_embeddings'
-import { CreatePendingEmbeddingsIndex } from './activities/ai/create_pending_embeddings_index'
-import { IndexText } from './activities/metadata/text'
-import { logger } from '@bosca/common/lib/logger'
-import { Job } from 'bullmq/dist/esm/classes/job'
 import { jobStartedCount, jobErrorCount, jobFinishedCount, jobAddedCount, jobFailedCount, workerCount } from './metrics'
 import routes from './routes'
-
-const downloader = new DefaultDownloader()
-
-function getAvailableActivities(): { [id: string]: Activity } {
-  const activities = [
-    new ProcessTraitsActivity(),
-    new ProcessBibleActivity(downloader),
-    new DeleteBibleActivity(downloader),
-    new CreateVerseJsonTable(downloader),
-    new CreateVerses(downloader),
-    new TransitionToActivity(),
-    new PromptActivity(),
-    new ChildWorkflow(),
-    new CreatePendingEmbeddingsFromJsonTable(),
-    new CreatePendingEmbeddingsIndex(),
-    new CreateTextEmbeddings(),
-    new IndexText(),
-  ]
-  const activitiesById: { [id: string]: Activity } = {}
-  for (const activity of activities) {
-    activitiesById[activity.id] = activity
-  }
-  return activitiesById
-}
+import { getActivities } from './activities';
 
 async function runJob(job: Job, definition: WorkflowJob, activities: { [id: string]: Activity }): Promise<any> {
   if (!definition.activity) return
@@ -86,13 +48,11 @@ async function runJob(job: Job, definition: WorkflowJob, activities: { [id: stri
 
 async function main() {
   const configuration = getConfiguration()
-  const activities = getAvailableActivities()
-
+  const activities = getActivities()
   const connection: ConnectionOptions = {
     host: process.env.BOSCA_REDIS_HOST!,
     port: parseInt(process.env.BOSCA_REDIS_PORT!),
   }
-
   for (const queueConfigurationId in configuration.queues) {
     const queueConfiguration = configuration.queues[queueConfigurationId]
     const worker = new Worker(
@@ -127,7 +87,6 @@ async function main() {
       jobFailedCount.add(1)
       logger.error({ jobId: job?.id, error: err }, 'job failed')
     })
-
     const events = new QueueEvents(queueConfigurationId, { connection })
     events.on('added', async (job) => {
       jobAddedCount.add(1)
@@ -141,7 +100,6 @@ async function main() {
         logger.error({ error }, 'job error')
       }
     })
-
     workerCount.add(1)
     logger.info({ queue: queueConfigurationId, concurrency: queueConfiguration.maxConcurrency }, 'worker started')
   }

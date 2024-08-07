@@ -23,9 +23,9 @@ import {
   toArrayBuffer,
   uploadAll,
   uploadSupplementary,
+  Job,
 } from '@bosca/workflow-activities-api'
 import { AddCollectionRequest, AddMetadataRequest, Collection, Metadata, Source, WorkflowJob } from '@bosca/protobufs'
-import { Job } from 'bullmq/dist/esm/classes/job'
 import { protoInt64 } from '@bufbuild/protobuf';
 
 export class CreateVerses extends BookActivity {

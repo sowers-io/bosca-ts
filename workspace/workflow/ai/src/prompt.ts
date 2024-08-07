@@ -15,14 +15,10 @@
  */
 
 import { Activity, ActivityJobExecutor, execute, toArrayBuffer, uploadSupplementary } from '@bosca/workflow-activities-api'
-import { Ollama } from '@langchain/community/llms/ollama'
-import { ChatOpenAI } from '@langchain/openai'
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai'
-import { ChatPromptTemplate } from '@langchain/core/prompts'
-import { JsonOutputParser } from '@langchain/core/output_parsers'
 import { Job } from 'bullmq'
 import { ContentService, IdRequest, SupplementaryIdRequest, WorkflowActivityModel, WorkflowJob } from '@bosca/protobufs'
-import { BaseLanguageModel } from '@langchain/core/language_models/base'
+import { BaseLanguageModel, Ollama, ChatOpenAI, ChatGoogleGenerativeAI, ChatPromptTemplate, JsonOutputParser } from '@bosca/ai'
+
 import { logger, useServiceAccountClient } from '@bosca/common'
 
 export class PromptActivity extends Activity {

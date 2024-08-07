@@ -19,6 +19,11 @@ set -e
 go install github.com/pressly/goose/v3/cmd/goose@latest
 
 pnpm --filter protobufs -r build
+pnpm --filter ai -r build
 pnpm --filter common -r build
 pnpm --filter bible-processor -r build
 pnpm --filter workflow-activities-api -r build
+pnpm --filter workflow-metadata-activities -r build
+pnpm --filter workflow-bible-activities -r build
+pnpm --filter workflow-ai-activities -r build
+pnpm --filter workflow-video-activities -r build

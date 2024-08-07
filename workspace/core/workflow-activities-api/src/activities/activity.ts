@@ -15,7 +15,7 @@
  */
 
 import { WorkflowJob } from '@bosca/protobufs'
-import { Job } from 'bullmq/dist/esm/classes/job'
+import { Job } from 'bullmq'
 
 export abstract class Activity {
   abstract get id(): string

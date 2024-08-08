@@ -10,7 +10,9 @@
     "start": "ts-node src/main.ts"
   },
   "type": "commonjs",
-  "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
+  "main": "./lib/index.js",
+  "module": "./lib/index.js",
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect": "^1.4.0",

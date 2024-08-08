@@ -11,6 +11,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "@authzed/authzed-node": "^0.16.0",
+    "@bosca/ai": "workspace:*",
     "@bosca/protobufs": "workspace:*",
     "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect": "^1.4.0",
@@ -28,7 +29,6 @@
     "@opentelemetry/sdk-trace-base": "^1.25.1",
     "@opentelemetry/sdk-trace-node": "^1.25.1",
     "@opentelemetry/semantic-conventions": "^1.25.1",
-    "@qdrant/js-client-grpc": "^1.10.0",
     "fastify": "^4.28.1",
     "fastify-plugin": "^4.5.1",
     "graphql": "^16.9.0",
@@ -39,5 +39,8 @@
   },
   "devDependencies": {
     "@types/pg": "^8.11.6"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-sso-oidc": "^3.614.0"
   }
 }

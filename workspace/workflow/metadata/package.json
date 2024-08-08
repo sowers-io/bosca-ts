@@ -1,0 +1,21 @@
+{
+  "name": "@bosca/workflow-metadata-activities",
+  "version": "0.0.0",
+  "private": true,
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "build.watch": "tsc --build --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@bosca/workflow-activities-api": "workspace:*",
+    "@bosca/common": "workspace:*",
+    "@bosca/protobufs": "workspace:*",
+    "@bufbuild/protobuf": "^1.10.0",
+    "@connectrpc/connect": "^1.4.0",
+    "@connectrpc/connect-fastify": "^1.4.0",
+    "@connectrpc/connect-node": "^1.4.0"
+  }
+}

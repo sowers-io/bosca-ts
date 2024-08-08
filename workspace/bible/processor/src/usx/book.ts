@@ -16,7 +16,7 @@
 
 import { ManifestName, PublicationContent } from '../metadata'
 import { Chapter } from './chapter'
-import { Position } from './position';
+import { Position } from './position'
 
 export class Book {
 

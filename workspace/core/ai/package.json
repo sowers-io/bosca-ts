@@ -1,0 +1,25 @@
+{
+  "name": "@bosca/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc --build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@langchain/community": "^0.2.24",
+    "@langchain/core": "^0.2.15",
+    "@langchain/google-genai": "^0.0.23",
+    "@langchain/openai": "^0.2.5",
+    "@langchain/qdrant": "^0.0.5",
+    "@langchain/textsplitters": "^0.0.3",
+    "@qdrant/js-client-grpc": "^1.10.0"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-sso-oidc": "^3.614.0",
+    "d3-dsv": "2.0.0"
+  }
+}

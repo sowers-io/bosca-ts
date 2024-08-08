@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { USXProcessor } from './processor';
-import { test } from 'vitest';
+import { USXProcessor } from './processor'
+import { test } from 'vitest'
 
 test('USX Processor', async () => {
   const processor = new USXProcessor()

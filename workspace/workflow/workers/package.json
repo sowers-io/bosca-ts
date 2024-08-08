@@ -1,0 +1,34 @@
+{
+  "name": "@bosca/workflow-workers",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --build",
+    "build.watch": "tsc --build --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "dev": "DISABLE_OTEL=true ts-node --require ./src/instrumentation.ts src/main.ts",
+    "start": "node --require ./lib/instrumentation.js ./lib/main.js"
+  },
+  "dependencies": {
+    "@bosca/common": "workspace:*",
+    "@bosca/protobufs": "workspace:*",
+    "@bosca/workflow-activities-api": "workspace:*",
+    "@bosca/bible-processor": "workspace:*",
+    "@bosca/workflow-metadata-activities": "workspace:*",
+    "@bosca/workflow-bible-activities": "workspace:*",
+    "@bosca/workflow-ai-activities": "workspace:*",
+    "@bosca/workflow-media-activities": "workspace:*",
+    "@bufbuild/protobuf": "^1.10.0",
+    "@connectrpc/connect": "^1.4.0",
+    "@connectrpc/connect-fastify": "^1.4.0",
+    "@connectrpc/connect-node": "^1.4.0",
+    "@opentelemetry/api": "^1.9.0",
+    "bullmq": "^5.10.3",
+    "fastify": "^4.28.1",
+    "fastify-plugin": "^4.5.1"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-sso-oidc": "^3.614.0"
+  }
+}

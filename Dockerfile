@@ -10,9 +10,10 @@ COPY . /usr/src/app
 RUN mv /usr/src/app/.npmrc-docker /usr/src/app/.npmrc
 WORKDIR /usr/src/app
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --shamefully-hoist
+RUN pnpm install --frozen-lockfile --shamefully-hoist
 
 RUN pnpm run --filter=protobufs build
+RUN pnpm run --filter=ai build
 RUN pnpm run --filter=common build
 RUN pnpm run -r build
 RUN pnpm deploy --filter=@bosca/content --prod /prod/content

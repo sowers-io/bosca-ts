@@ -22,6 +22,7 @@ module.exports = {
     '@stylistic/ts',
   ],
   rules: {
+    'semi': ['error', 'never'],
     '@stylistic/ts/quotes': ['error', 'single'],
     '@stylistic/ts/object-curly-spacing': ['error', 'always'],
     '@stylistic/ts/space-before-function-paren': ['error', {

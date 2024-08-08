@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "media-py"
+version = "0.1.0"
+description = ""
+authors = ["Kyle Brock <kyle@sowers.io>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+whisper-timestamped = "^1.15.4"
+onnxruntime = "^1.18.1"
+transformers = "^4.44.0"
+openai-whisper = {git = "https://github.com/openai/whisper.git"}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -20,9 +20,14 @@ import { CreateVerseJsonTable } from './book/verse_table'
 import { CreateVerses } from './book/verse_create'
 import { WorkflowActivity, WorkflowJob } from '@bosca/protobufs'
 import { Job, Queue, Worker } from 'bullmq'
-import { test } from 'vitest';
+import { test } from 'vitest'
 
 class DummyDownloader implements Downloader {
+
+  newTemporaryFile(_: string): Promise<FileName> {
+    throw new Error('unimplemented')
+  }
+
   async download(_: WorkflowJob): Promise<FileName> {
     return '../example-data/asv.zip'
   }

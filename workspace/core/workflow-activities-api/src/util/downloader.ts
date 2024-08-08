@@ -31,6 +31,8 @@ const deleteDirectory = promisify(fs.rmdir)
 
 export interface Downloader {
 
+  newTemporaryFile(id: string): Promise<FileName>
+
   download(definition: WorkflowJob): Promise<FileName>
 
   cleanup(file: FileName): Promise<void>
@@ -38,13 +40,17 @@ export interface Downloader {
 
 export class DefaultDownloader implements Downloader {
 
-  async download(definition: WorkflowJob): Promise<FileName> {
-    const service = useServiceAccountClient(ContentService)
+  async newTemporaryFile(id: string): Promise<FileName> {
     const temporaryDirectory = tmpdir()
     const directory = await mkdtemp(`${temporaryDirectory}${sep}`)
+    return `${directory}${sep}${id}`
+  }
+
+  async download(definition: WorkflowJob): Promise<FileName> {
+    const service = useServiceAccountClient(ContentService)
     const url = await service.getMetadataDownloadUrl(new IdRequest({ id: definition.metadataId }))
     const buffer = await execute(url)
-    const fileName = `${directory}${sep}${definition.metadataId}`
+    const fileName = await this.newTemporaryFile(definition.metadataId!)
     await writeFile(fileName, buffer)
     return fileName
   }

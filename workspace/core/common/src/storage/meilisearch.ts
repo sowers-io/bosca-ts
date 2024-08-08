@@ -17,7 +17,7 @@
 import { IStorageSystem } from './storagesystem'
 import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
 import { MeiliSearch, Index } from 'meilisearch'
-import { logger } from '../logger';
+import { logger } from '../logger'
 
 export class MeilisearchStorageSystem implements IStorageSystem {
   private readonly client = new MeiliSearch({

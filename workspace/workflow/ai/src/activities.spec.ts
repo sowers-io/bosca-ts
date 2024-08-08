@@ -26,7 +26,7 @@ import {
 } from '@bosca/protobufs'
 import { Activity } from '@bosca/workflow-activities-api'
 import { Job, Queue, Worker } from 'bullmq'
-import { test } from 'vitest';
+import { test } from 'vitest'
 
 async function runTest(activity: Activity, definition: WorkflowJob) {
   const connection = {

@@ -1,0 +1,26 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Workflow Server" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/workspace/core/workflow/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="dev" />
+    </scripts>
+    <node-interpreter value="project" />
+    <envs>
+      <env name="BOSCA_CONTENT_API_ADDRESS" value="localhost:7000" />
+      <env name="BOSCA_WORKFLOW_API_ADDRESS" value="localhost:7100" />
+      <env name="BOSCA_WORKFLOW_QUEUE_API_ADDRESS" value="localhost:7200" />
+      <env name="BOSCA_WORKFLOW_CONNECTION_STRING" value="postgresql://bosca:bosca@localhost:5432/boscacontent" />
+      <env name="BOSCA_SERVICE_ACCOUNT_ID" value="sa" />
+      <env name="BOSCA_SERVICE_ACCOUNT_TOKEN" value="sat" />
+      <env name="BOSCA_SESSION_ENDPOINT" value="http://localhost:4433/sessions/whoami" />
+      <env name="BOSCA_PERMISSIONS_SHARED_TOKEN" value="bosca-spicedb" />
+      <env name="BOSCA_PERMISSIONS_ENDPOINT" value="localhost:50051" />
+      <env name="BOSCA_MEILISEARCH_API_ADDRESS" value="http://localhost:7700" />
+      <env name="BOSCA_MEILI_MASTER_KEY" value="p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M" />
+      <env name="BOSCA_QDRANT_API_ADDRESS" value="localhost:6334" />
+      <env name="BOSCA_QDRANT_REST_API_ADDRESS" value="http://localhost:6333" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

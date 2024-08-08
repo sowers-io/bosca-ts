@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-import { USXProcessor } from './processor'
 import { test } from 'vitest'
+import { downloadHLS, extractMP3, transcribe } from './ffmpeg'
 
-test('USX Processor', async () => {
-  const processor = new USXProcessor()
-  await processor.process('../../../example-data/asv.zip')
+test('test download mp4', async () => {
+  await downloadHLS('https://devstreaming-cdn.apple.com/videos/streaming/examples/adv_dv_atmos/main.m3u8', 'test.mp4')
+}, 120_000_000)
 
-  console.log(processor.metadata)
+test('test convert to mp3', async () => {
+  await extractMP3('test.mp4', 'test.mp3')
+}, 120_000_000)
 
-  const book = processor.books[0]
-  const chapter = book.chapters[0]
-
-  console.log(chapter.toString())
-
-  console.log(book.raw.substring(chapter.position.start, chapter.position.end))
-})
+test('transcribe mp3', async () => {
+  const data = await transcribe('test.mp3', 'my')
+  console.log(data)
+}, 120_000_000)

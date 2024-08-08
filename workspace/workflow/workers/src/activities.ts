@@ -19,15 +19,16 @@ import {
   CreateVerses,
   DeleteBibleActivity,
   ProcessBibleActivity,
-} from '@bosca/workflow-bible-activities';
+} from '@bosca/workflow-bible-activities'
 import {
   CreatePendingEmbeddingsFromJsonTable,
   CreatePendingEmbeddingsIndex,
   CreateTextEmbeddings,
   PromptActivity,
-} from '@bosca/workflow-ai-activities';
-import { ProcessTraitsActivity, ChildWorkflow, IndexText, TransitionToActivity } from '@bosca/workflow-metadata-activities';
+} from '@bosca/workflow-ai-activities'
+import { ProcessTraitsActivity, ChildWorkflow, IndexText, TransitionToActivity } from '@bosca/workflow-metadata-activities'
 import { Activity, DefaultDownloader } from '@bosca/workflow-activities-api'
+import { SendToMux, Transcribe } from '@bosca/workflow-media-activities'
 
 const downloader = new DefaultDownloader()
 
@@ -45,6 +46,8 @@ export function getActivities(): { [id: string]: Activity } {
     new CreatePendingEmbeddingsIndex(),
     new CreateTextEmbeddings(),
     new IndexText(),
+    new Transcribe(downloader),
+    new SendToMux(downloader),
   ]
   const activitiesById: { [id: string]: Activity } = {}
   for (const activity of activities) {

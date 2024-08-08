@@ -14,3 +14,5 @@
  * limitations under the License.
  */
 
+export * from './transcribe'
+export * from './send_to_mux'

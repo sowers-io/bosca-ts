@@ -23,7 +23,7 @@ import { ConnectionOptions, QueueEvents, WaitingChildrenError, Worker } from 'bu
 import { WorkflowJob } from '@bosca/protobufs'
 import { jobStartedCount, jobErrorCount, jobFinishedCount, jobAddedCount, jobFailedCount, workerCount } from './metrics'
 import routes from './routes'
-import { getActivities } from './activities';
+import { getActivities } from './activities'
 
 async function runJob(job: Job, definition: WorkflowJob, activities: { [id: string]: Activity }): Promise<any> {
   if (!definition.activity) return

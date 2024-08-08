@@ -1,5 +1,5 @@
 {
-  "name": "@bosca/workflow-video-activities",
+  "name": "@bosca/workflow-media-activities",
   "version": "0.0.0",
   "private": true,
   "main": "lib/index.js",
@@ -10,12 +10,13 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@bosca/workflow-activities-api": "workspace:*",
     "@bosca/common": "workspace:*",
     "@bosca/protobufs": "workspace:*",
+    "@bosca/workflow-activities-api": "workspace:*",
     "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect": "^1.4.0",
     "@connectrpc/connect-fastify": "^1.4.0",
-    "@connectrpc/connect-node": "^1.4.0"
+    "@connectrpc/connect-node": "^1.4.0",
+    "@mux/mux-node": "^8.8.0"
   }
 }

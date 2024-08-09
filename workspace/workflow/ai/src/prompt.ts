@@ -14,10 +14,24 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor, execute, toArrayBuffer, uploadSupplementary } from '@bosca/workflow-activities-api'
+import {
+  Activity,
+  ActivityJobExecutor,
+  execute,
+  toArrayBuffer,
+  uploadSupplementary,
+} from '@bosca/workflow-activities-api'
 import { Job } from 'bullmq'
 import { ContentService, IdRequest, SupplementaryIdRequest, WorkflowActivityModel, WorkflowJob } from '@bosca/protobufs'
-import { BaseLanguageModel, Ollama, ChatOpenAI, ChatGoogleGenerativeAI, ChatPromptTemplate, JsonOutputParser } from '@bosca/ai'
+import {
+  BaseLanguageModel,
+  Ollama,
+  ChatOpenAI,
+  ChatGoogleGenerativeAI,
+  ChatPromptTemplate,
+  JsonOutputParser,
+  getModel,
+} from '@bosca/ai'
 
 import { logger, useServiceAccountClient } from '@bosca/common'
 
@@ -32,39 +46,6 @@ export class PromptActivity extends Activity {
 }
 
 class Executor extends ActivityJobExecutor<PromptActivity> {
-  private getModel(m: WorkflowActivityModel): BaseLanguageModel {
-    let temperature: any = m.model!.configuration!.temperature
-    if (temperature) {
-      temperature = parseFloat(temperature)
-    } else {
-      temperature = 0
-    }
-    switch (m.model!.type) {
-      case 'ollama-llm':
-        return new Ollama({
-          model: m.model!.name,
-          temperature: temperature as number,
-          format: 'json',
-        })
-      case 'openai-llm':
-        return new ChatOpenAI({
-          model: m.model!.name,
-          temperature: temperature as number,
-          apiKey: process.env.OPENAI_KEY,
-          streaming: false,
-        })
-      case 'google-llm':
-        return new ChatGoogleGenerativeAI({
-          model: m.model!.name,
-          temperature: temperature as number,
-          apiKey: process.env.GOOGLE_API_KEY,
-          streaming: false,
-        })
-      default:
-        throw new Error('unsupported model type: ' + m.model!.type)
-    }
-  }
-
   async execute() {
     const service = useServiceAccountClient(ContentService)
     const source = await service.getSource(new IdRequest({ id: 'workflow' }))
@@ -77,8 +58,7 @@ class Executor extends ActivityJobExecutor<PromptActivity> {
         key: key,
       }),
     )
-    const payload = await execute(downloadUrl)
-    const json = JSON.parse(payload.toString())
+    let payload = (await execute(downloadUrl)).toString()
 
     const m = this.definition.models[0]
 
@@ -88,30 +68,36 @@ class Executor extends ActivityJobExecutor<PromptActivity> {
 
     if (!prompt) throw new Error('missing prompt')
 
-    const model = this.getModel(m)
+    const model = getModel(m)
     const promptTemplate = ChatPromptTemplate.fromMessages([
       ['system', prompt.prompt!.systemPrompt],
       ['user', prompt.prompt!.userPrompt],
     ])
-    const chain = promptTemplate.pipe(model).pipe(new JsonOutputParser())
+    let chain = promptTemplate.pipe(model)
+    if (prompt.prompt?.outputType == 'application/json') {
+      chain = chain.pipe(new JsonOutputParser())
+    }
     try {
-      const jsonInput = JSON.stringify(json)
-      const response: any = await chain.invoke({ input: jsonInput })
-      logger.debug({ response: response }, 'got response from chain')
-      if (!Array.isArray(response) || response.length != json.length) {
-        throw new Error('invalid response')
+      if (prompt.prompt?.inputType == 'application/json') {
+        // ensure proper json
+        const json = JSON.parse(payload)
+        payload = JSON.stringify(json)
       }
+      const response: any = await chain.invoke({ input: payload })
+      logger.debug({ response: response }, 'got response from chain')
+
+      const responseText = prompt.prompt?.outputType == 'application/json' ? JSON.stringify(response) : response.toString()
       await uploadSupplementary(
         this.definition.metadataId!,
         'Prompt Response',
-        'application/json',
+        prompt.prompt?.outputType || 'text/plain',
         this.definition.supplementaryId
           ? this.definition.activity!.outputs['supplementaryId'] + this.definition.supplementaryId
           : this.definition.activity!.outputs['supplementaryId'],
         source.id,
         undefined,
         undefined,
-        toArrayBuffer(JSON.stringify(response)),
+        toArrayBuffer(responseText),
       )
     } catch (e) {
       logger.error({ error: e }, 'error in chain')

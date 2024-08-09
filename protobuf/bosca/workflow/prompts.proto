@@ -25,6 +25,8 @@ message Prompt {
   string description = 3;
   string system_prompt = 4;
   string user_prompt = 5;
+  string input_type = 6;
+  string output_type = 7;
 }
 
 message Prompts {

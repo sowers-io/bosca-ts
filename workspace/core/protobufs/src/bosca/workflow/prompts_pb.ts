@@ -50,6 +50,16 @@ export class Prompt extends Message<Prompt> {
    */
   userPrompt = "";
 
+  /**
+   * @generated from field: string input_type = 6;
+   */
+  inputType = "";
+
+  /**
+   * @generated from field: string output_type = 7;
+   */
+  outputType = "";
+
   constructor(data?: PartialMessage<Prompt>) {
     super();
     proto3.util.initPartial(data, this);
@@ -63,6 +73,8 @@ export class Prompt extends Message<Prompt> {
     { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "system_prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "user_prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "input_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "output_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Prompt {

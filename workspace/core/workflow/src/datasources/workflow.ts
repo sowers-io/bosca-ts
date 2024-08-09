@@ -125,8 +125,8 @@ export class WorkflowDataSource extends DataSource {
 
   async addPrompt(prompt: Prompt): Promise<string> {
     const records = await this.query(
-      'insert into prompts (name, description, system_prompt, user_prompt) values ($1, $2, $3, $4) returning id::varchar',
-      [prompt.name, prompt.description, prompt.systemPrompt, prompt.userPrompt],
+      'insert into prompts (name, description, system_prompt, user_prompt, input_type, output_type) values ($1, $2, $3, $4, $5, $6) returning id::varchar',
+      [prompt.name, prompt.description, prompt.systemPrompt, prompt.userPrompt, prompt.inputType, prompt.outputType],
     )
     return records.rows[0].id
   }

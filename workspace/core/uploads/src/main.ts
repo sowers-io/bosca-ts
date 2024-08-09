@@ -23,9 +23,28 @@ import { ContentService, IdRequest, Metadata } from '@bosca/protobufs'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { Code, ConnectError } from '@connectrpc/connect'
 import http, { ServerResponse } from 'node:http'
+import cors from '@fastify/cors'
 
 async function main() {
   const server = fastify()
+  await server.register(cors, {
+    credentials: true,
+    allowedHeaders: '*',
+    origin: (origin, callback) => {
+      const hostname = new URL(origin || '').hostname
+      if (hostname === 'localhost'){
+        //  Request from localhost will pass
+        callback(null, true)
+        return
+      } else if (hostname == process.env.HOSTNAME) {
+        callback(null, true)
+        return
+      }
+      // Generate an error on other origins, disabling access
+      callback(new Error('Not allowed'), false)
+    },
+  })
+
   server.setErrorHandler((error, request, reply) => {
     logger.error({ error, request }, 'uncaught error')
     reply.status(500).send({ ok: false })
@@ -171,6 +190,7 @@ async function main() {
   })
 
   await server.listen({ host: '0.0.0.0', port: 7001 })
+  logger.info('server listening on 0.0.0.0:7001')
 }
 
 void main()

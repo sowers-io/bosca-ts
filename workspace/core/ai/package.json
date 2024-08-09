@@ -10,6 +10,7 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@bosca/protobufs": "workspace:*",
     "@langchain/community": "^0.2.24",
     "@langchain/core": "^0.2.15",
     "@langchain/google-genai": "^0.0.23",

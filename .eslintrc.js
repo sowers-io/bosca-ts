@@ -6,12 +6,7 @@ module.exports = {
   extends: [
     'eslint:recommended',
   ],
-  overrides: [
-    {
-      'files': ['*.ts', '*.tsx'],
-    },
-  ],
-  ignorePatterns: ['node_modules', 'lib'],
+  ignorePatterns: ['node_modules', 'dist', 'bosca-ui'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 12,

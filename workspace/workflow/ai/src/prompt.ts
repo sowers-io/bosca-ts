@@ -22,12 +22,8 @@ import {
   uploadSupplementary,
 } from '@bosca/workflow-activities-api'
 import { Job } from 'bullmq'
-import { ContentService, IdRequest, SupplementaryIdRequest, WorkflowActivityModel, WorkflowJob } from '@bosca/protobufs'
+import { ContentService, IdRequest, SupplementaryIdRequest, WorkflowJob } from '@bosca/protobufs'
 import {
-  BaseLanguageModel,
-  Ollama,
-  ChatOpenAI,
-  ChatGoogleGenerativeAI,
   ChatPromptTemplate,
   JsonOutputParser,
   getModel,

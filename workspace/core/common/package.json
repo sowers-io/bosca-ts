@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "dependencies": {
     "@authzed/authzed-node": "^0.16.0",
     "@bosca/ai": "workspace:*",

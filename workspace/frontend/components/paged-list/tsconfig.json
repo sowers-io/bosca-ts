@@ -1,11 +1,11 @@
 {
   "extends": "../../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./lib",
+    "outDir": "./dist",
     "rootDir": "./src",
   },
   "exclude": [
-    "lib",
+    "dist",
     "node_modules",
     "src/**/*.test.*/*"
   ]

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { SubjectFinder } from '@bosca/common/lib/authentication/subject_finder'
-import { useServiceAccountClient } from '@bosca/common/lib/service_client'
+import { SubjectFinder } from '@bosca/common'
+import { useServiceAccountClient } from '@bosca/common'
 import {
   ContentService,
   PermissionAction,

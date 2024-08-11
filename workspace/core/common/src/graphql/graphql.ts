@@ -33,7 +33,7 @@ export async function createSchemaWithContext<TContext extends GraphQLRequestCon
   return createSchema<TContext>({
     typeDefs: await loadFiles('src/schema/**/*.graphql'),
     resolvers: await loadFiles(
-      production ? ['lib/resolvers/*.js', 'lib/resolvers/**/*.js'] : ['src/resolvers/*.ts', 'src/resolvers/**/*.ts'],
+      production ? ['dist/resolvers/*.js', 'dist/resolvers/**/*.js'] : ['src/resolvers/*.ts', 'src/resolvers/**/*.ts'],
     ),
   })
 }

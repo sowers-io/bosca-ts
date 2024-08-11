@@ -107,7 +107,7 @@
     /* Skip type checking all .d.ts files. */
   },
   "exclude": [
-    "lib",
+    "dist",
     "node_modules",
     "src/**/*.test.*/*"
   ]

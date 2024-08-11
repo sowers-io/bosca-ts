@@ -6,7 +6,7 @@
     "url": "git+https://github.com/sowers-io/bosca.git"
   },
   "type": "commonjs",
-  "main": "./lib/main.js",
+  "main": "./dist/main.js",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

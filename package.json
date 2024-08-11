@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "clean": "rm -Rf node_modules && pnpm -r exec rm -Rf node_modules && pnpm -r exec rm -Rf lib",
+    "clean": "rm -Rf node_modules && pnpm -r exec rm -Rf node_modules && pnpm -r exec rm -Rf dist",
     "lint": "pnpm -r run lint",
     "lint:fix": "pnpm -r run lint:fix",
     "test": "echo \"Error: no test specified\" && exit 1"

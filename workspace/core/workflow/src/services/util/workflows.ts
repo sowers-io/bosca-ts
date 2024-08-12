@@ -92,13 +92,14 @@ export async function verifyExitTransitionExecution(
   dataSource: WorkflowDataSource,
   metadata: Metadata,
   nextStateId: string,
+  context: { [key: string]: string },
 ): Promise<void> {
   const nextState = await dataSource.getWorkflowState(nextStateId)
   if (!nextState) {
     throw new ConnectError('missing next state', Code.NotFound)
   }
   if (nextState.exitWorkflowId) {
-    await executeWorkflow(dataSource, null, metadata.id, null, null, nextState.exitWorkflowId, null, true)
+    await executeWorkflow(dataSource, null, metadata.id, null, null, nextState.exitWorkflowId, context, true)
   }
 }
 
@@ -106,13 +107,14 @@ export async function verifyEnterTransitionExecution(
   dataSource: WorkflowDataSource,
   metadata: Metadata,
   nextStateId: string,
+  context: { [key: string]: string },
 ): Promise<WorkflowState | null> {
   const nextState = await dataSource.getWorkflowState(nextStateId)
   if (!nextState) {
     throw new ConnectError('missing next state', Code.NotFound)
   }
   if (nextState.entryWorkflowId) {
-    await executeWorkflow(dataSource, null, metadata.id, null, null, nextState.entryWorkflowId, null, true)
+    await executeWorkflow(dataSource, null, metadata.id, null, null, nextState.entryWorkflowId, context, true)
   }
   return nextState
 }
@@ -123,6 +125,7 @@ export async function transition(
   nextState: WorkflowState,
   status: string,
   waitForCompletion: boolean,
+  context: { [key: string]: string },
 ): Promise<void> {
   if (nextState.workflowId) {
     await useServiceAccountClient(ContentService).setWorkflowState(
@@ -132,7 +135,7 @@ export async function transition(
         stateId: nextState.id,
       }),
     )
-    await executeWorkflow(workflowDataSource, null, metadata.id, null, null, nextState.workflowId, null, waitForCompletion)
+    await executeWorkflow(workflowDataSource, null, metadata.id, null, null, nextState.workflowId, context, waitForCompletion)
   } else {
     await useServiceAccountClient(ContentService).setWorkflowStateComplete(
       new SetWorkflowStateCompleteRequest({

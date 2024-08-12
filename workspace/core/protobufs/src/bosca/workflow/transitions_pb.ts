@@ -55,6 +55,11 @@ export class BeginTransitionWorkflowRequest extends Message<BeginTransitionWorkf
    */
   supplementaryId?: string;
 
+  /**
+   * @generated from field: bool wait_for_completion = 7;
+   */
+  waitForCompletion = false;
+
   constructor(data?: PartialMessage<BeginTransitionWorkflowRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -69,6 +74,7 @@ export class BeginTransitionWorkflowRequest extends Message<BeginTransitionWorkf
     { no: 4, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "retry", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 6, name: "supplementaryId", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 7, name: "wait_for_completion", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BeginTransitionWorkflowRequest {

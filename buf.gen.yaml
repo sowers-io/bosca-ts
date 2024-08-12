@@ -10,6 +10,16 @@ plugins:
     opt:
       - target=ts
       - import_extension=none
+  - local: protoc-gen-es
+    out: workspace/frontend/bosca-ui/src/lib/protobufs
+    opt:
+      - target=ts
+      - import_extension=none
+  - local: protoc-gen-connect-es
+    out: workspace/frontend/bosca-ui/src/lib/protobufs
+    opt:
+      - target=ts
+      - import_extension=none
   - local: protoc-gen-go
     out: cli/api/protobuf
     opt: paths=source_relative

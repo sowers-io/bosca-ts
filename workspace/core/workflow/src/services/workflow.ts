@@ -30,7 +30,7 @@ import {
   WorkflowStates,
   FindCollectionRequest,
   FindMetadataRequest,
-  WorkflowEnqueueResponses,
+  WorkflowEnqueueResponses, PermissionObjectType, PermissionAction
 } from '@bosca/protobufs'
 import { logger, PermissionManager, SubjectKey, SubjectType, useServiceAccountClient } from '@bosca/common'
 import { Code, ConnectError, type ConnectRouter } from '@connectrpc/connect'
@@ -132,11 +132,7 @@ export function workflow(
       }
       return workflow
     },
-    async getWorkflowStates(_, context) {
-      const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+    async getWorkflowStates(_) {
       return new WorkflowStates({ states: await dataSource.getWorkflowStates() })
     },
     async getWorkflowState(request, context) {
@@ -180,9 +176,12 @@ export function workflow(
     },
     async beginTransitionWorkflow(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        request.metadataId,
+        PermissionAction.manage,
+      )
       const metadata = await useServiceAccountClient(ContentService).getMetadata(
         new IdRequest({ id: request.metadataId }),
       )
@@ -190,13 +189,14 @@ export function workflow(
       if (metadata.workflowStateId === request.stateId) {
         throw new ConnectError('workflow already in state', Code.FailedPrecondition)
       }
+      const ctx: { [key: string]: string } = { subject: subject.id, subjectType: subject.type }
       await verifyTransitionExists(dataSource, metadata, request.stateId)
-      await verifyExitTransitionExecution(dataSource, metadata, request.stateId)
-      const nextState = await verifyEnterTransitionExecution(dataSource, metadata, request.stateId)
+      await verifyExitTransitionExecution(dataSource, metadata, request.stateId, ctx)
+      const nextState = await verifyEnterTransitionExecution(dataSource, metadata, request.stateId, ctx)
       if (!nextState) {
         throw new ConnectError('missing next state', Code.NotFound)
       }
-      await transition(dataSource, metadata, nextState, request.stateId, false)
+      await transition(dataSource, metadata, nextState, request.stateId, request.waitForCompletion, ctx)
       return new Empty()
     },
     async completeTransitionWorkflow(request, context) {

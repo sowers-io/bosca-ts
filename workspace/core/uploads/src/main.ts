@@ -29,7 +29,7 @@ async function main() {
   const server = fastify()
   await server.register(cors, {
     credentials: true,
-    allowedHeaders: '*',
+    allowedHeaders: ['Content-Type', 'Cookies', 'Authorization', 'Upload-Offset', 'Location', 'Upload-Length', 'Tus-Version', 'Tus-Resumable', 'Tus-Max-Size', 'Tus-Extension', 'Upload-Metadata'],
     origin: (origin, callback) => {
       const hostname = new URL(origin || '').hostname
       if (hostname === 'localhost'){

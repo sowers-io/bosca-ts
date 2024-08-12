@@ -15,7 +15,7 @@
  */
 
 import { fastify } from 'fastify'
-import { Server, FileKvStore } from '@tus/server'
+import { Server, FileKvStore, Upload } from '@tus/server'
 import { S3Store } from '@tus/s3-store'
 import { HttpSessionInterceptor, HttpSubjectFinder, logger, useServiceAccountClient } from '@bosca/common'
 import { verifyPermissions } from './authorization'
@@ -23,27 +23,25 @@ import { ContentService, IdRequest, Metadata } from '@bosca/protobufs'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { Code, ConnectError } from '@connectrpc/connect'
 import http, { ServerResponse } from 'node:http'
-import cors from '@fastify/cors'
 
 async function main() {
   const server = fastify()
-  await server.register(cors, {
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Cookies', 'Authorization', 'Upload-Offset', 'Location', 'Upload-Length', 'Tus-Version', 'Tus-Resumable', 'Tus-Max-Size', 'Tus-Extension', 'Upload-Metadata'],
-    origin: (origin, callback) => {
-      const hostname = new URL(origin || '').hostname
-      if (hostname === 'localhost'){
-        //  Request from localhost will pass
-        callback(null, true)
-        return
-      } else if (hostname == process.env.HOSTNAME) {
-        callback(null, true)
-        return
-      }
-      // Generate an error on other origins, disabling access
-      callback(new Error('Not allowed'), false)
-    },
-  })
+  // await server.register(cors, {
+  //   credentials: true,
+  //   origin: (origin, callback) => {
+  //     const hostname = new URL(origin || '').hostname
+  //     if (hostname === 'localhost') {
+  //       //  Request from localhost will pass
+  //       callback(null, true)
+  //       return
+  //     } else if (hostname == process.env.HOSTNAME) {
+  //       callback(null, true)
+  //       return
+  //     }
+  //     // Generate an error on other origins, disabling access
+  //     callback(new Error('Not allowed'), false)
+  //   },
+  // })
 
   server.setErrorHandler((error, request, reply) => {
     logger.error({ error, request }, 'uncaught error')
@@ -81,6 +79,30 @@ async function main() {
     }
   }
 
+  async function newMetadata(upload: Upload) {
+    let collection = upload.metadata!['collection']
+    if (!collection) {
+      collection = '00000000-0000-0000-0000-000000000000'
+    }
+    const service = useServiceAccountClient(ContentService)
+    const source = await service.getSource(new IdRequest({ id: 'uploader' }))
+    let traits = upload.metadata!['traits']?.split(',') || []
+    const metadata = new Metadata({
+      id: upload.metadata!['id'] || '',
+      name: upload.metadata!['name']!,
+      contentType: upload.metadata!['filetype']!,
+      traitIds: traits,
+      contentLength: protoInt64.parse(upload.size!),
+      languageTag: upload.metadata!['language'] || 'en',
+      sourceId: source.id,
+      sourceIdentifier: upload.id,
+    })
+    return await service.addMetadata({
+      collection: collection,
+      metadata: metadata,
+    })
+  }
+
   const tusServer = new Server({
     path: '/files',
     datastore: new S3Store({
@@ -109,7 +131,9 @@ async function main() {
       } catch (e) {
         onError(res, e, true)
       }
-      return res
+
+      const metadata = await newMetadata(upload)
+      return { res, metadata: {...upload.metadata, filename: metadata.id } }
     },
     onResponseError: async (req, res, error) => {
       logger.error({ error }, 'failed to upload')
@@ -117,28 +141,9 @@ async function main() {
     },
     onUploadFinish: async (req, res, upload) => {
       try {
-        let collection = upload.metadata!['collection']
-        if (!collection) {
-          collection = '00000000-0000-0000-0000-000000000000'
-        }
         const service = useServiceAccountClient(ContentService)
-        const source = await service.getSource(new IdRequest({ id: 'uploader' }))
-        let traits = upload.metadata!['traits']?.split(',') || []
-        const metadata = new Metadata({
-          id: upload.metadata!['id'] || '',
-          name: upload.metadata!['name']!,
-          contentType: upload.metadata!['filetype']!,
-          traitIds: traits,
-          contentLength: protoInt64.parse(upload.size!),
-          languageTag: upload.metadata!['language'] || 'en',
-          sourceId: source.id,
-          sourceIdentifier: upload.id,
-        })
-        const newMetadata = await service.addMetadata({
-          collection: collection,
-          metadata: metadata,
-        })
-        await service.setMetadataReady(new IdRequest({ id: newMetadata.id }))
+        const id = new IdRequest({ id: upload.metadata!['filename']! })
+        await service.setMetadataReady(id)
       } catch (e) {
         onError(res, e, true)
       }

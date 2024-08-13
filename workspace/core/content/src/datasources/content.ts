@@ -260,6 +260,10 @@ export class ContentDataSource extends DataSource {
     await this.query('insert into metadata_traits (metadata_id, trait_id) values ($1, $2)', [metadataId, traitId])
   }
 
+  async deleteMetadataTrait(metadataId: string, traitId: string): Promise<void> {
+    await this.query('delete from metadata_traits where metadata_id = $1 and trait_id = $2', [metadataId, traitId])
+  }
+
   async addMetadataCategory(metadataId: string, categoryId: string): Promise<void> {
     await this.query('insert into metadata_categories (metadata_id, category_id) values ($1, $2)', [
       metadataId,
@@ -345,11 +349,13 @@ export class ContentDataSource extends DataSource {
     )
   }
 
-  async getMetadataRelationships(metadataId: string, relationship: string): Promise<MetadataRelationship[]> {
+  async getMetadataRelationships(metadataId: string, relationship: string | undefined): Promise<MetadataRelationship[]> {
     return await this.queryAndMap(
       () => new MetadataRelationship(),
-      'select * from metadata_relationship where relationship = $1 and (metadata1_id = $2 or metadata2_id = $2)',
-      [relationship, metadataId],
+      relationship ?
+        'select metadata1_id as metadata_id1, metadata2_id as metadata_id2, relationship, attributes from metadata_relationship where relationship = $1 and (metadata1_id = $2 or metadata2_id = $2)' :
+        'select metadata1_id as metadata_id1, metadata2_id as metadata_id2, relationship, attributes from metadata_relationship where metadata1_id = $1 or metadata2_id = $1',
+      relationship ? [relationship, metadataId] : [metadataId],
     )
   }
 

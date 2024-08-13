@@ -182,6 +182,12 @@ service ContentService {
     };
   }
 
+  rpc SetMetadataTraits(SetMetadataTraitsRequest) returns (Metadata) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{metadata_id}/traits"
+    };
+  }
+
   rpc DeleteMetadata(bosca.IdRequest) returns (bosca.Empty) {
     option (google.api.http) = {
       delete: "/v1/content/metadata/{id}"
@@ -291,8 +297,7 @@ service ContentService {
 
   rpc GetMetadataRelationships(MetadataRelationshipIdRequest) returns (MetadataRelationships) {
     option (google.api.http) = {
-      post: "/v1/content/metadata/{id}/relationships/{relationship}"
-      body: "*"
+      get: "/v1/content/metadata/{id}/relationships/{relationship}"
     };
   }
 }

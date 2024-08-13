@@ -127,14 +127,14 @@ export async function transition(
   waitForCompletion: boolean,
   context: { [key: string]: string },
 ): Promise<void> {
+  await useServiceAccountClient(ContentService).setWorkflowState(
+    new SetWorkflowStateRequest({
+      metadataId: metadata.id,
+      status: status,
+      stateId: nextState.id,
+    }),
+  )
   if (nextState.workflowId) {
-    await useServiceAccountClient(ContentService).setWorkflowState(
-      new SetWorkflowStateRequest({
-        metadataId: metadata.id,
-        status: status,
-        stateId: nextState.id,
-      }),
-    )
     await executeWorkflow(workflowDataSource, null, metadata.id, null, null, nextState.workflowId, context, waitForCompletion)
   } else {
     await useServiceAccountClient(ContentService).setWorkflowStateComplete(

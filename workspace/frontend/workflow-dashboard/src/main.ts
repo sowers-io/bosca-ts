@@ -35,8 +35,8 @@ async function main() {
   serverAdapter.setBasePath('/ui')
   app.register(serverAdapter.registerPlugin(), { prefix: '/ui', basePath: '/ui' })
 
-  await app.listen({ port: 3000 })
-  logger.info('For the UI, open http://localhost:3000/ui')
+  await app.listen({ port: 3001 })
+  logger.info('For the UI, open http://localhost:3001/ui')
 }
 
 main().catch((e) => {

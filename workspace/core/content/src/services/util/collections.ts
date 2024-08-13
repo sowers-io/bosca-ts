@@ -31,6 +31,7 @@ import {
 import { logger, PermissionManager, Subject, useServiceAccountClient } from '@bosca/common'
 import { ContentDataSource, IdName } from '../../datasources/content'
 import { Code, ConnectError } from '@connectrpc/connect'
+import { AdministratorGroup } from './permissions'
 
 export async function getCollectionItems(
   dataSource: ContentDataSource,
@@ -121,7 +122,7 @@ export function newCollectionPermissions(serviceAccountId: string, userId: strin
   return [
     new Permission({
       id: id,
-      subject: 'administrators',
+      subject: AdministratorGroup,
       subjectType: PermissionSubjectType.group,
       relation: PermissionRelation.owners,
     }),

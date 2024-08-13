@@ -23,7 +23,7 @@ import {
   ContentService,
   IdRequest,
   Source,
-  WorkflowJob, FindCollectionRequest,
+  WorkflowJob, FindCollectionRequest, MetadataRelationship,
 } from '@bosca/protobufs'
 import {
   Job,
@@ -74,7 +74,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
         }),
       }),
     )
-    return getCollection(new IdRequest({ id: addResponse.id }))
+    return await getCollection(new IdRequest({ id: addResponse.id }))
   }
 
   private async createBookCollections(
@@ -131,7 +131,24 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
     const addCollectionResponses = await addCollections(addCollectionRequests)
 
     // create metadata
-    await addMetadatas(addMetadatasRequests, buffers)
+    const responses = await addMetadatas(addMetadatasRequests, buffers)
+
+    const service = useServiceAccountClient(ContentService)
+    for (const id of responses.id) {
+      if (id.error) {
+        throw new Error(id.error)
+      }
+      await service.addMetadataRelationship(new MetadataRelationship({
+        metadataId1: this.definition.metadataId,
+        metadataId2: id.id,
+        relationship: 'book',
+      }))
+      await service.addMetadataRelationship(new MetadataRelationship({
+        metadataId1: id.id,
+        metadataId2: this.definition.metadataId,
+        relationship: 'source',
+      }))
+    }
 
     // fetch created collections
     const collections: Collection[] = []

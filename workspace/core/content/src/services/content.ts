@@ -307,6 +307,45 @@ export function content(
       )
       return metadata
     },
+    async setMetadataTraits(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        request.metadataId,
+        PermissionAction.manage,
+      )
+      const metadata = await dataSource.getMetadata(request.metadataId)
+      if (!metadata) {
+        throw new ConnectError('missing metadata', Code.NotFound)
+      }
+
+      // TODO: use transaction
+
+      let removeIds = new Set(metadata.traitIds)
+      const traitIds: string[] = []
+      for (const id of request.traitId) {
+        if (!metadata.traitIds.includes(id)) {
+          await dataSource.addMetadataTrait(request.metadataId, id)
+        }
+        removeIds.delete(id)
+        traitIds.push(id)
+      }
+      metadata.traitIds = traitIds
+
+      for (const id of removeIds) {
+        await dataSource.deleteMetadataTrait(request.metadataId, id)
+      }
+
+      await useServiceAccountClient(WorkflowService).beginTransitionWorkflow(
+        new BeginTransitionWorkflowRequest({
+          metadataId: request.metadataId,
+          status: 'setting traits: ' + request.traitId.join(','),
+          stateId: StateProcessing,
+        }),
+      )
+      return metadata
+    },
     async addMetadata(request, context) {
       if (!request.metadata) throw new ConnectError('missing metadata', Code.InvalidArgument)
       let collection = RootCollectionId
@@ -453,7 +492,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.id,
-        PermissionAction.service,
+        PermissionAction.view,
       )
       return new MetadataSupplementaries({ supplementaries: await dataSource.getMetadataSupplementaries(request.id) })
     },
@@ -537,18 +576,36 @@ export function content(
     },
     async addMetadataRelationship(request, context) {
       const subject = context.values.get(SubjectKey)
-      await permissions.checkWithError(
-        subject,
-        PermissionObjectType.metadata_type,
-        request.metadataId1,
-        PermissionAction.manage,
-      )
-      await permissions.checkWithError(
-        subject,
-        PermissionObjectType.metadata_type,
-        request.metadataId2,
-        PermissionAction.manage,
-      )
+      try {
+        await permissions.checkWithError(
+          subject,
+          PermissionObjectType.metadata_type,
+          request.metadataId1,
+          PermissionAction.manage,
+        )
+      } catch (_) {
+        await permissions.checkWithError(
+          subject,
+          PermissionObjectType.metadata_type,
+          request.metadataId1,
+          PermissionAction.service,
+        )
+      }
+      try {
+        await permissions.checkWithError(
+          subject,
+          PermissionObjectType.metadata_type,
+          request.metadataId2,
+          PermissionAction.manage,
+        )
+      } catch (_) {
+        await permissions.checkWithError(
+          subject,
+          PermissionObjectType.metadata_type,
+          request.metadataId2,
+          PermissionAction.service,
+        )
+      }
       await dataSource.addMetadataRelationship(request.metadataId1, request.metadataId2, request.relationship)
       return new Empty()
     },

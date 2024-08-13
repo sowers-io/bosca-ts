@@ -82,7 +82,7 @@ message Metadatas {
 
 message MetadataRelationshipIdRequest {
   string id = 1;
-  string relationship = 2;
+  optional string relationship = 2;
 }
 
 message MetadataRelationship {
@@ -99,6 +99,11 @@ message MetadataRelationships {
 message AddMetadataTraitRequest {
   string metadata_id = 1;
   string trait_id = 2;
+}
+
+message SetMetadataTraitsRequest {
+  string metadata_id = 1;
+  repeated string trait_id = 2;
 }
 
 message AddSupplementaryRequest {

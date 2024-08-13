@@ -415,9 +415,9 @@ export class MetadataRelationshipIdRequest extends Message<MetadataRelationshipI
   id = "";
 
   /**
-   * @generated from field: string relationship = 2;
+   * @generated from field: optional string relationship = 2;
    */
-  relationship = "";
+  relationship?: string;
 
   constructor(data?: PartialMessage<MetadataRelationshipIdRequest>) {
     super();
@@ -428,7 +428,7 @@ export class MetadataRelationshipIdRequest extends Message<MetadataRelationshipI
   static readonly typeName = "bosca.content.MetadataRelationshipIdRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "relationship", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "relationship", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MetadataRelationshipIdRequest {
@@ -580,6 +580,49 @@ export class AddMetadataTraitRequest extends Message<AddMetadataTraitRequest> {
 
   static equals(a: AddMetadataTraitRequest | PlainMessage<AddMetadataTraitRequest> | undefined, b: AddMetadataTraitRequest | PlainMessage<AddMetadataTraitRequest> | undefined): boolean {
     return proto3.util.equals(AddMetadataTraitRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message bosca.content.SetMetadataTraitsRequest
+ */
+export class SetMetadataTraitsRequest extends Message<SetMetadataTraitsRequest> {
+  /**
+   * @generated from field: string metadata_id = 1;
+   */
+  metadataId = "";
+
+  /**
+   * @generated from field: repeated string trait_id = 2;
+   */
+  traitId: string[] = [];
+
+  constructor(data?: PartialMessage<SetMetadataTraitsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.SetMetadataTraitsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "metadata_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "trait_id", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetMetadataTraitsRequest {
+    return new SetMetadataTraitsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetMetadataTraitsRequest {
+    return new SetMetadataTraitsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetMetadataTraitsRequest {
+    return new SetMetadataTraitsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetMetadataTraitsRequest | PlainMessage<SetMetadataTraitsRequest> | undefined, b: SetMetadataTraitsRequest | PlainMessage<SetMetadataTraitsRequest> | undefined): boolean {
+    return proto3.util.equals(SetMetadataTraitsRequest, a, b);
   }
 }
 

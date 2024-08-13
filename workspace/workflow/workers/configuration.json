@@ -19,9 +19,7 @@
     "bible-verse": {
       "maxConcurrency": 20
     },
-    "bible-ai": {
-      "maxConcurrency": 3
-    },
+
     "search-index": {
       "maxConcurrency": 20
     }

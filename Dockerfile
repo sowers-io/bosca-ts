@@ -19,6 +19,7 @@ RUN pnpm run -r build
 RUN pnpm deploy --filter=@bosca/content --prod /prod/content
 RUN pnpm deploy --filter=@bosca/graphql --prod /prod/graphql
 RUN pnpm deploy --filter=@bosca/uploads --prod /prod/uploads
+RUN pnpm deploy --filter=@bosca/imageproxy --prod /prod/imageproxy
 RUN pnpm deploy --filter=@bosca/workflow --prod /prod/workflow
 RUN pnpm deploy --filter=@bosca/workflow-queue --prod /prod/workflow-queue
 RUN pnpm deploy --filter=@bosca/workflow-workers --prod /prod/workflow-workers
@@ -42,6 +43,12 @@ FROM base AS uploads
 COPY --from=build /prod/uploads /prod/uploads
 WORKDIR /prod/uploads
 EXPOSE 7001
+CMD [ "pnpm", "start" ]
+
+FROM base AS imageproxy
+COPY --from=build /prod/imageproxy /prod/imageproxy
+WORKDIR /prod/imageproxy
+EXPOSE 8002
 CMD [ "pnpm", "start" ]
 
 FROM base AS workflow

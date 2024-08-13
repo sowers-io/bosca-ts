@@ -1,0 +1,23 @@
+{
+  "name": "@bosca/imageproxy",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "DISABLE_OTEL=true ts-node --require ./src/instrumentation.ts ./src/main.ts",
+    "build": "tsc --build",
+    "start": "node --require ./dist/instrumentation.js ./dist/main.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@bosca/common": "workspace:*",
+    "@bosca/protobufs": "workspace:*",
+    "@bufbuild/protobuf": "^1.10.0",
+    "@connectrpc/connect": "^1.4.0",
+    "@connectrpc/connect-fastify": "^1.4.0",
+    "@connectrpc/connect-node": "^1.4.0",
+    "blurhash": "^2.0.5",
+    "fastify": "^4.28.1",
+    "sharp": "^0.33.4"
+  }
+}

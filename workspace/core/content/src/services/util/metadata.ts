@@ -54,7 +54,7 @@ export async function addMetadata(
     const newPermissions = newMetadataPermissions(serviceAccountId, subject.id, metadataId)
     await permissions.createRelationships(PermissionObjectType.metadata_type, newPermissions)
     if (parentId && parentId.length > 0) {
-      await dataSource.addCollectionMetadataItem(parentId, metadataId)
+      await dataSource.addCollectionItemId(parentId, null, metadataId)
     }
     await permissions.waitForPermissions(PermissionObjectType.metadata_type, newPermissions)
   }

@@ -54,15 +54,6 @@ create table collections
     primary key (id)
 );
 
-create table collection_collection_items
-(
-    collection_id uuid,
-    child_id      uuid,
-    primary key (collection_id, child_id),
-    foreign key (collection_id) references collections (id) on delete cascade,
-    foreign key (child_id) references collections (id) on delete cascade
-);
-
 create table collection_traits
 (
     collection_id uuid,
@@ -120,6 +111,20 @@ create table metadata
     primary key (id),
     foreign key (parent_id) references metadata (id) on delete cascade,
     foreign key (source_id) references sources (id)
+);
+
+create table collection_items
+(
+    id                  bigserial,
+    collection_id       uuid,
+    child_collection_id uuid,
+    child_metadata_id    uuid,
+    primary key (id),
+    foreign key (collection_id) references collections (id) on delete cascade,
+    foreign key (child_collection_id) references collections (id) on delete cascade,
+    foreign key (child_metadata_id) references metadata (id) on delete cascade,
+    unique (collection_id, child_collection_id),
+    unique (collection_id, child_metadata_id)
 );
 
 create table metadata_supplementary
@@ -323,15 +328,6 @@ create table collection_workflow_transition_history
     complete      boolean   not null default false,
     created       timestamp          default now(),
     primary key (id),
-    foreign key (metadata_id) references metadata (id) on delete cascade
-);
-
-create table collection_metadata_items
-(
-    collection_id uuid,
-    metadata_id   uuid,
-    primary key (collection_id, metadata_id),
-    foreign key (collection_id) references collections (id) on delete cascade,
     foreign key (metadata_id) references metadata (id) on delete cascade
 );
 
@@ -562,9 +558,8 @@ create table workflow_state_transitions
 drop table if exists collection_traits cascade;
 drop table if exists collection_categories cascade;
 drop table if exists collections cascade;
-drop table if exists collection_collection_items cascade;
+drop table if exists collection_items cascade;
 drop table if exists collection_workflow_transition_history cascade;
-drop table if exists collection_metadata_items cascade;
 drop type if exists collection_type cascade;
 drop table if exists metadata_relationship cascade;
 drop table if exists metadata_traits cascade;

@@ -207,6 +207,15 @@ export const ContentService = {
       kind: MethodKind.Unary,
     },
     /**
+     * @generated from rpc bosca.content.ContentService.GetMetadataCollections
+     */
+    getMetadataCollections: {
+      name: "GetMetadataCollections",
+      I: IdRequest,
+      O: Collections,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc bosca.content.ContentService.GetMetadatas
      */
     getMetadatas: {

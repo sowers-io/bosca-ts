@@ -29,6 +29,11 @@ import { QueryResult } from 'pg'
 
 export const RootCollectionId = '00000000-0000-0000-0000-000000000000'
 
+export interface ChildCollectionItemId {
+  collectionId: string | null
+  metadataId: string | null
+}
+
 export interface IdName {
   id: string
   name: string
@@ -71,7 +76,7 @@ export class ContentDataSource extends DataSource {
 
   async getCollectionIdNames(collectionId: string): Promise<IdName[]> {
     const records = await this.query(
-      'select id, name from collections where id in (select child_id from collection_collection_items where collection_id = $1)',
+      'select id, name from collections where id in (select child_collection_id from collection_items where collection_id = $1 and child_collection_id is not null)',
       [collectionId],
     )
     return records.rows.map((r) => ({ id: r.id, name: r.name }))
@@ -79,7 +84,7 @@ export class ContentDataSource extends DataSource {
 
   async getCollectionIdName(collectionId: string, name: string): Promise<IdName[]> {
     const records = await this.query(
-      'select id, name from collections where id in (select child_id from collection_collection_items where collection_id = $1) and lower(name) = lower($2)',
+      'select id, name from collections where id in (select child_metadata_id from collection_items where collection_id = $1 and child_metadata_id is not null) and lower(name) = lower($2)',
       [collectionId, name],
     )
     return records.rows.map((r) => ({ id: r.id, name: r.name }))
@@ -87,7 +92,7 @@ export class ContentDataSource extends DataSource {
 
   async getMetadataIdNames(collectionId: string) {
     const records = await this.query(
-      'select id, name from metadata where id in (select metadata_id from collection_metadata_items where collection_id = $1)',
+      'select id, name from metadata where id in (select child_metadata_id from collection_items where collection_id = $1 and child_metadata_id is not null)',
       [collectionId],
     )
     return records.rows.map((r) => ({ id: r.id, name: r.name }))
@@ -95,20 +100,17 @@ export class ContentDataSource extends DataSource {
 
   async getMetadataIdName(collectionId: string, name: string): Promise<IdName[]> {
     const records = await this.query(
-      'select id, name from metadata where id in (select metadata_id from collection_metadata_items where collection_id = $1) and lower(name) = lower($2)',
+      'select id, name from metadata where id in (select child_metadata_id from collection_items where collection_id = $1 and child_metadata_id is not null) and lower(name) = lower($2)',
       [collectionId, name],
     )
     return records.rows.map((r) => ({ id: r.id, name: r.name }))
   }
 
-  async getCollectionCollectionItemIds(id: string): Promise<string[]> {
-    const records = await this.query('select child_id from collection_collection_items where collection_id = $1', [id])
-    return records.rows.map((r) => r.child_id)
-  }
-
-  async getCollectionMetadataItemIds(id: string): Promise<string[]> {
-    const records = await this.query('select metadata_id from collection_metadata_items where collection_id = $1', [id])
-    return records.rows.map((r) => r.metadata_id)
+  async getCollectionItemIds(id: string): Promise<ChildCollectionItemId[]> {
+    const records = await this.query('select child_collection_id, child_metadata_id from collection_items where collection_id = $1', [id])
+    return records.rows.map((r) => {
+      return { collectionId: r.child_collection_id, metadataId: r.child_metadata_id }
+    })
   }
 
   private buildFindWhere(attributes: { [key: string]: string }): string {
@@ -174,17 +176,11 @@ export class ContentDataSource extends DataSource {
     return collectionId
   }
 
-  async addCollectionCollectionItem(collectionId: string, itemId: string): Promise<void> {
-    await this.query('insert into collection_collection_items (collection_id, child_id) values ($1::uuid, $2::uuid)', [
+  async addCollectionItemId(collectionId: string, childCollectionId: string | null, childMetadataId: string | null): Promise<void> {
+    await this.query('insert into collection_items (collection_id, child_collection_id, child_metadata_id) values ($1::uuid, $2::uuid, $3::uuid)', [
       collectionId,
-      itemId,
-    ])
-  }
-
-  async addCollectionMetadataItem(collectionId: string, itemId: string): Promise<void> {
-    await this.query('insert into collection_metadata_items (collection_id, metadata_id) values ($1::uuid, $2::uuid)', [
-      collectionId,
-      itemId,
+      childCollectionId,
+      childMetadataId,
     ])
   }
 
@@ -340,6 +336,11 @@ export class ContentDataSource extends DataSource {
       await this.query('select category_id from metadata_version_categories where metadata_id = $1::uuid and version = $2', [id, version])
     ).rows.map((r) => r.category_id)
     return metadata
+  }
+
+  async getMetadataCollectionIds(id: string): Promise<string[]> {
+    const result = await this.query('select collection_id from collection_items where child_metadata_id = $1', [id])
+    return result.rows.map((r) => r.collection_id)
   }
 
   async addMetadataRelationship(metadataId1: string, metadataId2: string, relationship: string): Promise<void> {

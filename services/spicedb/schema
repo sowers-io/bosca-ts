@@ -25,7 +25,7 @@ definition metadata {
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list
     permission edit = editors->edit + owners->edit
-    permission manage = managers->manage + owners->manage
+    permission manage = managers->manage + owners->manage + servicers->service
     permission service = owners->service + servicers->service
     permission delete = owners->delete
 }
@@ -41,7 +41,7 @@ definition collection {
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list
     permission edit = editors->edit + owners->edit
-    permission manage = managers->manage + owners->manage
+    permission manage = managers->manage + owners->manage + servicers->service
     permission service = owners->service + servicers->service
     permission delete = owners->delete
 }
@@ -57,7 +57,7 @@ definition systemresource {
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list
     permission edit = editors->edit + owners->edit
-    permission manage = managers->manage + owners->manage
+    permission manage = managers->manage + owners->manage + servicers->service
     permission service = owners->service + servicers->service
     permission delete = owners->delete
 }
@@ -73,7 +73,7 @@ definition workflow {
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list + servicers->list
     permission edit = editors->edit + owners->edit
-    permission manage = managers->manage + owners->manage
+    permission manage = managers->manage + owners->manage + servicers->service
     permission service = owners->service + servicers->service
     permission delete = owners->delete
 }
@@ -89,7 +89,7 @@ definition workflowstate {
     permission view = viewers->view + editors->view + owners->view
     permission list = discoverers->list + editors->list + owners->list + servicers->list
     permission edit = editors->edit + owners->edit
-    permission manage = managers->manage + owners->manage
+    permission manage = managers->manage + owners->manage + servicers->service
     permission service = owners->service + servicers->service
     permission delete = owners->delete
 }

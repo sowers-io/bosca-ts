@@ -39,15 +39,16 @@ export async function getCollectionItems(
   subject: Subject,
   collectionId: string,
 ): Promise<CollectionItems> {
+  const ids = await dataSource.getCollectionItemIds(collectionId)
+  let collectionItemIds = ids.filter((id) => id.collectionId != null).map((id) => id.collectionId) as string[]
+  let metadataItemIds = ids.filter((id) => id.metadataId != null).map((id) => id.metadataId) as string[]
   // TODO: paging?
-  let collectionItemIds = await dataSource.getCollectionCollectionItemIds(collectionId)
   collectionItemIds = await permissions.bulkCheck(
     subject,
     PermissionObjectType.collection_type,
     collectionItemIds,
     PermissionAction.view,
   )
-  let metadataItemIds = await dataSource.getCollectionMetadataItemIds(collectionId)
   metadataItemIds = await permissions.bulkCheck(
     subject,
     PermissionObjectType.metadata_type,
@@ -112,7 +113,7 @@ export async function addCollection(
   const newPermissions = newCollectionPermissions(serviceAccountId, subject.id, id)
   await permissions.createRelationships(PermissionObjectType.collection_type, newPermissions)
   if (parentId && parentId.length) {
-    await dataSource.addCollectionCollectionItem(parentId, id)
+    await dataSource.addCollectionItemId(parentId, id, null)
   }
   await permissions.waitForPermissions(PermissionObjectType.collection_type, newPermissions)
   return new IdResponsesId({ id: id })

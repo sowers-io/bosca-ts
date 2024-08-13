@@ -69,6 +69,7 @@ async function main() {
       reply.code(500).send()
       return
     }
+    let contentType = response.headers.get('Content-Type')
     let transformer = sharp()
     // @ts-ignore
     if (opts.w || opts.h) {
@@ -101,6 +102,7 @@ async function main() {
           .send(blurhash)
       }
       case 'jpeg': {
+        contentType = 'image/jpeg'
         const quality = opts.q ? parseInt(opts.q) : 80
         if (isNaN(quality)) {
           return reply.code(400).send()
@@ -111,10 +113,21 @@ async function main() {
         })
         break
       }
+      case 'webp': {
+        contentType = 'image/webp'
+        const quality = opts.q ? parseInt(opts.q) : 80
+        if (isNaN(quality)) {
+          return reply.code(400).send()
+        }
+        transformer = transformer.toFormat(sharp.format.webp, {
+          quality: quality,
+        })
+        break
+      }
     }
-
     // @ts-ignore
-    await reply.send(Readable.fromWeb(response.body).pipe(transformer))
+    const buffer = await Readable.fromWeb(response.body).pipe(transformer).toBuffer()
+    await reply.header('Content-Type', contentType).send(buffer)
   })
   await server.listen({ host: '0.0.0.0', port: 8002 })
   logger.info('server listening on 0.0.0.0:8002')

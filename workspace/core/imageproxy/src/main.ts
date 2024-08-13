@@ -46,7 +46,7 @@ async function main() {
     reply.status(500).send({ ok: false })
   })
   await server.register(openTelemetryPlugin)
-  server.get('/', {}, async function (request, reply) {
+  server.get('/imageproxy', {}, async function (request, reply) {
     const opts = request.query as QueryOpts
     if (!opts.u) {
       reply.code(400).send()

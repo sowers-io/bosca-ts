@@ -39,7 +39,7 @@ type Resize = {
 }
 
 async function main() {
-  const supportedUrls = process.env.SUPPORTED_URLS?.split(',').map((u) => new RegExp(u)) || []
+  const supportedUrls = process.env.SUPPORTED_URLS?.split(',') || []
   const server = fastify()
   server.setErrorHandler((error, request, reply) => {
     logger.error({ error, request }, 'uncaught error')
@@ -55,7 +55,7 @@ async function main() {
     const imageUrl = new URL(opts.u)
     let isSupported = false
     for (const supported of supportedUrls) {
-      if (supported.test(opts.u)) {
+      if (opts.u.startsWith(supported)) {
         isSupported = true
         break
       }
@@ -107,6 +107,7 @@ async function main() {
         }
         transformer = transformer.toFormat(sharp.format.jpeg, {
           quality: quality,
+          mozjpeg: true,
         })
         break
       }

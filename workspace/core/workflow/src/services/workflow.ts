@@ -30,7 +30,7 @@ import {
   WorkflowStates,
   FindCollectionRequest,
   FindMetadataRequest,
-  WorkflowEnqueueResponses, PermissionObjectType, PermissionAction
+  WorkflowEnqueueResponses, PermissionObjectType, PermissionAction,
 } from '@bosca/protobufs'
 import { logger, PermissionManager, SubjectKey, SubjectType, useServiceAccountClient } from '@bosca/common'
 import { Code, ConnectError, type ConnectRouter } from '@connectrpc/connect'
@@ -52,16 +52,22 @@ export function workflow(
   return router.service(WorkflowService, {
     async getModels(_, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       return new Models({ models: await dataSource.getModels() })
     },
     async getModel(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       const model = await dataSource.getModel(request.id)
       if (!model) {
         throw new ConnectError('missing model', Code.NotFound)
@@ -70,16 +76,22 @@ export function workflow(
     },
     async getPrompts(_, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       return new Prompts({ prompts: await dataSource.getPrompts() })
     },
     async getPrompt(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       const model = await dataSource.getModel(request.id)
       if (!model) {
         throw new ConnectError('missing model', Code.NotFound)
@@ -88,16 +100,22 @@ export function workflow(
     },
     async getStorageSystems(_, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       return new StorageSystems({ systems: await dataSource.getStorageSystems() })
     },
     async getStorageSystem(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       const system = await dataSource.getStorageSystem(request.id)
       if (!system) {
         throw new ConnectError('missing storage system', Code.NotFound)
@@ -106,25 +124,34 @@ export function workflow(
     },
     async getStorageSystemModels(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       return new StorageSystemModels({
         models: await dataSource.getStorageSystemModels(request.id),
       })
     },
     async getWorkflows(_, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       return new Workflows({ workflows: await dataSource.getWorkflows() })
     },
     async getWorkflow(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       const workflow = await dataSource.getWorkflow(request.id)
       if (!workflow) {
         logger.warn({ id: request.id }, 'missing workflow')
@@ -132,14 +159,24 @@ export function workflow(
       }
       return workflow
     },
-    async getWorkflowStates(_) {
+    async getWorkflowStates(_, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       return new WorkflowStates({ states: await dataSource.getWorkflowStates() })
     },
     async getWorkflowState(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       const state = await dataSource.getWorkflowState(request.id)
       if (!state) {
         logger.warn({ id: request.id }, 'missing workflow state')
@@ -149,27 +186,36 @@ export function workflow(
     },
     async getWorkflowActivities(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       return new WorkflowActivities({
         activities: await dataSource.getWorkflowActivities(request.id),
       })
     },
     async getWorkflowActivityStorageSystems(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       return new WorkflowActivityStorageSystems({
         systems: await dataSource.getWorkflowActivityStorageSystems(Number(request.workflowActivityId)),
       })
     },
     async getWorkflowActivityPrompts(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
       return new WorkflowActivityPrompts({
         prompts: await dataSource.getWorkflowActivityPrompts(Number(request.workflowActivityId)),
       })
@@ -201,9 +247,12 @@ export function workflow(
     },
     async completeTransitionWorkflow(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
-        throw new ConnectError('unauthorized', Code.PermissionDenied)
-      }
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.manage,
+      )
       const metadata = await useServiceAccountClient(ContentService).getMetadata(
         new IdRequest({ id: request.metadataId }),
       )

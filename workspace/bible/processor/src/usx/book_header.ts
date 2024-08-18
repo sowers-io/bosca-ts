@@ -26,6 +26,10 @@ export class BookHeader extends UsxItemContainer<Text> {
     super(context, attributes)
     this.style = attributes.STYLE.toString() as BookHeaderStyle
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class BookHeaderFactory extends UsxItemFactory<BookHeader> {

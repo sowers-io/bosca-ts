@@ -19,7 +19,7 @@ import { Footnote, FootnoteFactory } from './footnote'
 import { Char, CharFactory } from './char'
 import { Break, BreakFactory } from './break'
 import { Text, TextFactory } from './text'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, HtmlContext, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
 import { Verse } from './verse'
 import { Milestone, MilestoneFactory } from './milestone'
 import { Figure, FigureFactory } from './figure'
@@ -39,6 +39,18 @@ export class Paragraph extends UsxItemContainer<ParagraphType> {
     super(context, attributes)
     this.style = attributes.STYLE.toString() as ParaStyle
     this.vid = attributes.VID?.toString()
+  }
+
+  get htmlClass(): string {
+    return this.style
+  }
+
+  toHtml(context: HtmlContext): string {
+    return context.render('p', this)
+  }
+
+  toString(): string {
+    return '\n'
   }
 }
 

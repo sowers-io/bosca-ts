@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, EndIdFactoryFilter, UsxContext, UsxItem, UsxItemFactory } from './item'
+import { Attributes, EndIdFactoryFilter, HtmlContext, UsxContext, UsxItem, UsxItemFactory } from './item'
 import { Position } from './position'
 
 export class ChapterEnd implements UsxItem {
@@ -28,6 +28,22 @@ export class ChapterEnd implements UsxItem {
     this.eid = attributes.EID.toString()
     this.verse = context.addVerseItem(this)
     this.position = context.position
+  }
+
+  get htmlClass(): string {
+    return ''
+  }
+
+  get htmlAttributes(): { [p: string]: string } {
+    return {}
+  }
+
+  toHtml(context: HtmlContext): string {
+    return ''
+  }
+
+  toString(): string {
+    return ''
   }
 }
 

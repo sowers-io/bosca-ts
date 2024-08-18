@@ -16,15 +16,82 @@
 
 import { Tag, QualifiedTag, QualifiedAttribute } from 'sax'
 import { Position } from './position'
+import { VerseStart } from './verse_start'
 
 export type Attributes = { [key: string]: string | QualifiedAttribute }
 
 export type UsxTag = Tag | QualifiedTag
 
+export class HtmlContext {
+
+  pretty: boolean
+  indent: number
+  includeVerseNumbers: boolean
+
+  constructor(pretty: boolean, indent: number, includeVerseNumbers: boolean) {
+    this.pretty = pretty
+    this.indent = indent
+    this.includeVerseNumbers = includeVerseNumbers
+  }
+
+  addIndent() {
+    this.indent += 2
+  }
+
+  removeIndent() {
+    this.indent -= 2
+  }
+
+  render(tag: string, item: UsxItem | UsxVerseItems, text: string | undefined = undefined): string {
+    let html = ''
+    if (this.pretty) html += ' '.repeat(this.indent)
+    html += '<' + tag
+    let attrs = {
+      ...item.htmlAttributes
+    }
+    if (item.htmlClass != '') attrs['class'] = item.htmlClass
+    for (const key in attrs) {
+      html += ' '
+      html += key + '="' + attrs[key] + '"'
+    }
+    html += '>'
+    if (this.pretty) html += '\n'
+    this.addIndent()
+    let childHtml = ''
+    if (text) {
+      if (this.pretty) html += ' '.repeat(this.indent)
+      childHtml += text
+    } else if (item instanceof UsxItemContainer) {
+      for (const child of item.items) {
+        childHtml += child.toHtml(this)
+      }
+    } else if (item instanceof UsxVerseItems) {
+      for (const child of item.items) {
+        childHtml += child.toHtml(this)
+      }
+    } else {
+      childHtml += item.toHtml(this)
+    }
+    html += childHtml
+    if (this.pretty && !html.endsWith('\n')) html += '\n'
+    this.removeIndent()
+    if (this.pretty) html += ' '.repeat(this.indent)
+    html += '</' + tag + '>'
+    if (this.pretty) html += '\n'
+    return html
+  }
+}
+
 export interface UsxItem {
 
   readonly position: Position
   readonly verse: string | null
+
+  get htmlClass(): string
+
+  get htmlAttributes(): { [key: string]: string }
+
+  toHtml(context: HtmlContext): string
 
   toString(): string
 }
@@ -40,8 +107,18 @@ export abstract class UsxItemContainer<T extends UsxItem> implements UsxItem {
     this.verse = context.addVerseItem(this)
   }
 
+  abstract get htmlClass(): string
+
+  get htmlAttributes(): { [key: string]: string } {
+    return {}
+  }
+
   addItem(item: T) {
     this.items.push(item)
+  }
+
+  toHtml(context: HtmlContext): string {
+    return context.render('div', this)
   }
 
   toString(): string {
@@ -109,14 +186,27 @@ export class UsxVerseItems {
   readonly items: UsxItem[] = []
   readonly position: Position
 
-  constructor(usfm: string, verse: string, position: Position) {
+  constructor(usfm: string, verse: VerseStart, position: Position) {
     this.usfm = usfm
-    this.verse = verse
+    this.verse = verse.number
     this.position = position
+    this.items.push(verse)
+  }
+
+  get htmlClass(): string {
+    return 'verses'
+  }
+
+  get htmlAttributes(): { [key: string]: string } {
+    return {}
   }
 
   addItem(item: UsxItem) {
     this.items.push(item)
+  }
+
+  toHtml(context: HtmlContext) {
+    return context.render('div', this)
   }
 
   toString(): string {
@@ -138,8 +228,8 @@ export abstract class UsxContext {
     return this.positions[this.positions.length - 1]
   }
 
-  pushVerse(bookChapterUsfm: string, verse: string, position: Position) {
-    this.verses.push(new UsxVerseItems(bookChapterUsfm + '.' + verse, verse, position))
+  pushVerse(bookChapterUsfm: string, verse: VerseStart, position: Position) {
+    this.verses.push(new UsxVerseItems(bookChapterUsfm + '.' + verse.number, verse, position))
   }
 
   popVerse(): UsxVerseItems {

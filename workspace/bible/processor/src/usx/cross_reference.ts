@@ -31,6 +31,14 @@ export class CrossReference extends UsxItemContainer<CrossReferenceType> {
     this.style = attributes.STYLE.toString() as CrossReferenceStyle
     this.caller = attributes.CALLER.toString()
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
+
+  get htmlAttributes(): { [p: string]: string } {
+    return {'data-caller': this.caller, ...super.htmlAttributes}
+  }
 }
 
 export class CrossReferenceFactory extends UsxItemFactory<CrossReference> {

@@ -33,6 +33,10 @@ export class FootnoteChar extends UsxItemContainer<FootnoteCharType> {
     super(context, attributes)
     this.style = attributes.STYLE.toString() as FootnoteCharStyle
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class FootnoteCharFactory extends UsxItemFactory<FootnoteChar> {

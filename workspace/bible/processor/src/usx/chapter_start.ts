@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-import { Attributes, EndIdFactoryFilter, NegateFactoryFilter, UsxContext, UsxItem, UsxItemFactory } from './item'
+import {
+  Attributes,
+  EndIdFactoryFilter,
+  HtmlContext,
+  NegateFactoryFilter,
+  UsxContext,
+  UsxItem,
+  UsxItemFactory
+} from './item'
 import { Position } from './position'
 
 export class ChapterStart implements UsxItem {
@@ -34,6 +42,22 @@ export class ChapterStart implements UsxItem {
     this.altnumber = attributes.ALTNUMBER?.toString()
     this.pubnumber = attributes.PUBNUMBER?.toString()
     this.position = context.position
+  }
+
+  get htmlClass(): string {
+    return ''
+  }
+
+  get htmlAttributes(): { [p: string]: string } {
+    return {}
+  }
+
+  toHtml(context: HtmlContext): string {
+    return ''
+  }
+
+  toString(): string {
+    return ''
   }
 }
 

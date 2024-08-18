@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemFactory } from './item'
+import { Attributes, HtmlContext, StyleFactoryFilter, UsxContext, UsxItem, UsxItemFactory } from './item'
 import { VerseStartStyle, VerseStartStyles } from './styles'
 import { Position } from './position'
 
@@ -36,6 +36,21 @@ export class VerseStart implements UsxItem {
     this.pubnumber = attributes.PUBNUMBER?.toString()
     this.sid = attributes.SID.toString()
     this.verse = context.addVerseItem(this)
+  }
+
+  get htmlClass(): string {
+    return this.style
+  }
+
+  get htmlAttributes(): { [p: string]: string } {
+    return {
+      'data-verse': this.number
+    }
+  }
+
+  toHtml(context: HtmlContext): string {
+    if (context.includeVerseNumbers) return context.render('span', this, this.number)
+    return ''
   }
 
   toString(): string {

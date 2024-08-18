@@ -66,7 +66,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
             attributes: {
               'bible.type': 'chapter',
               'bible.system.id': args.systemId,
-              // 'bible.version': args.version,
+              'bible.version': args.version,
               'bible.chapter.usfm': args.usfm,
             },
           }),
@@ -97,7 +97,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
               attributes: {
                 'bible.type': 'verse',
                 'bible.system.id': args.systemId,
-                // 'bible.version': args.version,
+                'bible.version': args.version,
                 'bible.verse.usfm': usfm,
               },
             }),
@@ -130,7 +130,7 @@ export const resolvers: Resolvers<BibleRequestContext> = {
             attributes: {
               'bible.type': 'verse',
               'bible.system.id': args.systemId,
-              // 'bible.version': args.version,
+              'bible.version': args.version,
               'bible.verse.usfm': args.usfm,
             },
           }),

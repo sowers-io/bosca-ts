@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, UsxContext, UsxItem, UsxItemFactory } from './item'
+import { Attributes, HtmlContext, UsxContext, UsxItem, UsxItemFactory } from './item'
 import { Position } from './position'
 
 export class Milestone implements UsxItem {
@@ -32,6 +32,22 @@ export class Milestone implements UsxItem {
     this.sid = attributes.SID.toString()
     this.eid = attributes.EID.toString()
     this.verse = context.addVerseItem(this)
+  }
+
+  get htmlClass(): string {
+    return this.style
+  }
+
+  get htmlAttributes(): { [p: string]: string } {
+    return {}
+  }
+
+  toHtml(context: HtmlContext): string {
+    return context.render('milestone', this)
+  }
+
+  toString(): string {
+    return ''
   }
 }
 

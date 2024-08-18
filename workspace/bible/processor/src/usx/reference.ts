@@ -25,6 +25,10 @@ export class Reference extends UsxItemContainer<Text> {
     super(context, attributes)
     this.loc = attributes.LOC.toString()
   }
+
+  get htmlClass(): string {
+    return ''
+  }
 }
 
 export class ReferenceFactory extends UsxItemFactory<Reference> {

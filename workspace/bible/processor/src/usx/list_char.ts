@@ -35,6 +35,10 @@ export class ListChar extends UsxItemContainer<ListCharType> {
     super(context, attributes)
     this.style = attributes.STYLE.toString() as ListCharStyle
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class ListCharFactory extends UsxItemFactory<ListChar> {

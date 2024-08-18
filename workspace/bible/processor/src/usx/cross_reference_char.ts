@@ -32,6 +32,10 @@ export class CrossReferenceChar extends UsxItemContainer<CrossReferenceCharType>
     super(context, attributes)
     this.style = attributes.STYLE.toString() as CrossReferenceCharStyle
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class CrossReferenceCharFactory extends UsxItemFactory<CrossReferenceChar> {

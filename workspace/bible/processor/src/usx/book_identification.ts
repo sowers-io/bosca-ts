@@ -27,6 +27,18 @@ export class BookIdentification extends UsxItemContainer<Text> {
     this.id = attributes.STYLE.toString()
     this.code = attributes.CODE.toString() as BookIdentificationCode
   }
+
+  get htmlClass(): string {
+    return 'book-identification'
+  }
+
+  get htmlAttributes(): { [p: string]: string } {
+    return {
+      'data-id': this.id,
+      'data-code': this.code,
+      ...super.htmlAttributes
+    }
+  }
 }
 
 export class BookIdentificationFactory extends UsxItemFactory<BookIdentification> {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, UsxContext, UsxItem, UsxItemFactory } from './item'
+import { Attributes, HtmlContext, UsxContext, UsxItem, UsxItemFactory } from './item'
 import { Position } from './position'
 
 export class Break implements UsxItem {
@@ -25,6 +25,22 @@ export class Break implements UsxItem {
   constructor(context: UsxContext) {
     this.position = context.position
     this.verse = context.addVerseItem(this)
+  }
+
+  get htmlClass(): string {
+    return ''
+  }
+
+  get htmlAttributes(): { [p: string]: string } {
+    return {}
+  }
+
+  toHtml(context: HtmlContext): string {
+    return context.render('br', this)
+  }
+
+  toString(): string {
+    return ''
   }
 }
 

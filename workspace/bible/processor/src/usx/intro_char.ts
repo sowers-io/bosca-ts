@@ -35,6 +35,10 @@ export class IntroChar extends UsxItemContainer<IntroCharType> {
     super(context, attributes)
     this.style = attributes.STYLE.toString() as IntroCharStyle
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class IntroCharFactory extends UsxItemFactory<IntroChar> {

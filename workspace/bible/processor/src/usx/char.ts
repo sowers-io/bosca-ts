@@ -34,6 +34,10 @@ export class Char extends UsxItemContainer<CharType> {
     super(context, attributes)
     this.style = attributes.STYLE.toString() as CharStyle
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class CharFactory extends UsxItemFactory<Char> {

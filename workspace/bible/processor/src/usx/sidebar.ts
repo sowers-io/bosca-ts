@@ -34,4 +34,8 @@ export class Sidebar extends UsxItemContainer<SidebarType> {
     this.style = attributes.STYLE.toString() as SidebarStyle
     this.category = attributes.CATEGORY?.toString()
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }

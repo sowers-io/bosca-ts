@@ -37,6 +37,10 @@ export class Figure extends UsxItemContainer<Text> {
     this.copy = attributes.COPY?.toString()
     this.ref = attributes.REF?.toString()
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class FigureFactory extends UsxItemFactory<Figure> {

@@ -33,6 +33,10 @@ export class Footnote extends UsxItemContainer<FootnoteItem> {
     this.caller = attributes.CALLER.toString()
     this.category = attributes.CATEGORY?.toString()
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class FootnoteFactory extends UsxItemFactory<Footnote> {

@@ -26,6 +26,10 @@ export class FootnoteVerse extends UsxItemContainer<Text> {
     super(context, attributes)
     this.style = attributes.STYLE.toString() as FootnoteVerseStyle
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class FootnoteVerseFactory extends UsxItemFactory<FootnoteVerse> {

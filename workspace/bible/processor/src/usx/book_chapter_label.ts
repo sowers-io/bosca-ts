@@ -25,6 +25,10 @@ export class BookChapterLabel extends UsxItemContainer<Text> {
     super(context, attributes)
     this.style = attributes.STYLE.toString() as BookChapterLabelStyle
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class BookChapterLabelFactory extends UsxItemFactory<BookChapterLabel> {

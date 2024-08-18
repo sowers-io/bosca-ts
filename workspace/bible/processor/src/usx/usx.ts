@@ -28,24 +28,7 @@ import { ListFactory } from './list'
 import { FootnoteFactory } from './footnote'
 import { CrossReferenceFactory } from './cross_reference'
 import { TextFactory } from './text'
-
-/*
-element usx {
-        attribute version { xsd:string { minLength = "3" pattern = "\d+\.\d+(\.\d+)?"} },
-        attribute xsi:noNamespaceSchemaLocation { text }?,
-
-        BookIdentification,
-        BookHeaders*,
-        BookTitles+,
-        BookIntroduction*,
-        BookIntroductionEndTitles*,
-        BookChapterLabel?,
-        Chapter,
-        # Chapter is used to separate intro from scripture text.
-        # All books will have chapter including the single chapter books: OBA, PHM, 2JN, 3JN, JUD
-        ChapterContent+
-    }
- */
+import { TableFactory } from './table'
 
 type UsxType =
   BookIdentification
@@ -61,6 +44,10 @@ export class Usx extends UsxItemContainer<UsxType> {
 
   constructor(context: UsxContext, attributes: Attributes) {
     super(context, attributes)
+  }
+
+  get htmlClass(): string {
+    return ''
   }
 }
 
@@ -91,7 +78,7 @@ export class UsxFactory extends UsxItemFactory<Usx> {
     this.register(ChapterEndFactory.instance)
     this.register(ParagraphFactory.instance)
     this.register(ListFactory.instance)
-    // this.register(Table)
+    this.register(TableFactory.instance)
     this.register(FootnoteFactory.instance)
     this.register(CrossReferenceFactory.instance)
     // this.register(Sidebar)

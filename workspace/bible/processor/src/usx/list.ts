@@ -41,6 +41,10 @@ export class List extends UsxItemContainer<ListType> {
     this.style = attributes.STYLE.toString() as ListStyle
     this.vid = attributes.VID.toString()
   }
+
+  get htmlClass(): string {
+    return this.style
+  }
 }
 
 export class ListFactory extends UsxItemFactory<List> {

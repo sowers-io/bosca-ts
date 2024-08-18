@@ -66,6 +66,18 @@ export class Chapter extends UsxItemContainer<ChapterType> {
     this.start = start
   }
 
+  get htmlClass(): string {
+    return 'chapter c' + this.number
+  }
+
+  get htmlAttributes(): { [p: string]: string } {
+    return {
+      'data-usfm': this.usfm,
+      'data-number': this.number,
+      ...super.htmlAttributes
+    }
+  }
+
   get end(): ChapterEnd {
     return this._end!
   }
@@ -105,7 +117,7 @@ export class Chapter extends UsxItemContainer<ChapterType> {
         this.number,
         usfmParts[usfmParts.length - 1],
         items,
-        raw,
+        raw
       ))
     }
 

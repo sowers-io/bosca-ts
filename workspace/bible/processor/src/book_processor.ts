@@ -145,7 +145,7 @@ class BookProcessorContext extends UsxContext {
       this.chapters.push(chapter)
       this.items.push(new UsxNode(node.factory, chapter, position))
     } else if (item instanceof VerseStart) {
-      this.pushVerse(this.chapters[this.chapters.length - 1].usfm, item.number, new Position(item.position.start))
+      this.pushVerse(this.chapters[this.chapters.length - 1].usfm, item, new Position(item.position.start))
     }
     if (node.item instanceof UsxItemContainer) {
       node.item.addItem(item)

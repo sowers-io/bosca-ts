@@ -14,27 +14,33 @@
  * limitations under the License.
  */
 
-import { Attributes, UsxContext, UsxItemContainer } from './item'
-import { Footnote } from './footnote'
-import { Char } from './char'
-import { Milestone } from './milestone'
-import { Figure } from './figure'
-import { Break } from './break'
-import { Text } from './text'
-import { CrossReference } from './cross_reference'
+import { Attributes, HtmlContext, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Footnote, FootnoteFactory } from './footnote'
+import { Char, CharFactory } from './char'
+import { Milestone, MilestoneFactory } from './milestone'
+import { Figure, FigureFactory } from './figure'
+import { Break, BreakFactory } from './break'
+import { Text, TextFactory } from './text'
+import { CrossReference, CrossReferenceFactory } from './cross_reference'
 import { Verse } from './verse'
+import { VerseStartFactory } from './verse_start'
+import { VerseEndFactory } from './verse_end'
 
 export class Table extends UsxItemContainer<Row> {
 
   vid: string
 
-  get element(): string {
-    return 'table'
-  }
-
   constructor(context: UsxContext, attributes: Attributes) {
     super(context, attributes)
     this.vid = attributes.VID.toString()
+  }
+
+  get htmlClass(): string {
+    return ''
+  }
+
+  toHtml(context: HtmlContext): string {
+    return context.render('table', this)
   }
 }
 
@@ -44,13 +50,17 @@ export class Row extends UsxItemContainer<RowType> {
 
   style: string
 
-  get element(): string {
-    return 'row'
-  }
-
   constructor(context: UsxContext, attributes: Attributes) {
     super(context, attributes)
     this.style = attributes.STYLE.toString()
+  }
+
+  get htmlClass(): string {
+    return this.style
+  }
+
+  toHtml(context: HtmlContext): string {
+    return context.render('tr', this)
   }
 }
 
@@ -61,14 +71,79 @@ export class TableContent extends UsxItemContainer<TableContentType> {
   align: string
   colspan: string
 
-  get element(): string {
-    return 'cell'
-  }
-
   constructor(context: UsxContext, attributes: Attributes) {
     super(context, attributes)
     this.style = attributes.STYLE.toString()
     this.align = attributes.ALIGN.toString()
     this.colspan = attributes.COLSPAN?.toString()
+  }
+
+  get htmlClass(): string {
+    return this.style
+  }
+
+  toHtml(context: HtmlContext): string {
+    return context.render('td', this)
+  }
+}
+
+export class TableFactory extends UsxItemFactory<Table> {
+
+  static readonly instance = new TableFactory()
+
+  private constructor() {
+    super('table')
+  }
+
+  protected onInitialize() {
+    this.register(RowFactory.instance)
+    this.register(VerseStartFactory.instance)
+    this.register(VerseEndFactory.instance)
+  }
+
+  create(context: UsxContext, attributes: Attributes): Table {
+    return new Table(context, attributes)
+  }
+}
+
+class RowFactory extends UsxItemFactory<Row> {
+
+  static readonly instance = new RowFactory()
+
+  private constructor() {
+    super('row')
+  }
+
+  protected onInitialize() {
+    this.register(ContentFactory.instance)
+  }
+
+  create(context: UsxContext, attributes: Attributes): Row {
+    return new Row(context, attributes)
+  }
+}
+
+class ContentFactory extends UsxItemFactory<TableContent> {
+
+  static readonly instance = new ContentFactory()
+
+  private constructor() {
+    super('cell')
+  }
+
+  protected onInitialize() {
+    this.register(FootnoteFactory.instance)
+    this.register(CrossReferenceFactory.instance)
+    this.register(CharFactory.instance)
+    this.register(MilestoneFactory.instance)
+    this.register(FigureFactory.instance)
+    this.register(VerseStartFactory.instance)
+    this.register(VerseEndFactory.instance)
+    this.register(BreakFactory.instance)
+    this.register(TextFactory.instance)
+  }
+
+  create(context: UsxContext, attributes: Attributes): TableContent {
+    return new TableContent(context, attributes)
   }
 }

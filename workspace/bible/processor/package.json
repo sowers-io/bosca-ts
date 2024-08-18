@@ -1,15 +1,15 @@
 {
   "name": "@bosca/bible-processor",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.0.1",
   "scripts": {
     "build": "tsc --build",
     "build.watch": "tsc --build --watch",
+    "clean": "rm -Rf node_modules && rm -Rf dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "main": "dist/index.js",
-  "types": "src/index.ts",
+  "types": "src/index.d.ts",
   "type": "commonjs",
   "dependencies": {
     "decompress": "^4.2.1",
@@ -20,5 +20,15 @@
     "@types/decompress": "^4.2.7",
     "@types/sax": "^1.2.7",
     "@types/xml2js": "^0.4.14"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/sowers-io/bosca.git"
+  },
+  "author": "Kyle Brock <kyle@sowers.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sowers-io/bosca/issues"
+  },
+  "homepage": "https://github.com/sowers-io/bosca#readme"
 }

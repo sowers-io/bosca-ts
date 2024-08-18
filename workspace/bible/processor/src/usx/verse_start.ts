@@ -39,12 +39,12 @@ export class VerseStart implements UsxItem {
   }
 
   get htmlClass(): string {
-    return `${this.style} v${this.number}`
+    return this.style
   }
 
   get htmlAttributes(): { [p: string]: string } {
     return {
-      'data-number': this.number
+      'data-verse': this.number
     }
   }
 

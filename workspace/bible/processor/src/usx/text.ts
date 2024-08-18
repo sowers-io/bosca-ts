@@ -29,11 +29,12 @@ export class Text implements UsxItem {
   }
 
   get htmlClass(): string {
-    return 'verse v' + this.verse
+    return 'verse'
   }
 
   get htmlAttributes(): { [p: string]: string } {
-    return {}
+    if (!this.verse) return {}
+    return {'data-verse': this.verse}
   }
 
   toHtml(context: HtmlContext): string {

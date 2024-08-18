@@ -60,7 +60,7 @@ export class HtmlContext {
     let childHtml = ''
     if (text) {
       if (this.pretty) html += ' '.repeat(this.indent)
-      childHtml += item
+      childHtml += text
     } else if (item instanceof UsxItemContainer) {
       for (const child of item.items) {
         childHtml += child.toHtml(this)
@@ -230,7 +230,7 @@ export abstract class UsxContext {
 
   pushVerse(bookChapterUsfm: string, verse: VerseStart, position: Position) {
     this.verses.push(new UsxVerseItems(bookChapterUsfm + '.' + verse.number, verse, position))
-  }w
+  }
 
   popVerse(): UsxVerseItems {
     return this.verses.pop()!

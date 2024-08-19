@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql'
+import { GraphQLResolveInfo } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -37,6 +37,7 @@ export interface BookMetadata {
 
 export interface Chapter {
   __typename?: 'Chapter';
+  html?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   number?: Maybe<Scalars['String']['output']>;
@@ -82,6 +83,7 @@ export interface QueryVersesArgs {
 
 export interface Verse {
   __typename?: 'Verse';
+  html?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   number?: Maybe<Scalars['String']['output']>;
@@ -206,6 +208,7 @@ export type BookMetadataResolvers<ContextType = any, ParentType extends Resolver
 }>;
 
 export type ChapterResolvers<ContextType = any, ParentType extends ResolversParentTypes['Chapter'] = ResolversParentTypes['Chapter']> = ResolversObject<{
+  html?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   number?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -229,6 +232,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 }>;
 
 export type VerseResolvers<ContextType = any, ParentType extends ResolversParentTypes['Verse'] = ResolversParentTypes['Verse']> = ResolversObject<{
+  html?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   number?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;

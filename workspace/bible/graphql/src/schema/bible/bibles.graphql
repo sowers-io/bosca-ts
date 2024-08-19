@@ -55,6 +55,7 @@ type Chapter {
     name: String!
     number: String
 
+    html: String
     usx: String
 }
 
@@ -65,5 +66,6 @@ type Verse {
     number: String
 
     text: String
+    html: String
     usx: String
 }

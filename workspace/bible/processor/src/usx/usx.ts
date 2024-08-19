@@ -18,7 +18,7 @@ import { Attributes, UsxContext, UsxItemContainer, UsxItemFactory } from './item
 import { BookIdentification, BookIdentificationFactory } from './book_identification'
 import { BookHeader, BookHeaderFactory } from './book_header'
 import { BookTitle, BookTitleFactory } from './book_title'
-import { BookIntroduction, BookIntroductionFactory } from './book_introduction'
+import { BookIntroduction, BookIntroductionFactory, BookIntroductionTableFactory } from './book_introduction'
 import { BookIntroductionEndTitle, BookIntroductionEndTitleFactory } from './book_introduction_end_titles'
 import { BookChapterLabel, BookChapterLabelFactory } from './book_chapter_label'
 import { ChapterStart, ChapterStartFactory } from './chapter_start'
@@ -72,6 +72,7 @@ export class UsxFactory extends UsxItemFactory<Usx> {
     this.register(BookHeaderFactory.instance)
     this.register(BookTitleFactory.instance)
     this.register(BookIntroductionFactory.instance)
+    this.register(BookIntroductionTableFactory.instance)
     this.register(BookIntroductionEndTitleFactory.instance)
     this.register(BookChapterLabelFactory.instance)
     this.register(ChapterStartFactory.instance)

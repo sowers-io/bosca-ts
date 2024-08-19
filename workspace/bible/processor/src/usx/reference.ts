@@ -15,7 +15,7 @@
  */
 
 import { Attributes, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
-import { Text } from './text'
+import { Text, TextFactory } from './text'
 
 export class Reference extends UsxItemContainer<Text> {
 
@@ -40,6 +40,7 @@ export class ReferenceFactory extends UsxItemFactory<Reference> {
   }
 
   protected onInitialize() {
+    this.register(TextFactory.instance)
   }
 
   create(context: UsxContext, attributes: Attributes): Reference {

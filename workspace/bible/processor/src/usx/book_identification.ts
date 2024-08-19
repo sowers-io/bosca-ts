@@ -36,7 +36,7 @@ export class BookIdentification extends UsxItemContainer<Text> {
     return {
       'data-id': this.id,
       'data-code': this.code,
-      ...super.htmlAttributes
+      ...super.htmlAttributes,
     }
   }
 }

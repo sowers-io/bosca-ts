@@ -21,7 +21,7 @@ import {
   NegateFactoryFilter,
   UsxContext,
   UsxItem,
-  UsxItemFactory
+  UsxItemFactory,
 } from './item'
 import { Position } from './position'
 
@@ -52,7 +52,7 @@ export class ChapterStart implements UsxItem {
     return {}
   }
 
-  toHtml(context: HtmlContext): string {
+  toHtml(_: HtmlContext): string {
     return ''
   }
 

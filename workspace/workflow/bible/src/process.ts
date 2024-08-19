@@ -23,7 +23,9 @@ import {
   ContentService,
   IdRequest,
   Source,
-  WorkflowJob, FindCollectionRequest, MetadataRelationship, AddCollectionItemRequest,
+  WorkflowJob,
+  FindCollectionRequest,
+  AddCollectionItemRequest,
 } from '@bosca/protobufs'
 import {
   Job,
@@ -34,9 +36,12 @@ import {
   toArrayBuffer,
   addCollections,
   addMetadatas,
+  uploadAll,
+  uploadSupplementary,
 } from '@bosca/workflow-activities-api'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { useServiceAccountClient } from '@bosca/common'
+import { HtmlContext } from '@bosca/bible-processor'
 
 export class ProcessBibleActivity extends Activity {
   readonly downloader: Downloader
@@ -161,11 +166,14 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
 
   private async createChapters(source: Source, metadata: BibleMetadata, bookCollection: Collection, book: Book) {
     const requests: AddMetadataRequest[] = []
-    const buffers: ArrayBuffer[] = []
+    const usxChapters: ArrayBuffer[] = []
+    const htmlChapters: ArrayBuffer[] = []
     let order = 0
     for (const chapter of book.chapters) {
       const buffer = toArrayBuffer(book.raw.substring(chapter.position.start, chapter.position.end))
-      buffers.push(buffer)
+      usxChapters.push(buffer)
+      const chapterHtml = toArrayBuffer(chapter.toHtml(new HtmlContext(false, 0, true)))
+      htmlChapters.push(chapterHtml)
       requests.push(
         new AddMetadataRequest({
           collection: bookCollection.id,
@@ -191,8 +199,20 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
         }),
       )
     }
-
-    await addMetadatas(requests, buffers)
+    const responses = await addMetadatas(requests)
+    for (let i = 0; i < responses.id.length; i++) {
+      await uploadSupplementary(
+        responses.id[i].id,
+        'Chapter HTML',
+        'text/html',
+        book.chapters[i].usfm,
+        source.id,
+        undefined,
+        undefined,
+        htmlChapters[i],
+      )
+    }
+    await uploadAll(responses, usxChapters)
   }
 
   private async findNextVersion(metadata: BibleMetadata): Promise<number> {

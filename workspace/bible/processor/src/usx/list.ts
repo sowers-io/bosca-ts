@@ -34,12 +34,12 @@ type ListType = Reference | Footnote | CrossReference | Char | ListChar | Milest
 export class List extends UsxItemContainer<ListType> {
 
   style: ListStyle
-  vid: string
+  vid: string | null
 
   constructor(context: UsxContext, attributes: Attributes) {
     super(context, attributes)
     this.style = attributes.STYLE.toString() as ListStyle
-    this.vid = attributes.VID.toString()
+    this.vid = attributes.VID?.toString() || null
   }
 
   get htmlClass(): string {

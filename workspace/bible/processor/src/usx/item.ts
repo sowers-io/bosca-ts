@@ -17,6 +17,7 @@
 import { Tag, QualifiedTag, QualifiedAttribute } from 'sax'
 import { Position } from './position'
 import { VerseStart } from './verse_start'
+import { UsxNode } from '../book_processor'
 
 export type Attributes = { [key: string]: string | QualifiedAttribute }
 
@@ -47,7 +48,7 @@ export class HtmlContext {
     if (this.pretty) html += ' '.repeat(this.indent)
     html += '<' + tag
     let attrs = {
-      ...item.htmlAttributes
+      ...item.htmlAttributes,
     }
     if (item.htmlClass != '') attrs['class'] = item.htmlClass
     for (const key in attrs) {
@@ -131,7 +132,7 @@ export abstract class UsxItemContainer<T extends UsxItem> implements UsxItem {
 }
 
 export interface ItemFactoryFilter {
-  supports(context: UsxContext, attributes: Attributes): boolean
+  supports(context: UsxContext, attributes: Attributes, progression: number | null): boolean
 }
 
 export class StyleFactoryFilter<T> implements ItemFactoryFilter {
@@ -141,8 +142,11 @@ export class StyleFactoryFilter<T> implements ItemFactoryFilter {
     this.styles = styles
   }
 
-  supports(context: UsxContext, attributes: Attributes): boolean {
+  supports(context: UsxContext, attributes: Attributes, progression: number | null): boolean {
     if (!attributes.STYLE) return false
+    if (progression != null) {
+      return this.styles[progression] === attributes.STYLE.toString()
+    }
     return this.styles.includes(attributes.STYLE.toString() as T)
   }
 }
@@ -175,8 +179,8 @@ export class NegateFactoryFilter implements ItemFactoryFilter {
     this.filter = filter
   }
 
-  supports(context: UsxContext, attributes: Attributes): boolean {
-    return !this.filter.supports(context, attributes)
+  supports(context: UsxContext, attributes: Attributes, progression: number | null): boolean {
+    return !this.filter.supports(context, attributes, progression)
   }
 }
 
@@ -248,8 +252,8 @@ export abstract class UsxContext {
     return verses.verse
   }
 
-  supports(factory: UsxItemFactory<any>, tag: UsxTag): boolean {
-    return factory.supports(this, tag.attributes)
+  supports(factory: UsxItemFactory<any>, parent: UsxNode, tag: UsxTag, progression: number | null = null): boolean {
+    return factory.supports(this, tag.attributes, progression)
   }
 }
 
@@ -288,18 +292,18 @@ export abstract class UsxItemFactory<T extends UsxItem> {
     factories.push(factory)
   }
 
-  supports(context: UsxContext, attributes: Attributes): boolean {
-    return this.filter?.supports(context, attributes) ?? true
+  supports(context: UsxContext, attributes: Attributes, progression: number | null): boolean {
+    return this.filter?.supports(context, attributes, progression) ?? true
   }
 
   abstract create(context: UsxContext, attributes: Attributes): T
 
-  findChildFactory(context: UsxContext, tag: UsxTag): UsxItemFactory<any> {
+  findChildFactory(context: UsxContext, parent: UsxNode, tag: UsxTag): UsxItemFactory<any> {
     const factories = this.factories[tag.name.toLowerCase()]
     if (!factories) {
       throw new Error('unsupported tag: ' + tag.name + ' in ' + this.tagName)
     }
-    const supported = factories.filter((factory) => context.supports(factory, tag))
+    const supported = factories.filter((factory) => context.supports(factory, parent, tag))
     if (supported.length === 0) {
       throw new Error('zero supported items')
     } else if (supported.length > 1) {

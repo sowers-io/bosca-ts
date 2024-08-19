@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Char } from './char'
+import { Char, CharFactory } from './char'
 import { Reference } from './reference'
 import { Text, TextFactory } from './text'
 import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
@@ -49,6 +49,7 @@ export class FootnoteCharFactory extends UsxItemFactory<FootnoteChar> {
 
   protected onInitialize() {
     this.register(TextFactory.instance)
+    this.register(CharFactory.instance)
   }
 
   create(context: UsxContext, attributes: Attributes): FootnoteChar {

@@ -27,20 +27,20 @@ test('USX Processor', async () => {
   const book = processor.books[0]
   const chapter = book.chapters[0]
 
-  // console.log(chapter.toString())
+  console.log(chapter.toString())
 
-  // console.log(book.raw.substring(chapter.position.start, chapter.position.end))
+  console.log(book.raw.substring(chapter.position.start, chapter.position.end))
 })
 
 test('USX Processor', async () => {
   const processor = new USXProcessor()
   await processor.process('../../../example-data/asv.zip')
 
-  // console.log(processor.metadata)
+  console.log(processor.metadata)
 
   const book = processor.books[0]
   const chapter = book.chapters[0]
-  // console.log(chapter.toHtml(new HtmlContext(true, 0)))
+  console.log(chapter.toHtml(new HtmlContext(true, 0, true)))
 
-  console.log(chapter.verseItems["GEN.1.6"][0].toHtml(new HtmlContext(true, 0, true)))
+  console.log(chapter.verseItems['GEN.1.6'][0].toHtml(new HtmlContext(true, 0, true)))
 })

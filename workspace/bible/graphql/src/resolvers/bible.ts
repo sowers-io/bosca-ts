@@ -153,12 +153,28 @@ export const resolvers: Resolvers<BibleRequestContext> = {
     },
   },
   Chapter: {
-    usx: async (verse, args, context) => {
+    html: async (chapter, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const url = await service.getMetadataSupplementaryDownloadUrl(
+          new SupplementaryIdRequest({
+            id: chapter.id,
+            key: 'html',
+          }),
+          {
+            headers: getGraphQLHeaders(context),
+          },
+        )
+        const response = await executeHttpRequest(url)
+        return response.toString()
+      })
+    },
+    usx: async (chapter, args, context) => {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const url = await service.getMetadataDownloadUrl(
           new IdRequest({
-            id: verse.id,
+            id: chapter.id,
           }),
           {
             headers: getGraphQLHeaders(context),
@@ -170,6 +186,22 @@ export const resolvers: Resolvers<BibleRequestContext> = {
     },
   },
   Verse: {
+    html: async (verse, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const url = await service.getMetadataSupplementaryDownloadUrl(
+          new SupplementaryIdRequest({
+            id: verse.id,
+            key: 'html',
+          }),
+          {
+            headers: getGraphQLHeaders(context),
+          },
+        )
+        const response = await executeHttpRequest(url)
+        return response.toString()
+      })
+    },
     text: async (verse, args, context) => {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)

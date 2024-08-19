@@ -24,6 +24,7 @@ import { Footnote, FootnoteFactory } from './footnote'
 import { CrossReference, CrossReferenceFactory } from './cross_reference'
 import { Char, CharFactory } from './char'
 import { IntroChar, IntroCharFactory } from './intro_char'
+import { TableFactory } from './table'
 
 type BookIntroductionType = Reference | Footnote | CrossReference | Char | IntroChar | Milestone | Figure | Text
 
@@ -57,6 +58,23 @@ export class BookIntroductionFactory extends UsxItemFactory<BookIntroduction> {
     this.register(MilestoneFactory.instance)
     this.register(FigureFactory.instance)
     this.register(TextFactory.instance)
+  }
+
+  create(context: UsxContext, attributes: Attributes): BookIntroduction {
+    return new BookIntroduction(context, attributes)
+  }
+}
+
+export class BookIntroductionTableFactory extends UsxItemFactory<BookIntroduction> {
+
+  static readonly instance = new BookIntroductionTableFactory()
+
+  private constructor() {
+    super('table', new StyleFactoryFilter(BookIntroductionStyles))
+  }
+
+  protected onInitialize() {
+    this.register(TableFactory.instance)
   }
 
   create(context: UsxContext, attributes: Attributes): BookIntroduction {

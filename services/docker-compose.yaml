@@ -37,7 +37,7 @@ services:
       - net1
 
   meilisearch:
-    image: getmeili/meilisearch:v1.7
+    image: getmeili/meilisearch:v1.9.0
     restart: always
     ports:
       - 7700:7700
@@ -285,20 +285,20 @@ services:
     networks:
       - net1
 
-#  ollama:
-#    image: ollama/ollama:latest
-#    ports:
-#      - 11434:11434
-#    environment:
-#      OLLAMA_NUM_PARALLEL: 4
-#      OLLAMA_MAX_LOADED_MODELS: 4
-#      OLLAMA_DEBUG: 1
-#    volumes:
-#      - ./ollama/ollama:/root/.ollama
-#    tty: true
-#    restart: always
-#    networks:
-#      - net1
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    environment:
+      OLLAMA_NUM_PARALLEL: 4
+      OLLAMA_MAX_LOADED_MODELS: 4
+      OLLAMA_DEBUG: 1
+    volumes:
+      - ./ollama/ollama:/root/.ollama
+    tty: true
+    restart: always
+    networks:
+      - net1
 #    deploy:
 #      resources:
 #        reservations:
@@ -346,6 +346,7 @@ volumes:
   minio-data3-2:
   minio-data4-1:
   minio-data4-2:
+  ollama:
   qdrant:
   meilisearch:
   dragonflydata:

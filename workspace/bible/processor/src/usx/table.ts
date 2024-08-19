@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, HtmlContext, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, HtmlContext, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { Footnote, FootnoteFactory } from './footnote'
 import { Char, CharFactory } from './char'
 import { Milestone, MilestoneFactory } from './milestone'
@@ -30,8 +30,8 @@ export class Table extends UsxItemContainer<Row> {
 
   vid: string
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.vid = attributes.VID.toString()
   }
 
@@ -50,8 +50,8 @@ export class Row extends UsxItemContainer<RowType> {
 
   style: string
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString()
   }
 
@@ -71,8 +71,8 @@ export class TableContent extends UsxItemContainer<TableContentType> {
   align: string
   colspan: string
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString()
     this.align = attributes.ALIGN.toString()
     this.colspan = attributes.COLSPAN?.toString()
@@ -101,8 +101,8 @@ export class TableFactory extends UsxItemFactory<Table> {
     this.register(VerseEndFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): Table {
-    return new Table(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): Table {
+    return new Table(context, parent, attributes)
   }
 }
 
@@ -118,8 +118,8 @@ class RowFactory extends UsxItemFactory<Row> {
     this.register(ContentFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): Row {
-    return new Row(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): Row {
+    return new Row(context, parent, attributes)
   }
 }
 
@@ -143,7 +143,7 @@ class ContentFactory extends UsxItemFactory<TableContent> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): TableContent {
-    return new TableContent(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): TableContent {
+    return new TableContent(context, parent, attributes)
   }
 }

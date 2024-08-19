@@ -23,11 +23,27 @@ export type Attributes = { [key: string]: string | QualifiedAttribute }
 
 export type UsxTag = Tag | QualifiedTag
 
+export class StringContext {
+  readonly includeVerseNumbers: boolean
+  readonly includeNewLines: boolean
+  readonly includeFootNotes: boolean
+  readonly includeCrossReferences: boolean
+
+  constructor(includeVerseNumbers: boolean = false, includeFootNotes: boolean = false, includeCrossReferences: boolean = false, includeNewLines: boolean = false) {
+    this.includeVerseNumbers = includeVerseNumbers
+    this.includeFootNotes = includeFootNotes
+    this.includeNewLines = includeNewLines
+    this.includeCrossReferences = includeCrossReferences
+  }
+
+  static readonly defaultContext = new StringContext()
+}
+
 export class HtmlContext {
 
-  pretty: boolean
-  indent: number
-  includeVerseNumbers: boolean
+  readonly pretty: boolean
+  readonly includeVerseNumbers: boolean
+  private indent: number
 
   constructor(pretty: boolean, indent: number, includeVerseNumbers: boolean) {
     this.pretty = pretty
@@ -94,7 +110,7 @@ export interface UsxItem {
 
   toHtml(context: HtmlContext): string
 
-  toString(): string
+  toString(context: StringContext | undefined): string
 }
 
 export abstract class UsxItemContainer<T extends UsxItem> implements UsxItem {
@@ -103,9 +119,9 @@ export abstract class UsxItemContainer<T extends UsxItem> implements UsxItem {
   readonly position: Position
   readonly verse: string | null
 
-  protected constructor(context: UsxContext, _: Attributes) {
+  protected constructor(context: UsxContext, parent: UsxItem | null, _: Attributes) {
     this.position = context.position
-    this.verse = context.addVerseItem(this)
+    this.verse = context.addVerseItem(parent, this)
   }
 
   abstract get htmlClass(): string
@@ -122,12 +138,12 @@ export abstract class UsxItemContainer<T extends UsxItem> implements UsxItem {
     return context.render('div', this)
   }
 
-  toString(): string {
+  toString(context: StringContext | undefined = undefined): string {
     let verseContent = ''
     for (const item of this.items) {
-      verseContent += item.toString()
+      verseContent += item.toString(context)
     }
-    return verseContent
+    return verseContent.trim()
   }
 }
 
@@ -213,12 +229,12 @@ export class UsxVerseItems {
     return context.render('div', this)
   }
 
-  toString(): string {
+  toString(context: StringContext | undefined = undefined): string {
     let verseContent = ''
     for (const item of this.items) {
-      verseContent += item.toString()
+      verseContent += item.toString(context)
     }
-    return verseContent
+    return verseContent.trim()
   }
 }
 
@@ -245,10 +261,12 @@ export abstract class UsxContext {
     return this.verses[this.verses.length - 1].verse
   }
 
-  addVerseItem(item: UsxItem): string | null {
+  addVerseItem(parent: UsxItem | null, item: UsxItem): string | null {
     if (this.verses.length === 0) return null
     const verses = this.verses[this.verses.length - 1]
-    verses.addItem(item)
+    if (!parent || parent.verse != verses.verse) {
+      verses.addItem(item)
+    }
     return verses.verse
   }
 
@@ -296,7 +314,7 @@ export abstract class UsxItemFactory<T extends UsxItem> {
     return this.filter?.supports(context, attributes, progression) ?? true
   }
 
-  abstract create(context: UsxContext, attributes: Attributes): T
+  abstract create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): T
 
   findChildFactory(context: UsxContext, parent: UsxNode, tag: UsxTag): UsxItemFactory<any> {
     const factories = this.factories[tag.name.toLowerCase()]

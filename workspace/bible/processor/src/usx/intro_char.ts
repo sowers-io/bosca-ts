@@ -19,7 +19,7 @@ import { Milestone } from './milestone'
 import { Footnote } from './footnote'
 import { Break } from './break'
 import { Text } from './text'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { IntroCharStyle, IntroCharStyles } from './styles'
 import { Char } from './char'
 
@@ -31,8 +31,8 @@ export class IntroChar extends UsxItemContainer<IntroCharType> {
 
   // char.closed?
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as IntroCharStyle
   }
 
@@ -51,7 +51,7 @@ export class IntroCharFactory extends UsxItemFactory<IntroChar> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): IntroChar {
-    return new IntroChar(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): IntroChar {
+    return new IntroChar(context, parent, attributes)
   }
 }

@@ -26,12 +26,12 @@ export class Milestone implements UsxItem {
   readonly position: Position
   readonly verse: string | null
 
-  constructor(context: UsxContext, attributes: Attributes) {
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
     this.position = context.position
     this.style = attributes.STYLE.toString()
     this.sid = attributes.SID.toString()
     this.eid = attributes.EID.toString()
-    this.verse = context.addVerseItem(this)
+    this.verse = context.addVerseItem(parent, this)
   }
 
   get htmlClass(): string {
@@ -62,7 +62,7 @@ export class MilestoneFactory extends UsxItemFactory<Milestone> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): Milestone {
-    return new Milestone(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): Milestone {
+    return new Milestone(context, parent, attributes)
   }
 }

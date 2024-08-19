@@ -35,8 +35,8 @@ export class ChapterStart implements UsxItem {
 
   readonly verse: string | null
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    this.verse = context.addVerseItem(this)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    this.verse = context.addVerseItem(parent, this)
     this.number = attributes.NUMBER.toString()
     this.sid = attributes.SID.toString()
     this.altnumber = attributes.ALTNUMBER?.toString()
@@ -72,7 +72,7 @@ export class ChapterStartFactory extends UsxItemFactory<ChapterStart> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): ChapterStart {
-    return new ChapterStart(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): ChapterStart {
+    return new ChapterStart(context, parent, attributes)
   }
 }

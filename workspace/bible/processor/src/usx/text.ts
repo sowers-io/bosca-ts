@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, HtmlContext, UsxContext, UsxItem, UsxItemFactory } from './item'
+import { Attributes, HtmlContext, StringContext, UsxContext, UsxItem, UsxItemFactory } from './item'
 import { Position } from './position'
 
 export class Text implements UsxItem {
@@ -23,9 +23,9 @@ export class Text implements UsxItem {
   readonly position: Position
   readonly verse: string | null
 
-  constructor(context: UsxContext) {
+  constructor(context: UsxContext, parent: UsxItem | null) {
     this.position = context.position
-    this.verse = context.addVerseItem(this)
+    this.verse = context.addVerseItem(parent, this)
   }
 
   get htmlClass(): string {
@@ -34,7 +34,7 @@ export class Text implements UsxItem {
 
   get htmlAttributes(): { [p: string]: string } {
     if (!this.verse) return {}
-    return {'data-verse': this.verse}
+    return { 'data-verse': this.verse }
   }
 
   toHtml(context: HtmlContext): string {
@@ -42,7 +42,9 @@ export class Text implements UsxItem {
     return context.render('span', this, this.text)
   }
 
-  toString(): string {
+  toString(context: StringContext | undefined = undefined): string {
+    const ctx = context || StringContext.defaultContext
+    if (!ctx.includeNewLines) return this.text.replace(/\r?\n/g, '')
     return this.text
   }
 }
@@ -58,7 +60,7 @@ export class TextFactory extends UsxItemFactory<Text> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, _: Attributes): Text {
-    return new Text(context)
+  create(context: UsxContext, parent: UsxItem | null, _: Attributes): Text {
+    return new Text(context, parent)
   }
 }

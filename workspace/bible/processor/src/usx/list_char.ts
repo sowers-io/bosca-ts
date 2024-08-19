@@ -19,7 +19,7 @@ import { Milestone, MilestoneFactory } from './milestone'
 import { Footnote, FootnoteFactory } from './footnote'
 import { Break, BreakFactory } from './break'
 import { Text, TextFactory } from './text'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { ListCharStyle, ListCharStyles } from './styles'
 import { Char, CharFactory } from './char'
 
@@ -31,8 +31,8 @@ export class ListChar extends UsxItemContainer<ListCharType> {
   // char.link?
   // char.closed?
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as ListCharStyle
   }
 
@@ -58,7 +58,7 @@ export class ListCharFactory extends UsxItemFactory<ListChar> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): ListChar {
-    return new ListChar(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): ListChar {
+    return new ListChar(context, parent, attributes)
   }
 }

@@ -98,7 +98,7 @@ class Executor extends BookExecutor {
           new AddMetadataRequest({
             collection: collection.id,
             metadata: new Metadata({
-              name: book.name.short + ' ' + chapter.number + ':' + verse.verse,
+              name: book.name.long + ' ' + chapter.number + ':' + verse.verse,
               contentType: 'bible/usx-verse',
               languageTag: metadata.languageTag,
               contentLength: protoInt64.parse(buffer.byteLength),

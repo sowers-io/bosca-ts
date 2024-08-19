@@ -11,6 +11,14 @@ mc policy download boscaminio/bosca
 echo "Setting up search index..."
 
 curl \
+  -X PATCH 'http://meilisearch:7700/experimental-features/' \
+  -H "Authorization: Bearer p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M" \
+  -H 'Content-Type: application/json'  \
+  --data-binary '{
+    "vectorStore": true
+  }'
+
+curl \
   -X POST 'http://meilisearch:7700/keys' \
   -H 'Authorization: Bearer p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M' \
   -H 'Content-Type: application/json' \
@@ -40,7 +48,7 @@ curl \
 echo "Pull llm..."
 
 curl http://ollama:11434/api/pull -d "{
-  \"name\": \"$BOSCA_OLLAMA_MODEL\"
+  \"name\": \"all-minilm\"
 }"
 
 echo "...Done"

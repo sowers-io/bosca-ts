@@ -15,7 +15,7 @@
  */
 
 import { SidebarStyle } from './styles'
-import { Attributes, UsxContext, UsxItemContainer } from './item'
+import { Attributes, UsxContext, UsxItem, UsxItemContainer } from './item'
 import { Paragraph } from './paragraph'
 import { List } from './list'
 import { Table } from './table'
@@ -29,8 +29,8 @@ export class Sidebar extends UsxItemContainer<SidebarType> {
   style: SidebarStyle
   category?: String
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as SidebarStyle
     this.category = attributes.CATEGORY?.toString()
   }

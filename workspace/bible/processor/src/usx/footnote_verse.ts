@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import {
+  Attributes,
+  StringContext,
+  StyleFactoryFilter,
+  UsxContext,
+  UsxItem,
+  UsxItemContainer,
+  UsxItemFactory,
+} from './item'
 import { Text } from './text'
 import { FootnoteVerseStyle, FootnoteVerseStyles } from './styles'
 
@@ -22,13 +30,19 @@ export class FootnoteVerse extends UsxItemContainer<Text> {
 
   style: FootnoteVerseStyle
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as FootnoteVerseStyle
   }
 
   get htmlClass(): string {
     return this.style
+  }
+
+  toString(context: StringContext | undefined = undefined): string {
+    const ctx = context || StringContext.defaultContext
+    if (!ctx.includeFootNotes) return ''
+    return super.toString(context)
   }
 }
 
@@ -41,7 +55,7 @@ export class FootnoteVerseFactory extends UsxItemFactory<FootnoteVerse> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): FootnoteVerse {
-    return new FootnoteVerse(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): FootnoteVerse {
+    return new FootnoteVerse(context, parent, attributes)
   }
 }

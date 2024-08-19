@@ -23,10 +23,10 @@ export class VerseEnd implements UsxItem {
   readonly verse: string | null
   readonly position: Position
 
-  constructor(context: UsxContext, attributes: Attributes) {
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
     this.position = context.position
     this.eid = attributes.EID.toString()
-    this.verse = context.verse
+    this.verse = context.addVerseItem(parent, this)
   }
 
   get htmlClass(): string {
@@ -37,7 +37,7 @@ export class VerseEnd implements UsxItem {
     return {}
   }
 
-  toHtml(context: HtmlContext): string {
+  toHtml(_: HtmlContext): string {
     return ''
   }
 
@@ -57,7 +57,7 @@ export class VerseEndFactory extends UsxItemFactory<VerseEnd> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): VerseEnd {
-    return new VerseEnd(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): VerseEnd {
+    return new VerseEnd(context, parent, attributes)
   }
 }

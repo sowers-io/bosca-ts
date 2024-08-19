@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { BookIdentification, BookIdentificationFactory } from './book_identification'
 import { BookHeader, BookHeaderFactory } from './book_header'
 import { BookTitle, BookTitleFactory } from './book_title'
@@ -42,8 +42,8 @@ type UsxType =
 
 export class Usx extends UsxItemContainer<UsxType> {
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
   }
 
   get htmlClass(): string {
@@ -86,7 +86,7 @@ export class UsxFactory extends UsxItemFactory<Usx> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): Usx {
-    return new Usx(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): Usx {
+    return new Usx(context, parent, attributes)
   }
 }

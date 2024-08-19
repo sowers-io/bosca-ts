@@ -15,7 +15,7 @@
  */
 
 import { CharStyle, CharStyles } from './styles'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { Footnote, FootnoteFactory } from './footnote'
 import { Break, BreakFactory } from './break'
 import { Text, TextFactory } from './text'
@@ -30,8 +30,8 @@ export class Char extends UsxItemContainer<CharType> {
   //char.link?,
   //char.closed?,
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as CharStyle
   }
 
@@ -57,7 +57,7 @@ export class CharFactory extends UsxItemFactory<Char> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): Char {
-    return new Char(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): Char {
+    return new Char(context, parent, attributes)
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, HtmlContext, StyleFactoryFilter, UsxContext, UsxItem, UsxItemFactory } from './item'
+import { Attributes, HtmlContext, StringContext, StyleFactoryFilter, UsxContext, UsxItem, UsxItemFactory } from './item'
 import { VerseStartStyle, VerseStartStyles } from './styles'
 import { Position } from './position'
 
@@ -28,14 +28,14 @@ export class VerseStart implements UsxItem {
   readonly verse: string | null
   readonly position: Position
 
-  constructor(context: UsxContext, attributes: Attributes) {
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
     this.position = context.position
     this.style = attributes.STYLE.toString() as VerseStartStyle
     this.number = attributes.NUMBER.toString()
     this.altnumber = attributes.ALTNUMBER?.toString()
     this.pubnumber = attributes.PUBNUMBER?.toString()
     this.sid = attributes.SID.toString()
-    this.verse = context.addVerseItem(this)
+    this.verse = context.addVerseItem(parent, this)
   }
 
   get htmlClass(): string {
@@ -44,7 +44,7 @@ export class VerseStart implements UsxItem {
 
   get htmlAttributes(): { [p: string]: string } {
     return {
-      'data-verse': this.number
+      'data-verse': this.number,
     }
   }
 
@@ -53,8 +53,10 @@ export class VerseStart implements UsxItem {
     return ''
   }
 
-  toString(): string {
-    return this.number + '. '
+  toString(context: StringContext | undefined = undefined): string {
+    const ctx = context || StringContext.defaultContext
+    if (ctx.includeVerseNumbers) return this.number + '. '
+    return ''
   }
 }
 
@@ -69,7 +71,7 @@ export class VerseStartFactory extends UsxItemFactory<VerseStart> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): VerseStart {
-    return new VerseStart(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): VerseStart {
+    return new VerseStart(context, parent, attributes)
   }
 }

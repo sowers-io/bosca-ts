@@ -17,7 +17,15 @@
 import { Char, CharFactory } from './char'
 import { Reference } from './reference'
 import { Text, TextFactory } from './text'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import {
+  Attributes,
+  StringContext,
+  StyleFactoryFilter,
+  UsxContext,
+  UsxItem,
+  UsxItemContainer,
+  UsxItemFactory,
+} from './item'
 import { FootnoteCharStyle, FootnoteCharStyles } from './styles'
 import { FootnoteVerse } from './footnote_verse'
 
@@ -29,13 +37,19 @@ export class FootnoteChar extends UsxItemContainer<FootnoteCharType> {
   // char.link?,
   // char.closed?,
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as FootnoteCharStyle
   }
 
   get htmlClass(): string {
     return this.style
+  }
+
+  toString(context: StringContext | undefined = undefined): string {
+    const ctx = context || StringContext.defaultContext
+    if (!ctx.includeFootNotes) return ''
+    return super.toString(context)
   }
 }
 
@@ -52,7 +66,7 @@ export class FootnoteCharFactory extends UsxItemFactory<FootnoteChar> {
     this.register(CharFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): FootnoteChar {
-    return new FootnoteChar(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): FootnoteChar {
+    return new FootnoteChar(context, parent, attributes)
   }
 }

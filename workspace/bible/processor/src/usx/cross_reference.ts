@@ -16,7 +16,15 @@
 
 import { CrossReferenceChar, CrossReferenceCharFactory } from './cross_reference_char'
 import { Text, TextFactory } from './text'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import {
+  Attributes,
+  StringContext,
+  StyleFactoryFilter,
+  UsxContext,
+  UsxItem,
+  UsxItemContainer,
+  UsxItemFactory,
+} from './item'
 import { CrossReferenceStyle, CrossReferenceStyles } from './styles'
 
 type CrossReferenceType = CrossReferenceChar | Text
@@ -26,8 +34,8 @@ export class CrossReference extends UsxItemContainer<CrossReferenceType> {
   style: CrossReferenceStyle
   caller: string
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as CrossReferenceStyle
     this.caller = attributes.CALLER.toString()
   }
@@ -37,7 +45,13 @@ export class CrossReference extends UsxItemContainer<CrossReferenceType> {
   }
 
   get htmlAttributes(): { [p: string]: string } {
-    return {'data-caller': this.caller, ...super.htmlAttributes}
+    return { 'data-caller': this.caller, ...super.htmlAttributes }
+  }
+
+  toString(context: StringContext | undefined = undefined): string {
+    const ctx = context || StringContext.defaultContext
+    if (!ctx.includeCrossReferences) return ''
+    return super.toString(context)
   }
 }
 
@@ -54,7 +68,7 @@ export class CrossReferenceFactory extends UsxItemFactory<CrossReference> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): CrossReference {
-    return new CrossReference(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): CrossReference {
+    return new CrossReference(context, parent, attributes)
   }
 }

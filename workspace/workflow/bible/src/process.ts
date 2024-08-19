@@ -116,7 +116,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
         new AddCollectionRequest({
           parent: bible.id,
           collection: new Collection({
-            name: book.name.short + ' Chapters',
+            name: book.name.long + ' Chapters',
             attributes: attributes,
           }),
         }),
@@ -127,7 +127,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
         new AddMetadataRequest({
           collection: bible.id,
           metadata: new Metadata({
-            name: book.name.short,
+            name: book.name.long,
             contentType: 'bible/usx-book',
             languageTag: metadata.language.iso,
             contentLength: protoInt64.parse(buffer.byteLength),
@@ -178,7 +178,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
         new AddMetadataRequest({
           collection: bookCollection.id,
           metadata: new Metadata({
-            name: book.name.short + ' ' + chapter.number,
+            name: book.name.long + ' ' + chapter.number,
             contentType: 'bible/usx-chapter',
             contentLength: protoInt64.parse(buffer.byteLength),
             languageTag: metadata.language.iso,

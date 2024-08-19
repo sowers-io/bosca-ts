@@ -15,15 +15,15 @@
  */
 
 import { BookIdentificationCode, BookIdentificationCodes } from '../identification'
-import { Attributes, CodeFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, CodeFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { Text, TextFactory } from './text'
 
 export class BookIdentification extends UsxItemContainer<Text> {
   id!: string
   code: BookIdentificationCode
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.id = attributes.STYLE.toString()
     this.code = attributes.CODE.toString() as BookIdentificationCode
   }
@@ -53,7 +53,7 @@ export class BookIdentificationFactory extends UsxItemFactory<BookIdentification
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): BookIdentification {
-    return new BookIdentification(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): BookIdentification {
+    return new BookIdentification(context, parent, attributes)
   }
 }

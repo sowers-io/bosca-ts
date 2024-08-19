@@ -20,7 +20,7 @@ import { Char, CharFactory } from './char'
 import { Milestone, MilestoneFactory } from './milestone'
 import { Break, BreakFactory } from './break'
 import { Text, TextFactory } from './text'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { BookIntroductionEndTitleStyle, BookIntroductionEndTitleStyles } from './styles'
 
 
@@ -29,8 +29,8 @@ type BookIntroductionEndTitleType = Footnote | CrossReference | Char | Milestone
 export class BookIntroductionEndTitle extends UsxItemContainer<BookIntroductionEndTitleType> {
   style: BookIntroductionEndTitleStyle
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as BookIntroductionEndTitleStyle
   }
 
@@ -56,7 +56,7 @@ export class BookIntroductionEndTitleFactory extends UsxItemFactory<BookIntroduc
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): BookIntroductionEndTitle {
-    return new BookIntroductionEndTitle(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): BookIntroductionEndTitle {
+    return new BookIntroductionEndTitle(context, parent, attributes)
   }
 }

@@ -16,7 +16,15 @@
 
 import { FootnoteStyle } from './styles'
 import { Text, TextFactory } from './text'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import {
+  Attributes,
+  StringContext,
+  StyleFactoryFilter,
+  UsxContext,
+  UsxItem,
+  UsxItemContainer,
+  UsxItemFactory,
+} from './item'
 import { FootnoteStyles } from './styles'
 import { FootnoteChar, FootnoteCharFactory } from './footnote_char'
 
@@ -27,8 +35,8 @@ export class Footnote extends UsxItemContainer<FootnoteItem> {
   caller: string
   category?: string
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as FootnoteStyle
     this.caller = attributes.CALLER.toString()
     this.category = attributes.CATEGORY?.toString()
@@ -36,6 +44,12 @@ export class Footnote extends UsxItemContainer<FootnoteItem> {
 
   get htmlClass(): string {
     return this.style
+  }
+
+  toString(context: StringContext | undefined = undefined): string {
+    const ctx = context || StringContext.defaultContext
+    if (!ctx.includeFootNotes) return ''
+    return super.toString(context)
   }
 }
 
@@ -52,8 +66,8 @@ export class FootnoteFactory extends UsxItemFactory<Footnote> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): Footnote {
-    return new Footnote(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): Footnote {
+    return new Footnote(context, parent, attributes)
   }
 }
 

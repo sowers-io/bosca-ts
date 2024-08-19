@@ -15,7 +15,7 @@
  */
 
 import { BookIntroductionStyle, BookIntroductionStyles } from './styles'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { Text, TextFactory } from './text'
 import { Milestone, MilestoneFactory } from './milestone'
 import { Figure, FigureFactory } from './figure'
@@ -31,8 +31,8 @@ type BookIntroductionType = Reference | Footnote | CrossReference | Char | Intro
 export class BookIntroduction extends UsxItemContainer<BookIntroductionType> {
   style: BookIntroductionStyle
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as BookIntroductionStyle
   }
 
@@ -60,8 +60,8 @@ export class BookIntroductionFactory extends UsxItemFactory<BookIntroduction> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): BookIntroduction {
-    return new BookIntroduction(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): BookIntroduction {
+    return new BookIntroduction(context, parent, attributes)
   }
 }
 
@@ -77,7 +77,7 @@ export class BookIntroductionTableFactory extends UsxItemFactory<BookIntroductio
     this.register(TableFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): BookIntroduction {
-    return new BookIntroduction(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): BookIntroduction {
+    return new BookIntroduction(context, parent, attributes)
   }
 }

@@ -24,9 +24,9 @@ export class ChapterEnd implements UsxItem {
 
   readonly verse: string | null
 
-  constructor(context: UsxContext, attributes: Attributes) {
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
     this.eid = attributes.EID.toString()
-    this.verse = context.addVerseItem(this)
+    this.verse = context.addVerseItem(parent, this)
     this.position = context.position
   }
 
@@ -38,7 +38,7 @@ export class ChapterEnd implements UsxItem {
     return {}
   }
 
-  toHtml(context: HtmlContext): string {
+  toHtml(_: HtmlContext): string {
     return ''
   }
 
@@ -58,7 +58,7 @@ export class ChapterEndFactory extends UsxItemFactory<ChapterEnd> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): ChapterEnd {
-    return new ChapterEnd(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): ChapterEnd {
+    return new ChapterEnd(context, parent, attributes)
   }
 }

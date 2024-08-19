@@ -23,6 +23,12 @@ models:
     configuration:
       temperature: 0
       vectorSize: 1536
+  all-minilm:
+    type: ollama-embedding
+    name: all-minilm
+    configuration:
+      temperator: 0
+      vectorSize: 384
   phi3:medium-128k:
     type: ollama-llm
     name: phi3:medium-128k
@@ -51,12 +57,20 @@ storageSystems:
       indexName: metadata
       type: meilisearch
       primaryKey: id
+      embeddings.source: ollama
+      embeddings.url: http://ollama:11434/api/embeddings
+      embeddings.model: all-minilm
+      embeddings.template: "A document titled {{doc.name}} with a body of {{doc.content|truncatewords:500}}"
   bible.verse.search.index:
     type: search
     configuration:
       indexName: bibleverses
       type: meilisearch
       primaryKey: id
+      embeddings.source: ollama
+      embeddings.url: http://ollama:11434/api/embeddings
+      embeddings.model: all-minilm
+      embeddings.template: "A Bible verse titled {{doc.name}} with a body of {{doc.content}}"
   bible.chapter.vector.index:
     type: vector
     models:

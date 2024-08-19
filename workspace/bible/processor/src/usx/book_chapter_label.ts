@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { Text, TextFactory } from './text'
 import { BookChapterLabelStyle, BookChapterLabelStyles } from './styles'
 
 export class BookChapterLabel extends UsxItemContainer<Text> {
   style: BookChapterLabelStyle
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as BookChapterLabelStyle
   }
 
@@ -43,7 +43,7 @@ export class BookChapterLabelFactory extends UsxItemFactory<BookChapterLabel> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): BookChapterLabel {
-    return new BookChapterLabel(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): BookChapterLabel {
+    return new BookChapterLabel(context, parent, attributes)
   }
 }

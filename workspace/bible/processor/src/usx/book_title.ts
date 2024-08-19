@@ -19,7 +19,7 @@ import { CrossReference } from './cross_reference'
 import { Char } from './char'
 import { Break } from './break'
 import { Text, TextFactory } from './text'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { BookTitleStyle, BookTitleStyles } from './styles'
 
 type BookTitleType = Footnote | CrossReference | Char | Break | Text
@@ -27,8 +27,8 @@ type BookTitleType = Footnote | CrossReference | Char | Break | Text
 export class BookTitle extends UsxItemContainer<BookTitleType> {
   style: BookTitleStyle
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as BookTitleStyle
   }
 
@@ -49,7 +49,7 @@ export class BookTitleFactory extends UsxItemFactory<BookTitle> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): BookTitle {
-    return new BookTitle(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): BookTitle {
+    return new BookTitle(context, parent, attributes)
   }
 }

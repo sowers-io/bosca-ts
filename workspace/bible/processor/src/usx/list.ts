@@ -15,7 +15,7 @@
  */
 
 import { ListStyle, ListStyles } from './styles'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { Reference, ReferenceFactory } from './reference'
 import { Footnote, FootnoteFactory } from './footnote'
 import { Char, CharFactory } from './char'
@@ -36,8 +36,8 @@ export class List extends UsxItemContainer<ListType> {
   style: ListStyle
   vid: string | null
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as ListStyle
     this.vid = attributes.VID?.toString() || null
   }
@@ -69,7 +69,7 @@ export class ListFactory extends UsxItemFactory<List> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): List {
-    return new List(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): List {
+    return new List(context, parent, attributes)
   }
 }

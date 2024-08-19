@@ -22,9 +22,9 @@ export class Break implements UsxItem {
   readonly verse: string | null
   readonly position: Position
 
-  constructor(context: UsxContext) {
+  constructor(context: UsxContext, parent: UsxItem | null) {
     this.position = context.position
-    this.verse = context.addVerseItem(this)
+    this.verse = context.addVerseItem(parent, this)
   }
 
   get htmlClass(): string {
@@ -55,7 +55,7 @@ export class BreakFactory extends UsxItemFactory<Break> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, _: Attributes): Break {
-    return new Break(context)
+  create(context: UsxContext, parent: UsxItem | null, _: Attributes): Break {
+    return new Break(context, parent)
   }
 }

@@ -70,7 +70,7 @@ class Executor extends ActivityJobExecutor<BookActivity> {
     try {
       const source = await contentService.getSource(new IdRequest({ id: 'workflow' }))
       const processor = new USXProcessor()
-      const name = new ManifestName({ short: metadata.name })
+      const name = new ManifestName({ long: metadata.name })
       const content = new PublicationContent({ $: { role: metadata.attributes['bible.book.usfm'] } })
       const book = await processor.processBook(name, content, file)
       await this.executor.execute(source, systemId, version, metadata, book)

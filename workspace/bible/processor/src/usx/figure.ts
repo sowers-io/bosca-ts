@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { Text } from './text'
 
 export class Figure extends UsxItemContainer<Text> {
@@ -27,8 +27,8 @@ export class Figure extends UsxItemContainer<Text> {
   copy?: string
   ref?: string
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString()
     this.alt = attributes.ALT?.toString()
     this.file = attributes.FILE.toString()
@@ -54,7 +54,7 @@ export class FigureFactory extends UsxItemFactory<Figure> {
   protected onInitialize() {
   }
 
-  create(context: UsxContext, attributes: Attributes): Figure {
-    return new Figure(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): Figure {
+    return new Figure(context, parent, attributes)
   }
 }

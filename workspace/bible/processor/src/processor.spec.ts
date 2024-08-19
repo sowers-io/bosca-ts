@@ -18,7 +18,7 @@ import { USXProcessor } from './processor'
 import { test } from 'vitest'
 import { HtmlContext } from './usx/item'
 
-test('USX Processor', async () => {
+test('USX Processor 1', async () => {
   const processor = new USXProcessor()
   await processor.process('../../../example-data/asv.zip')
 
@@ -32,15 +32,16 @@ test('USX Processor', async () => {
   console.log(book.raw.substring(chapter.position.start, chapter.position.end))
 })
 
-test('USX Processor', async () => {
+test('USX Processor 2', async () => {
   const processor = new USXProcessor()
   await processor.process('../../../example-data/asv.zip')
 
   console.log(processor.metadata)
 
-  const book = processor.books[0]
-  const chapter = book.chapters[0]
+  const book = processor.books.filter((b) => b.usfm == 'RUT')[0]
+  const chapter = book.chapters.filter((c) => c.usfm == 'RUT.1')[0]
   console.log(chapter.toHtml(new HtmlContext(true, 0, true)))
 
-  console.log(chapter.verseItems['GEN.1.6'][0].toHtml(new HtmlContext(true, 0, true)))
+  console.log(chapter.verseItems['RUT.1.1'][0].toHtml(new HtmlContext(true, 0, true)))
+  console.log(chapter.verseItems['RUT.1.1'][0].toString())
 })

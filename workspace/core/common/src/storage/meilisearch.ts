@@ -16,7 +16,7 @@
 
 import { IStorageSystem } from './storagesystem'
 import { Metadata, PendingEmbeddings, WorkflowJob } from '@bosca/protobufs'
-import { MeiliSearch, Index } from 'meilisearch'
+import { MeiliSearch, Index, OllamaEmbedder } from 'meilisearch'
 import { logger } from '../logger'
 
 export class MeilisearchStorageSystem implements IStorageSystem {
@@ -26,11 +26,22 @@ export class MeilisearchStorageSystem implements IStorageSystem {
   })
   private readonly indexName: string
   private readonly primaryKey: string
+  private readonly defaultEmbedder: OllamaEmbedder | null = null
   private index!: Index
 
   constructor(configuration: { [key: string]: string }) {
     this.indexName = configuration.indexName
     this.primaryKey = configuration.primaryKey
+    if (configuration['embeddings.source'] === 'ollama') {
+      this.defaultEmbedder = {
+        source: 'ollama',
+        url: configuration['embeddings.url'],
+        model: configuration['embeddings.model'],
+        documentTemplate: configuration['embeddings.template'],
+      }
+    } else {
+      logger.warn('unsupported embedder')
+    }
   }
 
   async register(): Promise<void> {
@@ -59,6 +70,13 @@ export class MeilisearchStorageSystem implements IStorageSystem {
           try {
             await this.client.tasks.waitForTask(task.taskUid)
             this.index = await this.client.getIndex(this.indexName)
+            if (this.defaultEmbedder) {
+              this.index.updateSettings({
+                embedders: {
+                  default: this.defaultEmbedder!,
+                },
+              })
+            }
             return
           } catch (e) {
             logger.warn({ error: e }, 'failed to create index')
@@ -79,6 +97,8 @@ export class MeilisearchStorageSystem implements IStorageSystem {
       document[key.replace(/\./gi, '_')] = metadata.attributes[key]
     }
     document[this.primaryKey] = metadata.id
+    document['name'] = metadata.name
+    document['language_tag'] = metadata.languageTag
     await this.index.addDocuments([document])
   }
 

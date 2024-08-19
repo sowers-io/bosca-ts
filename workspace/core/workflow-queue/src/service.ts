@@ -107,7 +107,7 @@ export default (router: ConnectRouter) => {
       let success = false
       let complete = false
 
-      logger.info({ jobId: flow.job.id, jobName: flow.job.name, flowJob }, 'flow enqueued')
+      logger.debug({ jobId: flow.job.id, jobName: flow.job.name, flowJob }, 'flow enqueued')
 
       if (request.waitForCompletion) {
         try {

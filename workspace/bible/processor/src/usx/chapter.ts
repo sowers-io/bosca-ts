@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { UsxContext, UsxItemContainer, UsxVerseItems } from './item'
+import { StringContext, UsxContext, UsxItem, UsxItemContainer, UsxVerseItems } from './item'
 import { Paragraph } from './paragraph'
 import { List } from './list'
 import { Table } from './table'
@@ -42,12 +42,12 @@ export class ChapterVerse {
     this.raw = raw
   }
 
-  toString(): string {
+  toString(context: StringContext | undefined = undefined): string {
     let buf = ''
     for (const item of this.items) {
-      buf += item.toString()
+      buf += item.toString(context)
     }
-    return buf
+    return buf.trim()
   }
 }
 
@@ -59,8 +59,8 @@ export class Chapter extends UsxItemContainer<ChapterType> {
   readonly start: ChapterStart
   private _end?: ChapterEnd
 
-  constructor(context: UsxContext, book: Book, start: ChapterStart) {
-    super(context, {})
+  constructor(context: UsxContext, parent: UsxItem | null, book: Book, start: ChapterStart) {
+    super(context, parent, {})
     this.number = start.number
     this.usfm = book.usfm + '.' + start.number
     this.start = start
@@ -74,7 +74,7 @@ export class Chapter extends UsxItemContainer<ChapterType> {
     return {
       'data-usfm': this.usfm,
       'data-number': this.number,
-      ...super.htmlAttributes
+      ...super.htmlAttributes,
     }
   }
 
@@ -117,7 +117,7 @@ export class Chapter extends UsxItemContainer<ChapterType> {
         this.number,
         usfmParts[usfmParts.length - 1],
         items,
-        raw
+        raw,
       ))
     }
 

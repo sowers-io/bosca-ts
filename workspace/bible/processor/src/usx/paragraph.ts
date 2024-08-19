@@ -19,7 +19,14 @@ import { Footnote, FootnoteFactory } from './footnote'
 import { Char, CharFactory } from './char'
 import { Break, BreakFactory } from './break'
 import { Text, TextFactory } from './text'
-import { Attributes, HtmlContext, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import {
+  Attributes,
+  HtmlContext,
+  StyleFactoryFilter,
+  UsxContext, UsxItem,
+  UsxItemContainer,
+  UsxItemFactory,
+} from './item'
 import { Verse } from './verse'
 import { Milestone, MilestoneFactory } from './milestone'
 import { Figure, FigureFactory } from './figure'
@@ -35,8 +42,8 @@ export class Paragraph extends UsxItemContainer<ParagraphType> {
   style: ParaStyle
   vid?: string
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as ParaStyle
     this.vid = attributes.VID?.toString()
   }
@@ -47,10 +54,6 @@ export class Paragraph extends UsxItemContainer<ParagraphType> {
 
   toHtml(context: HtmlContext): string {
     return context.render('p', this)
-  }
-
-  toString(): string {
-    return '\n'
   }
 }
 
@@ -75,7 +78,7 @@ export class ParagraphFactory extends UsxItemFactory<Paragraph> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): Paragraph {
-    return new Paragraph(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): Paragraph {
+    return new Paragraph(context, parent, attributes)
   }
 }

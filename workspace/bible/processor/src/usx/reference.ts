@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { Attributes, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { Text, TextFactory } from './text'
 
 export class Reference extends UsxItemContainer<Text> {
 
   loc: string
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.loc = attributes.LOC.toString()
   }
 
@@ -43,7 +43,7 @@ export class ReferenceFactory extends UsxItemFactory<Reference> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): Reference {
-    return new Reference(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): Reference {
+    return new Reference(context, parent, attributes)
   }
 }

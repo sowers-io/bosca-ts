@@ -15,15 +15,15 @@
  */
 
 import { BookHeaderStyle } from './styles'
-import { Attributes, StyleFactoryFilter, UsxContext, UsxItemContainer, UsxItemFactory } from './item'
+import { Attributes, StyleFactoryFilter, UsxContext, UsxItem, UsxItemContainer, UsxItemFactory } from './item'
 import { Text, TextFactory } from './text'
 import { BookHeaderStyles } from './styles'
 
 export class BookHeader extends UsxItemContainer<Text> {
   style: BookHeaderStyle
 
-  constructor(context: UsxContext, attributes: Attributes) {
-    super(context, attributes)
+  constructor(context: UsxContext, parent: UsxItem | null, attributes: Attributes) {
+    super(context, parent, attributes)
     this.style = attributes.STYLE.toString() as BookHeaderStyle
   }
 
@@ -44,7 +44,7 @@ export class BookHeaderFactory extends UsxItemFactory<BookHeader> {
     this.register(TextFactory.instance)
   }
 
-  create(context: UsxContext, attributes: Attributes): BookHeader {
-    return new BookHeader(context, attributes)
+  create(context: UsxContext, parent: UsxItem | null, attributes: Attributes): BookHeader {
+    return new BookHeader(context, parent, attributes)
   }
 }

@@ -18,7 +18,7 @@ import { ManifestName, PublicationContent } from './metadata'
 import { parser } from 'sax'
 import { UsxContext, UsxItem, UsxItemContainer, UsxItemFactory, UsxTag, UsxVerseItems } from './usx/item'
 import { Book } from './usx/book'
-import { Usx, UsxFactory } from './usx/usx'
+import { UsxFactory } from './usx/usx'
 import { BookIdentificationFactory } from './usx/book_identification'
 import { BookTitleFactory } from './usx/book_title'
 import { BookHeaderFactory } from './usx/book_header'
@@ -173,7 +173,7 @@ class BookProcessorContext extends UsxContext {
     this.positions.push(new Position(position))
     if (tag.name.toLowerCase() === 'usx') {
       const factory = UsxFactory.instance
-      const item = factory.create(this, tag.attributes)
+      const item = factory.create(this, null, tag.attributes)
       this.items.push(new UsxNode(factory, item, position))
       return item
     }
@@ -182,11 +182,11 @@ class BookProcessorContext extends UsxContext {
     }
     const node = this.items[this.items.length - 1]
     const factory = node.factory.findChildFactory(this, node, tag)
-    const item = factory.create(this, tag.attributes)
+    const item = factory.create(this, node.item, tag.attributes)
     if (item instanceof ChapterStart) {
       this.progression = false
       this.positions.push(new Position(position))
-      const chapter = new Chapter(this, this.book, item)
+      const chapter = new Chapter(this, null, this.book, item)
       this.positions.pop()
       this.chapters.push(chapter)
       this.items.push(new UsxNode(node.factory, chapter, position))

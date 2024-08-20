@@ -16,6 +16,7 @@
 
 import {
   Attributes,
+  HtmlContext,
   StringContext,
   StyleFactoryFilter,
   UsxContext,
@@ -37,6 +38,11 @@ export class FootnoteVerse extends UsxItemContainer<Text> {
 
   get htmlClass(): string {
     return this.style
+  }
+
+  toHtml(context: HtmlContext): string {
+    if (!context.includeFootNotes) return ''
+    return super.toHtml(context)
   }
 
   toString(context: StringContext | undefined = undefined): string {

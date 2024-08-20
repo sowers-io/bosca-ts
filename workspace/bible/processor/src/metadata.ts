@@ -26,15 +26,21 @@ export class ManifestName {
   }
 
   get abbreviation(): string {
-    return this.name.abbr
+    const name = this.name.abbr
+    if (Array.isArray(name)) return name[0]
+    return name
   }
 
   get short(): string {
-    return this.name.short
+    const name = this.name.short
+    if (Array.isArray(name)) return name[0]
+    return name
   }
 
   get long(): string {
-    return this.name.long
+    const name = this.name.long
+    if (Array.isArray(name)) return name[0]
+    return name
   }
 }
 

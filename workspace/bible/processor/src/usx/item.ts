@@ -42,13 +42,17 @@ export class StringContext {
 export class HtmlContext {
 
   readonly pretty: boolean
+  readonly includeFootNotes: boolean
+  readonly includeCrossReferences: boolean
   readonly includeVerseNumbers: boolean
   private indent: number
 
-  constructor(pretty: boolean, indent: number, includeVerseNumbers: boolean) {
+  constructor(pretty: boolean, indent: number, includeVerseNumbers: boolean, includeFootNotes: boolean = true, includeCrossReferences: boolean = true) {
     this.pretty = pretty
     this.indent = indent
     this.includeVerseNumbers = includeVerseNumbers
+    this.includeFootNotes = includeFootNotes
+    this.includeCrossReferences = includeCrossReferences
   }
 
   addIndent() {

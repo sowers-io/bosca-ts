@@ -23,6 +23,7 @@ export class Book {
   readonly name: ManifestName
   readonly content: PublicationContent
   readonly chapters: Chapter[] = []
+  readonly chaptersByUsfm: { [usfm: string]: Chapter } = {}
   readonly raw: string
 
   constructor(name: ManifestName, content: PublicationContent, raw: string) {

@@ -55,7 +55,7 @@ export class Chapter extends UsxItemContainer<ChapterType> {
 
   readonly number: string
   readonly usfm: string
-  readonly verseItems: { [verse: string]: UsxVerseItems[] } = {}
+  readonly verseItems: { [usfm: string]: UsxVerseItems[] } = {}
   readonly start: ChapterStart
   private _end?: ChapterEnd
 

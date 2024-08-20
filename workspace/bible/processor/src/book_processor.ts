@@ -219,6 +219,7 @@ class BookProcessorContext extends UsxContext {
         chapter.addVerseItems(this.verseItems)
         this.verseItems = []
         this.book.chapters.push(chapter)
+        this.book.chaptersByUsfm[chapter.usfm] = chapter
       }
     }
   }

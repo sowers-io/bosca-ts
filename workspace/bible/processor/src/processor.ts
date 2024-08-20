@@ -22,12 +22,14 @@ import { Book } from './usx/book'
 import { promisify } from 'node:util'
 import * as fs from 'node:fs'
 import { Chapter } from './usx/chapter'
+import { Bible } from './bible'
 
 const readFile = promisify(fs.readFile)
 
 export class USXProcessor {
   metadata?: BibleMetadata
   books: Book[] = []
+  booksByUsfm: { [usfm: string]: Book } = {}
 
   async processBook(name: ManifestName, content: PublicationContent, file: string): Promise<Book> {
     const data = await readFile(file, 'utf-8')
@@ -42,7 +44,7 @@ export class USXProcessor {
     return book.chapters[0]
   }
 
-  async process(file: string) {
+  async process(file: string): Promise<Bible> {
     const files = await decompress(file)
     const filesMap: { [key: string]: decompress.File } = {}
     for (const file of files) {
@@ -60,6 +62,9 @@ export class USXProcessor {
       const file = filesMap[content.file]
       const book = await processor.process(name, content, file.data.toString())
       this.books.push(book)
+      this.booksByUsfm[book.usfm] = book
     }
+
+    return new Bible(this.books, this.booksByUsfm)
   }
 }

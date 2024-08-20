@@ -18,6 +18,7 @@ import { FootnoteStyle } from './styles'
 import { Text, TextFactory } from './text'
 import {
   Attributes,
+  HtmlContext,
   StringContext,
   StyleFactoryFilter,
   UsxContext,
@@ -44,6 +45,11 @@ export class Footnote extends UsxItemContainer<FootnoteItem> {
 
   get htmlClass(): string {
     return this.style
+  }
+
+  toHtml(context: HtmlContext): string {
+    if (!context.includeFootNotes) return ''
+    return super.toHtml(context)
   }
 
   toString(context: StringContext | undefined = undefined): string {

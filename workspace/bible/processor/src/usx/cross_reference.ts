@@ -18,6 +18,7 @@ import { CrossReferenceChar, CrossReferenceCharFactory } from './cross_reference
 import { Text, TextFactory } from './text'
 import {
   Attributes,
+  HtmlContext,
   StringContext,
   StyleFactoryFilter,
   UsxContext,
@@ -46,6 +47,11 @@ export class CrossReference extends UsxItemContainer<CrossReferenceType> {
 
   get htmlAttributes(): { [p: string]: string } {
     return { 'data-caller': this.caller, ...super.htmlAttributes }
+  }
+
+  toHtml(context: HtmlContext): string {
+    if (!context.includeCrossReferences) return ''
+    return super.toHtml(context)
   }
 
   toString(context: StringContext | undefined = undefined): string {

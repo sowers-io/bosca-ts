@@ -113,16 +113,28 @@ export class BibleReference {
   }
 
   private static parseSingle(bible: Bible, human: string): BibleReference | null {
-    const parts = human.trim().split(' ')
-    const nameLower = parts[0].toLocaleLowerCase()
-    const book = bible.books.find((b) => nameLower === b.name?.long?.toLocaleLowerCase() || nameLower === b.name?.short?.toLocaleLowerCase() || nameLower === b.name.abbreviation?.toLocaleLowerCase() )
-    if (!book) {
+    const humanLower = human.toLocaleLowerCase()
+    let book: Book | null = null
+    let nonBook: string | null = null
+    for (const b of bible.books) {
+      if (humanLower.indexOf(b.name?.long?.toLocaleLowerCase() || '') === 0) {
+        book = b
+        nonBook = humanLower.substring(b.name.long.length).trim()
+      } else if (humanLower.indexOf(b.name?.short?.toLocaleLowerCase() || '') === 0) {
+        book = b
+        nonBook = humanLower.substring(b.name.short.length).trim()
+      } else if (humanLower.indexOf(b.name.abbreviation?.toLocaleLowerCase() || '') === 0) {
+        book = b
+        nonBook = humanLower.substring(b.name.abbreviation.length).trim()
+      }
+    }
+    if (!book || !nonBook) {
       return null
     }
-    if (parts.length === 1) {
+    if (nonBook.length === 0) {
         return new BibleReference(book.usfm)
     }
-    const numberParts = parts[1].split(':')
+    const numberParts = nonBook.split(':')
     const chapter = book.chapters.find((c) => c.number.toLocaleLowerCase() === numberParts[0].toLocaleLowerCase())
     if (!chapter) {
       return new BibleReference(book.usfm)

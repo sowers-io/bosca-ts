@@ -133,7 +133,7 @@ async function main() {
       }
 
       const metadata = await newMetadata(upload)
-      return { res, metadata: {...upload.metadata, filename: metadata.id } }
+      return { res, metadata: { ...upload.metadata, filename: metadata.id } }
     },
     onResponseError: async (req, res, error) => {
       logger.error({ error }, 'failed to upload')

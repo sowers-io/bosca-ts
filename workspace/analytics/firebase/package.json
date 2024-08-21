@@ -1,0 +1,16 @@
+{
+  "name": "@bosca/analytics-client-firebase",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "build.watch": "tsc --build --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@bosca/analytics-client-api": "workspace:*",
+    "firebase": "^10.13.0"
+  },
+  "peerDependencies": {}
+}

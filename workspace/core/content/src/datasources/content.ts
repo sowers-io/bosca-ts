@@ -84,7 +84,7 @@ export class ContentDataSource extends DataSource {
 
   async getCollectionIdName(collectionId: string, name: string): Promise<IdName[]> {
     const records = await this.query(
-      'select id, name from collections where id in (select child_metadata_id from collection_items where collection_id = $1 and child_metadata_id is not null) and lower(name) = lower($2)',
+      'select id, name from collections where id in (select child_collection_id from collection_items where collection_id = $1 and child_collection_id is not null) and lower(name) = lower($2)',
       [collectionId, name],
     )
     return records.rows.map((r) => ({ id: r.id, name: r.name }))

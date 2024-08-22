@@ -17,13 +17,14 @@
 package upload
 
 import (
+	"net/http"
+	"os"
+	"strings"
+
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/cmd/cli/commands/login"
 	"github.com/eventials/go-tus"
 	"github.com/spf13/cobra"
-	"net/http"
-	"os"
-	"strings"
 )
 
 var Command = &cobra.Command{
@@ -38,6 +39,8 @@ var Command = &cobra.Command{
 		defer f.Close()
 
 		endpoint := cmd.Flag(flags.EndpointFlag).Value.String()
+
+		cmd.Printf("Uploading to %v", endpoint)
 
 		cfg := tus.DefaultConfig()
 

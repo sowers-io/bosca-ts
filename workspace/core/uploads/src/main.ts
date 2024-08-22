@@ -130,6 +130,7 @@ async function main() {
         }
       } catch (e) {
         onError(res, e, true)
+        throw e
       }
 
       const metadata = await newMetadata(upload)
@@ -140,12 +141,24 @@ async function main() {
       onError(res, error, false)
     },
     onUploadFinish: async (req, res, upload) => {
-      try {
-        const service = useServiceAccountClient(ContentService)
-        const id = new IdRequest({ id: upload.metadata!['filename']! })
-        await service.setMetadataReady(id)
-      } catch (e) {
-        onError(res, e, true)
+      for (let tries = 0; tries < 5; tries++) {
+        try {
+          const id = new IdRequest({ id: upload.metadata!['filename']! })
+          if (req.headers.cookie) {
+            await verifyPermissions(true, req.headers.cookie, id.id, subjectFinder, true)
+          } else if (req.headers.authorization) {
+            await verifyPermissions(false, req.headers.authorization, id.id, subjectFinder, true)
+          }
+          const service = useServiceAccountClient(ContentService)
+          await service.setMetadataReady(id)
+          return res
+        } catch (e) {
+          if (tries === 4) {
+            onError(res, e, true)
+            throw e
+          }
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+        }
       }
       return res
     },

@@ -132,7 +132,7 @@ export function content(
         permissions,
         serviceAccountId,
         subject,
-        request.parent,
+        parent,
         request.collection,
       )
       return new IdResponse({ id: id.id })

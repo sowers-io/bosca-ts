@@ -19,20 +19,28 @@ package clients
 import (
 	"crypto/tls"
 	"errors"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func NewClientConnection(endpoint string) (*grpc.ClientConn, error) {
 	if endpoint == "" {
 		return nil, errors.New("endpoint is required")
 	}
-	opts := []grpc.DialOption{
-		// TLS is managed at the service mesh
-		// grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(104857600)),
+	var opts []grpc.DialOption
+	if strings.Contains(endpoint, "localhost") {
+		opts = []grpc.DialOption{
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(104857600)),
+		}
+	} else {
+		opts = []grpc.DialOption{
+			grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
+			grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(104857600)),
+		}
 	}
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {

@@ -1,3 +1,16 @@
 {
-  "vitest.disableWorkspaceWarning": true
+  "vitest.disableWorkspaceWarning": true,
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "content",
+      "group": "bosca",
+      "database": "boscacontent",
+      "username": "bosca",
+      "password": "bosca"
+    }
+  ]
 }

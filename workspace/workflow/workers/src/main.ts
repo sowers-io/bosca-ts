@@ -50,8 +50,8 @@ async function main() {
   const configuration = getConfiguration()
   const activities = getActivities()
   const connection: ConnectionOptions = {
-    host: process.env.BOSCA_REDIS_HOST!,
-    port: parseInt(process.env.BOSCA_REDIS_PORT!),
+    host: (process.env.BOSCA_REDIS_HOST || 'localhost'),
+    port: parseInt(process.env.BOSCA_REDIS_PORT || '6379'),
   }
   for (const queueConfigurationId in configuration.queues) {
     const queueConfiguration = configuration.queues[queueConfigurationId]

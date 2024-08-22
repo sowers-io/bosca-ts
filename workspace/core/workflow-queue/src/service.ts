@@ -23,8 +23,8 @@ import { logger } from '@bosca/common'
 
 export default (router: ConnectRouter) => {
   const connection: ConnectionOptions = {
-    host: process.env.BOSCA_REDIS_HOST!,
-    port: parseInt(process.env.BOSCA_REDIS_PORT!),
+    host: (process.env.BOSCA_REDIS_HOST || 'localhost'),
+    port: parseInt(process.env.BOSCA_REDIS_PORT || '6379'),
   }
   const flowProducer = new FlowProducer({ connection })
   const queueEvents: { [queue: string]: QueueEvents } = {}

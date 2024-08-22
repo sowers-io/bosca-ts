@@ -29,8 +29,9 @@ import { Code, ConnectError } from '@connectrpc/connect'
 export async function verifyPermissions(
   fromCookie: boolean,
   authorization: string,
-  collection: string,
+  id: string,
   subjectFinder: SubjectFinder,
+  metadata: boolean = false,
 ) {
   const subject = await subjectFinder.findSubject(fromCookie, authorization)
   let subjectPermissionType = PermissionSubjectType.user
@@ -41,8 +42,8 @@ export async function verifyPermissions(
     new PermissionCheckRequest({
       subject: subject.id,
       subjectType: subjectPermissionType,
-      object: collection,
-      objectType: PermissionObjectType.collection_type,
+      object: id,
+      objectType: metadata ? PermissionObjectType.metadata_type : PermissionObjectType.collection_type,
       action: PermissionAction.edit,
     }),
   )

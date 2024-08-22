@@ -17,6 +17,7 @@
 import { GraphQLError } from 'graphql/error'
 import { ConnectError, Code } from '@connectrpc/connect'
 import { GraphQLRequestContext } from './graphql'
+import { logger } from '../logger'
 
 export function getGraphQLHeaders(context: GraphQLRequestContext): Record<string, string> {
   const headers: Record<string, string> = {}
@@ -32,6 +33,7 @@ export async function executeGraphQL<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn()
   } catch (e: any) {
+    logger.error({ error: e }, 'failed to execute graphql request')
     if (e instanceof ConnectError) {
       if (e.code == Code.NotFound) {
         return null as T

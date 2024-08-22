@@ -24,8 +24,8 @@ async function main() {
         new BullMQAdapter(
           new QueueMQ(name, {
             connection: {
-              port: 6379,
-              host: 'localhost',
+              host: process.env.BOSCA_REDIS_HOST!,
+              port: parseInt(process.env.BOSCA_REDIS_PORT!),
             },
           }),
         ),

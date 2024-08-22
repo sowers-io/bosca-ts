@@ -39,6 +39,12 @@ WORKDIR /prod/graphql
 EXPOSE 9000
 CMD [ "pnpm", "start" ]
 
+FROM base AS bible-graphql
+COPY --from=build /prod/bible-graphql /prod/bible-graphql
+WORKDIR /prod/bible-graphql
+EXPOSE 2000
+CMD [ "pnpm", "start" ]
+
 FROM base AS uploads
 COPY --from=build /prod/uploads /prod/uploads
 WORKDIR /prod/uploads

@@ -16,6 +16,7 @@
 
 import { SignedUrl } from '@bosca/protobufs'
 import * as http from 'node:http'
+import * as https from 'node:https'
 import { logger } from './logger'
 
 let executing = 0
@@ -42,23 +43,24 @@ export async function executeHttpRequest(signedUrl: SignedUrl, body?: ArrayBuffe
         method: signedUrl.method,
         headers: headers,
       }
-      const request = http.request(signedUrl.url, options, function (res) {
-        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-          return reject(new Error('Request Failed: ' + res.statusCode))
-        }
-        const body: any = []
-        res.on('data', function (chunk) {
-          body.push(chunk)
-        })
-        res.on('end', function () {
-          request.destroy()
-          try {
-            resolve(Buffer.concat(body))
-          } catch (e) {
-            reject(e)
+      const request = (signedUrl.url.startsWith('https') ? https:  http)
+        .request(signedUrl.url, options, function (res) {
+          if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
+            return reject(new Error('Request Failed: ' + res.statusCode))
           }
+          const body: any = []
+          res.on('data', function (chunk) {
+            body.push(chunk)
+          })
+          res.on('end', function () {
+            request.destroy()
+            try {
+              resolve(Buffer.concat(body))
+            } catch (e) {
+              reject(e)
+            }
+          })
         })
-      })
       request.on('error', function (err) {
         reject(err)
       })

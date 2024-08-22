@@ -27,7 +27,7 @@
     "url": "git+ssh://git@github.com/sowers-io/bosca.git"
   },
   "author": "Kyle Brock <kyle@sowers.io>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/sowers-io/bosca/issues"
   },

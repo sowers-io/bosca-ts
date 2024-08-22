@@ -23,6 +23,9 @@ importers:
       '@nx/eslint':
         specifier: 19.6.2
         version: 19.6.2(@babel/traverse@7.25.3)(@types/node@20.14.15)(@zkochan/js-yaml@0.0.7)(eslint@8.57.0)(nx@19.6.2)
+      '@nx/next':
+        specifier: 19.6.2
+        version: 19.6.2(@babel/core@7.25.2)(@babel/traverse@7.25.3)(@types/node@20.14.15)(@zkochan/js-yaml@0.0.7)(eslint@8.57.0)(next@14.2.3(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(nx@19.6.2)(typescript@5.5.4)(webpack@5.93.0)
       '@stylistic/eslint-plugin':
         specifier: ^2.6.2
         version: 2.6.2(eslint@8.57.0)(typescript@5.5.4)
@@ -536,9 +539,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.4.0
         version: 3.9.0(react-hook-form@7.52.2(react@18.3.1))
-      '@nx/next':
-        specifier: 19.6.2
-        version: 19.6.2(@babel/core@7.25.2)(@babel/traverse@7.25.3)(@types/node@20.14.15)(@zkochan/js-yaml@0.0.7)(eslint@8.57.0)(next@14.2.3(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(nx@19.6.2)(typescript@5.5.4)(webpack@5.93.0)
       '@radix-ui/react-accordion':
         specifier: ^1.1.2
         version: 1.2.0(@types/react-dom@18.3.0)(@types/react@18.3.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -714,6 +714,9 @@ importers:
         specifier: ^0.9.1
         version: 0.9.1(@types/react-dom@18.3.0)(@types/react@18.3.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
+      '@nx/next':
+        specifier: ^19.6.2
+        version: 19.6.2(@babel/core@7.25.2)(@babel/traverse@7.25.3)(@types/node@20.14.15)(@zkochan/js-yaml@0.0.7)(eslint@8.57.0)(next@14.2.3(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(nx@19.6.2)(typescript@5.5.4)(webpack@5.93.0)
       '@types/google-protobuf':
         specifier: ^3.15.12
         version: 3.15.12

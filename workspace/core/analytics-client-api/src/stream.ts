@@ -1,4 +1,11 @@
-import { AnalyticEvent } from './event'
+import { AnalyticEvent, IAnalyticEvent } from './event'
+import { getAnalyticEventFactory } from './factory'
+
+let sinks: AnalyticEventSink[] = []
+
+export function addSink(sink: AnalyticEventSink) {
+  sinks.push(sink)
+}
 
 export interface AnalyticEventInterceptor {
 
@@ -22,4 +29,13 @@ export abstract class AnalyticEventSink {
     }
     await this.onAdd(original, event)
   }
+}
+
+export async function logEvent(event: IAnalyticEvent): Promise<void> {
+  const ev = await getAnalyticEventFactory().createEvent(event)
+  const promises = []
+  for (const sink of sinks) {
+    promises.push(sink.add(ev))
+  }
+  await Promise.all(promises)
 }

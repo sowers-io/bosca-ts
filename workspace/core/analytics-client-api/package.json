@@ -1,13 +1,27 @@
 {
   "name": "@bosca/analytics-client-api",
   "version": "0.0.1",
-  "main": "dist/index.js",
   "scripts": {
     "build": "tsc --build",
     "build.watch": "tsc --build --watch",
     "lint": "nx eslint:lint",
     "lint:fix": "nx eslint:lint --fix"
   },
-  "dependencies": {},
-  "peerDependencies": {}
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/sowers-io/bosca.git"
+  },
+  "author": "Kyle Brock <kyle@sowers.io>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/sowers-io/bosca/issues"
+  },
+  "homepage": "https://github.com/sowers-io/bosca#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/bosca/node-packages",
+    "access": "public"
+  }
 }

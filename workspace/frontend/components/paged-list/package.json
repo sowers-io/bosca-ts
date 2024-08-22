@@ -8,8 +8,8 @@
   "type": "commonjs",
   "main": "./dist/main.js",
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "nx eslint:lint",
+    "lint:fix": "nx eslint:lint --fix",
     "build": "tsc --build"
   },
   "publishConfig": {
@@ -18,7 +18,5 @@
   "dependencies": {
     "rxjs": "^7.8.1"
   },
-  "devDependencies": {
-
-  }
+  "devDependencies": {}
 }

@@ -7,8 +7,8 @@
     "dev": "DISABLE_REQUIRE_METHOD=true DISABLE_OTEL=true ts-node --require ./src/instrumentation.ts src/main.ts",
     "start": "node --require ./dist/instrumentation.js ./dist/main.js",
     "build": "tsc --build",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "nx eslint:lint",
+    "lint:fix": "nx eslint:lint --fix",
     "generate": "graphql-codegen"
   },
   "dependencies": {

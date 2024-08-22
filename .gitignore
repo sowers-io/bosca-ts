@@ -6,3 +6,12 @@ __pycache__
 services/meilisearch/meili_data
 services/ollama/ollama
 services/qdrant
+
+
+
+.nx/cache
+.nx/workspace-data
+
+# Next.js
+.next
+out

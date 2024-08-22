@@ -6,8 +6,8 @@
     "dev": "DISABLE_OTEL=true ts-node --require ./src/instrumentation.ts ./src/main.ts",
     "build": "tsc --build",
     "start": "node --require ./dist/instrumentation.js ./dist/main.js",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint": "nx eslint:lint",
+    "lint:fix": "nx eslint:lint --fix"
   },
   "dependencies": {
     "@bosca/common": "workspace:*",

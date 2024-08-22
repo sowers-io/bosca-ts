@@ -5,8 +5,8 @@
   "scripts": {
     "build": "tsc --build",
     "build.watch": "tsc --build --watch",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint": "nx eslint:lint",
+    "lint:fix": "nx eslint:lint --fix"
   },
   "dependencies": {},
   "peerDependencies": {}

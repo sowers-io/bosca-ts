@@ -5,8 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc --build",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint": "nx eslint:lint",
+    "lint:fix": "nx eslint:lint --fix"
   },
   "main": "dist/index.js",
   "dependencies": {

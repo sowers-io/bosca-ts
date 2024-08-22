@@ -13,6 +13,7 @@
     "@bufbuild/protobuf": "^1.10.0",
     "@bufbuild/protoc-gen-es": "^1.10.0",
     "@connectrpc/protoc-gen-connect-es": "^1.4.0",
+    "@nx/eslint": "19.6.2",
     "@stylistic/eslint-plugin": "^2.6.2",
     "@stylistic/eslint-plugin-ts": "^2.6.2",
     "@tsconfig/node18": "^18.2.4",
@@ -23,6 +24,7 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^8.10.0",
     "globals": "^15.9.0",
+    "nx": "19.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
     "vitest": "^1.6.0"

@@ -5,8 +5,8 @@
   "scripts": {
     "build": "tsc --build",
     "build.watch": "tsc --build --watch",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "nx eslint:lint",
+    "lint:fix": "nx eslint:lint --fix",
     "dev": "DISABLE_OTEL=true ts-node --require ./src/instrumentation.ts src/main.ts",
     "start": "node --require ./dist/instrumentation.js ./dist/main.js"
   },

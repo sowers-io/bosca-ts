@@ -6,7 +6,7 @@ if [ "$IMAGE_TAG" = "" ]; then
   IMAGE_TAG="latest"
 fi
 
-for project in content imageproxy graphql uploads workflow workflow-queue workflow-workers workflow-dashboard ui; do
+for project in content imageproxy bible-graphql graphql uploads workflow workflow-queue workflow-workers workflow-dashboard ui; do
   if [ "$1" = "publish" ]; then
     docker push ghcr.io/sowers-io/bosca/$project:latest
     docker push ghcr.io/sowers-io/bosca/$project:$IMAGE_TAG

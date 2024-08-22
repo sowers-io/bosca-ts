@@ -43,7 +43,7 @@ export async function executeHttpRequest(signedUrl: SignedUrl, body?: ArrayBuffe
         method: signedUrl.method,
         headers: headers,
       }
-      const request = (signedUrl.url.startsWith('https') ? https:  http)
+      const request = (signedUrl.url.startsWith('https') ? https : http)
         .request(signedUrl.url, options, function (res) {
           if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
             return reject(new Error('Request Failed: ' + res.statusCode))

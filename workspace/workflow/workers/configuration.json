@@ -10,6 +10,12 @@
     "transition": {
       "maxConcurrency": 100
     },
+    "media-transcription": {
+      "maxConcurrency": 3
+    },
+    "media-upload": {
+      "maxConcurrency": 3
+    },
     "bible": {
       "maxConcurrency": 20
     },
@@ -19,7 +25,6 @@
     "bible-verse": {
       "maxConcurrency": 20
     },
-
     "search-index": {
       "maxConcurrency": 20
     }

@@ -16,26 +16,31 @@
 
 import { Resolvers } from '../generated/resolvers'
 import { Configuration, FrontendApi } from '@ory/kratos-client-fetch'
-import { GraphQLRequestContext } from '@bosca/common'
+import { GraphQLRequestContext, logger } from '@bosca/common'
 
 export const resolvers: Resolvers<GraphQLRequestContext> = {
   Mutation: {
     login: async (_, args) => {
-      const configuration = new Configuration({
-        basePath: process.env.KRATOS_BASE_PATH,
-      })
-      const client = new FrontendApi(configuration)
-      const loginFlow = await client.createNativeLoginFlow({})
-      const updatedFlow = await client.updateLoginFlow({
-        flow: loginFlow.id,
-        updateLoginFlowBody: {
-          method: 'password',
-          identifier: args.username,
-          password: args.password,
-          password_identifier: args.username,
-        },
-      })
-      return updatedFlow.session_token || null
+      try {
+        const configuration = new Configuration({
+          basePath: process.env.KRATOS_BASE_PATH,
+        })
+        const client = new FrontendApi(configuration)
+        const loginFlow = await client.createNativeLoginFlow({})
+        const updatedFlow = await client.updateLoginFlow({
+          flow: loginFlow.id,
+          updateLoginFlowBody: {
+            method: 'password',
+            identifier: args.username,
+            password: args.password,
+            password_identifier: args.username,
+          },
+        })
+        return updatedFlow.session_token || null
+      } catch (e) {
+        logger.error({ error: e }, 'failed to login')
+        throw e
+      }
     },
   },
 }

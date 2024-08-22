@@ -17,13 +17,14 @@
 package login
 
 import (
-	"bosca.io/cmd/cli/commands/flags"
-	"bosca.io/pkg/security/management/kratos"
 	"context"
 	"fmt"
+	"os"
+
+	"bosca.io/cmd/cli/commands/flags"
+	"bosca.io/pkg/security/management/kratos"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 func GetSession() (string, error) {

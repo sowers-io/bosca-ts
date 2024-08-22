@@ -17,10 +17,11 @@
 package collection
 
 import (
+	"context"
+
 	grpc "bosca.io/api/protobuf/bosca/content"
 	"bosca.io/cmd/cli/commands/flags"
 	"bosca.io/pkg/cli"
-	"context"
 	"github.com/spf13/cobra"
 )
 
@@ -38,6 +39,8 @@ var Command = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		cmd.Printf("creating: %v\n", args[0])
 
 		parent := cmd.Flag(flags.ParentFlag)
 		response, err := client.AddCollection(ctx, &grpc.AddCollectionRequest{

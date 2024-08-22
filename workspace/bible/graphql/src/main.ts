@@ -17,7 +17,7 @@
 import { createAndRunServer, GraphQLRequestContext } from '@bosca/common'
 
 async function main() {
-  await createAndRunServer<GraphQLRequestContext>(2000)
+  await createAndRunServer<GraphQLRequestContext>(2000, '/bible/graphql')
 }
 
 void main()

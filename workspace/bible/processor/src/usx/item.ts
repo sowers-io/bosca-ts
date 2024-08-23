@@ -229,7 +229,7 @@ export class UsxVerseItems {
     this.items.push(item)
   }
 
-  toHtml(context: HtmlContext) {
+  toHtml(context: HtmlContext): string {
     return context.render('div', this)
   }
 

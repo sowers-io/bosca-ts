@@ -37,6 +37,14 @@ test('John 1:1, John 1:2, John 2:1-3', async () => {
   expect(references[1].usfm).toBe('JHN.2.1+JHN.2.2+JHN.2.3')
 })
 
+test('Isaiah 2:2–3', async () => {
+  const processor = new USXProcessor()
+  const bible = await processor.process('../../../example-data/asv.zip')
+  const references = BibleReference.parse(bible, 'Isaiah 2:2–3')
+  expect(references.length).toBe(1)
+  expect(references[0].usfm).toBe('ISA.2.2+ISA.2.3')
+})
+
 test('Get Verses', async () => {
   const processor = new USXProcessor()
   const bible = await processor.process('../../../example-data/asv.zip')

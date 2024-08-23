@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Book } from "./usx/book";
-import { UsxVerseItems } from "./usx/item";
+import { Book } from './usx/book'
+import { UsxVerseItems } from './usx/item'
 
 export class Bible {
 
@@ -132,7 +132,7 @@ export class BibleReference {
       return null
     }
     if (nonBook.length === 0) {
-        return new BibleReference(book.usfm)
+      return new BibleReference(book.usfm)
     }
     const numberParts = nonBook.split(':')
     const chapter = book.chapters.find((c) => c.number.toLocaleLowerCase() === numberParts[0].toLocaleLowerCase())
@@ -141,6 +141,9 @@ export class BibleReference {
     }
     if (numberParts.length === 1) {
       return new BibleReference(chapter.usfm)
+    }
+    if (numberParts[1].includes('–')) {
+      numberParts[1] = numberParts[1].replace('–', '-')
     }
     if (numberParts[1].includes('-')) {
       const rangeParts = numberParts[1].split('-')

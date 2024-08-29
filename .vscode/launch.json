@@ -88,6 +88,8 @@
         "BOSCA_CONTENT_API_ADDRESS": "localhost:7000",
         "BOSCA_WORKFLOW_API_ADDRESS": "localhost:7100",
         "BOSCA_WORKFLOW_QUEUE_API_ADDRESS": "localhost:7200",
+        "BOSCA_MEILISEARCH_API_ADDRESS": "http://localhost:7700",
+        "BOSCA_MEILI_MASTER_KEY": "p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M",
         "BOSCA_S3_ACCESS_KEY_ID": "67fO5gFs6BuksBrh6rMp",
         "BOSCA_S3_ENDPOINT": "http://127.0.0.1:9010",
         "BOSCA_S3_SECRET_ACCESS_KEY": "eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm",
@@ -95,7 +97,9 @@
         "BOSCA_SERVICE_ACCOUNT_TOKEN": "sat",
         "BOSCA_SESSION_ENDPOINT": "http://localhost:4433/sessions/whoami",
         "BOSCA_PERMISSIONS_SHARED_TOKEN": "bosca-spicedb",
-        "BOSCA_PERMISSIONS_ENDPOINT": "localhost:50051"
+        "BOSCA_PERMISSIONS_ENDPOINT": "localhost:50051",
+        "BOSCA_QDRANT_API_ADDRESS": "localhost:6334",
+        "BOSCA_QDRANT_REST_API_ADDRESS": "http://localhost:6333"
       },
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [

@@ -22,6 +22,49 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
 
 /**
+ * @generated from message bosca.content.MetadataReadyRequest
+ */
+export class MetadataReadyRequest extends Message<MetadataReadyRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: optional string source_identifier = 2;
+   */
+  sourceIdentifier?: string;
+
+  constructor(data?: PartialMessage<MetadataReadyRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.MetadataReadyRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "source_identifier", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MetadataReadyRequest {
+    return new MetadataReadyRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MetadataReadyRequest {
+    return new MetadataReadyRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MetadataReadyRequest {
+    return new MetadataReadyRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MetadataReadyRequest | PlainMessage<MetadataReadyRequest> | undefined, b: MetadataReadyRequest | PlainMessage<MetadataReadyRequest> | undefined): boolean {
+    return proto3.util.equals(MetadataReadyRequest, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.content.Metadata
  */
 export class Metadata extends Message<Metadata> {

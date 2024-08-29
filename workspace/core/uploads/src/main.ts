@@ -19,7 +19,7 @@ import { Server, FileKvStore, Upload } from '@tus/server'
 import { S3Store } from '@tus/s3-store'
 import { HttpSessionInterceptor, HttpSubjectFinder, logger, useServiceAccountClient } from '@bosca/common'
 import { verifyPermissions } from './authorization'
-import { ContentService, IdRequest, Metadata } from '@bosca/protobufs'
+import { ContentService, IdRequest, Metadata, MetadataReadyRequest } from '@bosca/protobufs'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { Code, ConnectError } from '@connectrpc/connect'
 import http, { ServerResponse } from 'node:http'
@@ -143,7 +143,7 @@ async function main() {
     onUploadFinish: async (req, res, upload) => {
       for (let tries = 0; tries < 5; tries++) {
         try {
-          const id = new IdRequest({ id: upload.metadata!['filename']! })
+          const id = new MetadataReadyRequest({ id: upload.metadata!['filename']!, sourceIdentifier: upload.id })
           if (req.headers.cookie) {
             await verifyPermissions(true, req.headers.cookie, id.id, subjectFinder, true)
           } else if (req.headers.authorization) {

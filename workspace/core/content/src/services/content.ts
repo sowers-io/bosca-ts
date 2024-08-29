@@ -33,6 +33,7 @@ import {
   PermissionCheckResponse,
   PermissionObjectType,
   PermissionSubjectType,
+  SignedUrl,
   Sources,
   Traits,
   WorkflowService,
@@ -421,6 +422,14 @@ export function content(
       if (!metadata) {
         throw new ConnectError('missing metadata', Code.NotFound)
       }
+      if (metadata.sourceIdentifier) {
+        // TODO: enable the source to specify an object store
+        if (metadata.sourceIdentifier.startsWith('http://') || metadata.sourceIdentifier.startsWith('https://')) {
+          return new SignedUrl({
+            url: metadata.sourceIdentifier,
+          })
+        }
+      }
       return await objectStore.createDownloadUrl(metadata)
     },
     async addMetadataSupplementary(request, context) {
@@ -521,7 +530,7 @@ export function content(
     },
     async setMetadataReady(request, context) {
       const subject = context.values.get(SubjectKey)
-      await setMetadataReady(dataSource, permissions, subject, request.id)
+      await setMetadataReady(dataSource, permissions, subject, request.id, request.sourceIdentifier)
       return new Empty()
     },
     async getMetadataPermissions(request, context) {

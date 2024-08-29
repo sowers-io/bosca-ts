@@ -89,10 +89,14 @@ export async function setMetadataReady(
   permissions: PermissionManager,
   subject: Subject,
   metadataId: string,
+  sourceIdentifier: string | null | undefined,
 ) {
   const metadata = await dataSource.getMetadata(metadataId)
   if (!metadata) throw new ConnectError('missing metadata', Code.NotFound)
   await permissions.checkWithError(subject, PermissionObjectType.metadata_type, metadata.id, PermissionAction.manage)
+  if (sourceIdentifier) {
+    await dataSource.setMetadataSourceIdentifier(metadataId, sourceIdentifier)
+  }
   const workflowService = useServiceAccountClient(WorkflowService)
   await workflowService.beginTransitionWorkflow(
     new BeginTransitionWorkflowRequest({

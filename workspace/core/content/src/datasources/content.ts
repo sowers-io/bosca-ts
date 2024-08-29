@@ -360,6 +360,10 @@ export class ContentDataSource extends DataSource {
     )
   }
 
+  async setMetadataSourceIdentifier(metadataId: string, sourceIdentifier: string) {
+    await this.query('update metadata set source_identifier = $1 where id = $2', [sourceIdentifier, metadataId])
+  }
+
   async addMetadataSupplementary(
     metadataId: string,
     key: string,

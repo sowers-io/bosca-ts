@@ -22,6 +22,11 @@ import "google/protobuf/struct.proto";
 
 package bosca.content;
 
+message MetadataReadyRequest {
+  string id = 1;
+  optional string source_identifier = 2;
+}
+
 message Metadata {
   string default_id = 1;
 

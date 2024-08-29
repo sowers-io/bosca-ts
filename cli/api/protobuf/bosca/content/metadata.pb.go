@@ -37,6 +37,61 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type MetadataReadyRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id               string  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	SourceIdentifier *string `protobuf:"bytes,2,opt,name=source_identifier,json=sourceIdentifier,proto3,oneof" json:"source_identifier,omitempty"`
+}
+
+func (x *MetadataReadyRequest) Reset() {
+	*x = MetadataReadyRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_bosca_content_metadata_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MetadataReadyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MetadataReadyRequest) ProtoMessage() {}
+
+func (x *MetadataReadyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bosca_content_metadata_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MetadataReadyRequest.ProtoReflect.Descriptor instead.
+func (*MetadataReadyRequest) Descriptor() ([]byte, []int) {
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *MetadataReadyRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *MetadataReadyRequest) GetSourceIdentifier() string {
+	if x != nil && x.SourceIdentifier != nil {
+		return *x.SourceIdentifier
+	}
+	return ""
+}
+
 type Metadata struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -67,7 +122,7 @@ type Metadata struct {
 func (x *Metadata) Reset() {
 	*x = Metadata{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[0]
+		mi := &file_bosca_content_metadata_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -80,7 +135,7 @@ func (x *Metadata) String() string {
 func (*Metadata) ProtoMessage() {}
 
 func (x *Metadata) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[0]
+	mi := &file_bosca_content_metadata_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -93,7 +148,7 @@ func (x *Metadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Metadata.ProtoReflect.Descriptor instead.
 func (*Metadata) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{0}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Metadata) GetDefaultId() string {
@@ -247,7 +302,7 @@ type MetadataSupplementaries struct {
 func (x *MetadataSupplementaries) Reset() {
 	*x = MetadataSupplementaries{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[1]
+		mi := &file_bosca_content_metadata_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -260,7 +315,7 @@ func (x *MetadataSupplementaries) String() string {
 func (*MetadataSupplementaries) ProtoMessage() {}
 
 func (x *MetadataSupplementaries) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[1]
+	mi := &file_bosca_content_metadata_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -273,7 +328,7 @@ func (x *MetadataSupplementaries) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetadataSupplementaries.ProtoReflect.Descriptor instead.
 func (*MetadataSupplementaries) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{1}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *MetadataSupplementaries) GetSupplementaries() []*MetadataSupplementary {
@@ -301,7 +356,7 @@ type MetadataSupplementary struct {
 func (x *MetadataSupplementary) Reset() {
 	*x = MetadataSupplementary{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[2]
+		mi := &file_bosca_content_metadata_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -314,7 +369,7 @@ func (x *MetadataSupplementary) String() string {
 func (*MetadataSupplementary) ProtoMessage() {}
 
 func (x *MetadataSupplementary) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[2]
+	mi := &file_bosca_content_metadata_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -327,7 +382,7 @@ func (x *MetadataSupplementary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetadataSupplementary.ProtoReflect.Descriptor instead.
 func (*MetadataSupplementary) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{2}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *MetadataSupplementary) GetMetadataId() string {
@@ -398,7 +453,7 @@ type AddMetadataRequest struct {
 func (x *AddMetadataRequest) Reset() {
 	*x = AddMetadataRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[3]
+		mi := &file_bosca_content_metadata_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -411,7 +466,7 @@ func (x *AddMetadataRequest) String() string {
 func (*AddMetadataRequest) ProtoMessage() {}
 
 func (x *AddMetadataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[3]
+	mi := &file_bosca_content_metadata_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -424,7 +479,7 @@ func (x *AddMetadataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddMetadataRequest.ProtoReflect.Descriptor instead.
 func (*AddMetadataRequest) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{3}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AddMetadataRequest) GetCollection() string {
@@ -452,7 +507,7 @@ type AddMetadatasRequest struct {
 func (x *AddMetadatasRequest) Reset() {
 	*x = AddMetadatasRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[4]
+		mi := &file_bosca_content_metadata_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -465,7 +520,7 @@ func (x *AddMetadatasRequest) String() string {
 func (*AddMetadatasRequest) ProtoMessage() {}
 
 func (x *AddMetadatasRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[4]
+	mi := &file_bosca_content_metadata_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -478,7 +533,7 @@ func (x *AddMetadatasRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddMetadatasRequest.ProtoReflect.Descriptor instead.
 func (*AddMetadatasRequest) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{4}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *AddMetadatasRequest) GetMetadatas() []*AddMetadataRequest {
@@ -499,7 +554,7 @@ type Metadatas struct {
 func (x *Metadatas) Reset() {
 	*x = Metadatas{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[5]
+		mi := &file_bosca_content_metadata_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -512,7 +567,7 @@ func (x *Metadatas) String() string {
 func (*Metadatas) ProtoMessage() {}
 
 func (x *Metadatas) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[5]
+	mi := &file_bosca_content_metadata_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -525,7 +580,7 @@ func (x *Metadatas) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Metadatas.ProtoReflect.Descriptor instead.
 func (*Metadatas) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{5}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Metadatas) GetMetadata() []*Metadata {
@@ -547,7 +602,7 @@ type MetadataRelationshipIdRequest struct {
 func (x *MetadataRelationshipIdRequest) Reset() {
 	*x = MetadataRelationshipIdRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[6]
+		mi := &file_bosca_content_metadata_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -560,7 +615,7 @@ func (x *MetadataRelationshipIdRequest) String() string {
 func (*MetadataRelationshipIdRequest) ProtoMessage() {}
 
 func (x *MetadataRelationshipIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[6]
+	mi := &file_bosca_content_metadata_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -573,7 +628,7 @@ func (x *MetadataRelationshipIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetadataRelationshipIdRequest.ProtoReflect.Descriptor instead.
 func (*MetadataRelationshipIdRequest) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{6}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *MetadataRelationshipIdRequest) GetId() string {
@@ -604,7 +659,7 @@ type MetadataRelationship struct {
 func (x *MetadataRelationship) Reset() {
 	*x = MetadataRelationship{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[7]
+		mi := &file_bosca_content_metadata_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -617,7 +672,7 @@ func (x *MetadataRelationship) String() string {
 func (*MetadataRelationship) ProtoMessage() {}
 
 func (x *MetadataRelationship) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[7]
+	mi := &file_bosca_content_metadata_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -630,7 +685,7 @@ func (x *MetadataRelationship) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetadataRelationship.ProtoReflect.Descriptor instead.
 func (*MetadataRelationship) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{7}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *MetadataRelationship) GetMetadataId1() string {
@@ -672,7 +727,7 @@ type MetadataRelationships struct {
 func (x *MetadataRelationships) Reset() {
 	*x = MetadataRelationships{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[8]
+		mi := &file_bosca_content_metadata_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -685,7 +740,7 @@ func (x *MetadataRelationships) String() string {
 func (*MetadataRelationships) ProtoMessage() {}
 
 func (x *MetadataRelationships) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[8]
+	mi := &file_bosca_content_metadata_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -698,7 +753,7 @@ func (x *MetadataRelationships) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetadataRelationships.ProtoReflect.Descriptor instead.
 func (*MetadataRelationships) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{8}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *MetadataRelationships) GetRelationships() []*MetadataRelationship {
@@ -720,7 +775,7 @@ type AddMetadataTraitRequest struct {
 func (x *AddMetadataTraitRequest) Reset() {
 	*x = AddMetadataTraitRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[9]
+		mi := &file_bosca_content_metadata_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -733,7 +788,7 @@ func (x *AddMetadataTraitRequest) String() string {
 func (*AddMetadataTraitRequest) ProtoMessage() {}
 
 func (x *AddMetadataTraitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[9]
+	mi := &file_bosca_content_metadata_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -746,7 +801,7 @@ func (x *AddMetadataTraitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddMetadataTraitRequest.ProtoReflect.Descriptor instead.
 func (*AddMetadataTraitRequest) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{9}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *AddMetadataTraitRequest) GetMetadataId() string {
@@ -775,7 +830,7 @@ type SetMetadataTraitsRequest struct {
 func (x *SetMetadataTraitsRequest) Reset() {
 	*x = SetMetadataTraitsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[10]
+		mi := &file_bosca_content_metadata_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -788,7 +843,7 @@ func (x *SetMetadataTraitsRequest) String() string {
 func (*SetMetadataTraitsRequest) ProtoMessage() {}
 
 func (x *SetMetadataTraitsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[10]
+	mi := &file_bosca_content_metadata_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -801,7 +856,7 @@ func (x *SetMetadataTraitsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetMetadataTraitsRequest.ProtoReflect.Descriptor instead.
 func (*SetMetadataTraitsRequest) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{10}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SetMetadataTraitsRequest) GetMetadataId() string {
@@ -836,7 +891,7 @@ type AddSupplementaryRequest struct {
 func (x *AddSupplementaryRequest) Reset() {
 	*x = AddSupplementaryRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[11]
+		mi := &file_bosca_content_metadata_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -849,7 +904,7 @@ func (x *AddSupplementaryRequest) String() string {
 func (*AddSupplementaryRequest) ProtoMessage() {}
 
 func (x *AddSupplementaryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[11]
+	mi := &file_bosca_content_metadata_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -862,7 +917,7 @@ func (x *AddSupplementaryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddSupplementaryRequest.ProtoReflect.Descriptor instead.
 func (*AddSupplementaryRequest) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{11}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *AddSupplementaryRequest) GetMetadataId() string {
@@ -932,7 +987,7 @@ type FindMetadataRequest struct {
 func (x *FindMetadataRequest) Reset() {
 	*x = FindMetadataRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_bosca_content_metadata_proto_msgTypes[12]
+		mi := &file_bosca_content_metadata_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -945,7 +1000,7 @@ func (x *FindMetadataRequest) String() string {
 func (*FindMetadataRequest) ProtoMessage() {}
 
 func (x *FindMetadataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bosca_content_metadata_proto_msgTypes[12]
+	mi := &file_bosca_content_metadata_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -958,7 +1013,7 @@ func (x *FindMetadataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FindMetadataRequest.ProtoReflect.Descriptor instead.
 func (*FindMetadataRequest) Descriptor() ([]byte, []int) {
-	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{12}
+	return file_bosca_content_metadata_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *FindMetadataRequest) GetAttributes() map[string]string {
@@ -977,7 +1032,14 @@ var file_bosca_content_metadata_proto_rawDesc = []byte{
 	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74,
 	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1c,
 	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f,
-	0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xd4, 0x07, 0x0a,
+	0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x6e, 0x0a, 0x14,
+	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x65, 0x61, 0x64, 0x79, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x02, 0x69, 0x64, 0x12, 0x30, 0x0a, 0x11, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f, 0x69,
+	0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x48,
+	0x00, 0x52, 0x10, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66,
+	0x69, 0x65, 0x72, 0x88, 0x01, 0x01, 0x42, 0x14, 0x0a, 0x12, 0x5f, 0x73, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x5f, 0x69, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x22, 0xd4, 0x07, 0x0a,
 	0x08, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x1d, 0x0a, 0x0a, 0x64, 0x65, 0x66,
 	0x61, 0x75, 0x6c, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x64,
 	0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x49, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02,
@@ -1173,37 +1235,38 @@ func file_bosca_content_metadata_proto_rawDescGZIP() []byte {
 	return file_bosca_content_metadata_proto_rawDescData
 }
 
-var file_bosca_content_metadata_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_bosca_content_metadata_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_bosca_content_metadata_proto_goTypes = []any{
-	(*Metadata)(nil),                      // 0: bosca.content.Metadata
-	(*MetadataSupplementaries)(nil),       // 1: bosca.content.MetadataSupplementaries
-	(*MetadataSupplementary)(nil),         // 2: bosca.content.MetadataSupplementary
-	(*AddMetadataRequest)(nil),            // 3: bosca.content.AddMetadataRequest
-	(*AddMetadatasRequest)(nil),           // 4: bosca.content.AddMetadatasRequest
-	(*Metadatas)(nil),                     // 5: bosca.content.Metadatas
-	(*MetadataRelationshipIdRequest)(nil), // 6: bosca.content.MetadataRelationshipIdRequest
-	(*MetadataRelationship)(nil),          // 7: bosca.content.MetadataRelationship
-	(*MetadataRelationships)(nil),         // 8: bosca.content.MetadataRelationships
-	(*AddMetadataTraitRequest)(nil),       // 9: bosca.content.AddMetadataTraitRequest
-	(*SetMetadataTraitsRequest)(nil),      // 10: bosca.content.SetMetadataTraitsRequest
-	(*AddSupplementaryRequest)(nil),       // 11: bosca.content.AddSupplementaryRequest
-	(*FindMetadataRequest)(nil),           // 12: bosca.content.FindMetadataRequest
-	nil,                                   // 13: bosca.content.Metadata.AttributesEntry
-	nil,                                   // 14: bosca.content.MetadataRelationship.AttributesEntry
-	nil,                                   // 15: bosca.content.FindMetadataRequest.AttributesEntry
-	(*timestamppb.Timestamp)(nil),         // 16: google.protobuf.Timestamp
+	(*MetadataReadyRequest)(nil),          // 0: bosca.content.MetadataReadyRequest
+	(*Metadata)(nil),                      // 1: bosca.content.Metadata
+	(*MetadataSupplementaries)(nil),       // 2: bosca.content.MetadataSupplementaries
+	(*MetadataSupplementary)(nil),         // 3: bosca.content.MetadataSupplementary
+	(*AddMetadataRequest)(nil),            // 4: bosca.content.AddMetadataRequest
+	(*AddMetadatasRequest)(nil),           // 5: bosca.content.AddMetadatasRequest
+	(*Metadatas)(nil),                     // 6: bosca.content.Metadatas
+	(*MetadataRelationshipIdRequest)(nil), // 7: bosca.content.MetadataRelationshipIdRequest
+	(*MetadataRelationship)(nil),          // 8: bosca.content.MetadataRelationship
+	(*MetadataRelationships)(nil),         // 9: bosca.content.MetadataRelationships
+	(*AddMetadataTraitRequest)(nil),       // 10: bosca.content.AddMetadataTraitRequest
+	(*SetMetadataTraitsRequest)(nil),      // 11: bosca.content.SetMetadataTraitsRequest
+	(*AddSupplementaryRequest)(nil),       // 12: bosca.content.AddSupplementaryRequest
+	(*FindMetadataRequest)(nil),           // 13: bosca.content.FindMetadataRequest
+	nil,                                   // 14: bosca.content.Metadata.AttributesEntry
+	nil,                                   // 15: bosca.content.MetadataRelationship.AttributesEntry
+	nil,                                   // 16: bosca.content.FindMetadataRequest.AttributesEntry
+	(*timestamppb.Timestamp)(nil),         // 17: google.protobuf.Timestamp
 }
 var file_bosca_content_metadata_proto_depIdxs = []int32{
-	13, // 0: bosca.content.Metadata.attributes:type_name -> bosca.content.Metadata.AttributesEntry
-	16, // 1: bosca.content.Metadata.created:type_name -> google.protobuf.Timestamp
-	16, // 2: bosca.content.Metadata.modified:type_name -> google.protobuf.Timestamp
-	2,  // 3: bosca.content.MetadataSupplementaries.supplementaries:type_name -> bosca.content.MetadataSupplementary
-	0,  // 4: bosca.content.AddMetadataRequest.metadata:type_name -> bosca.content.Metadata
-	3,  // 5: bosca.content.AddMetadatasRequest.metadatas:type_name -> bosca.content.AddMetadataRequest
-	0,  // 6: bosca.content.Metadatas.metadata:type_name -> bosca.content.Metadata
-	14, // 7: bosca.content.MetadataRelationship.attributes:type_name -> bosca.content.MetadataRelationship.AttributesEntry
-	7,  // 8: bosca.content.MetadataRelationships.relationships:type_name -> bosca.content.MetadataRelationship
-	15, // 9: bosca.content.FindMetadataRequest.attributes:type_name -> bosca.content.FindMetadataRequest.AttributesEntry
+	14, // 0: bosca.content.Metadata.attributes:type_name -> bosca.content.Metadata.AttributesEntry
+	17, // 1: bosca.content.Metadata.created:type_name -> google.protobuf.Timestamp
+	17, // 2: bosca.content.Metadata.modified:type_name -> google.protobuf.Timestamp
+	3,  // 3: bosca.content.MetadataSupplementaries.supplementaries:type_name -> bosca.content.MetadataSupplementary
+	1,  // 4: bosca.content.AddMetadataRequest.metadata:type_name -> bosca.content.Metadata
+	4,  // 5: bosca.content.AddMetadatasRequest.metadatas:type_name -> bosca.content.AddMetadataRequest
+	1,  // 6: bosca.content.Metadatas.metadata:type_name -> bosca.content.Metadata
+	15, // 7: bosca.content.MetadataRelationship.attributes:type_name -> bosca.content.MetadataRelationship.AttributesEntry
+	8,  // 8: bosca.content.MetadataRelationships.relationships:type_name -> bosca.content.MetadataRelationship
+	16, // 9: bosca.content.FindMetadataRequest.attributes:type_name -> bosca.content.FindMetadataRequest.AttributesEntry
 	10, // [10:10] is the sub-list for method output_type
 	10, // [10:10] is the sub-list for method input_type
 	10, // [10:10] is the sub-list for extension type_name
@@ -1218,7 +1281,7 @@ func file_bosca_content_metadata_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_bosca_content_metadata_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*Metadata); i {
+			switch v := v.(*MetadataReadyRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1230,7 +1293,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*MetadataSupplementaries); i {
+			switch v := v.(*Metadata); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1242,7 +1305,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*MetadataSupplementary); i {
+			switch v := v.(*MetadataSupplementaries); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1254,7 +1317,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*AddMetadataRequest); i {
+			switch v := v.(*MetadataSupplementary); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1266,7 +1329,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*AddMetadatasRequest); i {
+			switch v := v.(*AddMetadataRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1278,7 +1341,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[5].Exporter = func(v any, i int) any {
-			switch v := v.(*Metadatas); i {
+			switch v := v.(*AddMetadatasRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1290,7 +1353,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[6].Exporter = func(v any, i int) any {
-			switch v := v.(*MetadataRelationshipIdRequest); i {
+			switch v := v.(*Metadatas); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1302,7 +1365,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[7].Exporter = func(v any, i int) any {
-			switch v := v.(*MetadataRelationship); i {
+			switch v := v.(*MetadataRelationshipIdRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1314,7 +1377,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[8].Exporter = func(v any, i int) any {
-			switch v := v.(*MetadataRelationships); i {
+			switch v := v.(*MetadataRelationship); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1326,7 +1389,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[9].Exporter = func(v any, i int) any {
-			switch v := v.(*AddMetadataTraitRequest); i {
+			switch v := v.(*MetadataRelationships); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1338,7 +1401,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[10].Exporter = func(v any, i int) any {
-			switch v := v.(*SetMetadataTraitsRequest); i {
+			switch v := v.(*AddMetadataTraitRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1350,7 +1413,7 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[11].Exporter = func(v any, i int) any {
-			switch v := v.(*AddSupplementaryRequest); i {
+			switch v := v.(*SetMetadataTraitsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1362,6 +1425,18 @@ func file_bosca_content_metadata_proto_init() {
 			}
 		}
 		file_bosca_content_metadata_proto_msgTypes[12].Exporter = func(v any, i int) any {
+			switch v := v.(*AddSupplementaryRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_bosca_content_metadata_proto_msgTypes[13].Exporter = func(v any, i int) any {
 			switch v := v.(*FindMetadataRequest); i {
 			case 0:
 				return &v.state
@@ -1375,17 +1450,18 @@ func file_bosca_content_metadata_proto_init() {
 		}
 	}
 	file_bosca_content_metadata_proto_msgTypes[0].OneofWrappers = []any{}
-	file_bosca_content_metadata_proto_msgTypes[2].OneofWrappers = []any{}
+	file_bosca_content_metadata_proto_msgTypes[1].OneofWrappers = []any{}
 	file_bosca_content_metadata_proto_msgTypes[3].OneofWrappers = []any{}
-	file_bosca_content_metadata_proto_msgTypes[6].OneofWrappers = []any{}
-	file_bosca_content_metadata_proto_msgTypes[11].OneofWrappers = []any{}
+	file_bosca_content_metadata_proto_msgTypes[4].OneofWrappers = []any{}
+	file_bosca_content_metadata_proto_msgTypes[7].OneofWrappers = []any{}
+	file_bosca_content_metadata_proto_msgTypes[12].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_bosca_content_metadata_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

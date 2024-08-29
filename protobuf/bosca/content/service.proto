@@ -254,9 +254,10 @@ service ContentService {
     };
   }
 
-  rpc SetMetadataReady(bosca.IdRequest) returns (Empty) {
+  rpc SetMetadataReady(MetadataReadyRequest) returns (Empty) {
     option (google.api.http) = {
       post: "/v1/content/metadata/{id}/ready"
+      body: "*"
     };
   }
 

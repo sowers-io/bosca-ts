@@ -1,7 +1,6 @@
 {
   "name": "@bosca/protobufs",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.0.1",
   "scripts": {
     "build": "tsc --build",
     "build.watch": "tsc --build --watch",
@@ -17,5 +16,15 @@
     "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect": "^1.4.0",
     "@connectrpc/connect-node": "^1.4.0"
+  },
+  "author": "Kyle Brock <kyle@sowers.io>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/sowers-io/bosca/issues"
+  },
+  "homepage": "https://github.com/sowers-io/bosca#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/bosca/node-packages",
+    "access": "public"
   }
 }

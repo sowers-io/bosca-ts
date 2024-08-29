@@ -1,0 +1,142 @@
+include:
+  # This includes services like database, storage, etc
+  - ../services/docker-compose.yaml
+
+services:
+  migration-content:
+    image: ghcr.io/sowers-io/bosca/migration-content:latest
+    environment:
+      GOOSE_DRIVER: postgres
+      GOOSE_DBSTRING: postgresql://bosca:bosca@postgres:5432/boscacontent
+    networks:
+      - net1
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  content:
+    restart: always
+    image: ghcr.io/sowers-io/bosca/content:latest
+    environment:
+      BOSCA_CONTENT_API_ADDRESS: content:7000
+      BOSCA_WORKFLOW_API_ADDRESS: workflow:7100
+      BOSCA_WORKFLOW_QUEUE_API_ADDRESS: workflow-queue:7200
+      BOSCA_CONTENT_CONNECTION_STRING: postgresql://bosca:bosca@postgres:5432/boscacontent
+      BOSCA_S3_ACCESS_KEY_ID: 67fO5gFs6BuksBrh6rMp
+      BOSCA_S3_ENDPOINT: http://minio:9010
+      BOSCA_S3_SECRET_ACCESS_KEY: eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
+      BOSCA_STORAGE_TYPE: minio
+      BOSCA_SERVICE_ACCOUNT_ID: sa
+      BOSCA_SERVICE_ACCOUNT_TOKEN: sat
+      BOSCA_SESSION_ENDPOINT: http://kratos:4433/sessions/whoami
+      BOSCA_PERMISSIONS_SHARED_TOKEN: bosca-spicedb
+      BOSCA_PERMISSIONS_ENDPOINT: spicedb:50051
+      BOSCA_MEILISEARCH_API_ADDRESS: http://meilisearch:7700
+      BOSCA_MEILI_MASTER_KEY: p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M
+      DISABLE_OTEL: "true"
+      NODE_ENV: production
+    ports:
+      - "7000:7000"
+    networks:
+      - net1
+
+  workflow:
+    restart: always
+    image: ghcr.io/sowers-io/bosca/workflow:latest
+    environment:
+      BOSCA_CONTENT_API_ADDRESS: content:7000
+      BOSCA_WORKFLOW_API_ADDRESS: workflow:7100
+      BOSCA_WORKFLOW_QUEUE_API_ADDRESS: workflow-queue:7200
+      BOSCA_WORKFLOW_CONNECTION_STRING: postgresql://bosca:bosca@postgres:5432/boscacontent
+      BOSCA_S3_ACCESS_KEY_ID: 67fO5gFs6BuksBrh6rMp
+      BOSCA_S3_ENDPOINT: http://minio:9010
+      BOSCA_S3_SECRET_ACCESS_KEY: eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
+      BOSCA_STORAGE_TYPE: minio
+      BOSCA_SERVICE_ACCOUNT_ID: sa
+      BOSCA_SERVICE_ACCOUNT_TOKEN: sat
+      BOSCA_SESSION_ENDPOINT: http://kratos:4433/sessions/whoami
+      BOSCA_PERMISSIONS_SHARED_TOKEN: bosca-spicedb
+      BOSCA_PERMISSIONS_ENDPOINT: spicedb:50051
+      BOSCA_MEILISEARCH_API_ADDRESS: http://meilisearch:7700
+      BOSCA_MEILI_MASTER_KEY: p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M
+      BOSCA_QDRANT_API_ADDRESS: qdrant:6334
+      BOSCA_QDRANT_REST_API_ADDRESS: http://qdrant:6333
+      DISABLE_OTEL: "true"
+      NODE_ENV: production
+    ports:
+      - "7100:7100"
+    networks:
+      - net1
+
+  workflow-queue:
+    restart: always
+    image: ghcr.io/sowers-io/bosca/workflow-queue:latest
+    environment:
+      BOSCA_REDIS_HOST: dragonfly
+      BOSCA_REDIS_PORT: 6379
+      BOSCA_CONTENT_API_ADDRESS: content:7000
+      BOSCA_WORKFLOW_API_ADDRESS: workflow:7100
+      BOSCA_PERMISSIONS_SHARED_TOKEN: bosca-spicedb
+      BOSCA_QDRANT_API_ADDRESS: qdrant:6334
+      BOSCA_SERVICE_ACCOUNT_ID: sa
+      BOSCA_SERVICE_ACCOUNT_TOKEN: sat
+      DISABLE_OTEL: "true"
+      NODE_ENV: production
+    ports:
+      - "7200:7200"
+    networks:
+      - net1
+
+  workflow-workers:
+    restart: always
+    image: ghcr.io/sowers-io/bosca/workflow-workers:latest
+    environment:
+      BOSCA_REDIS_HOST: dragonfly
+      BOSCA_REDIS_PORT: 6379
+      BOSCA_CONTENT_API_ADDRESS: content:7000
+      BOSCA_WORKFLOW_API_ADDRESS: workflow:7100
+      BOSCA_WORKFLOW_QUEUE_API_ADDRESS: workflow-queue:7200
+      BOSCA_MEILISEARCH_API_ADDRESS: http://meilisearch:7700
+      BOSCA_MEILI_MASTER_KEY: p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M
+      BOSCA_S3_ACCESS_KEY_ID: 67fO5gFs6BuksBrh6rMp
+      BOSCA_S3_ENDPOINT: http://minio:9010
+      BOSCA_S3_BUCKET: bosca
+      BOSCA_S3_SECRET_ACCESS_KEY: eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
+      BOSCA_SERVICE_ACCOUNT_ID: sa
+      BOSCA_SERVICE_ACCOUNT_TOKEN: sat
+      BOSCA_SESSION_ENDPOINT: http://kratos:4433/sessions/whoami
+      BOSCA_PERMISSIONS_SHARED_TOKEN: bosca-spicedb
+      BOSCA_PERMISSIONS_ENDPOINT: spicedb:50051
+      BOSCA_QDRANT_API_ADDRESS: qdrant:6334
+      BOSCA_QDRANT_REST_API_ADDRESS: http://qdrant:6333
+      DISABLE_OTEL: "true"
+      NODE_ENV: production
+    networks:
+      - net1
+
+  imageproxy:
+    image: ghcr.io/sowers-io/bosca/imageproxy:latest
+    environment:
+      SUPPORTED_URLS: http://minio
+      DISABLE_OTEL: "true"
+      NODE_ENV: production
+    ports:
+      - "8002:8002"
+    networks:
+      - net1
+
+  graphql:
+    image: ghcr.io/sowers-io/bosca/graphql:latest
+    environment:
+      BOSCA_CONTENT_API_ADDRESS: content:7000
+      BOSCA_SESSION_ENDPOINT: http://kratos:4433/sessions/whoami
+      BOSCA_PERMISSIONS_SHARED_TOKEN: bosca-spicedb
+      BOSCA_PERMISSIONS_ENDPOINT: spicedb:50051
+      BOSCA_SERVICE_ACCOUNT_ID: sa
+      BOSCA_SERVICE_ACCOUNT_TOKEN: sat
+      DISABLE_OTEL: "true"
+      NODE_ENV: production
+    ports:
+      - "9000:9000"
+    networks:
+      - net1

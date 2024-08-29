@@ -1,7 +1,6 @@
 {
   "name": "@bosca/workflow-activities-api",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.0.1",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --build",

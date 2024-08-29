@@ -58,6 +58,7 @@ const (
 	ContentService_GetMetadatas_FullMethodName                        = "/bosca.content.ContentService/GetMetadatas"
 	ContentService_SetMetadataActiveVersion_FullMethodName            = "/bosca.content.ContentService/SetMetadataActiveVersion"
 	ContentService_AddMetadata_FullMethodName                         = "/bosca.content.ContentService/AddMetadata"
+	ContentService_AddMetadataAttributes_FullMethodName               = "/bosca.content.ContentService/AddMetadataAttributes"
 	ContentService_AddMetadatas_FullMethodName                        = "/bosca.content.ContentService/AddMetadatas"
 	ContentService_AddMetadataTrait_FullMethodName                    = "/bosca.content.ContentService/AddMetadataTrait"
 	ContentService_SetMetadataTraits_FullMethodName                   = "/bosca.content.ContentService/SetMetadataTraits"
@@ -108,6 +109,7 @@ type ContentServiceClient interface {
 	GetMetadatas(ctx context.Context, in *bosca.IdsRequest, opts ...grpc.CallOption) (*Metadatas, error)
 	SetMetadataActiveVersion(ctx context.Context, in *bosca.IdAndVersionRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddMetadata(ctx context.Context, in *AddMetadataRequest, opts ...grpc.CallOption) (*bosca.IdResponse, error)
+	AddMetadataAttributes(ctx context.Context, in *AddMetadataAttributesRequest, opts ...grpc.CallOption) (*Metadata, error)
 	AddMetadatas(ctx context.Context, in *AddMetadatasRequest, opts ...grpc.CallOption) (*bosca.IdResponses, error)
 	AddMetadataTrait(ctx context.Context, in *AddMetadataTraitRequest, opts ...grpc.CallOption) (*Metadata, error)
 	SetMetadataTraits(ctx context.Context, in *SetMetadataTraitsRequest, opts ...grpc.CallOption) (*Metadata, error)
@@ -369,6 +371,16 @@ func (c *contentServiceClient) AddMetadata(ctx context.Context, in *AddMetadataR
 	return out, nil
 }
 
+func (c *contentServiceClient) AddMetadataAttributes(ctx context.Context, in *AddMetadataAttributesRequest, opts ...grpc.CallOption) (*Metadata, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Metadata)
+	err := c.cc.Invoke(ctx, ContentService_AddMetadataAttributes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) AddMetadatas(ctx context.Context, in *AddMetadatasRequest, opts ...grpc.CallOption) (*bosca.IdResponses, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.IdResponses)
@@ -606,6 +618,7 @@ type ContentServiceServer interface {
 	GetMetadatas(context.Context, *bosca.IdsRequest) (*Metadatas, error)
 	SetMetadataActiveVersion(context.Context, *bosca.IdAndVersionRequest) (*bosca.Empty, error)
 	AddMetadata(context.Context, *AddMetadataRequest) (*bosca.IdResponse, error)
+	AddMetadataAttributes(context.Context, *AddMetadataAttributesRequest) (*Metadata, error)
 	AddMetadatas(context.Context, *AddMetadatasRequest) (*bosca.IdResponses, error)
 	AddMetadataTrait(context.Context, *AddMetadataTraitRequest) (*Metadata, error)
 	SetMetadataTraits(context.Context, *SetMetadataTraitsRequest) (*Metadata, error)
@@ -705,6 +718,9 @@ func (UnimplementedContentServiceServer) SetMetadataActiveVersion(context.Contex
 }
 func (UnimplementedContentServiceServer) AddMetadata(context.Context, *AddMetadataRequest) (*bosca.IdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadata not implemented")
+}
+func (UnimplementedContentServiceServer) AddMetadataAttributes(context.Context, *AddMetadataAttributesRequest) (*Metadata, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataAttributes not implemented")
 }
 func (UnimplementedContentServiceServer) AddMetadatas(context.Context, *AddMetadatasRequest) (*bosca.IdResponses, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadatas not implemented")
@@ -1204,6 +1220,24 @@ func _ContentService_AddMetadata_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_AddMetadataAttributes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMetadataAttributesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).AddMetadataAttributes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_AddMetadataAttributes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).AddMetadataAttributes(ctx, req.(*AddMetadataAttributesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_AddMetadatas_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddMetadatasRequest)
 	if err := dec(in); err != nil {
@@ -1680,6 +1714,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddMetadata",
 			Handler:    _ContentService_AddMetadata_Handler,
+		},
+		{
+			MethodName: "AddMetadataAttributes",
+			Handler:    _ContentService_AddMetadataAttributes_Handler,
 		},
 		{
 			MethodName: "AddMetadatas",

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { Activity, ActivityJobExecutor, Downloader, Retry } from '@bosca/workflow-activities-api'
+import { Activity, ActivityJobExecutor, Downloader, Retry, uploadSupplementary } from '@bosca/workflow-activities-api'
 import { Job } from 'bullmq'
-import { WorkflowJob } from '@bosca/protobufs'
+import { AddMetadataAttributesRequest, ContentService, IdRequest, WorkflowJob } from '@bosca/protobufs'
 import { Mux } from '@mux/mux-node'
 import * as fs from 'node:fs'
 import { promisify } from 'node:util'
-import { logger } from '@bosca/common'
+import { logger, toArrayBuffer, useServiceAccountClient } from '@bosca/common'
 
 export class SendToMux extends Activity {
 
@@ -46,12 +46,14 @@ class Executor extends ActivityJobExecutor<SendToMux> {
   async execute() {
     const fileName = await this.activity.downloader.download(this.definition)
     try {
-      let uploadUrl = await this.job.data['uploadUrl']
+      const mux = new Mux({
+        tokenId: process.env.MUX_TOKEN_ID,
+        tokenSecret: process.env.MUX_TOKEN_SECRET,
+      })
+
+      let uploadUrl = this.job.data['uploadUrl']
+      let uploadId = this.job.data['uploadId']
       if (!uploadUrl) {
-        const mux = new Mux({
-          tokenId: process.env.MUX_TOKEN_ID,
-          tokenSecret: process.env.MUX_TOKEN_SECRET,
-        })
         const initialUpload = await mux.video.uploads.create({
           cors_origin: '*',
           new_asset_settings: {
@@ -61,9 +63,11 @@ class Executor extends ActivityJobExecutor<SendToMux> {
           },
         })
         uploadUrl = initialUpload.url
+        uploadId = initialUpload.id
         await this.job.updateData({
           ...this.job.data,
           'uploadUrl': uploadUrl,
+          'uploadId': uploadId,
         })
       }
       const fileBuffer = await readFile(fileName)
@@ -88,6 +92,40 @@ class Executor extends ActivityJobExecutor<SendToMux> {
           }
         })
       }
+      const { url, assetId } = await Retry.execute(50, async () => {
+        const result = await mux.video.uploads.retrieve(uploadId)
+        if (!result.asset_id) throw new Error('missing asset id')
+        const asset = await mux.video.assets.retrieve(result.asset_id!)
+        const playbackId = await mux.video.assets.createPlaybackId(asset.id, {
+          policy: 'public',
+        })
+        return { url: 'https://stream.mux.com/' + playbackId.id + '.m3u8', assetId: result.asset_id! }
+      })
+      const service = useServiceAccountClient(ContentService)
+      const source = await service.getSource(new IdRequest({ id: 'workflow' }))
+      await service.addMetadataAttributes(new AddMetadataAttributesRequest({
+        id: this.definition.metadataId!,
+        attributes: {
+          'mux.hls.url': url,
+          'mux.asset.id': assetId,
+        },
+      }))
+      await uploadSupplementary(
+        this.definition.metadataId!,
+        'Mux HLS',
+        'text/json',
+        this.definition.supplementaryId
+          ? this.definition.activity!.outputs['supplementaryId'] + this.definition.supplementaryId
+          : this.definition.activity!.outputs['supplementaryId'],
+        source.id,
+        undefined,
+        undefined,
+        toArrayBuffer(JSON.stringify({
+          'uploadId': uploadId,
+          'assetId': assetId,
+          'hls.url': url,
+        })),
+      )
     } finally {
       await this.activity.downloader.cleanup(fileName)
     }

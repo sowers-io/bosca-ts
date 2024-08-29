@@ -25,7 +25,7 @@ import { IdAndVersionRequest, IdRequest, IdResponse, IdResponses, IdsRequest, Su
 import { Trait, Traits } from "./traits_pb";
 import { AddCollectionItemRequest, AddCollectionRequest, AddCollectionsRequest, Collection, CollectionItems, Collections, FindCollectionRequest } from "./collections_pb";
 import { Permission, PermissionCheckRequest, PermissionCheckResponse, Permissions } from "./permissions_pb";
-import { AddMetadataRequest, AddMetadatasRequest, AddMetadataTraitRequest, AddSupplementaryRequest, FindMetadataRequest, Metadata, MetadataReadyRequest, MetadataRelationship, MetadataRelationshipIdRequest, MetadataRelationships, Metadatas, MetadataSupplementaries, MetadataSupplementary, SetMetadataTraitsRequest } from "./metadata_pb";
+import { AddMetadataAttributesRequest, AddMetadataRequest, AddMetadatasRequest, AddMetadataTraitRequest, AddSupplementaryRequest, FindMetadataRequest, Metadata, MetadataReadyRequest, MetadataRelationship, MetadataRelationshipIdRequest, MetadataRelationships, Metadatas, MetadataSupplementaries, MetadataSupplementary, SetMetadataTraitsRequest } from "./metadata_pb";
 import { SignedUrl } from "./url_pb";
 import { SetWorkflowStateCompleteRequest, SetWorkflowStateRequest } from "./workflows_pb";
 
@@ -240,6 +240,15 @@ export const ContentService = {
       name: "AddMetadata",
       I: AddMetadataRequest,
       O: IdResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.AddMetadataAttributes
+     */
+    addMetadataAttributes: {
+      name: "AddMetadataAttributes",
+      I: AddMetadataAttributesRequest,
+      O: Metadata,
       kind: MethodKind.Unary,
     },
     /**

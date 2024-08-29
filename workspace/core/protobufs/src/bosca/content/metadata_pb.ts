@@ -375,6 +375,49 @@ export class AddMetadataRequest extends Message<AddMetadataRequest> {
 }
 
 /**
+ * @generated from message bosca.content.AddMetadataAttributesRequest
+ */
+export class AddMetadataAttributesRequest extends Message<AddMetadataAttributesRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: map<string, string> attributes = 2;
+   */
+  attributes: { [key: string]: string } = {};
+
+  constructor(data?: PartialMessage<AddMetadataAttributesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.AddMetadataAttributesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "attributes", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddMetadataAttributesRequest {
+    return new AddMetadataAttributesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AddMetadataAttributesRequest {
+    return new AddMetadataAttributesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AddMetadataAttributesRequest {
+    return new AddMetadataAttributesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AddMetadataAttributesRequest | PlainMessage<AddMetadataAttributesRequest> | undefined, b: AddMetadataAttributesRequest | PlainMessage<AddMetadataAttributesRequest> | undefined): boolean {
+    return proto3.util.equals(AddMetadataAttributesRequest, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.content.AddMetadatasRequest
  */
 export class AddMetadatasRequest extends Message<AddMetadatasRequest> {

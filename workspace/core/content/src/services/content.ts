@@ -21,6 +21,7 @@ import {
   Collections,
   ContentService,
   Empty,
+  IdRequest,
   IdResponse,
   IdResponses,
   IdResponsesId,
@@ -284,6 +285,21 @@ export function content(
         }
       }
       return new IdResponses({ id: ids })
+    },
+    async addMetadataAttributes(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        request.id,
+        PermissionAction.edit,
+      )
+      await dataSource.addMetadataAttributes(request.id, request.attributes)
+      const metadata = await dataSource.getMetadata(request.id)
+      if (!metadata) {
+        throw new ConnectError('missing metadata', Code.NotFound)
+      }
+      return metadata
     },
     async addMetadataTrait(request, context) {
       const subject = context.values.get(SubjectKey)

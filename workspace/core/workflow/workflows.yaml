@@ -15,6 +15,13 @@ traits:
     workflowIds:
       - bible.usx.verse
   common.temporary: { }
+  media.video.local:
+    workflowIds:
+      - media.transcribe
+  media.video.mux:
+    workflowIds:
+      - media.transcribe
+      - video.send_to_mux
 
 models:
   default:
@@ -204,6 +211,14 @@ workflows:
     bible.book.verse.table.create:
       outputs:
         supplementaryId: supplementary
+    # media
+    media.transcribe:
+      outputs:
+        supplementaryId: supplementary
+    video.send_to_mux:
+      outputs:
+        supplementaryId: supplementary
+
   workflows:
     # metadata workflows
     metadata.process:
@@ -275,6 +290,20 @@ workflows:
         metadata.text.index:
           storageSystems:
             bible.verse.search.index: { }
+    # media transcription
+    media.transcribe:
+      queue: media-transcription
+      activities:
+        media.transcribe:
+          outputs:
+            supplementaryId: transcription
+    # video hls stream
+    video.send_to_mux:
+      queue: media-upload
+      activities:
+        video.send_to_mux:
+          outputs:
+            supplementaryId: mux
 
 prompts:
   verse.labeller:

@@ -77,6 +77,11 @@ message AddMetadataRequest {
   Metadata metadata = 2;
 }
 
+message AddMetadataAttributesRequest {
+  string id = 1;
+  map<string, string> attributes = 2;
+}
+
 message AddMetadatasRequest {
   repeated AddMetadataRequest metadatas = 1;
 }

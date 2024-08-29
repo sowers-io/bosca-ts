@@ -175,6 +175,13 @@ service ContentService {
     };
   }
 
+  rpc AddMetadataAttributes(AddMetadataAttributesRequest) returns (Metadata) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/attributes"
+      body: "*"
+    };
+  }
+
   rpc AddMetadatas(AddMetadatasRequest) returns (IdResponses) {
     option (google.api.http) = {
       post: "/v1/content/metadatas"

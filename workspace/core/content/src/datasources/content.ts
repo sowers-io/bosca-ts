@@ -252,6 +252,10 @@ export class ContentDataSource extends DataSource {
     return { metadataId, version }
   }
 
+  async addMetadataAttributes(metadataId: string, attributes: { [key: string]: string }) {
+    await this.query('update metadata set attributes = attributes || $1::jsonb, modified = now() where id = $2::uuid', [attributes, metadataId])
+  }
+
   async addMetadataTrait(metadataId: string, traitId: string): Promise<void> {
     await this.query('insert into metadata_traits (metadata_id, trait_id) values ($1, $2)', [metadataId, traitId])
   }

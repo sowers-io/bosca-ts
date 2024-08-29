@@ -1,0 +1,34 @@
+{
+  "name": "@bosca/workflow-worker-api",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "lint": "nx eslint:lint",
+    "lint:fix": "nx eslint:lint --fix"
+  },
+  "dependencies": {
+    "@bosca/common": "workspace:*",
+    "@bosca/protobufs": "workspace:*",
+    "@bosca/workflow-activities-api": "workspace:*",
+    "@bufbuild/protobuf": "^1.10.0",
+    "@connectrpc/connect": "^1.4.0",
+    "@connectrpc/connect-fastify": "^1.4.0",
+    "@connectrpc/connect-node": "^1.4.0",
+    "@opentelemetry/api": "^1.9.0",
+    "bullmq": "^5.10.3"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-sso-oidc": "^3.614.0"
+  },
+  "author": "Kyle Brock <kyle@sowers.io>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/sowers-io/bosca/issues"
+  },
+  "homepage": "https://github.com/sowers-io/bosca#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/bosca/node-packages",
+    "access": "public"
+  }
+}

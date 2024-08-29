@@ -14,6 +14,7 @@
     "@bosca/common": "workspace:*",
     "@bosca/protobufs": "workspace:*",
     "@bosca/workflow-activities-api": "workspace:*",
+    "@bosca/workflow-worker-api": "workspace:*",
     "@bosca/bible-processor": "workspace:*",
     "@bosca/workflow-metadata-activities": "workspace:*",
     "@bosca/workflow-bible-activities": "workspace:*",

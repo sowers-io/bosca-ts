@@ -516,6 +516,39 @@ importers:
         specifier: ^4.28.1
         version: 4.28.1
 
+  workspace/core/workflow-worker-api:
+    dependencies:
+      '@aws-sdk/client-sso-oidc':
+        specifier: ^3.614.0
+        version: 3.624.0(@aws-sdk/client-sts@3.624.0)
+      '@bosca/common':
+        specifier: workspace:*
+        version: link:../common
+      '@bosca/protobufs':
+        specifier: workspace:*
+        version: link:../protobufs
+      '@bosca/workflow-activities-api':
+        specifier: workspace:*
+        version: link:../workflow-activities-api
+      '@bufbuild/protobuf':
+        specifier: ^1.10.0
+        version: 1.10.0
+      '@connectrpc/connect':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.10.0)
+      '@connectrpc/connect-fastify':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect-node@1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.10.0)))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.10.0))(fastify@4.28.1)
+      '@connectrpc/connect-node':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.10.0))
+      '@opentelemetry/api':
+        specifier: ^1.9.0
+        version: 1.9.0
+      bullmq:
+        specifier: ^5.10.3
+        version: 5.12.1
+
   workspace/frontend/bosca-ui:
     dependencies:
       '@bufbuild/protobuf':
@@ -924,6 +957,9 @@ importers:
       '@bosca/workflow-metadata-activities':
         specifier: workspace:*
         version: link:../metadata
+      '@bosca/workflow-worker-api':
+        specifier: workspace:*
+        version: link:../../core/workflow-worker-api
       '@bufbuild/protobuf':
         specifier: ^1.10.0
         version: 1.10.0
@@ -14128,21 +14164,6 @@ snapshots:
     transitivePeerDependencies:
       - nx
 
-  '@nrwl/js@19.6.2(@babel/traverse@7.25.3)(@types/node@20.16.1)(nx@19.6.2)(typescript@5.4.5)':
-    dependencies:
-      '@nx/js': 19.6.2(@babel/traverse@7.25.3)(@types/node@20.16.1)(nx@19.6.2)(typescript@5.4.5)
-    transitivePeerDependencies:
-      - '@babel/traverse'
-      - '@swc-node/register'
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - debug
-      - nx
-      - supports-color
-      - typescript
-      - verdaccio
-
   '@nrwl/js@19.6.2(@babel/traverse@7.25.3)(@types/node@20.16.1)(nx@19.6.2)(typescript@5.5.4)':
     dependencies:
       '@nx/js': 19.6.2(@babel/traverse@7.25.3)(@types/node@20.16.1)(nx@19.6.2)(typescript@5.5.4)
@@ -14324,7 +14345,7 @@ snapshots:
       '@babel/preset-env': 7.25.3(@babel/core@7.25.2)
       '@babel/preset-typescript': 7.24.7(@babel/core@7.25.2)
       '@babel/runtime': 7.25.0
-      '@nrwl/js': 19.6.2(@babel/traverse@7.25.3)(@types/node@20.16.1)(nx@19.6.2)(typescript@5.4.5)
+      '@nrwl/js': 19.6.2(@babel/traverse@7.25.3)(@types/node@20.16.1)(nx@19.6.2)(typescript@5.5.4)
       '@nx/devkit': 19.6.2(nx@19.6.2)
       '@nx/workspace': 19.6.2
       babel-plugin-const-enum: 1.2.0(@babel/core@7.25.2)

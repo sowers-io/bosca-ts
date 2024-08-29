@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import fs from 'node:fs'
-
 export interface Configuration {
   queues: { [id: string]: QueueConfiguration }
   maxUploadConcurrency: number
@@ -26,13 +24,11 @@ export interface QueueConfiguration {
   maxConcurrency: number
 }
 
-export function getConfiguration(): Configuration {
-  const configuration: Configuration = JSON.parse(fs.readFileSync('configuration.json', 'utf8'))
-
+export function newConfiguration(json: string): Configuration {
+  const configuration: Configuration = JSON.parse(json)
   for (const queueId in configuration.queues) {
     const queue = configuration.queues[queueId]
     queue.id = queueId
   }
-
   return configuration
 }

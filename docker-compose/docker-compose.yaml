@@ -22,10 +22,10 @@ services:
       BOSCA_WORKFLOW_API_ADDRESS: workflow:7100
       BOSCA_WORKFLOW_QUEUE_API_ADDRESS: workflow-queue:7200
       BOSCA_CONTENT_CONNECTION_STRING: postgresql://bosca:bosca@postgres:5432/boscacontent
-      BOSCA_S3_BUCKET: bosca-demo
-      BOSCA_S3_ENDPOINT: https://nyc3.digitaloceanspaces.com
-      BOSCA_S3_ACCESS_KEY_ID: DO00CPFDQFC6BX2AJ2LC
-      BOSCA_S3_SECRET_ACCESS_KEY: "GQT+p7GcL3uMqHo/dU/GZ2bz0UR36ZOLsGxUs+T6xVk"
+      BOSCA_S3_FORCE_PATH_STYLE: 'true'
+      BOSCA_S3_ACCESS_KEY_ID: 67fO5gFs6BuksBrh6rMp
+      BOSCA_S3_ENDPOINT: http://minio:9010
+      BOSCA_S3_SECRET_ACCESS_KEY: eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
       BOSCA_STORAGE_TYPE: minio
       BOSCA_SERVICE_ACCOUNT_ID: sa
       BOSCA_SERVICE_ACCOUNT_TOKEN: sat
@@ -49,10 +49,11 @@ services:
       BOSCA_WORKFLOW_API_ADDRESS: workflow:7100
       BOSCA_WORKFLOW_QUEUE_API_ADDRESS: workflow-queue:7200
       BOSCA_WORKFLOW_CONNECTION_STRING: postgresql://bosca:bosca@postgres:5432/boscacontent
-      BOSCA_S3_BUCKET: bosca-demo
-      BOSCA_S3_ENDPOINT: https://nyc3.digitaloceanspaces.com
-      BOSCA_S3_ACCESS_KEY_ID: DO00CPFDQFC6BX2AJ2LC
-      BOSCA_S3_SECRET_ACCESS_KEY: "GQT+p7GcL3uMqHo/dU/GZ2bz0UR36ZOLsGxUs+T6xVk"
+      BOSCA_S3_FORCE_PATH_STYLE: 'true'
+      BOSCA_S3_ACCESS_KEY_ID: 67fO5gFs6BuksBrh6rMp
+      BOSCA_S3_ENDPOINT: http://minio:9010
+      BOSCA_S3_SECRET_ACCESS_KEY: eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
+      BOSCA_STORAGE_TYPE: minio
       BOSCA_SERVICE_ACCOUNT_ID: sa
       BOSCA_SERVICE_ACCOUNT_TOKEN: sat
       BOSCA_SESSION_ENDPOINT: http://kratos:4433/sessions/whoami
@@ -99,10 +100,11 @@ services:
       BOSCA_WORKFLOW_QUEUE_API_ADDRESS: workflow-queue:7200
       BOSCA_MEILISEARCH_API_ADDRESS: http://meilisearch:7700
       BOSCA_MEILI_MASTER_KEY: p8JcB_HuMHRxN7uVXfrG2wU06b5k7oTvaAAYo6nsi9M
-      BOSCA_S3_BUCKET: bosca-demo
-      BOSCA_S3_ENDPOINT: https://nyc3.digitaloceanspaces.com
-      BOSCA_S3_ACCESS_KEY_ID: DO00CPFDQFC6BX2AJ2LC
-      BOSCA_S3_SECRET_ACCESS_KEY: "GQT+p7GcL3uMqHo/dU/GZ2bz0UR36ZOLsGxUs+T6xVk"
+      BOSCA_S3_FORCE_PATH_STYLE: 'true'
+      BOSCA_S3_ACCESS_KEY_ID: 67fO5gFs6BuksBrh6rMp
+      BOSCA_S3_ENDPOINT: http://minio:9010
+      BOSCA_S3_BUCKET: bosca
+      BOSCA_S3_SECRET_ACCESS_KEY: eV4rlwomvXsM19CXorOTb5uYaFLeNXsPLKx5Uxdm
       BOSCA_SERVICE_ACCOUNT_ID: sa
       BOSCA_SERVICE_ACCOUNT_TOKEN: sat
       BOSCA_SESSION_ENDPOINT: http://kratos:4433/sessions/whoami
@@ -112,6 +114,19 @@ services:
       BOSCA_QDRANT_REST_API_ADDRESS: http://qdrant:6333
       DISABLE_OTEL: "true"
       NODE_ENV: production
+    networks:
+      - net1
+
+  workflow-dashboard:
+    restart: always
+    image: ghcr.io/sowers-io/bosca/workflow-dashboard:latest
+    environment:
+      BOSCA_REDIS_HOST: dragonfly
+      BOSCA_REDIS_PORT: 6379
+      DISABLE_OTEL: "true"
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
     networks:
       - net1
 

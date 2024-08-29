@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"bosca.io/api/protobuf/bosca"
 	"bosca.io/api/protobuf/bosca/content"
@@ -52,13 +53,19 @@ var Command = &cobra.Command{
 		}
 		s, _ := f.Stat()
 		size := s.Size()
+		m := &content.Metadata{
+			Name:          args[0],
+			ContentType:   "application/octet-stream",
+			ContentLength: &size,
+			LanguageTag:   "en",
+		}
+		trait := cmd.Flag(flags.TraitFlag).Value.String()
+		if trait != "" {
+			m.TraitIds = make([]string, 0)
+			m.TraitIds = append(m.TraitIds, trait)
+		}
 		metadata, err := client.AddMetadata(ctx, &content.AddMetadataRequest{
-			Metadata: &content.Metadata{
-				Name:          args[0],
-				ContentType:   "application/octet-stream",
-				ContentLength: &size,
-				LanguageTag:   "en",
-			},
+			Metadata: m,
 		})
 		if err != nil {
 			return err
@@ -69,14 +76,11 @@ var Command = &cobra.Command{
 		if err != nil {
 			return err
 		}
-
-		cmd.Printf("\r\n\r\n%v\r\n\r\n", signedUrl)
-
-		// req, err := http.NewRequest(signedUrl.Method, strings.Replace(signedUrl.Url, "bosca.minio", "minio", 1), f)
 		req, err := http.NewRequest(signedUrl.Method, signedUrl.Url, f)
 		for _, h := range signedUrl.Headers {
-			req.Header.Add(h.Name, h.Value)
+			req.Header.Add(strings.ToLower(h.Name), h.Value)
 		}
+		req.ContentLength = s.Size()
 		for k, v := range signedUrl.Attributes {
 			req.Header.Add(k, v)
 		}

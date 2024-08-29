@@ -29,8 +29,9 @@ export class S3ObjectStore implements ObjectStore {
   constructor() {
     this.bucket = process.env.BOSCA_S3_BUCKET || 'bosca'
     this.client = new S3Client({
+      forcePathStyle: process.env.BOSCA_S3_FORCE_PATH_STYLE === 'true' || false,
       endpoint: process.env.BOSCA_S3_ENDPOINT!,
-      tls: false,
+      tls: process.env.BOSCA_S3_ENDPOINT!.endsWith('https://'),
       region: process.env.BOSCA_S3_REGION || 'us-east-1',
       credentials: {
         accessKeyId: process.env.BOSCA_S3_ACCESS_KEY_ID!,

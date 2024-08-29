@@ -77,6 +77,9 @@ var Command = &cobra.Command{
 		for _, h := range signedUrl.Headers {
 			req.Header.Add(h.Name, h.Value)
 		}
+		for k, v := range signedUrl.Attributes {
+			req.Header.Add(k, v)
+		}
 		if err != nil {
 			return err
 		}

@@ -59,7 +59,7 @@ class Executor extends ActivityJobExecutor<SendToMux> {
           new_asset_settings: {
             playback_policy: ['public'],
             encoding_tier: 'smart',
-            test: true,
+            test: process.env.MUX_TEST === 'true',
           },
         })
         uploadUrl = initialUpload.url
@@ -123,7 +123,7 @@ class Executor extends ActivityJobExecutor<SendToMux> {
         toArrayBuffer(JSON.stringify({
           'uploadId': uploadId,
           'assetId': assetId,
-          'hls.url': url,
+          'hlsUrl': url,
         })),
       )
     } finally {

@@ -5,13 +5,21 @@ description = ""
 authors = ["Kyle Brock <kyle@sowers.io>"]
 package-mode = false
 
+[[tool.poetry.source]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 whisper-timestamped = "^1.15.4"
+torch = { version = "2.0.0+cpu", source = "pytorch-cpu" }
+torchaudio = { version = "2.0.0+cpu", source = "pytorch-cpu" }
 onnxruntime = "^1.18.1"
 transformers = "^4.44.0"
 llvmlite = "^0.43.0"
 numba = "^0.60.0"
+numpy = "^1.26.4"
 openai-whisper = {git = "https://github.com/openai/whisper.git"}
 
 [build-system]

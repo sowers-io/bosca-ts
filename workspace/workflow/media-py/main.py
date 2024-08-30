@@ -19,17 +19,13 @@ import json
 import sys
 
 
-def transcribe(file, language):
-    try:
-        audio = whisper.load_audio(file)
-        model = whisper.load_model("tiny", device="cpu")
-        result = whisper.transcribe(model, audio, language=language)
-        print(json.dumps(result, indent = 0, ensure_ascii = False))
-        sys.exit(0)
-    except Exception as err:
-        print(json.dumps({"error": f"Unexpected {err=}, {type(err)=}"}))
-        sys.exit(1)
+def transcribe(file, language, model):
+    audio = whisper.load_audio(file)
+    model = whisper.load_model(model, device="cpu")
+    result = whisper.transcribe(model, audio, language=language)
+    print(json.dumps(result, indent = 0, ensure_ascii = False))
+    sys.exit(0)
 
 
 if __name__ == '__main__':
-    transcribe(sys.argv[1], sys.argv[2])
+    transcribe(sys.argv[1], sys.argv[2], sys.argv[3])

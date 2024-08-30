@@ -25,6 +25,7 @@ const WorkflowFlag = "workflow"
 const WaitFlag = "wait"
 const RetryFlag = "retry"
 const TraitFlag = "trait"
+const LanguageFlag = "language"
 
 const UsernameFlag = "username"
 const PasswordFlag = "password"

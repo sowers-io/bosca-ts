@@ -22,6 +22,8 @@
       <env name="BOSCA_TEXT_EXTRACTOR_API_ADDRESS" value="http://localhost:8083/parse/text" />
       <env name="BOSCA_WORKFLOW_API_ADDRESS" value="localhost:7100" />
       <env name="BOSCA_WORKFLOW_QUEUE_API_ADDRESS" value="localhost:7200" />
+      <env name="MEDIA_PYTHON_DIR" value="$PROJECT_DIR$/workspace/workflow/media-py" />
+      <env name="POETRY_PROGRAM" value="$USER_HOME$/.local/bin/poetry" />
     </envs>
     <method v="2" />
   </configuration>

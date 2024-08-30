@@ -21,8 +21,8 @@ import process from 'process'
 export type ProcessResult = { code: number, type: string, error?: string }
 
 export async function transcribe(mp3File: string, language: string): Promise<any> {
-  const spawned = ChildProcess.spawn(process.env.POETRY_PROGRAM!, ['run', 'python', 'main.py', process.cwd() + '/' + mp3File, language], {
-    cwd: process.env.MEDIA_PYTHON_DIR!,
+  const spawned = ChildProcess.spawn(process.env.POETRY_PROGRAM || 'poetry', ['run', 'python', 'main.py', mp3File, language, process.env.WHISPER_MODEL || 'tiny'], {
+    cwd: process.env.MEDIA_PYTHON_DIR || '../media-py',
   })
   let json = ''
   let processingData = false
@@ -33,6 +33,7 @@ export async function transcribe(mp3File: string, language: string): Promise<any
     }
   })
   try {
+    logger.debug({ json: json }, 'transcribed video')
     return JSON.parse(json)
   } catch (e) {
     logger.error({ error: e, data: json }, 'failed to parse json')

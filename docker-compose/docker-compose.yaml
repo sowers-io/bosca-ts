@@ -5,6 +5,7 @@ include:
 services:
   migration-content:
     image: ghcr.io/sowers-io/bosca/migration-content:latest
+    pull_policy: always
     environment:
       GOOSE_DRIVER: postgres
       GOOSE_DBSTRING: postgresql://bosca:bosca@postgres:5432/boscacontent
@@ -17,6 +18,7 @@ services:
   content:
     restart: always
     image: ghcr.io/sowers-io/bosca/content:latest
+    pull_policy: always
     environment:
       BOSCA_CONTENT_API_ADDRESS: content:7000
       BOSCA_WORKFLOW_API_ADDRESS: workflow:7100
@@ -44,6 +46,7 @@ services:
   workflow:
     restart: always
     image: ghcr.io/sowers-io/bosca/workflow:latest
+    pull_policy: always
     environment:
       BOSCA_CONTENT_API_ADDRESS: content:7000
       BOSCA_WORKFLOW_API_ADDRESS: workflow:7100
@@ -73,6 +76,7 @@ services:
   workflow-queue:
     restart: always
     image: ghcr.io/sowers-io/bosca/workflow-queue:latest
+    pull_policy: always
     environment:
       BOSCA_REDIS_HOST: dragonfly
       BOSCA_REDIS_PORT: 6379
@@ -92,6 +96,7 @@ services:
   workflow-workers:
     restart: always
     image: ghcr.io/sowers-io/bosca/workflow-workers:latest
+    pull_policy: always
     environment:
       BOSCA_REDIS_HOST: dragonfly
       BOSCA_REDIS_PORT: 6379
@@ -120,6 +125,7 @@ services:
   workflow-dashboard:
     restart: always
     image: ghcr.io/sowers-io/bosca/workflow-dashboard:latest
+    pull_policy: always
     environment:
       BOSCA_REDIS_HOST: dragonfly
       BOSCA_REDIS_PORT: 6379
@@ -131,7 +137,9 @@ services:
       - net1
 
   imageproxy:
+    restart: always
     image: ghcr.io/sowers-io/bosca/imageproxy:latest
+    pull_policy: always
     environment:
       SUPPORTED_URLS: http://minio
       DISABLE_OTEL: "true"
@@ -142,7 +150,9 @@ services:
       - net1
 
   graphql:
+    restart: always
     image: ghcr.io/sowers-io/bosca/graphql:latest
+    pull_policy: always
     environment:
       BOSCA_CONTENT_API_ADDRESS: content:7000
       BOSCA_SESSION_ENDPOINT: http://kratos:4433/sessions/whoami

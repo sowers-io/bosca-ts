@@ -215,6 +215,7 @@ workflows:
     media.transcribe:
       outputs:
         supplementaryId: supplementary
+        supplementaryTextId: supplementary
     video.send_to_mux:
       outputs:
         supplementaryId: supplementary
@@ -297,6 +298,7 @@ workflows:
         media.transcribe:
           outputs:
             supplementaryId: transcription
+            supplementaryTextId: transcription-text
     # video hls stream
     video.send_to_mux:
       queue: media-upload

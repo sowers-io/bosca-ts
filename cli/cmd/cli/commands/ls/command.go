@@ -47,9 +47,42 @@ var Command = &cobra.Command{
 		if len(args) == 0 {
 			items, err = client.GetRootCollectionItems(ctx, &grpcRequests.Empty{})
 		} else {
-			items, err = client.GetCollectionItems(ctx, &grpcRequests.IdRequest{
-				Id: args[0],
-			})
+			if len(args) == 2 {
+				if args[1] == "supplementary" {
+					sups, err := client.GetMetadataSupplementaries(ctx, &grpcRequests.IdRequest{
+						Id: args[0],
+					})
+					if err != nil {
+						return err
+					}
+					items = &content.CollectionItems{
+						Items: make([]*content.CollectionItem, 0),
+					}
+					for _, sup := range sups.Supplementaries {
+						items.Items = append(items.Items, &content.CollectionItem{
+							Item: &content.CollectionItem_Metadata{
+								Metadata: &content.Metadata{
+									Id:               sup.MetadataId + " / " + sup.Key,
+									Name:             sup.Name,
+									ContentType:      sup.ContentType,
+									ContentLength:    &sup.ContentLength,
+									TraitIds:         sup.TraitIds,
+									SourceId:         sup.SourceId,
+									SourceIdentifier: sup.SourceIdentifier,
+								},
+							},
+						})
+					}
+				} else {
+					items, err = client.GetCollectionItems(ctx, &grpcRequests.IdRequest{
+						Id: args[0],
+					})
+				}
+			} else {
+				items, err = client.GetCollectionItems(ctx, &grpcRequests.IdRequest{
+					Id: args[0],
+				})
+			}
 		}
 
 		if err != nil {

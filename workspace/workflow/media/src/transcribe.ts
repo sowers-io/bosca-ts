@@ -87,7 +87,7 @@ class Executor extends ActivityJobExecutor<Transcribe> {
 
     await uploadSupplementary(
       this.definition.metadataId!,
-      'Transcription',
+      'Transcription w/Timing',
       'text/json',
       this.definition.supplementaryId
         ? this.definition.activity!.outputs['supplementaryId'] + this.definition.supplementaryId
@@ -101,7 +101,7 @@ class Executor extends ActivityJobExecutor<Transcribe> {
     await uploadSupplementary(
       this.definition.metadataId!,
       'Transcription',
-      'text/json',
+      'text/plain',
       this.definition.supplementaryId
         ? this.definition.activity!.outputs['supplementaryTextId'] + this.definition.supplementaryId
         : this.definition.activity!.outputs['supplementaryTextId'],

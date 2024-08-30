@@ -410,7 +410,7 @@ export class ContentDataSource extends DataSource {
   async getMetadataSupplementaries(metadataId: string): Promise<MetadataSupplementary[]> {
     return this.queryAndMap(
       () => new MetadataSupplementary(),
-      'select "key", name, content_type, content_length, source_id, source_identifier from metadata_supplementary where metadata_id = $1::uuid',
+      'select metadata_id, "key", name, content_type, content_length, source_id, source_identifier from metadata_supplementary where metadata_id = $1::uuid',
       [metadataId],
     )
   }

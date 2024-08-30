@@ -115,6 +115,7 @@ var Command = &cobra.Command{
 
 func init() {
 	Command.PersistentFlags().String(flags.TraitFlag, "", "Trait ID")
+	Command.PersistentFlags().String(flags.ParentFlag, "", "Parent ID")
 	Command.PersistentFlags().String(flags.LanguageFlag, "en", "Language Tag")
 	Command.PersistentFlags().String(flags.EndpointFlag, "localhost:7000", "The endpoint to use.")
 }

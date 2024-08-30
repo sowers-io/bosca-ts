@@ -20,11 +20,15 @@ import sys
 
 
 def transcribe(file, language):
-    audio = whisper.load_audio(file)
-    model = whisper.load_model("tiny", device="cpu")
-    result = whisper.transcribe(model, audio, language=language)
-    print(json.dumps(result, indent = 0, ensure_ascii = False))
-    sys.exit(0)
+    try:
+        audio = whisper.load_audio(file)
+        model = whisper.load_model("tiny", device="cpu")
+        result = whisper.transcribe(model, audio, language=language)
+        print(json.dumps(result, indent = 0, ensure_ascii = False))
+        sys.exit(0)
+    except Exception as err:
+        print(json.dumps({"error": f"Unexpected {err=}, {type(err)=}"}))
+        sys.exit(1)
 
 
 if __name__ == '__main__':

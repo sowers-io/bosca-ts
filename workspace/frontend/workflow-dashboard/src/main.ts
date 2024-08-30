@@ -15,6 +15,8 @@ async function main() {
     'bible-book',
     'bible-ai',
     'search-index',
+    'media-transcription',
+    'media-upload',
   ]
   const app = fastify()
   const serverAdapter = new FastifyAdapter()

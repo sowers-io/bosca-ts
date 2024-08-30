@@ -32,7 +32,12 @@ export async function transcribe(mp3File: string, language: string): Promise<any
       json += data
     }
   })
-  return JSON.parse(json)
+  try {
+    return JSON.parse(json)
+  } catch (e) {
+    logger.error({ error: e, data: json }, 'failed to parse json')
+    throw e
+  }
 }
 
 export async function extractMP3(mp4File: string, mp3File: string) {

@@ -40,6 +40,11 @@ export interface Collection {
   type: CollectionType;
 }
 
+
+export interface CollectionItemsArgs {
+  filter?: InputMaybe<CollectionItemFilter>;
+}
+
 export interface CollectionInput {
   contentLength?: InputMaybe<Scalars['Int']['input']>;
   contentType: Scalars['String']['input'];
@@ -48,6 +53,10 @@ export interface CollectionInput {
 }
 
 export type CollectionItem = Collection | Metadata;
+
+export interface CollectionItemFilter {
+  created?: InputMaybe<Scalars['Date']['input']>;
+}
 
 export enum CollectionType {
   Folder = 'folder',
@@ -328,6 +337,7 @@ export type ResolversTypes = ResolversObject<{
   Collection: ResolverTypeWrapper<Omit<Collection, 'items'> & { items?: Maybe<Array<Maybe<ResolversTypes['CollectionItem']>>> }>;
   CollectionInput: CollectionInput;
   CollectionItem: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CollectionItem']>;
+  CollectionItemFilter: CollectionItemFilter;
   CollectionType: CollectionType;
   Date: ResolverTypeWrapper<Scalars['Date']['output']>;
   Find: ResolverTypeWrapper<Omit<Find, 'collections'> & { collections: Array<ResolversTypes['Collection']> }>;
@@ -358,6 +368,7 @@ export type ResolversParentTypes = ResolversObject<{
   Collection: Omit<Collection, 'items'> & { items?: Maybe<Array<Maybe<ResolversParentTypes['CollectionItem']>>> };
   CollectionInput: CollectionInput;
   CollectionItem: ResolversUnionTypes<ResolversParentTypes>['CollectionItem'];
+  CollectionItemFilter: CollectionItemFilter;
   Date: Scalars['Date']['output'];
   Find: Omit<Find, 'collections'> & { collections: Array<ResolversParentTypes['Collection']> };
   FindInputAttribute: FindInputAttribute;
@@ -391,7 +402,7 @@ export type CollectionResolvers<ContextType = any, ParentType extends ResolversP
   categoryIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  items?: Resolver<Maybe<Array<Maybe<ResolversTypes['CollectionItem']>>>, ParentType, ContextType>;
+  items?: Resolver<Maybe<Array<Maybe<ResolversTypes['CollectionItem']>>>, ParentType, ContextType, Partial<CollectionItemsArgs>>;
   labels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   modified?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

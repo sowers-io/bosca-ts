@@ -21,6 +21,10 @@ input CollectionInput {
     languageTag: String!
 }
 
+input CollectionItemFilter {
+    created: Date
+}
+
 enum CollectionType {
     root
     standard
@@ -46,5 +50,5 @@ type Collection {
     created: Date!
     modified: Date!
 
-    items: [CollectionItem]
+    items(filter: CollectionItemFilter): [CollectionItem]
 }

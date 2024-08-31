@@ -55,7 +55,23 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const items = await service.getCollectionItems(new IdRequest({ id: parent.id }), {
           headers: getGraphQLHeaders(context),
         })
-        return items.items.map((item) => {
+        return items.items.filter((item) => {
+          if (args.filter) {
+            if (args.filter.created) {
+              // TODO: move this filter to getCollectionItems
+              const dt = new Date(Date.parse(args.filter.created))
+              let created: Date | undefined = undefined
+              if (item.Item.case === 'collection') {
+                created = item.Item.value.created?.toDate()
+              } else if (item.Item.case === 'metadata') {
+                created = item.Item.value.created?.toDate()
+              }
+              if (!created) return false
+              return created.getTime() > dt.getTime()
+            }
+          }
+          return true
+        }).map((item) => {
           if (item.Item.case === 'collection') {
             return transformCollection(item.Item.value)
           } else if (item.Item.case === 'metadata') {

@@ -16,7 +16,7 @@
 
 import { Resolvers } from '../generated/resolvers'
 import { Configuration, FrontendApi } from '@ory/kratos-client-fetch'
-import { GraphQLRequestContext, logger } from '@bosca/common'
+import { GraphQLRequestContext, logger, getAuthenticationToken } from '@bosca/common'
 
 export const resolvers: Resolvers<GraphQLRequestContext> = {
   Mutation: {
@@ -42,5 +42,30 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         throw e
       }
     },
+    setPassword: async (_, args, context) => {
+      try {
+        const token = getAuthenticationToken(context)
+        if (!token) return false 
+        const configuration = new Configuration({
+          basePath: process.env.KRATOS_BASE_PATH,
+        })
+        const client = new FrontendApi(configuration)
+        const flow = await client.createNativeSettingsFlow({
+          xSessionToken: token,
+        })
+        const updatedFlow = await client.updateSettingsFlow({
+          flow: flow.id,
+          xSessionToken: token,
+          updateSettingsFlowBody: {
+            method: 'password',
+            password: args.password,
+          },
+        })
+        return updatedFlow.state === 'success'
+      } catch (e) {
+        logger.error({ error: e }, 'failed to set password')
+        throw e
+      }
+    }
   },
 }

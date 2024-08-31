@@ -132,6 +132,10 @@ export interface Mutation {
   __typename?: 'Mutation';
   addMetadata?: Maybe<Metadata>;
   login?: Maybe<Scalars['String']['output']>;
+  setMetadataJSONContent?: Maybe<Metadata>;
+  setMetadataReady?: Maybe<Metadata>;
+  setMetadataTextContent?: Maybe<Metadata>;
+  setPassword?: Maybe<Scalars['Boolean']['output']>;
 }
 
 
@@ -143,6 +147,28 @@ export interface MutationAddMetadataArgs {
 export interface MutationLoginArgs {
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
+}
+
+
+export interface MutationSetMetadataJsonContentArgs {
+  id: Scalars['String']['input'];
+  json?: InputMaybe<Scalars['JSONObject']['input']>;
+}
+
+
+export interface MutationSetMetadataReadyArgs {
+  id: Scalars['String']['input'];
+}
+
+
+export interface MutationSetMetadataTextContentArgs {
+  id: Scalars['String']['input'];
+  text?: InputMaybe<Scalars['String']['input']>;
+}
+
+
+export interface MutationSetPasswordArgs {
+  password: Scalars['String']['input'];
 }
 
 export interface Query {
@@ -434,6 +460,10 @@ export type MetadataWorkflowStateResolvers<ContextType = any, ParentType extends
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   addMetadata?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationAddMetadataArgs, 'metadata'>>;
   login?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'password' | 'username'>>;
+  setMetadataJSONContent?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataJsonContentArgs, 'id'>>;
+  setMetadataReady?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataReadyArgs, 'id'>>;
+  setMetadataTextContent?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataTextContentArgs, 'id'>>;
+  setPassword?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationSetPasswordArgs, 'password'>>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{

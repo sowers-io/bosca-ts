@@ -15,9 +15,11 @@
  */
 
 import { Resolvers, Metadata as GMetadata, SignedUrl as GSignedUrl, Supplementary } from '../../generated/resolvers'
-import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders } from '@bosca/common'
+import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders, toArrayBuffer } from '@bosca/common'
 import { useClient, executeHttpRequest } from '@bosca/common'
-import { AddMetadataRequest, ContentService, IdRequest, Metadata, SupplementaryIdRequest } from '@bosca/protobufs'
+import { AddMetadataRequest, ContentService, IdRequest, Metadata, MetadataReadyRequest, SupplementaryIdRequest } from '@bosca/protobufs'
+import { protoBase64, protoInt64 } from '@bufbuild/protobuf'
+import { GraphQLError } from 'graphql'
 
 export function transformMetadata(metadata: Metadata): GMetadata {
   const m = metadata.toJson() as unknown as GMetadata
@@ -165,13 +167,77 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const service = useClient(ContentService)
         const response = await service.addMetadata(
           new AddMetadataRequest({
+            collection: '00000000-0000-0000-0000-000000000000',
             metadata: {
               name: args.metadata.name,
-              // todo
+              contentType: args.metadata.contentType,
+              contentLength: args.metadata.contentLength ? protoInt64.parse(args.metadata.contentLength) : undefined,
+              languageTag: args.metadata.languageTag,
             },
-          }),
+          }), {
+            headers: getGraphQLHeaders(context),
+          }
         )
-        const metadata = await service.getMetadata(new IdRequest({ id: response.id }), {
+        let lastError: any | null = null
+        for (let tries = 0; tries < 100; tries++) {
+          try {
+            const metadata = await service.getMetadata(new IdRequest({ id: response.id }), {
+              headers: getGraphQLHeaders(context),
+            })
+            return transformMetadata(metadata)
+          } catch (e) {
+            lastError = e
+            await new Promise((resolve) => setTimeout(resolve, 100))
+          }
+        }
+        if (lastError) {
+          throw lastError
+        }
+        throw new GraphQLError('failed to get metadata after it was created')
+      })
+    },
+    setMetadataReady: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const response = await service.setMetadataReady(
+          new MetadataReadyRequest({
+            id: args.id,
+          }), {
+            headers: getGraphQLHeaders(context),
+          }
+        )
+        const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return transformMetadata(metadata)
+      })
+    },
+    setMetadataJSONContent: async (_, args, context) => {
+      if (!args.json) throw new GraphQLError('missing json')
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const idRequest = new IdRequest({ id: args.id })
+        const url = await service.getMetadataUploadUrl(idRequest, {
+          headers: getGraphQLHeaders(context),
+        })
+        const content = typeof args.json === 'string' ? args.json : JSON.stringify(args.json)
+        await executeHttpRequest(url, toArrayBuffer(content))
+        const metadata = await service.getMetadata(idRequest, {
+          headers: getGraphQLHeaders(context),
+        })
+        return transformMetadata(metadata)
+      })
+    },
+    setMetadataTextContent: async (_, args, context) => {
+      if (!args.text) throw new GraphQLError('missing json')
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const idRequest = new IdRequest({ id: args.id })
+        const url = await service.getMetadataUploadUrl(idRequest, {
+          headers: getGraphQLHeaders(context),
+        })
+        await executeHttpRequest(url, toArrayBuffer(args.text!))
+        const metadata = await service.getMetadata(idRequest, {
           headers: getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)

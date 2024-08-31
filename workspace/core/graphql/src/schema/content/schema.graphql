@@ -19,7 +19,3 @@ extend type Query {
     find: Find
 }
 
-extend type Mutation {
-
-    addMetadata(metadata: MetadataInput!): Metadata
-}

@@ -35,6 +35,14 @@ extend type Query {
     metadata(id: ID!): Metadata
 }
 
+extend type Mutation {
+
+    addMetadata(metadata: MetadataInput!): Metadata
+    setMetadataReady(id: String!): Metadata
+    setMetadataTextContent(id: String!, text: String): Metadata
+    setMetadataJSONContent(id: String!, json: JSONObject): Metadata
+}
+
 type MetadataContent {
     text: String
     json: JSONObject

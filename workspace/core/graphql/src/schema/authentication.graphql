@@ -16,4 +16,6 @@
 
 extend type Mutation {
     login(username: String!, password: String!): String
+
+    setPassword(password: String!): Boolean
 }

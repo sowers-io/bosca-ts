@@ -19,6 +19,17 @@ import { ConnectError, Code } from '@connectrpc/connect'
 import { GraphQLRequestContext } from './graphql'
 import { logger } from '../logger'
 
+export function getAuthenticationToken(context: GraphQLRequestContext): string | null {
+  // @ts-ignore
+  const authorization = context.request.headers.headersInit!['authorization']
+  if (authorization && authorization.length > 0) {
+    if (authorization.startsWith('Bearer ')) {
+      return authorization.toString().substring('Bearer '.length)
+    }
+  }
+  return null
+}
+
 export function getGraphQLHeaders(context: GraphQLRequestContext): Record<string, string> {
   const headers: Record<string, string> = {}
   // @ts-ignore

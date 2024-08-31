@@ -14,12 +14,26 @@
 # limitations under the License.
 #
 
+input SourceInput {
+    name: String!
+    description: String!
+    configuration: [KVInput!]!
+}
+
 type Source {
     id: ID!
     name: String!
+    description: String!
+    configuration: [KV!]!
 }
 
 extend type Query {
     sources: [Source!]!
     source(id: ID!): Source
+}
+
+extend type Mutation {
+    addSource(source: SourceInput!): Source!
+    editSource(id: ID!, source: SourceInput!): Source!
+    deleteSource(id: ID!): Boolean!
 }

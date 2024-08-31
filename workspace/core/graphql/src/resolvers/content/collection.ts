@@ -27,7 +27,7 @@ export function transformCollection(collection: Collection): GCollection {
     c.attributes = []
     for (const key in collection.attributes) {
       c.attributes.push({
-        name: key,
+        key: key,
         value: collection.attributes[key],
       })
     }

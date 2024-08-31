@@ -155,6 +155,7 @@ services:
     pull_policy: always
     environment:
       BOSCA_CONTENT_API_ADDRESS: content:7000
+      BOSCA_WORKFLOW_API_ADDRESS: workflow:7100
       KRATOS_BASE_PATH: http://kratos:4433/
       BOSCA_SESSION_ENDPOINT: http://kratos:4433/sessions/whoami
       BOSCA_PERMISSIONS_SHARED_TOKEN: bosca-spicedb

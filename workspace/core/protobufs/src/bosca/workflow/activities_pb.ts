@@ -333,6 +333,43 @@ export class WorkflowActivityModel extends Message<WorkflowActivityModel> {
 }
 
 /**
+ * @generated from message bosca.workflow.WorkflowActivityModels
+ */
+export class WorkflowActivityModels extends Message<WorkflowActivityModels> {
+  /**
+   * @generated from field: repeated bosca.workflow.WorkflowActivityModel models = 1;
+   */
+  models: WorkflowActivityModel[] = [];
+
+  constructor(data?: PartialMessage<WorkflowActivityModels>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.workflow.WorkflowActivityModels";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "models", kind: "message", T: WorkflowActivityModel, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowActivityModels {
+    return new WorkflowActivityModels().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowActivityModels {
+    return new WorkflowActivityModels().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowActivityModels {
+    return new WorkflowActivityModels().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkflowActivityModels | PlainMessage<WorkflowActivityModels> | undefined, b: WorkflowActivityModels | PlainMessage<WorkflowActivityModels> | undefined): boolean {
+    return proto3.util.equals(WorkflowActivityModels, a, b);
+  }
+}
+
+/**
  * @generated from message bosca.workflow.WorkflowActivity
  */
 export class WorkflowActivity extends Message<WorkflowActivity> {

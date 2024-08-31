@@ -63,6 +63,10 @@ message WorkflowActivityModel {
   map<string, string> configuration = 2;
 }
 
+message WorkflowActivityModels {
+  repeated WorkflowActivityModel models = 1;
+}
+
 message WorkflowActivity {
   int64 workflow_activity_id = 1;
   string activity_id = 2;

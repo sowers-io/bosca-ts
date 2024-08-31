@@ -1,0 +1,30 @@
+input PromptInput {
+    name: String
+    description: String
+    systemPrompt: String
+    userPrompt: String
+    inputType: String
+    outputType: String
+}
+
+type Prompt {
+    id: String
+    name: String
+    description: String
+    systemPrompt: String
+    userPrompt: String
+    inputType: String
+    outputType: String
+}
+
+extend type Workflows {
+
+    prompts: [Prompt!]!
+}
+
+extend type Mutation {
+
+    addPrompt(prompt: PromptInput!): Prompt!
+    editPrompt(id: ID!, prompt: PromptInput!): Prompt!
+    deletePrompt(id: ID!): Boolean!
+}

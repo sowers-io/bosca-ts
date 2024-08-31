@@ -47,6 +47,7 @@ const (
 	WorkflowService_GetWorkflowState_FullMethodName                  = "/bosca.workflow.WorkflowService/GetWorkflowState"
 	WorkflowService_GetWorkflowStates_FullMethodName                 = "/bosca.workflow.WorkflowService/GetWorkflowStates"
 	WorkflowService_GetWorkflowActivities_FullMethodName             = "/bosca.workflow.WorkflowService/GetWorkflowActivities"
+	WorkflowService_GetWorkflowActivityModels_FullMethodName         = "/bosca.workflow.WorkflowService/GetWorkflowActivityModels"
 	WorkflowService_GetWorkflowActivityStorageSystems_FullMethodName = "/bosca.workflow.WorkflowService/GetWorkflowActivityStorageSystems"
 	WorkflowService_GetWorkflowActivityPrompts_FullMethodName        = "/bosca.workflow.WorkflowService/GetWorkflowActivityPrompts"
 	WorkflowService_BeginTransitionWorkflow_FullMethodName           = "/bosca.workflow.WorkflowService/BeginTransitionWorkflow"
@@ -71,6 +72,7 @@ type WorkflowServiceClient interface {
 	GetWorkflowState(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowState, error)
 	GetWorkflowStates(ctx context.Context, in *bosca.Empty, opts ...grpc.CallOption) (*WorkflowStates, error)
 	GetWorkflowActivities(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowActivities, error)
+	GetWorkflowActivityModels(ctx context.Context, in *WorkflowActivityIdIntRequest, opts ...grpc.CallOption) (*WorkflowActivityModels, error)
 	GetWorkflowActivityStorageSystems(ctx context.Context, in *WorkflowActivityIdIntRequest, opts ...grpc.CallOption) (*WorkflowActivityStorageSystems, error)
 	GetWorkflowActivityPrompts(ctx context.Context, in *WorkflowActivityIdIntRequest, opts ...grpc.CallOption) (*WorkflowActivityPrompts, error)
 	BeginTransitionWorkflow(ctx context.Context, in *BeginTransitionWorkflowRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
@@ -207,6 +209,16 @@ func (c *workflowServiceClient) GetWorkflowActivities(ctx context.Context, in *b
 	return out, nil
 }
 
+func (c *workflowServiceClient) GetWorkflowActivityModels(ctx context.Context, in *WorkflowActivityIdIntRequest, opts ...grpc.CallOption) (*WorkflowActivityModels, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowActivityModels)
+	err := c.cc.Invoke(ctx, WorkflowService_GetWorkflowActivityModels_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workflowServiceClient) GetWorkflowActivityStorageSystems(ctx context.Context, in *WorkflowActivityIdIntRequest, opts ...grpc.CallOption) (*WorkflowActivityStorageSystems, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(WorkflowActivityStorageSystems)
@@ -283,6 +295,7 @@ type WorkflowServiceServer interface {
 	GetWorkflowState(context.Context, *bosca.IdRequest) (*WorkflowState, error)
 	GetWorkflowStates(context.Context, *bosca.Empty) (*WorkflowStates, error)
 	GetWorkflowActivities(context.Context, *bosca.IdRequest) (*WorkflowActivities, error)
+	GetWorkflowActivityModels(context.Context, *WorkflowActivityIdIntRequest) (*WorkflowActivityModels, error)
 	GetWorkflowActivityStorageSystems(context.Context, *WorkflowActivityIdIntRequest) (*WorkflowActivityStorageSystems, error)
 	GetWorkflowActivityPrompts(context.Context, *WorkflowActivityIdIntRequest) (*WorkflowActivityPrompts, error)
 	BeginTransitionWorkflow(context.Context, *BeginTransitionWorkflowRequest) (*bosca.Empty, error)
@@ -334,6 +347,9 @@ func (UnimplementedWorkflowServiceServer) GetWorkflowStates(context.Context, *bo
 }
 func (UnimplementedWorkflowServiceServer) GetWorkflowActivities(context.Context, *bosca.IdRequest) (*WorkflowActivities, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowActivities not implemented")
+}
+func (UnimplementedWorkflowServiceServer) GetWorkflowActivityModels(context.Context, *WorkflowActivityIdIntRequest) (*WorkflowActivityModels, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowActivityModels not implemented")
 }
 func (UnimplementedWorkflowServiceServer) GetWorkflowActivityStorageSystems(context.Context, *WorkflowActivityIdIntRequest) (*WorkflowActivityStorageSystems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowActivityStorageSystems not implemented")
@@ -590,6 +606,24 @@ func _WorkflowService_GetWorkflowActivities_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkflowService_GetWorkflowActivityModels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorkflowActivityIdIntRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).GetWorkflowActivityModels(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_GetWorkflowActivityModels_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).GetWorkflowActivityModels(ctx, req.(*WorkflowActivityIdIntRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkflowService_GetWorkflowActivityStorageSystems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(WorkflowActivityIdIntRequest)
 	if err := dec(in); err != nil {
@@ -752,6 +786,10 @@ var WorkflowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWorkflowActivities",
 			Handler:    _WorkflowService_GetWorkflowActivities_Handler,
+		},
+		{
+			MethodName: "GetWorkflowActivityModels",
+			Handler:    _WorkflowService_GetWorkflowActivityModels_Handler,
 		},
 		{
 			MethodName: "GetWorkflowActivityStorageSystems",

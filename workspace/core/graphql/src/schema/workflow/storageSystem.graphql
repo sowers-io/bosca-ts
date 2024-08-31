@@ -1,0 +1,43 @@
+enum StorageSystemType {
+    vector
+    search
+}
+
+input StorageSystemModelInput {
+    id: ID!
+    configuration: [KVInput!]!
+}
+
+input StorageSystemInput {
+    type: StorageSystemType
+    name: String
+    description: String
+    configuration: [KVInput!]!
+    models: [StorageSystemModelInput!]!
+}
+
+type StorageSystemModel {
+    model: Model!
+    configuration: [KV!]!
+}
+
+type StorageSystem {
+    id: ID!
+    type: String
+    name: String
+    description: String
+    configuration: [KV!]!
+    models: [StorageSystemModel!]!
+}
+
+extend type Workflows {
+
+    storageSystems: [StorageSystem!]!
+}
+
+extend type Mutation {
+
+    addStorageSystem(storageSystem: StorageSystemInput!): StorageSystem!
+    editStorageSystem(id: ID!, model: StorageSystemInput): StorageSystem!
+    deleteStorageSystem(id: ID!): Boolean
+}

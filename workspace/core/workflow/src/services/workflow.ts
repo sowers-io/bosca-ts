@@ -30,7 +30,7 @@ import {
   WorkflowStates,
   FindCollectionRequest,
   FindMetadataRequest,
-  WorkflowEnqueueResponses, PermissionObjectType, PermissionAction,
+  WorkflowEnqueueResponses, PermissionObjectType, PermissionAction, WorkflowActivityModels,
 } from '@bosca/protobufs'
 import { logger, PermissionManager, SubjectKey, SubjectType, useServiceAccountClient } from '@bosca/common'
 import { Code, ConnectError, type ConnectRouter } from '@connectrpc/connect'
@@ -218,6 +218,18 @@ export function workflow(
       )
       return new WorkflowActivityPrompts({
         prompts: await dataSource.getWorkflowActivityPrompts(Number(request.workflowActivityId)),
+      })
+    },
+    async getWorkflowActivityModels(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.workflow_type,
+        'all',
+        PermissionAction.view,
+      )
+      return new WorkflowActivityModels({
+        models: await dataSource.getWorkflowActivityModels(Number(request.workflowActivityId)),
       })
     },
     async beginTransitionWorkflow(request, context) {

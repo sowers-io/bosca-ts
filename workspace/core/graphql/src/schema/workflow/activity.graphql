@@ -1,0 +1,63 @@
+input WorkflowActivityModelInput {
+    id: ID!
+    configuration: [KVInput!]!
+}
+
+input WorkflowActivityStorageSystemInput {
+    id: ID!
+    configuration: [KVInput!]!
+}
+
+input WorkflowActivityPromptInput {
+    id: ID!
+    configuration: [KVInput!]!
+}
+
+input WorkflowActivityInput {
+    activityId: String!
+    childWorkflowId: String
+    queue: String!
+    executionGroup: Int!
+    configuration: [KVInput!]!
+    inputs: [KVInput!]!
+    outputs: [KVInput!]!
+    models: [WorkflowActivityModelInput!]
+    storageSystems: [WorkflowActivityStorageSystemInput!]!
+    prompts: [WorkflowActivityPromptInput!]!
+}
+
+type WorkflowActivityModel {
+    model: Model!
+    configuration: [KV!]!
+}
+
+type WorkflowActivityStorageSystem {
+    storageSystem: StorageSystem!
+    configuration: [KV!]!
+}
+
+type WorkflowActivityPrompt {
+    prompt: Prompt!
+    configuration: [KV!]!
+}
+
+type WorkflowActivity {
+    id: ID!
+    activityId: String!
+    childWorkflowId: String
+    queue: String!
+    executionGroup: Int!
+    configuration: [KV!]!
+    inputs: [KV!]!
+    outputs: [KV!]!
+    models: [WorkflowActivityModel!]!
+    storageSystems: [WorkflowActivityStorageSystem!]!
+    prompts: [WorkflowActivityPrompt!]!
+}
+
+extend type Mutation {
+
+    addWorkflowActivity(activity: WorkflowActivityInput): WorkflowActivity!
+    editWorkflowActivity(id: ID!, activity: WorkflowActivityInput): WorkflowActivity!
+    deleteWorkflowActivity(id: ID!): Boolean!
+}

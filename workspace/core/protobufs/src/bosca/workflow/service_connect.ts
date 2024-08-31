@@ -25,7 +25,7 @@ import { IdRequest } from "../requests_pb";
 import { Prompt, Prompts } from "./prompts_pb";
 import { StorageSystem, StorageSystemModels, StorageSystems } from "./storage_systems_pb";
 import { Workflow, Workflows, WorkflowState, WorkflowStates } from "./workflows_pb";
-import { WorkflowActivities, WorkflowActivityIdIntRequest, WorkflowActivityPrompts, WorkflowActivityStorageSystems } from "./activities_pb";
+import { WorkflowActivities, WorkflowActivityIdIntRequest, WorkflowActivityModels, WorkflowActivityPrompts, WorkflowActivityStorageSystems } from "./activities_pb";
 import { BeginTransitionWorkflowRequest, CompleteTransitionWorkflowRequest } from "./transitions_pb";
 import { FindAndWorkflowExecutionRequest, WorkflowEnqueueResponse, WorkflowEnqueueResponses, WorkflowExecutionRequest } from "./execution_context_pb";
 
@@ -141,6 +141,15 @@ export const WorkflowService = {
       name: "GetWorkflowActivities",
       I: IdRequest,
       O: WorkflowActivities,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.workflow.WorkflowService.GetWorkflowActivityModels
+     */
+    getWorkflowActivityModels: {
+      name: "GetWorkflowActivityModels",
+      I: WorkflowActivityIdIntRequest,
+      O: WorkflowActivityModels,
       kind: MethodKind.Unary,
     },
     /**

@@ -17,8 +17,16 @@
 import { Resolvers, Metadata as GMetadata, SignedUrl as GSignedUrl, Supplementary } from '../../generated/resolvers'
 import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders, toArrayBuffer } from '@bosca/common'
 import { useClient, executeHttpRequest } from '@bosca/common'
-import { AddMetadataRequest, ContentService, IdRequest, Metadata, MetadataReadyRequest, SupplementaryIdRequest } from '@bosca/protobufs'
-import { protoBase64, protoInt64 } from '@bufbuild/protobuf'
+import {
+  AddMetadataRequest,
+  ContentService,
+  IdRequest,
+  Metadata,
+  MetadataReadyRequest,
+  SignedUrl,
+  SupplementaryIdRequest,
+} from '@bosca/protobufs'
+import { protoInt64 } from '@bufbuild/protobuf'
 import { GraphQLError } from 'graphql'
 
 export function transformMetadata(metadata: Metadata): GMetadata {
@@ -28,7 +36,7 @@ export function transformMetadata(metadata: Metadata): GMetadata {
     m.attributes = []
     for (const key in metadata.attributes) {
       m.attributes.push({
-        name: key,
+        key: key,
         value: metadata.attributes[key],
       })
     }
@@ -97,20 +105,19 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       if (type === 'text/plain' || type === 'text/json') {
         const url = await executeGraphQL(async () => {
           const service = useClient(ContentService)
-          const url = await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
+          return await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
             headers: getGraphQLHeaders(context),
           })
-          return url
         })
         if (!url) return null
         const content = await executeHttpRequest(url)
         if (type === 'text/json') {
           return {
-            json: JSON.parse(content.toString())
+            json: JSON.parse(content.toString()),
           }
         }
         return {
-          text: content.toString()
+          text: content.toString(),
         }
       }
       return null
@@ -139,23 +146,22 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     content: async (parent, args, context) => {
       const type = parent.contentType.split(';')[0].trim()
       if (type === 'text/plain' || type === 'text/json') {
-        const url = await executeGraphQL(async () => {
+        const url: SignedUrl = await executeGraphQL(async () => {
           const service = useClient(ContentService)
           const request = new SupplementaryIdRequest({ id: parent.metadataId, key: parent.key })
-          const url = await service.getMetadataSupplementaryDownloadUrl(request, {
+          return await service.getMetadataSupplementaryDownloadUrl(request, {
             headers: getGraphQLHeaders(context),
           })
-          return url
         })
         if (!url) return null
         const content = await executeHttpRequest(url)
         if (type === 'text/json') {
           return {
-            json: JSON.parse(content.toString())
+            json: JSON.parse(content.toString()),
           }
         }
         return {
-          text: content.toString()
+          text: content.toString(),
         }
       }
       return null
@@ -177,7 +183,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
             },
           }), {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         let lastError: any | null = null
         for (let tries = 0; tries < 100; tries++) {
@@ -200,12 +206,12 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     setMetadataReady: async (_, args, context) => {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
-        const response = await service.setMetadataReady(
+        await service.setMetadataReady(
           new MetadataReadyRequest({
             id: args.id,
           }), {
             headers: getGraphQLHeaders(context),
-          }
+          },
         )
         const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
           headers: getGraphQLHeaders(context),

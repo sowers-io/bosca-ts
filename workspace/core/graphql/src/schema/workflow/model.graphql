@@ -1,0 +1,26 @@
+input ModelInput {
+    type: String
+    name: String
+    description: String
+    configuration: [KVInput!]!
+}
+
+type Model {
+    id: ID!
+    type: String
+    name: String
+    description: String
+    configuration: [KV!]!
+}
+
+extend type Workflows {
+
+    models: [Model!]!
+}
+
+extend type Mutation {
+
+    addModel(model: ModelInput!): Model!
+    editModel(id: ID!, model: ModelInput): Model!
+    deleteModel(id: ID!): Boolean
+}

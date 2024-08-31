@@ -40,4 +40,14 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       })
     },
   },
+  Trait: {
+    name: (parent) => {
+      if (!parent.name) return parent.id
+      return parent.name
+    },
+    workflowIds: (parent) => {
+      if (!parent.workflowIds) return []
+      return parent.workflowIds
+    },
+  },
 }

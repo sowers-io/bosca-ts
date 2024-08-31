@@ -104,6 +104,12 @@ service WorkflowService {
     };
   }
 
+  rpc GetWorkflowActivityModels(WorkflowActivityIdIntRequest) returns (WorkflowActivityModels) {
+    option (google.api.http) = {
+      get: "/v1/workflow/workflows/{workflow_id}/activities/{workflow_activity_id}/models"
+    };
+  }
+
   rpc GetWorkflowActivityStorageSystems(WorkflowActivityIdIntRequest) returns (WorkflowActivityStorageSystems) {
     option (google.api.http) = {
       get: "/v1/workflow/workflows/{workflow_id}/activities/{workflow_activity_id}/storagesystems"

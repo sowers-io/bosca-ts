@@ -14,9 +14,4 @@
 # limitations under the License.
 #
 
-type Attribute {
-    name: String!
-    value: String!
-}
-
 union CollectionItem = Metadata | Collection

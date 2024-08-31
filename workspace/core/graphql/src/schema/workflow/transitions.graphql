@@ -1,0 +1,22 @@
+input WorkflowStateTransitionInput {
+    fromStateId: String!
+    toStateId: String!
+    description: String!
+}
+
+type WorkflowStateTransition {
+    fromStateId: String!
+    toStateId: String!
+    description: String!
+}
+
+extend type Workflows {
+
+    transitions: [WorkflowStateTransition!]!
+}
+
+extend type Mutation {
+
+    addWorkflowStateTransition(workflow: WorkflowStateTransitionInput!): WorkflowStateTransition!
+    deleteWorkflowTransition(fromStateId: String!, toStateId: String!): Boolean
+}

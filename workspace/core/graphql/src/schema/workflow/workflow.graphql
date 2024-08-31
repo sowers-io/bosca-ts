@@ -1,0 +1,32 @@
+input WorkflowInput {
+    id: String!
+    name: String!
+    description: String!
+    queue: String!
+    configuration: [KVInput!]!
+}
+
+type Workflow {
+    id: String!
+    name: String!
+    description: String
+    configuration: [KV!]!
+    activities: [WorkflowActivity!]!
+}
+
+type Workflows {
+    workflows: [Workflow!]!
+    workflow(id: ID!): Workflow!
+}
+
+extend type Query {
+
+    workflows: Workflows!
+}
+
+extend type Mutation {
+
+    addWorkflow(workflow: WorkflowInput): Workflow!
+    editWorkflow(workflow: WorkflowInput): Workflow!
+    deleteWorkflow(id: String!): Boolean!
+}

@@ -62,7 +62,7 @@ type Metadata {
     traitIds: [String!]!
 
     labels: [String!]!
-    attributes: [Attribute!]!
+    attributes: [KV!]!
 
     sourceId: String
     sourceIdentifier: String

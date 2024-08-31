@@ -20,15 +20,9 @@ export interface Scalars {
   JSONObject: { input: any; output: any; }
 }
 
-export interface Attribute {
-  __typename?: 'Attribute';
-  name: Scalars['String']['output'];
-  value: Scalars['String']['output'];
-}
-
 export interface Collection {
   __typename?: 'Collection';
-  attributes: Array<Attribute>;
+  attributes: Array<Kv>;
   categoryIds: Array<Scalars['String']['output']>;
   created: Scalars['Date']['output'];
   id: Scalars['ID']['output'];
@@ -89,9 +83,20 @@ export interface FindQuery {
   attributes: Array<FindInputAttribute>;
 }
 
+export interface Kv {
+  __typename?: 'KV';
+  key: Scalars['String']['output'];
+  value: Scalars['String']['output'];
+}
+
+export interface KvInput {
+  key: Scalars['String']['input'];
+  value: Scalars['String']['input'];
+}
+
 export interface Metadata {
   __typename?: 'Metadata';
-  attributes: Array<Attribute>;
+  attributes: Array<Kv>;
   content?: Maybe<MetadataContent>;
   contentLength?: Maybe<Scalars['Int']['output']>;
   contentType: Scalars['String']['output'];
@@ -138,9 +143,46 @@ export interface MetadataWorkflowState {
   pendingId?: Maybe<Scalars['String']['output']>;
 }
 
+export interface Model {
+  __typename?: 'Model';
+  configuration: Array<Kv>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+}
+
+export interface ModelInput {
+  configuration: Array<KvInput>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+}
+
 export interface Mutation {
   __typename?: 'Mutation';
   addMetadata?: Maybe<Metadata>;
+  addModel: Model;
+  addPrompt: Prompt;
+  addSource: Source;
+  addStorageSystem: StorageSystem;
+  addWorkflow: Workflow;
+  addWorkflowActivity: WorkflowActivity;
+  addWorkflowState: WorkflowState;
+  addWorkflowStateTransition: WorkflowStateTransition;
+  deleteModel?: Maybe<Scalars['Boolean']['output']>;
+  deletePrompt: Scalars['Boolean']['output'];
+  deleteSource: Scalars['Boolean']['output'];
+  deleteStorageSystem?: Maybe<Scalars['Boolean']['output']>;
+  deleteWorkflow: Scalars['Boolean']['output'];
+  deleteWorkflowActivity: Scalars['Boolean']['output'];
+  deleteWorkflowTransition?: Maybe<Scalars['Boolean']['output']>;
+  editModel: Model;
+  editPrompt: Prompt;
+  editSource: Source;
+  editStorageSystem: StorageSystem;
+  editWorkflow: Workflow;
+  editWorkflowActivity: WorkflowActivity;
   login?: Maybe<Scalars['String']['output']>;
   setMetadataJSONContent?: Maybe<Metadata>;
   setMetadataReady?: Maybe<Metadata>;
@@ -151,6 +193,117 @@ export interface Mutation {
 
 export interface MutationAddMetadataArgs {
   metadata: MetadataInput;
+}
+
+
+export interface MutationAddModelArgs {
+  model: ModelInput;
+}
+
+
+export interface MutationAddPromptArgs {
+  prompt: PromptInput;
+}
+
+
+export interface MutationAddSourceArgs {
+  source: SourceInput;
+}
+
+
+export interface MutationAddStorageSystemArgs {
+  storageSystem: StorageSystemInput;
+}
+
+
+export interface MutationAddWorkflowArgs {
+  workflow?: InputMaybe<WorkflowInput>;
+}
+
+
+export interface MutationAddWorkflowActivityArgs {
+  activity?: InputMaybe<WorkflowActivityInput>;
+}
+
+
+export interface MutationAddWorkflowStateArgs {
+  workflow?: InputMaybe<WorkflowStateInput>;
+}
+
+
+export interface MutationAddWorkflowStateTransitionArgs {
+  workflow: WorkflowStateTransitionInput;
+}
+
+
+export interface MutationDeleteModelArgs {
+  id: Scalars['ID']['input'];
+}
+
+
+export interface MutationDeletePromptArgs {
+  id: Scalars['ID']['input'];
+}
+
+
+export interface MutationDeleteSourceArgs {
+  id: Scalars['ID']['input'];
+}
+
+
+export interface MutationDeleteStorageSystemArgs {
+  id: Scalars['ID']['input'];
+}
+
+
+export interface MutationDeleteWorkflowArgs {
+  id: Scalars['String']['input'];
+}
+
+
+export interface MutationDeleteWorkflowActivityArgs {
+  id: Scalars['ID']['input'];
+}
+
+
+export interface MutationDeleteWorkflowTransitionArgs {
+  fromStateId: Scalars['String']['input'];
+  toStateId: Scalars['String']['input'];
+}
+
+
+export interface MutationEditModelArgs {
+  id: Scalars['ID']['input'];
+  model?: InputMaybe<ModelInput>;
+}
+
+
+export interface MutationEditPromptArgs {
+  id: Scalars['ID']['input'];
+  prompt: PromptInput;
+}
+
+
+export interface MutationEditSourceArgs {
+  id: Scalars['ID']['input'];
+  source: SourceInput;
+}
+
+
+export interface MutationEditStorageSystemArgs {
+  id: Scalars['ID']['input'];
+  model?: InputMaybe<StorageSystemInput>;
+}
+
+
+export interface MutationEditWorkflowArgs {
+  workflow?: InputMaybe<WorkflowInput>;
+}
+
+
+export interface MutationEditWorkflowActivityArgs {
+  activity?: InputMaybe<WorkflowActivityInput>;
+  id: Scalars['ID']['input'];
 }
 
 
@@ -181,6 +334,26 @@ export interface MutationSetPasswordArgs {
   password: Scalars['String']['input'];
 }
 
+export interface Prompt {
+  __typename?: 'Prompt';
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['String']['output']>;
+  inputType?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  outputType?: Maybe<Scalars['String']['output']>;
+  systemPrompt?: Maybe<Scalars['String']['output']>;
+  userPrompt?: Maybe<Scalars['String']['output']>;
+}
+
+export interface PromptInput {
+  description?: InputMaybe<Scalars['String']['input']>;
+  inputType?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  outputType?: InputMaybe<Scalars['String']['input']>;
+  systemPrompt?: InputMaybe<Scalars['String']['input']>;
+  userPrompt?: InputMaybe<Scalars['String']['input']>;
+}
+
 export interface Query {
   __typename?: 'Query';
   collection?: Maybe<Collection>;
@@ -190,6 +363,7 @@ export interface Query {
   sources: Array<Source>;
   trait?: Maybe<Trait>;
   traits: Array<Trait>;
+  workflows: Workflows;
 }
 
 
@@ -228,8 +402,50 @@ export interface SignedUrlHeader {
 
 export interface Source {
   __typename?: 'Source';
+  configuration: Array<Kv>;
+  description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+}
+
+export interface SourceInput {
+  configuration: Array<KvInput>;
+  description: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+}
+
+export interface StorageSystem {
+  __typename?: 'StorageSystem';
+  configuration: Array<Kv>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  models: Array<StorageSystemModel>;
+  name?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+}
+
+export interface StorageSystemInput {
+  configuration: Array<KvInput>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  models: Array<StorageSystemModelInput>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<StorageSystemType>;
+}
+
+export interface StorageSystemModel {
+  __typename?: 'StorageSystemModel';
+  configuration: Array<Kv>;
+  model: Model;
+}
+
+export interface StorageSystemModelInput {
+  configuration: Array<KvInput>;
+  id: Scalars['ID']['input'];
+}
+
+export enum StorageSystemType {
+  Search = 'search',
+  Vector = 'vector'
 }
 
 export interface Supplementary {
@@ -254,6 +470,148 @@ export interface Trait {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   workflowIds: Array<Scalars['ID']['output']>;
+}
+
+export interface Workflow {
+  __typename?: 'Workflow';
+  activities: Array<WorkflowActivity>;
+  configuration: Array<Kv>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+}
+
+export interface WorkflowActivity {
+  __typename?: 'WorkflowActivity';
+  activityId: Scalars['String']['output'];
+  childWorkflowId?: Maybe<Scalars['String']['output']>;
+  configuration: Array<Kv>;
+  executionGroup: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  inputs: Array<Kv>;
+  models: Array<WorkflowActivityModel>;
+  outputs: Array<Kv>;
+  prompts: Array<WorkflowActivityPrompt>;
+  queue: Scalars['String']['output'];
+  storageSystems: Array<WorkflowActivityStorageSystem>;
+}
+
+export interface WorkflowActivityInput {
+  activityId: Scalars['String']['input'];
+  childWorkflowId?: InputMaybe<Scalars['String']['input']>;
+  configuration: Array<KvInput>;
+  executionGroup: Scalars['Int']['input'];
+  inputs: Array<KvInput>;
+  models?: InputMaybe<Array<WorkflowActivityModelInput>>;
+  outputs: Array<KvInput>;
+  prompts: Array<WorkflowActivityPromptInput>;
+  queue: Scalars['String']['input'];
+  storageSystems: Array<WorkflowActivityStorageSystemInput>;
+}
+
+export interface WorkflowActivityModel {
+  __typename?: 'WorkflowActivityModel';
+  configuration: Array<Kv>;
+  model: Model;
+}
+
+export interface WorkflowActivityModelInput {
+  configuration: Array<KvInput>;
+  id: Scalars['ID']['input'];
+}
+
+export interface WorkflowActivityPrompt {
+  __typename?: 'WorkflowActivityPrompt';
+  configuration: Array<Kv>;
+  prompt: Prompt;
+}
+
+export interface WorkflowActivityPromptInput {
+  configuration: Array<KvInput>;
+  id: Scalars['ID']['input'];
+}
+
+export interface WorkflowActivityStorageSystem {
+  __typename?: 'WorkflowActivityStorageSystem';
+  configuration: Array<Kv>;
+  storageSystem: StorageSystem;
+}
+
+export interface WorkflowActivityStorageSystemInput {
+  configuration: Array<KvInput>;
+  id: Scalars['ID']['input'];
+}
+
+export interface WorkflowInput {
+  configuration: Array<KvInput>;
+  description: Scalars['String']['input'];
+  id: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  queue: Scalars['String']['input'];
+}
+
+export interface WorkflowState {
+  __typename?: 'WorkflowState';
+  configuration: Array<Kv>;
+  description: Scalars['String']['output'];
+  entryWorkflowId?: Maybe<Scalars['String']['output']>;
+  exitWorkflowId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  queue: Scalars['String']['output'];
+  type: WorkflowStateType;
+  workflowId?: Maybe<Scalars['String']['output']>;
+}
+
+export interface WorkflowStateInput {
+  configuration: Array<KvInput>;
+  description: Scalars['String']['input'];
+  entryWorkflowId?: InputMaybe<Scalars['String']['input']>;
+  exitWorkflowId?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  queue: Scalars['String']['input'];
+  type: WorkflowStateType;
+  workflowId?: InputMaybe<Scalars['String']['input']>;
+}
+
+export interface WorkflowStateTransition {
+  __typename?: 'WorkflowStateTransition';
+  description: Scalars['String']['output'];
+  fromStateId: Scalars['String']['output'];
+  toStateId: Scalars['String']['output'];
+}
+
+export interface WorkflowStateTransitionInput {
+  description: Scalars['String']['input'];
+  fromStateId: Scalars['String']['input'];
+  toStateId: Scalars['String']['input'];
+}
+
+export enum WorkflowStateType {
+  Approval = 'approval',
+  Approved = 'approved',
+  Draft = 'draft',
+  Failure = 'failure',
+  Pending = 'pending',
+  Processing = 'processing',
+  Published = 'published'
+}
+
+export interface Workflows {
+  __typename?: 'Workflows';
+  models: Array<Model>;
+  prompts: Array<Prompt>;
+  states: Array<WorkflowState>;
+  storageSystems: Array<StorageSystem>;
+  transitions: Array<WorkflowStateTransition>;
+  workflow: Workflow;
+  workflows: Array<Workflow>;
+}
+
+
+export interface WorkflowsWorkflowArgs {
+  id: Scalars['ID']['input'];
 }
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -332,7 +690,6 @@ export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = Reso
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  Attribute: ResolverTypeWrapper<Attribute>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Collection: ResolverTypeWrapper<Omit<Collection, 'items'> & { items?: Maybe<Array<Maybe<ResolversTypes['CollectionItem']>>> }>;
   CollectionInput: CollectionInput;
@@ -347,23 +704,50 @@ export type ResolversTypes = ResolversObject<{
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
   JSONObject: ResolverTypeWrapper<Scalars['JSONObject']['output']>;
+  KV: ResolverTypeWrapper<Kv>;
+  KVInput: KvInput;
   Metadata: ResolverTypeWrapper<Metadata>;
   MetadataContent: ResolverTypeWrapper<MetadataContent>;
   MetadataInput: MetadataInput;
   MetadataWorkflowState: ResolverTypeWrapper<MetadataWorkflowState>;
+  Model: ResolverTypeWrapper<Model>;
+  ModelInput: ModelInput;
   Mutation: ResolverTypeWrapper<{}>;
+  Prompt: ResolverTypeWrapper<Prompt>;
+  PromptInput: PromptInput;
   Query: ResolverTypeWrapper<{}>;
   SignedUrl: ResolverTypeWrapper<SignedUrl>;
   SignedUrlHeader: ResolverTypeWrapper<SignedUrlHeader>;
   Source: ResolverTypeWrapper<Source>;
+  SourceInput: SourceInput;
+  StorageSystem: ResolverTypeWrapper<StorageSystem>;
+  StorageSystemInput: StorageSystemInput;
+  StorageSystemModel: ResolverTypeWrapper<StorageSystemModel>;
+  StorageSystemModelInput: StorageSystemModelInput;
+  StorageSystemType: StorageSystemType;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Supplementary: ResolverTypeWrapper<Supplementary>;
   Trait: ResolverTypeWrapper<Trait>;
+  Workflow: ResolverTypeWrapper<Workflow>;
+  WorkflowActivity: ResolverTypeWrapper<WorkflowActivity>;
+  WorkflowActivityInput: WorkflowActivityInput;
+  WorkflowActivityModel: ResolverTypeWrapper<WorkflowActivityModel>;
+  WorkflowActivityModelInput: WorkflowActivityModelInput;
+  WorkflowActivityPrompt: ResolverTypeWrapper<WorkflowActivityPrompt>;
+  WorkflowActivityPromptInput: WorkflowActivityPromptInput;
+  WorkflowActivityStorageSystem: ResolverTypeWrapper<WorkflowActivityStorageSystem>;
+  WorkflowActivityStorageSystemInput: WorkflowActivityStorageSystemInput;
+  WorkflowInput: WorkflowInput;
+  WorkflowState: ResolverTypeWrapper<WorkflowState>;
+  WorkflowStateInput: WorkflowStateInput;
+  WorkflowStateTransition: ResolverTypeWrapper<WorkflowStateTransition>;
+  WorkflowStateTransitionInput: WorkflowStateTransitionInput;
+  WorkflowStateType: WorkflowStateType;
+  Workflows: ResolverTypeWrapper<Workflows>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  Attribute: Attribute;
   Boolean: Scalars['Boolean']['output'];
   Collection: Omit<Collection, 'items'> & { items?: Maybe<Array<Maybe<ResolversParentTypes['CollectionItem']>>> };
   CollectionInput: CollectionInput;
@@ -377,28 +761,48 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int']['output'];
   JSON: Scalars['JSON']['output'];
   JSONObject: Scalars['JSONObject']['output'];
+  KV: Kv;
+  KVInput: KvInput;
   Metadata: Metadata;
   MetadataContent: MetadataContent;
   MetadataInput: MetadataInput;
   MetadataWorkflowState: MetadataWorkflowState;
+  Model: Model;
+  ModelInput: ModelInput;
   Mutation: {};
+  Prompt: Prompt;
+  PromptInput: PromptInput;
   Query: {};
   SignedUrl: SignedUrl;
   SignedUrlHeader: SignedUrlHeader;
   Source: Source;
+  SourceInput: SourceInput;
+  StorageSystem: StorageSystem;
+  StorageSystemInput: StorageSystemInput;
+  StorageSystemModel: StorageSystemModel;
+  StorageSystemModelInput: StorageSystemModelInput;
   String: Scalars['String']['output'];
   Supplementary: Supplementary;
   Trait: Trait;
-}>;
-
-export type AttributeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Attribute'] = ResolversParentTypes['Attribute']> = ResolversObject<{
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+  Workflow: Workflow;
+  WorkflowActivity: WorkflowActivity;
+  WorkflowActivityInput: WorkflowActivityInput;
+  WorkflowActivityModel: WorkflowActivityModel;
+  WorkflowActivityModelInput: WorkflowActivityModelInput;
+  WorkflowActivityPrompt: WorkflowActivityPrompt;
+  WorkflowActivityPromptInput: WorkflowActivityPromptInput;
+  WorkflowActivityStorageSystem: WorkflowActivityStorageSystem;
+  WorkflowActivityStorageSystemInput: WorkflowActivityStorageSystemInput;
+  WorkflowInput: WorkflowInput;
+  WorkflowState: WorkflowState;
+  WorkflowStateInput: WorkflowStateInput;
+  WorkflowStateTransition: WorkflowStateTransition;
+  WorkflowStateTransitionInput: WorkflowStateTransitionInput;
+  Workflows: Workflows;
 }>;
 
 export type CollectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Collection'] = ResolversParentTypes['Collection']> = ResolversObject<{
-  attributes?: Resolver<Array<ResolversTypes['Attribute']>, ParentType, ContextType>;
+  attributes?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
   categoryIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -433,8 +837,14 @@ export interface JsonObjectScalarConfig extends GraphQLScalarTypeConfig<Resolver
   name: 'JSONObject';
 }
 
+export type KvResolvers<ContextType = any, ParentType extends ResolversParentTypes['KV'] = ResolversParentTypes['KV']> = ResolversObject<{
+  key?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['Metadata'] = ResolversParentTypes['Metadata']> = ResolversObject<{
-  attributes?: Resolver<Array<ResolversTypes['Attribute']>, ParentType, ContextType>;
+  attributes?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
   content?: Resolver<Maybe<ResolversTypes['MetadataContent']>, ParentType, ContextType>;
   contentLength?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   contentType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -469,13 +879,54 @@ export type MetadataWorkflowStateResolvers<ContextType = any, ParentType extends
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type ModelResolvers<ContextType = any, ParentType extends ResolversParentTypes['Model'] = ResolversParentTypes['Model']> = ResolversObject<{
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   addMetadata?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationAddMetadataArgs, 'metadata'>>;
+  addModel?: Resolver<ResolversTypes['Model'], ParentType, ContextType, RequireFields<MutationAddModelArgs, 'model'>>;
+  addPrompt?: Resolver<ResolversTypes['Prompt'], ParentType, ContextType, RequireFields<MutationAddPromptArgs, 'prompt'>>;
+  addSource?: Resolver<ResolversTypes['Source'], ParentType, ContextType, RequireFields<MutationAddSourceArgs, 'source'>>;
+  addStorageSystem?: Resolver<ResolversTypes['StorageSystem'], ParentType, ContextType, RequireFields<MutationAddStorageSystemArgs, 'storageSystem'>>;
+  addWorkflow?: Resolver<ResolversTypes['Workflow'], ParentType, ContextType, Partial<MutationAddWorkflowArgs>>;
+  addWorkflowActivity?: Resolver<ResolversTypes['WorkflowActivity'], ParentType, ContextType, Partial<MutationAddWorkflowActivityArgs>>;
+  addWorkflowState?: Resolver<ResolversTypes['WorkflowState'], ParentType, ContextType, Partial<MutationAddWorkflowStateArgs>>;
+  addWorkflowStateTransition?: Resolver<ResolversTypes['WorkflowStateTransition'], ParentType, ContextType, RequireFields<MutationAddWorkflowStateTransitionArgs, 'workflow'>>;
+  deleteModel?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteModelArgs, 'id'>>;
+  deletePrompt?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePromptArgs, 'id'>>;
+  deleteSource?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteSourceArgs, 'id'>>;
+  deleteStorageSystem?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteStorageSystemArgs, 'id'>>;
+  deleteWorkflow?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteWorkflowArgs, 'id'>>;
+  deleteWorkflowActivity?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteWorkflowActivityArgs, 'id'>>;
+  deleteWorkflowTransition?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteWorkflowTransitionArgs, 'fromStateId' | 'toStateId'>>;
+  editModel?: Resolver<ResolversTypes['Model'], ParentType, ContextType, RequireFields<MutationEditModelArgs, 'id'>>;
+  editPrompt?: Resolver<ResolversTypes['Prompt'], ParentType, ContextType, RequireFields<MutationEditPromptArgs, 'id' | 'prompt'>>;
+  editSource?: Resolver<ResolversTypes['Source'], ParentType, ContextType, RequireFields<MutationEditSourceArgs, 'id' | 'source'>>;
+  editStorageSystem?: Resolver<ResolversTypes['StorageSystem'], ParentType, ContextType, RequireFields<MutationEditStorageSystemArgs, 'id'>>;
+  editWorkflow?: Resolver<ResolversTypes['Workflow'], ParentType, ContextType, Partial<MutationEditWorkflowArgs>>;
+  editWorkflowActivity?: Resolver<ResolversTypes['WorkflowActivity'], ParentType, ContextType, RequireFields<MutationEditWorkflowActivityArgs, 'id'>>;
   login?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'password' | 'username'>>;
   setMetadataJSONContent?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataJsonContentArgs, 'id'>>;
   setMetadataReady?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataReadyArgs, 'id'>>;
   setMetadataTextContent?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataTextContentArgs, 'id'>>;
   setPassword?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationSetPasswordArgs, 'password'>>;
+}>;
+
+export type PromptResolvers<ContextType = any, ParentType extends ResolversParentTypes['Prompt'] = ResolversParentTypes['Prompt']> = ResolversObject<{
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  inputType?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  outputType?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  systemPrompt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  userPrompt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
@@ -486,6 +937,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   sources?: Resolver<Array<ResolversTypes['Source']>, ParentType, ContextType>;
   trait?: Resolver<Maybe<ResolversTypes['Trait']>, ParentType, ContextType, RequireFields<QueryTraitArgs, 'id'>>;
   traits?: Resolver<Array<ResolversTypes['Trait']>, ParentType, ContextType>;
+  workflows?: Resolver<ResolversTypes['Workflows'], ParentType, ContextType>;
 }>;
 
 export type SignedUrlResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignedUrl'] = ResolversParentTypes['SignedUrl']> = ResolversObject<{
@@ -503,8 +955,26 @@ export type SignedUrlHeaderResolvers<ContextType = any, ParentType extends Resol
 }>;
 
 export type SourceResolvers<ContextType = any, ParentType extends ResolversParentTypes['Source'] = ResolversParentTypes['Source']> = ResolversObject<{
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type StorageSystemResolvers<ContextType = any, ParentType extends ResolversParentTypes['StorageSystem'] = ResolversParentTypes['StorageSystem']> = ResolversObject<{
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  models?: Resolver<Array<ResolversTypes['StorageSystemModel']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type StorageSystemModelResolvers<ContextType = any, ParentType extends ResolversParentTypes['StorageSystemModel'] = ResolversParentTypes['StorageSystemModel']> = ResolversObject<{
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  model?: Resolver<ResolversTypes['Model'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -532,23 +1002,108 @@ export type TraitResolvers<ContextType = any, ParentType extends ResolversParent
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type WorkflowResolvers<ContextType = any, ParentType extends ResolversParentTypes['Workflow'] = ResolversParentTypes['Workflow']> = ResolversObject<{
+  activities?: Resolver<Array<ResolversTypes['WorkflowActivity']>, ParentType, ContextType>;
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type WorkflowActivityResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkflowActivity'] = ResolversParentTypes['WorkflowActivity']> = ResolversObject<{
+  activityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  childWorkflowId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  executionGroup?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  inputs?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  models?: Resolver<Array<ResolversTypes['WorkflowActivityModel']>, ParentType, ContextType>;
+  outputs?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  prompts?: Resolver<Array<ResolversTypes['WorkflowActivityPrompt']>, ParentType, ContextType>;
+  queue?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  storageSystems?: Resolver<Array<ResolversTypes['WorkflowActivityStorageSystem']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type WorkflowActivityModelResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkflowActivityModel'] = ResolversParentTypes['WorkflowActivityModel']> = ResolversObject<{
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  model?: Resolver<ResolversTypes['Model'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type WorkflowActivityPromptResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkflowActivityPrompt'] = ResolversParentTypes['WorkflowActivityPrompt']> = ResolversObject<{
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  prompt?: Resolver<ResolversTypes['Prompt'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type WorkflowActivityStorageSystemResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkflowActivityStorageSystem'] = ResolversParentTypes['WorkflowActivityStorageSystem']> = ResolversObject<{
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  storageSystem?: Resolver<ResolversTypes['StorageSystem'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type WorkflowStateResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkflowState'] = ResolversParentTypes['WorkflowState']> = ResolversObject<{
+  configuration?: Resolver<Array<ResolversTypes['KV']>, ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  entryWorkflowId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  exitWorkflowId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  queue?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['WorkflowStateType'], ParentType, ContextType>;
+  workflowId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type WorkflowStateTransitionResolvers<ContextType = any, ParentType extends ResolversParentTypes['WorkflowStateTransition'] = ResolversParentTypes['WorkflowStateTransition']> = ResolversObject<{
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  fromStateId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  toStateId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type WorkflowsResolvers<ContextType = any, ParentType extends ResolversParentTypes['Workflows'] = ResolversParentTypes['Workflows']> = ResolversObject<{
+  models?: Resolver<Array<ResolversTypes['Model']>, ParentType, ContextType>;
+  prompts?: Resolver<Array<ResolversTypes['Prompt']>, ParentType, ContextType>;
+  states?: Resolver<Array<ResolversTypes['WorkflowState']>, ParentType, ContextType>;
+  storageSystems?: Resolver<Array<ResolversTypes['StorageSystem']>, ParentType, ContextType>;
+  transitions?: Resolver<Array<ResolversTypes['WorkflowStateTransition']>, ParentType, ContextType>;
+  workflow?: Resolver<ResolversTypes['Workflow'], ParentType, ContextType, RequireFields<WorkflowsWorkflowArgs, 'id'>>;
+  workflows?: Resolver<Array<ResolversTypes['Workflow']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = any> = ResolversObject<{
-  Attribute?: AttributeResolvers<ContextType>;
   Collection?: CollectionResolvers<ContextType>;
   CollectionItem?: CollectionItemResolvers<ContextType>;
   Date?: GraphQLScalarType;
   Find?: FindResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   JSONObject?: GraphQLScalarType;
+  KV?: KvResolvers<ContextType>;
   Metadata?: MetadataResolvers<ContextType>;
   MetadataContent?: MetadataContentResolvers<ContextType>;
   MetadataWorkflowState?: MetadataWorkflowStateResolvers<ContextType>;
+  Model?: ModelResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  Prompt?: PromptResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SignedUrl?: SignedUrlResolvers<ContextType>;
   SignedUrlHeader?: SignedUrlHeaderResolvers<ContextType>;
   Source?: SourceResolvers<ContextType>;
+  StorageSystem?: StorageSystemResolvers<ContextType>;
+  StorageSystemModel?: StorageSystemModelResolvers<ContextType>;
   Supplementary?: SupplementaryResolvers<ContextType>;
   Trait?: TraitResolvers<ContextType>;
+  Workflow?: WorkflowResolvers<ContextType>;
+  WorkflowActivity?: WorkflowActivityResolvers<ContextType>;
+  WorkflowActivityModel?: WorkflowActivityModelResolvers<ContextType>;
+  WorkflowActivityPrompt?: WorkflowActivityPromptResolvers<ContextType>;
+  WorkflowActivityStorageSystem?: WorkflowActivityStorageSystemResolvers<ContextType>;
+  WorkflowState?: WorkflowStateResolvers<ContextType>;
+  WorkflowStateTransition?: WorkflowStateTransitionResolvers<ContextType>;
+  Workflows?: WorkflowsResolvers<ContextType>;
 }>;
 

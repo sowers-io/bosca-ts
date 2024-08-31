@@ -1,0 +1,37 @@
+enum WorkflowStateType {
+    processing, draft, pending, approval, approved, published, failure
+}
+
+input WorkflowStateInput {
+    id: String!
+    name: String!
+    description: String!
+    type: WorkflowStateType!
+    queue: String!
+    configuration: [KVInput!]!
+    workflowId: String
+    exitWorkflowId: String
+    entryWorkflowId: String
+}
+
+type WorkflowState {
+    id: String!
+    name: String!
+    description: String!
+    type: WorkflowStateType!
+    queue: String!
+    configuration: [KV!]!
+    workflowId: String
+    exitWorkflowId: String
+    entryWorkflowId: String
+}
+
+extend type Workflows {
+
+    states: [WorkflowState!]!
+}
+
+extend type Mutation {
+
+    addWorkflowState(workflow: WorkflowStateInput): WorkflowState!
+}

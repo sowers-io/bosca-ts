@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "lint": "nx eslint:lint",
-    "lint:fix": "nx eslint:lint --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "build": "tsc --build",
     "start": "node ./dist/main.js",
     "dev": "DISABLE_OTEL=true ts-node ./src/main.ts"

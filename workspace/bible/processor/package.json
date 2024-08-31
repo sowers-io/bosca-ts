@@ -6,8 +6,8 @@
     "build.watch": "tsc --build --watch",
     "clean": "rm -Rf node_modules && rm -Rf dist",
     "test": "vitest .",
-    "lint": "nx eslint:lint",
-    "lint:fix": "nx eslint:lint --fix"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "main": "dist/index.js",
   "types": "src/index.d.ts",

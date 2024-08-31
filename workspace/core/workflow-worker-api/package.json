@@ -4,8 +4,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --build",
-    "lint": "nx eslint:lint",
-    "lint:fix": "nx eslint:lint --fix"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@bosca/common": "workspace:*",

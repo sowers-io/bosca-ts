@@ -8,8 +8,8 @@
   "type": "commonjs",
   "main": "./dist/main.js",
   "scripts": {
-    "lint": "nx eslint:lint",
-    "lint:fix": "nx eslint:lint --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "build": "tsc --build"
   },
   "publishConfig": {

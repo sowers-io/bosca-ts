@@ -171,6 +171,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
             metadata: {
               name: args.metadata.name,
               contentType: args.metadata.contentType,
+              traitIds: args.metadata.traitIds?.map((s) => s),
               contentLength: args.metadata.contentLength ? protoInt64.parse(args.metadata.contentLength) : undefined,
               languageTag: args.metadata.languageTag,
             },

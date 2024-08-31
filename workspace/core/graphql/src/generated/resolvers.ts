@@ -119,6 +119,7 @@ export interface MetadataInput {
   contentType: Scalars['String']['input'];
   languageTag: Scalars['String']['input'];
   name: Scalars['String']['input'];
+  traitIds?: InputMaybe<Array<Scalars['String']['input']>>;
 }
 
 export interface MetadataWorkflowState {

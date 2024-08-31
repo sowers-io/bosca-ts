@@ -14,6 +14,9 @@
 # limitations under the License.
 #
 
+scalar JSON
+scalar JSONObject
+
 input MetadataInput {
     name: String!
     contentType: String!
@@ -30,6 +33,11 @@ type MetadataWorkflowState {
 extend type Query {
 
     metadata(id: ID!): Metadata
+}
+
+type MetadataContent {
+    text: String
+    json: JSONObject
 }
 
 type Metadata {
@@ -57,8 +65,10 @@ type Metadata {
 
     downloadUrl: SignedUrl!
     uploadUrl: SignedUrl!
+    content: MetadataContent
 
-    supplementary: [Supplementary!]!
+    supplementary(key: String!): Supplementary
+    supplementaries: [Supplementary!]!
 }
 
 type Supplementary {
@@ -80,4 +90,5 @@ type Supplementary {
 
     downloadUrl: SignedUrl!
     uploadUrl: SignedUrl!
+    content: MetadataContent
 }

@@ -16,7 +16,7 @@
 
 import { Resolvers, Metadata as GMetadata, SignedUrl as GSignedUrl, Supplementary } from '../../generated/resolvers'
 import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders } from '@bosca/common'
-import { useClient } from '@bosca/common'
+import { useClient, executeHttpRequest } from '@bosca/common'
 import { AddMetadataRequest, ContentService, IdRequest, Metadata, SupplementaryIdRequest } from '@bosca/protobufs'
 
 export function transformMetadata(metadata: Metadata): GMetadata {
@@ -73,11 +73,45 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     supplementary: async (parent, args, context) => {
       return (await executeGraphQL(async () => {
         const service = useClient(ContentService)
-        const response = await service.getMetadataSupplementaries(new IdRequest({ id: parent.id }), {
+        const request = new SupplementaryIdRequest({ id: parent.id, key: args.key })
+        const response = await service.getMetadataSupplementary(request, {
+          headers: getGraphQLHeaders(context),
+        })
+        return response?.toJson() as unknown as Supplementary
+      }))
+    },
+    supplementaries: async (parent, args, context) => {
+      return (await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const request = new IdRequest({ id: parent.id })
+        const response = await service.getMetadataSupplementaries(request, {
           headers: getGraphQLHeaders(context),
         })
         return response.supplementaries.map((s) => s.toJson()) as unknown as Supplementary[]
       }))!
+    },
+    content: async (parent, args, context) => {
+      const type = parent.contentType.split(';')[0].trim()
+      if (type === 'text/plain' || type === 'text/json') {
+        const url = await executeGraphQL(async () => {
+          const service = useClient(ContentService)
+          const url = await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
+            headers: getGraphQLHeaders(context),
+          })
+          return url
+        })
+        if (!url) return null
+        const content = await executeHttpRequest(url)
+        if (type === 'text/json') {
+          return {
+            json: JSON.parse(content.toString())
+          }
+        }
+        return {
+          text: content.toString()
+        }
+      }
+      return null
     },
   },
   Supplementary: {
@@ -99,6 +133,30 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         })
         return url.toJson() as unknown as GSignedUrl
       })
+    },
+    content: async (parent, args, context) => {
+      const type = parent.contentType.split(';')[0].trim()
+      if (type === 'text/plain' || type === 'text/json') {
+        const url = await executeGraphQL(async () => {
+          const service = useClient(ContentService)
+          const request = new SupplementaryIdRequest({ id: parent.metadataId, key: parent.key })
+          const url = await service.getMetadataSupplementaryDownloadUrl(request, {
+            headers: getGraphQLHeaders(context),
+          })
+          return url
+        })
+        if (!url) return null
+        const content = await executeHttpRequest(url)
+        if (type === 'text/json') {
+          return {
+            json: JSON.parse(content.toString())
+          }
+        }
+        return {
+          text: content.toString()
+        }
+      }
+      return null
     },
   },
   Mutation: {

@@ -536,7 +536,7 @@ export function content(
         subject,
         PermissionObjectType.metadata_type,
         request.id,
-        PermissionAction.service,
+        PermissionAction.view,
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {

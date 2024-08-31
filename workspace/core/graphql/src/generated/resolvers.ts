@@ -16,6 +16,8 @@ export interface Scalars {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   Date: { input: any; output: any; }
+  JSON: { input: any; output: any; }
+  JSONObject: { input: any; output: any; }
 }
 
 export interface Attribute {
@@ -81,6 +83,7 @@ export interface FindQuery {
 export interface Metadata {
   __typename?: 'Metadata';
   attributes: Array<Attribute>;
+  content?: Maybe<MetadataContent>;
   contentLength?: Maybe<Scalars['Int']['output']>;
   contentType: Scalars['String']['output'];
   created: Scalars['Date']['output'];
@@ -93,10 +96,22 @@ export interface Metadata {
   parentId?: Maybe<Scalars['ID']['output']>;
   sourceId?: Maybe<Scalars['String']['output']>;
   sourceIdentifier?: Maybe<Scalars['String']['output']>;
-  supplementary: Array<Supplementary>;
+  supplementaries: Array<Supplementary>;
+  supplementary?: Maybe<Supplementary>;
   traitIds: Array<Scalars['String']['output']>;
   uploadUrl: SignedUrl;
   workflowState: MetadataWorkflowState;
+}
+
+
+export interface MetadataSupplementaryArgs {
+  key: Scalars['String']['input'];
+}
+
+export interface MetadataContent {
+  __typename?: 'MetadataContent';
+  json?: Maybe<Scalars['JSONObject']['output']>;
+  text?: Maybe<Scalars['String']['output']>;
 }
 
 export interface MetadataInput {
@@ -183,6 +198,7 @@ export interface Source {
 
 export interface Supplementary {
   __typename?: 'Supplementary';
+  content?: Maybe<MetadataContent>;
   contentLength?: Maybe<Scalars['Int']['output']>;
   contentType: Scalars['String']['output'];
   created: Scalars['Date']['output'];
@@ -292,7 +308,10 @@ export type ResolversTypes = ResolversObject<{
   FindQuery: FindQuery;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
+  JSONObject: ResolverTypeWrapper<Scalars['JSONObject']['output']>;
   Metadata: ResolverTypeWrapper<Metadata>;
+  MetadataContent: ResolverTypeWrapper<MetadataContent>;
   MetadataInput: MetadataInput;
   MetadataWorkflowState: ResolverTypeWrapper<MetadataWorkflowState>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -318,7 +337,10 @@ export type ResolversParentTypes = ResolversObject<{
   FindQuery: FindQuery;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
+  JSON: Scalars['JSON']['output'];
+  JSONObject: Scalars['JSONObject']['output'];
   Metadata: Metadata;
+  MetadataContent: MetadataContent;
   MetadataInput: MetadataInput;
   MetadataWorkflowState: MetadataWorkflowState;
   Mutation: {};
@@ -365,8 +387,17 @@ export type FindResolvers<ContextType = any, ParentType extends ResolversParentT
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
+  name: 'JSON';
+}
+
+export interface JsonObjectScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSONObject'], any> {
+  name: 'JSONObject';
+}
+
 export type MetadataResolvers<ContextType = any, ParentType extends ResolversParentTypes['Metadata'] = ResolversParentTypes['Metadata']> = ResolversObject<{
   attributes?: Resolver<Array<ResolversTypes['Attribute']>, ParentType, ContextType>;
+  content?: Resolver<Maybe<ResolversTypes['MetadataContent']>, ParentType, ContextType>;
   contentLength?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   contentType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
@@ -379,10 +410,17 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
   parentId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   sourceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   sourceIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  supplementary?: Resolver<Array<ResolversTypes['Supplementary']>, ParentType, ContextType>;
+  supplementaries?: Resolver<Array<ResolversTypes['Supplementary']>, ParentType, ContextType>;
+  supplementary?: Resolver<Maybe<ResolversTypes['Supplementary']>, ParentType, ContextType, RequireFields<MetadataSupplementaryArgs, 'key'>>;
   traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   uploadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
   workflowState?: Resolver<ResolversTypes['MetadataWorkflowState'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type MetadataContentResolvers<ContextType = any, ParentType extends ResolversParentTypes['MetadataContent'] = ResolversParentTypes['MetadataContent']> = ResolversObject<{
+  json?: Resolver<Maybe<ResolversTypes['JSONObject']>, ParentType, ContextType>;
+  text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -429,6 +467,7 @@ export type SourceResolvers<ContextType = any, ParentType extends ResolversParen
 }>;
 
 export type SupplementaryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Supplementary'] = ResolversParentTypes['Supplementary']> = ResolversObject<{
+  content?: Resolver<Maybe<ResolversTypes['MetadataContent']>, ParentType, ContextType>;
   contentLength?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   contentType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
@@ -457,7 +496,10 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   CollectionItem?: CollectionItemResolvers<ContextType>;
   Date?: GraphQLScalarType;
   Find?: FindResolvers<ContextType>;
+  JSON?: GraphQLScalarType;
+  JSONObject?: GraphQLScalarType;
   Metadata?: MetadataResolvers<ContextType>;
+  MetadataContent?: MetadataContentResolvers<ContextType>;
   MetadataWorkflowState?: MetadataWorkflowStateResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

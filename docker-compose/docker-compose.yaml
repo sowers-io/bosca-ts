@@ -10,7 +10,7 @@ services:
       GOOSE_DRIVER: postgres
       GOOSE_DBSTRING: postgresql://bosca:bosca@postgres:5432/boscacontent
     networks:
-      - net1
+      - boscanet
     depends_on:
       postgres:
         condition: service_healthy
@@ -41,7 +41,7 @@ services:
     ports:
       - "7000:7000"
     networks:
-      - net1
+      - boscanet
 
   workflow:
     restart: always
@@ -71,7 +71,7 @@ services:
     ports:
       - "7100:7100"
     networks:
-      - net1
+      - boscanet
 
   workflow-queue:
     restart: always
@@ -91,7 +91,7 @@ services:
     ports:
       - "7200:7200"
     networks:
-      - net1
+      - boscanet
 
   workflow-workers:
     restart: always
@@ -120,7 +120,7 @@ services:
       DISABLE_OTEL: "true"
       NODE_ENV: production
     networks:
-      - net1
+      - boscanet
 
   workflow-dashboard:
     restart: always
@@ -134,7 +134,7 @@ services:
     ports:
       - "3001:3001"
     networks:
-      - net1
+      - boscanet
 
   imageproxy:
     restart: always
@@ -147,7 +147,7 @@ services:
     ports:
       - "8002:8002"
     networks:
-      - net1
+      - boscanet
 
   graphql:
     restart: always
@@ -165,4 +165,4 @@ services:
     ports:
       - "9000:9000"
     networks:
-      - net1
+      - boscanet

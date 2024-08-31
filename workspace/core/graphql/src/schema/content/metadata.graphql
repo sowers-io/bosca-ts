@@ -62,7 +62,7 @@ type Metadata {
 }
 
 type Supplementary {
-    metdataId: ID!
+    metadataId: ID!
     key: ID!
 
     name: String!

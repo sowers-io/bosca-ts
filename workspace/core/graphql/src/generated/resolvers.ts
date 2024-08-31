@@ -188,7 +188,7 @@ export interface Supplementary {
   created: Scalars['Date']['output'];
   downloadUrl: SignedUrl;
   key: Scalars['ID']['output'];
-  metdataId: Scalars['ID']['output'];
+  metadataId: Scalars['ID']['output'];
   modified: Scalars['Date']['output'];
   name: Scalars['String']['output'];
   sourceId?: Maybe<Scalars['String']['output']>;
@@ -434,7 +434,7 @@ export type SupplementaryResolvers<ContextType = any, ParentType extends Resolve
   created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   downloadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
   key?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  metdataId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  metadataId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   modified?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   sourceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;

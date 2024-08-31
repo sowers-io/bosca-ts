@@ -159,8 +159,6 @@ services:
       BOSCA_SESSION_ENDPOINT: http://kratos:4433/sessions/whoami
       BOSCA_PERMISSIONS_SHARED_TOKEN: bosca-spicedb
       BOSCA_PERMISSIONS_ENDPOINT: spicedb:50051
-      BOSCA_SERVICE_ACCOUNT_ID: sa
-      BOSCA_SERVICE_ACCOUNT_TOKEN: sat
       DISABLE_OTEL: "true"
       NODE_ENV: production
     ports:

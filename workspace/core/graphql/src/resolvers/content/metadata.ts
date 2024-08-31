@@ -84,20 +84,21 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     uploadUrl: async (parent, args, context) => {
       return await executeGraphQL<GSignedUrl>(async () => {
         const service = useClient(ContentService)
-        const url = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({ id: parent.metdataId, key: parent.key }), {
+        const url = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({ id: parent.metadataId, key: parent.key }), {
           headers: getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
       })
     },
     downloadUrl: async (parent, args, context) => {
-      return (await executeGraphQL(async () => {
+      return await executeGraphQL(async () => {
         const service = useClient(ContentService)
-        const url = await service.getMetadataSupplementaryDownloadUrl(new SupplementaryIdRequest({ id: parent.metdataId, key: parent.key }), {
+        const request = new SupplementaryIdRequest({ id: parent.metadataId, key: parent.key })
+        const url = await service.getMetadataSupplementaryDownloadUrl(request, {
           headers: getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
-      }))!
+      })
     },
   },
   Mutation: {

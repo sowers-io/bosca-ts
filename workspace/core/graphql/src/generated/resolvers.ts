@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -50,7 +50,7 @@ export type CollectionItem = Collection | Metadata;
 export enum CollectionType {
   Folder = 'folder',
   Root = 'root',
-  Standard = 'standard',
+  Standard = 'standard'
 }
 
 export interface Find {
@@ -93,6 +93,8 @@ export interface Metadata {
   parentId?: Maybe<Scalars['ID']['output']>;
   sourceId?: Maybe<Scalars['String']['output']>;
   sourceIdentifier?: Maybe<Scalars['String']['output']>;
+  supplementary: Array<Supplementary>;
+  traitIds: Array<Scalars['String']['output']>;
   uploadUrl: SignedUrl;
   workflowState: MetadataWorkflowState;
 }
@@ -177,6 +179,22 @@ export interface Source {
   __typename?: 'Source';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+}
+
+export interface Supplementary {
+  __typename?: 'Supplementary';
+  contentLength?: Maybe<Scalars['Int']['output']>;
+  contentType: Scalars['String']['output'];
+  created: Scalars['Date']['output'];
+  downloadUrl: SignedUrl;
+  key: Scalars['ID']['output'];
+  metdataId: Scalars['ID']['output'];
+  modified: Scalars['Date']['output'];
+  name: Scalars['String']['output'];
+  sourceId?: Maybe<Scalars['String']['output']>;
+  sourceIdentifier?: Maybe<Scalars['String']['output']>;
+  traitIds: Array<Scalars['String']['output']>;
+  uploadUrl: SignedUrl;
 }
 
 export interface Trait {
@@ -283,6 +301,7 @@ export type ResolversTypes = ResolversObject<{
   SignedUrlHeader: ResolverTypeWrapper<SignedUrlHeader>;
   Source: ResolverTypeWrapper<Source>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Supplementary: ResolverTypeWrapper<Supplementary>;
   Trait: ResolverTypeWrapper<Trait>;
 }>;
 
@@ -308,6 +327,7 @@ export type ResolversParentTypes = ResolversObject<{
   SignedUrlHeader: SignedUrlHeader;
   Source: Source;
   String: Scalars['String']['output'];
+  Supplementary: Supplementary;
   Trait: Trait;
 }>;
 
@@ -359,6 +379,8 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
   parentId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   sourceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   sourceIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  supplementary?: Resolver<Array<ResolversTypes['Supplementary']>, ParentType, ContextType>;
+  traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   uploadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
   workflowState?: Resolver<ResolversTypes['MetadataWorkflowState'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -406,6 +428,22 @@ export type SourceResolvers<ContextType = any, ParentType extends ResolversParen
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type SupplementaryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Supplementary'] = ResolversParentTypes['Supplementary']> = ResolversObject<{
+  contentLength?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  contentType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  downloadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
+  key?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  metdataId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  modified?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  sourceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  sourceIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  uploadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type TraitResolvers<ContextType = any, ParentType extends ResolversParentTypes['Trait'] = ResolversParentTypes['Trait']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -426,6 +464,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   SignedUrl?: SignedUrlResolvers<ContextType>;
   SignedUrlHeader?: SignedUrlHeaderResolvers<ContextType>;
   Source?: SourceResolvers<ContextType>;
+  Supplementary?: SupplementaryResolvers<ContextType>;
   Trait?: TraitResolvers<ContextType>;
 }>;
 

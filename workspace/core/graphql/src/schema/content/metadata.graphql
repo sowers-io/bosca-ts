@@ -42,6 +42,8 @@ type Metadata {
     contentLength: Int
     languageTag: String!
 
+    traitIds: [String!]!
+
     labels: [String!]!
     attributes: [Attribute!]!
 
@@ -50,6 +52,29 @@ type Metadata {
 
     workflowState: MetadataWorkflowState!
 
+    created: Date!
+    modified: Date!
+
+    downloadUrl: SignedUrl!
+    uploadUrl: SignedUrl!
+
+    supplementary: [Supplementary!]!
+}
+
+type Supplementary {
+    metdataId: ID!
+    key: ID!
+
+    name: String!
+
+    contentType: String!
+    contentLength: Int
+    
+    sourceId: String
+    sourceIdentifier: String
+
+    traitIds: [String!]!
+    
     created: Date!
     modified: Date!
 

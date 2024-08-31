@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Resolvers, Metadata as GMetadata, SignedUrl as GSignedUrl } from '../../generated/resolvers'
+import { Resolvers, Metadata as GMetadata, SignedUrl as GSignedUrl, Supplementary } from '../../generated/resolvers'
 import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders } from '@bosca/common'
 import { useClient } from '@bosca/common'
-import { AddMetadataRequest, ContentService, IdRequest, Metadata } from '@bosca/protobufs'
+import { AddMetadataRequest, ContentService, IdRequest, Metadata, SupplementaryIdRequest } from '@bosca/protobufs'
 
 export function transformMetadata(metadata: Metadata): GMetadata {
   const m = metadata.toJson() as unknown as GMetadata
@@ -65,6 +65,35 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return (await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const url = await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return url.toJson() as unknown as GSignedUrl
+      }))!
+    },
+    supplementary: async (parent, args, context) => {
+      return (await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const response = await service.getMetadataSupplementaries(new IdRequest({ id: parent.id }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return response.supplementaries.map((s) => s.toJson()) as unknown as Supplementary[]
+      }))!
+    },
+  },
+  Supplementary: {
+    uploadUrl: async (parent, args, context) => {
+      return await executeGraphQL<GSignedUrl>(async () => {
+        const service = useClient(ContentService)
+        const url = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({ id: parent.metdataId, key: parent.key }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return url.toJson() as unknown as GSignedUrl
+      })
+    },
+    downloadUrl: async (parent, args, context) => {
+      return (await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const url = await service.getMetadataSupplementaryDownloadUrl(new SupplementaryIdRequest({ id: parent.metdataId, key: parent.key }), {
           headers: getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl

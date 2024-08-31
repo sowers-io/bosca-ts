@@ -1,4 +1,4 @@
-{
+d{
   "version": "0.2.0",
   "configurations": [
     {
@@ -131,6 +131,25 @@
       ]
     },
     {
+      "name": "Debug GraphQL",
+      "type": "node",
+      "request": "launch",
+      "outputCapture": "std",
+      "cwd": "${workspaceRoot}/workspace/core/graphql",
+      "env": {
+        "BOSCA_CONTENT_API_ADDRESS": "localhost:7000",
+        "KRATOS_BASE_PATH": "http://localhost:4433/",
+        "BOSCA_SESSION_ENDPOINT": "http://localhost:4433/sessions/whoami",
+        "BOSCA_PERMISSIONS_SHARED_TOKEN": "bosca-spicedb",
+        "BOSCA_PERMISSIONS_ENDPOINT": "localhost:50051"
+      },
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ]
+    },
+    {
       "name": "Debug Workflow Dashboard",
       "type": "node",
       "request": "launch",
@@ -165,6 +184,7 @@
         "Debug Workflow Queue",
         "Debug Workflow Workers",
         "Debug Workflow",
+        "Debug GraphQL",
         "Debug UI"
       ],
       "stopAll": true

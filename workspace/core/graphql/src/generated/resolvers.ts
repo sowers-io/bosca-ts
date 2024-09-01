@@ -117,6 +117,11 @@ export interface Metadata {
 }
 
 
+export interface MetadataSupplementariesArgs {
+  key?: InputMaybe<Array<Scalars['String']['input']>>;
+}
+
+
 export interface MetadataSupplementaryArgs {
   key: Scalars['String']['input'];
 }
@@ -950,7 +955,7 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
   permissions?: Resolver<Array<ResolversTypes['Permission']>, ParentType, ContextType>;
   sourceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   sourceIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  supplementaries?: Resolver<Array<ResolversTypes['Supplementary']>, ParentType, ContextType>;
+  supplementaries?: Resolver<Array<ResolversTypes['Supplementary']>, ParentType, ContextType, Partial<MetadataSupplementariesArgs>>;
   supplementary?: Resolver<Maybe<ResolversTypes['Supplementary']>, ParentType, ContextType, RequireFields<MetadataSupplementaryArgs, 'key'>>;
   traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   uploadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;

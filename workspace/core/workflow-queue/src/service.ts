@@ -34,8 +34,9 @@ export default (router: ConnectRouter) => {
         id: request.id,
         queueName: request.queue,
       })
+      const json = JSON.stringify(job.job.asJSON())
       return new WorkflowJobInstance({
-        json: JSON.stringify(job.job.asJSON()),
+        json: json,
       })
     },
     async enqueue(request) {

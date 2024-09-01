@@ -19,6 +19,7 @@ import {
   Resolvers,
   SignedUrl as GSignedUrl,
   Supplementary,
+  MetadataWorkflowJob,
 } from '../../generated/resolvers'
 import {
   executeGraphQL,
@@ -37,6 +38,7 @@ import {
   MetadataReadyRequest,
   SignedUrl,
   SupplementaryIdRequest,
+  WorkflowJob,
   WorkflowQueueService,
 } from '@bosca/protobufs'
 import { protoInt64 } from '@bufbuild/protobuf'
@@ -77,18 +79,22 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
   },
   Metadata: {
     workflowJobs: async (parent, _, context) => {
-      return await executeGraphQL(async () => {
+      return await executeGraphQL<MetadataWorkflowJob[]>(async () => {
         const service = useClient(ContentService)
         const queueService = useServiceAccountClient(WorkflowQueueService)
         const jobIds = await service.getMetadataWorkflowJobs(new IdRequest({ id: parent.id }), {
           headers: getGraphQLHeaders(context),
         })
-        const jobs = []
+        const jobs: MetadataWorkflowJob[] = []
         for (const jobId of jobIds.ids) {
           const job = await queueService.getJob(jobId)
-          jobs.push(job)
+          jobs.push({
+            id: jobId.id,
+            queue: jobId.queue,
+            json: JSON.parse(job.json),
+          })
         }
-        return jobs.map((j) => JSON.parse(j.json))
+        return jobs
       })
     },
     uploadUrl: async (parent, _, context) => {

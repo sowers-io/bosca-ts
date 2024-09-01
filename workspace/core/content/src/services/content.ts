@@ -624,7 +624,7 @@ export function content(
       await permissions.checkWithError(subject, PermissionObjectType.metadata_type, request.id, PermissionAction.manage)
       for (const permission of request.permissions) {
         permission.id = request.id
-        await permissions.createRelationship(PermissionObjectType.collection_type, permission)
+        await permissions.createRelationship(PermissionObjectType.metadata_type, permission)
       }
       return new Empty()
     },

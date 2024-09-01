@@ -194,6 +194,7 @@ export interface Mutation {
   editStorageSystem: StorageSystem;
   editWorkflow: Workflow;
   editWorkflowActivity: WorkflowActivity;
+  executeWorkflow: Scalars['String']['output'];
   login?: Maybe<Scalars['String']['output']>;
   setMetadataJSONContent?: Maybe<Metadata>;
   setMetadataReady?: Maybe<Metadata>;
@@ -357,6 +358,11 @@ export interface MutationEditWorkflowArgs {
 export interface MutationEditWorkflowActivityArgs {
   activity?: InputMaybe<WorkflowActivityInput>;
   id: Scalars['ID']['input'];
+}
+
+
+export interface MutationExecuteWorkflowArgs {
+  request?: InputMaybe<WorkflowExecutionInput>;
 }
 
 
@@ -631,6 +637,13 @@ export interface WorkflowActivityStorageSystemInput {
   id: Scalars['ID']['input'];
 }
 
+export interface WorkflowExecutionInput {
+  context?: InputMaybe<Array<KvInput>>;
+  metadataId?: InputMaybe<Scalars['String']['input']>;
+  version?: InputMaybe<Scalars['Int']['input']>;
+  workflowId: Scalars['String']['input'];
+}
+
 export interface WorkflowInput {
   configuration: Array<KvInput>;
   description: Scalars['String']['input'];
@@ -830,6 +843,7 @@ export type ResolversTypes = ResolversObject<{
   WorkflowActivityPromptInput: WorkflowActivityPromptInput;
   WorkflowActivityStorageSystem: ResolverTypeWrapper<WorkflowActivityStorageSystem>;
   WorkflowActivityStorageSystemInput: WorkflowActivityStorageSystemInput;
+  WorkflowExecutionInput: WorkflowExecutionInput;
   WorkflowInput: WorkflowInput;
   WorkflowState: ResolverTypeWrapper<WorkflowState>;
   WorkflowStateInput: WorkflowStateInput;
@@ -888,6 +902,7 @@ export type ResolversParentTypes = ResolversObject<{
   WorkflowActivityPromptInput: WorkflowActivityPromptInput;
   WorkflowActivityStorageSystem: WorkflowActivityStorageSystem;
   WorkflowActivityStorageSystemInput: WorkflowActivityStorageSystemInput;
+  WorkflowExecutionInput: WorkflowExecutionInput;
   WorkflowInput: WorkflowInput;
   WorkflowState: WorkflowState;
   WorkflowStateInput: WorkflowStateInput;
@@ -1015,6 +1030,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   editStorageSystem?: Resolver<ResolversTypes['StorageSystem'], ParentType, ContextType, RequireFields<MutationEditStorageSystemArgs, 'id'>>;
   editWorkflow?: Resolver<ResolversTypes['Workflow'], ParentType, ContextType, Partial<MutationEditWorkflowArgs>>;
   editWorkflowActivity?: Resolver<ResolversTypes['WorkflowActivity'], ParentType, ContextType, RequireFields<MutationEditWorkflowActivityArgs, 'id'>>;
+  executeWorkflow?: Resolver<ResolversTypes['String'], ParentType, ContextType, Partial<MutationExecuteWorkflowArgs>>;
   login?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'password' | 'username'>>;
   setMetadataJSONContent?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataJsonContentArgs, 'id'>>;
   setMetadataReady?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataReadyArgs, 'id'>>;

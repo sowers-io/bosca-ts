@@ -11,9 +11,11 @@ import {
   Empty,
   IdRequest,
   WorkflowActivityIdIntRequest,
+  WorkflowExecutionRequest,
   WorkflowService,
 } from '@bosca/protobufs'
 import { protoInt64 } from '@bufbuild/protobuf'
+import { GraphQLError } from 'graphql'
 
 export const resolvers: Resolvers<GraphQLRequestContext> = {
   Query: {
@@ -22,6 +24,32 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return {
         workflows: workflows,
       } as Workflows
+    },
+  },
+  Mutation: {
+    executeWorkflow: async (_, args, context) => {
+      if (!args || !args.request || !args.request.workflowId || !args.request.metadataId) throw new GraphQLError('Invalid request')
+      const ctx: { [key: string]: string } = {}
+      if (args.request.context) {
+        for (const c of args.request.context) {
+          ctx[c.key] = c.value
+        }
+      }
+      return await executeGraphQL(async () => {
+        const service = useClient(WorkflowService)
+        const request = new WorkflowExecutionRequest({ 
+          workflowId: args.request!.workflowId!,
+          metadataId: args.request!.metadataId!,
+          context: ctx,
+        })
+        const response = await service.executeWorkflow(request, {
+          headers: getGraphQLHeaders(context),
+        })
+        if (response.error) {
+          throw new GraphQLError(response.error)
+        }
+        return response.jobId
+      })
     },
   },
   Model: {

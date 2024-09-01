@@ -273,7 +273,21 @@ export function workflow(
     },
     async executeWorkflow(request, context) {
       const subject = context.values.get(SubjectKey)
-      if (subject.type != SubjectType.serviceaccount) {
+      if (request.metadataId) {
+        await permissions.checkWithError(
+          subject,
+          PermissionObjectType.metadata_type,
+          request.metadataId,
+          PermissionAction.manage,
+        )
+      } else if (request.collectionId) {
+        await permissions.checkWithError(
+          subject,
+          PermissionObjectType.collection_type,
+          request.collectionId,
+          PermissionAction.manage,
+        )
+      } else if (subject.type != SubjectType.serviceaccount) {
         throw new ConnectError('unauthorized', Code.PermissionDenied)
       }
       return await executeWorkflow(

@@ -197,7 +197,6 @@ export class SpiceDBPermissionManager implements PermissionManager {
   }
 
   async deleteRelationships(objectType: PermissionObjectType, permissions: Permission[]): Promise<void> {
-    const updates: v1.RelationshipUpdate[] = []
     for (const permission of permissions) {
       await this.client.deleteRelationships(v1.DeleteRelationshipsRequest.create({ 
         relationshipFilter: {
@@ -208,7 +207,7 @@ export class SpiceDBPermissionManager implements PermissionManager {
             subjectType: this.getSubjectType(permission.subjectType),
             optionalSubjectId: permission.subject,
           },
-        }
+        },
       }))
     }
   }

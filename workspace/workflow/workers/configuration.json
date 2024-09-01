@@ -11,10 +11,10 @@
       "maxConcurrency": 100
     },
     "media-transcription": {
-      "maxConcurrency": 3
+      "maxConcurrency": 1
     },
     "media-upload": {
-      "maxConcurrency": 3
+      "maxConcurrency": 1
     },
     "bible": {
       "maxConcurrency": 20

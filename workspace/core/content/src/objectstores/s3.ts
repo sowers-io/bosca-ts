@@ -55,18 +55,19 @@ export class S3ObjectStore implements ObjectStore {
       throw new ConnectError('metadata does not have a content length', Code.FailedPrecondition)
     }
     const id = this.getId(metadata, supplementary)
+    const length = Number(supplementary ? supplementary.contentLength : metadata.contentLength)
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: id,
       ContentType: metadata.contentType,
-      ContentLength: Number(metadata.contentLength),
+      ContentLength: length,
     })
     const url = await getSignedUrl(this.client, command, {
       expiresIn: 3600,
     })
     const headers: SignedUrlHeader[] = [
       new SignedUrlHeader({ name: 'Content-Type', value: metadata.contentType }),
-      new SignedUrlHeader({ name: 'Content-Length', value: metadata.contentLength.toString() }),
+      new SignedUrlHeader({ name: 'Content-Length', value: length.toString() }),
     ]
     return new SignedUrl({
       id: id,

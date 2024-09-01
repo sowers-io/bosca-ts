@@ -38,7 +38,6 @@ import {
   MetadataReadyRequest,
   SignedUrl,
   SupplementaryIdRequest,
-  WorkflowJob,
   WorkflowQueueService,
 } from '@bosca/protobufs'
 import { protoInt64 } from '@bufbuild/protobuf'

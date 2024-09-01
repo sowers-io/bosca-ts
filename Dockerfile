@@ -68,7 +68,6 @@ WORKDIR /prod/workflow-workers
 CMD [ "pnpm", "start" ]
 
 FROM base AS workflow-workers-ml
-
 ENV POETRY_HOME="/poetry"
 WORKDIR /poetry
 RUN apt update && apt install -y python3 curl ffmpeg
@@ -76,11 +75,13 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="$PATH:/poetry/bin"
 ENV POETRY_PROGRAM="/poetry/bin/poetry"
 ENV MEDIA_PYTHON_DIR="/prod/workflow-workers-py"
+
+COPY --from=build /usr/src/app/workspace/workflow/media-py /prod/workflow-workers-py
+
 RUN cd /prod/workflow-workers-py && poetry run pip install torch=="2.0.0+cpu" torchaudio=="2.0.0+cpu" -f https://download.pytorch.org/whl/torch_stable.html
 RUN cd /prod/workflow-workers-py && LLVM_CONFIG=/usr/bin/llvm-config-14 poetry install
 
 COPY --from=build /prod/workflow-workers /prod/workflow-workers
-COPY --from=build /usr/src/app/workspace/workflow/media-py /prod/workflow-workers-py
 WORKDIR /prod/workflow-workers
 CMD [ "pnpm", "start" ]
 

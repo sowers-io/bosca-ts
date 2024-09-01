@@ -568,16 +568,22 @@ export function content(
         request.metadataId,
         PermissionAction.service,
       )
-      await dataSource.addMetadataSupplementary(
-        request.metadataId,
-        request.key,
-        request.name,
-        request.contentType,
-        Number(request.contentLength),
-        request.traitIds,
-        request.sourceId || null,
-        request.sourceIdentifier || null,
-      )
+      try {
+        await dataSource.addMetadataSupplementary(
+          request.metadataId,
+          request.key,
+          request.name,
+          request.contentType,
+          Number(request.contentLength),
+          request.traitIds,
+          request.sourceId || null,
+          request.sourceIdentifier || null,
+        )
+      } catch (e: any) {
+        if (e.message.toString().includes('duplicate key value violates unique constraint')) {
+          throw new ConnectError('duplicate key', Code.AlreadyExists)
+        }
+      }
       return new MetadataSupplementary({
         metadataId: request.metadataId,
         key: request.key,

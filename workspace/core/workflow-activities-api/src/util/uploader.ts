@@ -93,10 +93,6 @@ export async function getMetadataSupplementaryUploadUrl(id: SupplementaryIdReque
   })
 }
 
-async function setMetadataSupplementaryUploaded(id: SupplementaryIdRequest) {
-  return Retry.execute(10, () => useServiceAccountClient(ContentService).setMetadataSupplementaryReady(id))
-}
-
 export async function uploadSupplementary(
   metadataId: string,
   name: string,
@@ -107,48 +103,31 @@ export async function uploadSupplementary(
   traitIds: string[] | undefined,
   buffer: ArrayBuffer,
 ) {
-  const supplementary = await Retry.execute(10, async () => {
+  await Retry.execute(10, async () => {
     const service = useServiceAccountClient(ContentService)
     const idRequest = new SupplementaryIdRequest({ id: metadataId, key: key })
-    let supplementary: MetadataSupplementary | undefined
     try {
-      supplementary = await service.getMetadataSupplementary(idRequest)
+      await service.deleteMetadataSupplementary(idRequest)
     } catch (e) {
       if (e instanceof ConnectError && e.code == Code.NotFound) {
-        supplementary = undefined
+        logger.debug({ error: e }, 'metadata supplementary not found, cannot delete it')
       } else {
-        throw e
+        logger.error({ error: e }, 'failed to delete metadata supplementary')
       }
-    }
-    if (supplementary && supplementary.metadataId && supplementary.metadataId.length > 0) {
-      await service.deleteMetadataSupplementary(idRequest)
     }
     const request = {
       metadataId: metadataId,
+      key: key,
       name: name,
       contentLength: protoInt64.parse(buffer.byteLength),
       contentType: contentType,
-      key: key,
       sourceId: sourceId,
       sourceIdentifier: sourceIdentifier,
       traitIds: traitIds,
     }
-    try {
-      return await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
-    } catch (e: any) {
-      if (
-        e.toString() ===
-        'ConnectError: [unknown] ERROR: duplicate key value violates unique constraint "metadata_supplementary_pkey" (SQLSTATE 23505)'
-      ) {
-        await service.deleteMetadataSupplementary(idRequest)
-      }
-      throw e
-    }
-  })
-  return Retry.execute(10, async () => {
-    const idRequest = new SupplementaryIdRequest({ id: supplementary.metadataId, key: supplementary.key })
+    await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
     const uploadUrl = await getMetadataSupplementaryUploadUrl(idRequest)
     await execute(uploadUrl, buffer)
-    await setMetadataSupplementaryUploaded(idRequest)
+    await useServiceAccountClient(ContentService).setMetadataSupplementaryReady(idRequest)
   })
 }

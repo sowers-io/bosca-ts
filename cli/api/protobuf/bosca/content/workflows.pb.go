@@ -161,6 +161,171 @@ func (x *SetWorkflowStateCompleteRequest) GetStatus() string {
 	return ""
 }
 
+type AddWorkflowJobRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id    string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	JobId string `protobuf:"bytes,2,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	Queue string `protobuf:"bytes,3,opt,name=queue,proto3" json:"queue,omitempty"`
+}
+
+func (x *AddWorkflowJobRequest) Reset() {
+	*x = AddWorkflowJobRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_bosca_content_workflows_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddWorkflowJobRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddWorkflowJobRequest) ProtoMessage() {}
+
+func (x *AddWorkflowJobRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bosca_content_workflows_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddWorkflowJobRequest.ProtoReflect.Descriptor instead.
+func (*AddWorkflowJobRequest) Descriptor() ([]byte, []int) {
+	return file_bosca_content_workflows_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AddWorkflowJobRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AddWorkflowJobRequest) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+func (x *AddWorkflowJobRequest) GetQueue() string {
+	if x != nil {
+		return x.Queue
+	}
+	return ""
+}
+
+type WorkflowJobIds struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ids []*WorkflowJobId `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
+}
+
+func (x *WorkflowJobIds) Reset() {
+	*x = WorkflowJobIds{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_bosca_content_workflows_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *WorkflowJobIds) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorkflowJobIds) ProtoMessage() {}
+
+func (x *WorkflowJobIds) ProtoReflect() protoreflect.Message {
+	mi := &file_bosca_content_workflows_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorkflowJobIds.ProtoReflect.Descriptor instead.
+func (*WorkflowJobIds) Descriptor() ([]byte, []int) {
+	return file_bosca_content_workflows_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *WorkflowJobIds) GetIds() []*WorkflowJobId {
+	if x != nil {
+		return x.Ids
+	}
+	return nil
+}
+
+type WorkflowJobId struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id    string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Queue string `protobuf:"bytes,2,opt,name=queue,proto3" json:"queue,omitempty"`
+}
+
+func (x *WorkflowJobId) Reset() {
+	*x = WorkflowJobId{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_bosca_content_workflows_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *WorkflowJobId) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorkflowJobId) ProtoMessage() {}
+
+func (x *WorkflowJobId) ProtoReflect() protoreflect.Message {
+	mi := &file_bosca_content_workflows_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorkflowJobId.ProtoReflect.Descriptor instead.
+func (*WorkflowJobId) Descriptor() ([]byte, []int) {
+	return file_bosca_content_workflows_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *WorkflowJobId) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *WorkflowJobId) GetQueue() string {
+	if x != nil {
+		return x.Queue
+	}
+	return ""
+}
+
 var File_bosca_content_workflows_proto protoreflect.FileDescriptor
 
 var file_bosca_content_workflows_proto_rawDesc = []byte{
@@ -181,10 +346,23 @@ var file_bosca_content_workflows_proto_rawDesc = []byte{
 	0x1f, 0x0a, 0x0b, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x5f, 0x69, 0x64, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x49, 0x64,
 	0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x42, 0x25, 0x5a, 0x23, 0x62, 0x6f, 0x73, 0x63,
-	0x61, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
-	0x66, 0x2f, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2f, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x54, 0x0a, 0x15, 0x41, 0x64, 0x64, 0x57,
+	0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x4a, 0x6f, 0x62, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
+	0x64, 0x12, 0x15, 0x0a, 0x06, 0x6a, 0x6f, 0x62, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x05, 0x6a, 0x6f, 0x62, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x71, 0x75, 0x65, 0x75,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x71, 0x75, 0x65, 0x75, 0x65, 0x22, 0x40,
+	0x0a, 0x0e, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x4a, 0x6f, 0x62, 0x49, 0x64, 0x73,
+	0x12, 0x2e, 0x0a, 0x03, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1c, 0x2e,
+	0x62, 0x6f, 0x73, 0x63, 0x61, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x2e, 0x57, 0x6f,
+	0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x4a, 0x6f, 0x62, 0x49, 0x64, 0x52, 0x03, 0x69, 0x64, 0x73,
+	0x22, 0x35, 0x0a, 0x0d, 0x57, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x4a, 0x6f, 0x62, 0x49,
+	0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
+	0x64, 0x12, 0x14, 0x0a, 0x05, 0x71, 0x75, 0x65, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x71, 0x75, 0x65, 0x75, 0x65, 0x42, 0x25, 0x5a, 0x23, 0x62, 0x6f, 0x73, 0x63, 0x61,
+	0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2f, 0x62, 0x6f, 0x73, 0x63, 0x61, 0x2f, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -199,17 +377,21 @@ func file_bosca_content_workflows_proto_rawDescGZIP() []byte {
 	return file_bosca_content_workflows_proto_rawDescData
 }
 
-var file_bosca_content_workflows_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_bosca_content_workflows_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_bosca_content_workflows_proto_goTypes = []any{
 	(*SetWorkflowStateRequest)(nil),         // 0: bosca.content.SetWorkflowStateRequest
 	(*SetWorkflowStateCompleteRequest)(nil), // 1: bosca.content.SetWorkflowStateCompleteRequest
+	(*AddWorkflowJobRequest)(nil),           // 2: bosca.content.AddWorkflowJobRequest
+	(*WorkflowJobIds)(nil),                  // 3: bosca.content.WorkflowJobIds
+	(*WorkflowJobId)(nil),                   // 4: bosca.content.WorkflowJobId
 }
 var file_bosca_content_workflows_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: bosca.content.WorkflowJobIds.ids:type_name -> bosca.content.WorkflowJobId
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_bosca_content_workflows_proto_init() }
@@ -242,6 +424,42 @@ func file_bosca_content_workflows_proto_init() {
 				return nil
 			}
 		}
+		file_bosca_content_workflows_proto_msgTypes[2].Exporter = func(v any, i int) any {
+			switch v := v.(*AddWorkflowJobRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_bosca_content_workflows_proto_msgTypes[3].Exporter = func(v any, i int) any {
+			switch v := v.(*WorkflowJobIds); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_bosca_content_workflows_proto_msgTypes[4].Exporter = func(v any, i int) any {
+			switch v := v.(*WorkflowJobId); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -249,7 +467,7 @@ func file_bosca_content_workflows_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_bosca_content_workflows_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

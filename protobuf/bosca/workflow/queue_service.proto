@@ -18,6 +18,7 @@ syntax = "proto3";
 option go_package = "bosca.io/api/protobuf/bosca/workflow";
 
 import "google/api/annotations.proto";
+import "bosca/content/workflows.proto";
 import "bosca/workflow/workflows.proto";
 import "bosca/workflow/models.proto";
 import "bosca/workflow/prompts.proto";
@@ -31,6 +32,12 @@ import "bosca/requests.proto";
 package bosca.workflow;
 
 service WorkflowQueueService {
+
+  rpc GetJob(bosca.content.WorkflowJobId) returns (WorkflowJobInstance) {
+    option (google.api.http) = {
+      get: "/v1/workflow/job/{id}"
+    };
+  }
 
   rpc Enqueue(WorkflowEnqueueRequest) returns (WorkflowEnqueueResponse) {
     option (google.api.http) = {

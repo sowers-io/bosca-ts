@@ -21,7 +21,6 @@ import {
   Collections,
   ContentService,
   Empty,
-  IdRequest,
   IdResponse,
   IdResponses,
   IdResponsesId,
@@ -37,6 +36,7 @@ import {
   SignedUrl,
   Sources,
   Traits,
+  WorkflowJobIds,
   WorkflowService,
 } from '@bosca/protobufs'
 import { Code, ConnectError, type ConnectRouter } from '@connectrpc/connect'
@@ -139,6 +139,27 @@ export function content(
       )
       return new IdResponse({ id: id.id })
     },
+    async addCollectionWorkflowJob(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.collection_type,
+        request.id,
+        PermissionAction.service,
+      )
+      await dataSource.addCollectionWorkflowJob(request.id, request.jobId, request.queue)
+      return new Empty()
+    },
+    async getCollectionWorkflowJobs(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        request.id,
+        PermissionAction.view,
+      )
+      return new WorkflowJobIds({ ids:  await dataSource.getCollectionWorkflowJobs(request.id) })
+    },
     async deleteCollection(request, context) {
       const subject = context.values.get(SubjectKey)
       await permissions.checkWithError(
@@ -235,7 +256,7 @@ export function content(
             subject: request.subject,
             relation: request.relation,
             subjectType: request.subjectType,
-          })
+          }),
         ],
       )
       return new Empty()
@@ -434,6 +455,27 @@ export function content(
       await permissions.checkWithError(subject, PermissionObjectType.collection_type, collection, PermissionAction.edit)
       const id = await addMetadata(dataSource, permissions, serviceAccountId, subject, collection, request.metadata)
       return new IdResponse({ id: id.id })
+    },
+    async addMetadataWorkflowJob(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        request.id,
+        PermissionAction.service,
+      )
+      await dataSource.addMetadataWorkflowJob(request.id, request.jobId, request.queue)
+      return new Empty()
+    },
+    async getMetadataWorkflowJobs(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        request.id,
+        PermissionAction.view,
+      )
+      return new WorkflowJobIds({ ids:  await dataSource.getMetadataWorkflowJobs(request.id) })
     },
     async deleteMetadata(request, context) {
       const subject = context.values.get(SubjectKey)
@@ -686,7 +728,7 @@ export function content(
             subject: request.subject,
             relation: request.relation,
             subjectType: request.subjectType,
-          })
+          }),
         ],
       )
       return new Empty()

@@ -30,3 +30,18 @@ message SetWorkflowStateCompleteRequest {
   string metadata_id = 1;
   string status = 2;
 }
+
+message AddWorkflowJobRequest {
+  string id = 1;
+  string job_id = 2;
+  string queue = 3;
+}
+
+message WorkflowJobIds {
+  repeated WorkflowJobId ids = 1;
+}
+
+message WorkflowJobId {
+  string id = 1;
+  string queue = 2;
+}

@@ -113,6 +113,7 @@ export interface Metadata {
   supplementary?: Maybe<Supplementary>;
   traitIds: Array<Scalars['String']['output']>;
   uploadUrl: SignedUrl;
+  workflowJobs: Array<MetadataWorkflowJob>;
   workflowState: MetadataWorkflowState;
 }
 
@@ -138,6 +139,13 @@ export interface MetadataInput {
   languageTag: Scalars['String']['input'];
   name: Scalars['String']['input'];
   traitIds?: InputMaybe<Array<Scalars['String']['input']>>;
+}
+
+export interface MetadataWorkflowJob {
+  __typename?: 'MetadataWorkflowJob';
+  id: Scalars['ID']['output'];
+  json: Scalars['JSONObject']['output'];
+  queue: Scalars['String']['output'];
 }
 
 export interface MetadataWorkflowState {
@@ -811,6 +819,7 @@ export type ResolversTypes = ResolversObject<{
   Metadata: ResolverTypeWrapper<Metadata>;
   MetadataContent: ResolverTypeWrapper<MetadataContent>;
   MetadataInput: MetadataInput;
+  MetadataWorkflowJob: ResolverTypeWrapper<MetadataWorkflowJob>;
   MetadataWorkflowState: ResolverTypeWrapper<MetadataWorkflowState>;
   Model: ResolverTypeWrapper<Model>;
   ModelInput: ModelInput;
@@ -873,6 +882,7 @@ export type ResolversParentTypes = ResolversObject<{
   Metadata: Metadata;
   MetadataContent: MetadataContent;
   MetadataInput: MetadataInput;
+  MetadataWorkflowJob: MetadataWorkflowJob;
   MetadataWorkflowState: MetadataWorkflowState;
   Model: Model;
   ModelInput: ModelInput;
@@ -974,6 +984,7 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
   supplementary?: Resolver<Maybe<ResolversTypes['Supplementary']>, ParentType, ContextType, RequireFields<MetadataSupplementaryArgs, 'key'>>;
   traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   uploadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
+  workflowJobs?: Resolver<Array<ResolversTypes['MetadataWorkflowJob']>, ParentType, ContextType>;
   workflowState?: Resolver<ResolversTypes['MetadataWorkflowState'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -981,6 +992,13 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
 export type MetadataContentResolvers<ContextType = any, ParentType extends ResolversParentTypes['MetadataContent'] = ResolversParentTypes['MetadataContent']> = ResolversObject<{
   json?: Resolver<Maybe<ResolversTypes['JSONObject']>, ParentType, ContextType>;
   text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type MetadataWorkflowJobResolvers<ContextType = any, ParentType extends ResolversParentTypes['MetadataWorkflowJob'] = ResolversParentTypes['MetadataWorkflowJob']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  json?: Resolver<ResolversTypes['JSONObject'], ParentType, ContextType>;
+  queue?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1213,6 +1231,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   KV?: KvResolvers<ContextType>;
   Metadata?: MetadataResolvers<ContextType>;
   MetadataContent?: MetadataContentResolvers<ContextType>;
+  MetadataWorkflowJob?: MetadataWorkflowJobResolvers<ContextType>;
   MetadataWorkflowState?: MetadataWorkflowStateResolvers<ContextType>;
   Model?: ModelResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;

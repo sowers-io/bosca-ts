@@ -22,6 +22,7 @@
 package workflow
 
 import (
+	content "bosca.io/api/protobuf/bosca/content"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -34,6 +35,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	WorkflowQueueService_GetJob_FullMethodName  = "/bosca.workflow.WorkflowQueueService/GetJob"
 	WorkflowQueueService_Enqueue_FullMethodName = "/bosca.workflow.WorkflowQueueService/Enqueue"
 )
 
@@ -41,6 +43,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WorkflowQueueServiceClient interface {
+	GetJob(ctx context.Context, in *content.WorkflowJobId, opts ...grpc.CallOption) (*WorkflowJobInstance, error)
 	Enqueue(ctx context.Context, in *WorkflowEnqueueRequest, opts ...grpc.CallOption) (*WorkflowEnqueueResponse, error)
 }
 
@@ -50,6 +53,16 @@ type workflowQueueServiceClient struct {
 
 func NewWorkflowQueueServiceClient(cc grpc.ClientConnInterface) WorkflowQueueServiceClient {
 	return &workflowQueueServiceClient{cc}
+}
+
+func (c *workflowQueueServiceClient) GetJob(ctx context.Context, in *content.WorkflowJobId, opts ...grpc.CallOption) (*WorkflowJobInstance, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowJobInstance)
+	err := c.cc.Invoke(ctx, WorkflowQueueService_GetJob_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *workflowQueueServiceClient) Enqueue(ctx context.Context, in *WorkflowEnqueueRequest, opts ...grpc.CallOption) (*WorkflowEnqueueResponse, error) {
@@ -66,6 +79,7 @@ func (c *workflowQueueServiceClient) Enqueue(ctx context.Context, in *WorkflowEn
 // All implementations must embed UnimplementedWorkflowQueueServiceServer
 // for forward compatibility.
 type WorkflowQueueServiceServer interface {
+	GetJob(context.Context, *content.WorkflowJobId) (*WorkflowJobInstance, error)
 	Enqueue(context.Context, *WorkflowEnqueueRequest) (*WorkflowEnqueueResponse, error)
 	mustEmbedUnimplementedWorkflowQueueServiceServer()
 }
@@ -77,6 +91,9 @@ type WorkflowQueueServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedWorkflowQueueServiceServer struct{}
 
+func (UnimplementedWorkflowQueueServiceServer) GetJob(context.Context, *content.WorkflowJobId) (*WorkflowJobInstance, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetJob not implemented")
+}
 func (UnimplementedWorkflowQueueServiceServer) Enqueue(context.Context, *WorkflowEnqueueRequest) (*WorkflowEnqueueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Enqueue not implemented")
 }
@@ -99,6 +116,24 @@ func RegisterWorkflowQueueServiceServer(s grpc.ServiceRegistrar, srv WorkflowQue
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&WorkflowQueueService_ServiceDesc, srv)
+}
+
+func _WorkflowQueueService_GetJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(content.WorkflowJobId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowQueueServiceServer).GetJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowQueueService_GetJob_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowQueueServiceServer).GetJob(ctx, req.(*content.WorkflowJobId))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _WorkflowQueueService_Enqueue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -126,6 +161,10 @@ var WorkflowQueueService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "bosca.workflow.WorkflowQueueService",
 	HandlerType: (*WorkflowQueueServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetJob",
+			Handler:    _WorkflowQueueService_GetJob_Handler,
+		},
 		{
 			MethodName: "Enqueue",
 			Handler:    _WorkflowQueueService_Enqueue_Handler,

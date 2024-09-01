@@ -70,3 +70,7 @@ message WorkflowStateTransition {
   string to_state_id = 2;
   string description = 3;
 }
+
+message WorkflowJobInstance {
+  string json = 1;
+}

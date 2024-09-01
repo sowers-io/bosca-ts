@@ -23,6 +23,7 @@ import {
   MetadataSupplementary,
   Source,
   Trait,
+  WorkflowJobId,
 } from '@bosca/protobufs'
 import { proto3 } from '@bufbuild/protobuf'
 import { QueryResult } from 'pg'
@@ -176,6 +177,18 @@ export class ContentDataSource extends DataSource {
     return collectionId
   }
 
+  async addCollectionWorkflowJob(collectionId: string, jobId: string, queue: string): Promise<void> {
+    await this.query('insert into collection_workflow_jobs (id, job_id, queue) values ($1::uuid, $2, $3)', [
+      collectionId,
+      jobId,
+      queue,
+    ])
+  }
+  
+  async getCollectionWorkflowJobs(metadataId: string): Promise<WorkflowJobId[]> {
+    return (await this.queryAndMap(() => new WorkflowJobId(), 'select job_id as id, queue from collection_workflow_jobs where id = $1::uuid', [metadataId]))
+  }
+
   async addCollectionItemId(collectionId: string, childCollectionId: string | null, childMetadataId: string | null): Promise<void> {
     await this.query('insert into collection_items (collection_id, child_collection_id, child_metadata_id) values ($1::uuid, $2::uuid, $3::uuid)', [
       collectionId,
@@ -250,6 +263,18 @@ export class ContentDataSource extends DataSource {
       await this.addMetadataCategory(metadataId, categoryId)
     }
     return { metadataId, version }
+  }
+
+  async addMetadataWorkflowJob(metadataId: string, jobId: string, queue: string): Promise<void> {
+    await this.query('insert into metadata_workflow_jobs (id, job_id, queue) values ($1::uuid, $2, $3)', [
+      metadataId,
+      jobId,
+      queue,
+    ])
+  }
+
+  async getMetadataWorkflowJobs(metadataId: string): Promise<WorkflowJobId[]> {
+    return (await this.queryAndMap(() => new WorkflowJobId(), 'select job_id as id, queue from metadata_workflow_jobs where id = $1::uuid', [metadataId]))
   }
 
   async addMetadataAttributes(metadataId: string, attributes: { [key: string]: string }) {

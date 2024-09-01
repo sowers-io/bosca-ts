@@ -377,3 +377,40 @@ export class WorkflowStateTransition extends Message<WorkflowStateTransition> {
   }
 }
 
+/**
+ * @generated from message bosca.workflow.WorkflowJobInstance
+ */
+export class WorkflowJobInstance extends Message<WorkflowJobInstance> {
+  /**
+   * @generated from field: string json = 1;
+   */
+  json = "";
+
+  constructor(data?: PartialMessage<WorkflowJobInstance>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.workflow.WorkflowJobInstance";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "json", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowJobInstance {
+    return new WorkflowJobInstance().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowJobInstance {
+    return new WorkflowJobInstance().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowJobInstance {
+    return new WorkflowJobInstance().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkflowJobInstance | PlainMessage<WorkflowJobInstance> | undefined, b: WorkflowJobInstance | PlainMessage<WorkflowJobInstance> | undefined): boolean {
+    return proto3.util.equals(WorkflowJobInstance, a, b);
+  }
+}
+

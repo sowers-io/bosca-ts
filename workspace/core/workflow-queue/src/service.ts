@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { WorkflowQueueService, WorkflowEnqueueRequest, WorkflowEnqueueResponse } from '@bosca/protobufs'
+import { WorkflowQueueService, WorkflowEnqueueResponse, useServiceAccountClient, ContentService, WorkflowJobInstance } from '@bosca/protobufs'
 import { health } from '@bosca/common'
 import { ConnectionOptions, FlowJob, FlowProducer, QueueEvents } from 'bullmq'
 
@@ -29,7 +29,16 @@ export default (router: ConnectRouter) => {
   const flowProducer = new FlowProducer({ connection })
   const queueEvents: { [queue: string]: QueueEvents } = {}
   return health(router).service(WorkflowQueueService, {
-    async enqueue(request: WorkflowEnqueueRequest) {
+    async getJob(request) {
+      const job = await flowProducer.getFlow({
+        id: request.id,
+        queueName: request.queue,
+      })
+      return new WorkflowJobInstance({
+        json: JSON.stringify(job.job.asJSON()),
+      })
+    },
+    async enqueue(request) {
       const workflow = request.workflow
       if (!workflow) throw new ConnectError('workflow is required', Code.InvalidArgument)
 
@@ -108,6 +117,23 @@ export default (router: ConnectRouter) => {
       let complete = false
 
       logger.debug({ jobId: flow.job.id, jobName: flow.job.name, flowJob }, 'flow enqueued')
+
+      if (request.collectionId) {
+        await useServiceAccountClient(ContentService)
+          .addCollectionWorkflowJob({
+            id: request.collectionId,
+            jobId: flow.job.id,
+            queue: flow.job.queueName,
+          })
+      }
+      if (request.metadataId) {
+        await useServiceAccountClient(ContentService)
+          .addMetadataWorkflowJob({
+            id: request.metadataId,
+            jobId: flow.job.id,
+            queue: flow.job.queueName,
+          })
+      }
 
       if (request.waitForCompletion) {
         try {

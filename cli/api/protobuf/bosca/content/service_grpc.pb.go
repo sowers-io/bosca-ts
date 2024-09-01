@@ -52,6 +52,8 @@ const (
 	ContentService_AddCollectionPermission_FullMethodName             = "/bosca.content.ContentService/AddCollectionPermission"
 	ContentService_DeleteCollectionPermission_FullMethodName          = "/bosca.content.ContentService/DeleteCollectionPermission"
 	ContentService_AddCollectionItem_FullMethodName                   = "/bosca.content.ContentService/AddCollectionItem"
+	ContentService_AddCollectionWorkflowJob_FullMethodName            = "/bosca.content.ContentService/AddCollectionWorkflowJob"
+	ContentService_GetCollectionWorkflowJobs_FullMethodName           = "/bosca.content.ContentService/GetCollectionWorkflowJobs"
 	ContentService_CheckPermission_FullMethodName                     = "/bosca.content.ContentService/CheckPermission"
 	ContentService_FindCollection_FullMethodName                      = "/bosca.content.ContentService/FindCollection"
 	ContentService_FindMetadata_FullMethodName                        = "/bosca.content.ContentService/FindMetadata"
@@ -83,6 +85,8 @@ const (
 	ContentService_DeleteMetadataPermission_FullMethodName            = "/bosca.content.ContentService/DeleteMetadataPermission"
 	ContentService_SetWorkflowState_FullMethodName                    = "/bosca.content.ContentService/SetWorkflowState"
 	ContentService_SetWorkflowStateComplete_FullMethodName            = "/bosca.content.ContentService/SetWorkflowStateComplete"
+	ContentService_AddMetadataWorkflowJob_FullMethodName              = "/bosca.content.ContentService/AddMetadataWorkflowJob"
+	ContentService_GetMetadataWorkflowJobs_FullMethodName             = "/bosca.content.ContentService/GetMetadataWorkflowJobs"
 	ContentService_AddMetadataRelationship_FullMethodName             = "/bosca.content.ContentService/AddMetadataRelationship"
 	ContentService_GetMetadataRelationships_FullMethodName            = "/bosca.content.ContentService/GetMetadataRelationships"
 )
@@ -108,6 +112,8 @@ type ContentServiceClient interface {
 	AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
 	DeleteCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddCollectionItem(ctx context.Context, in *AddCollectionItemRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	AddCollectionWorkflowJob(ctx context.Context, in *AddWorkflowJobRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	GetCollectionWorkflowJobs(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowJobIds, error)
 	CheckPermission(ctx context.Context, in *PermissionCheckRequest, opts ...grpc.CallOption) (*PermissionCheckResponse, error)
 	FindCollection(ctx context.Context, in *FindCollectionRequest, opts ...grpc.CallOption) (*Collections, error)
 	FindMetadata(ctx context.Context, in *FindMetadataRequest, opts ...grpc.CallOption) (*Metadatas, error)
@@ -139,6 +145,8 @@ type ContentServiceClient interface {
 	DeleteMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
 	SetWorkflowState(ctx context.Context, in *SetWorkflowStateRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	SetWorkflowStateComplete(ctx context.Context, in *SetWorkflowStateCompleteRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	AddMetadataWorkflowJob(ctx context.Context, in *AddWorkflowJobRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
+	GetMetadataWorkflowJobs(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowJobIds, error)
 	AddMetadataRelationship(ctx context.Context, in *MetadataRelationship, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetMetadataRelationships(ctx context.Context, in *MetadataRelationshipIdRequest, opts ...grpc.CallOption) (*MetadataRelationships, error)
 }
@@ -315,6 +323,26 @@ func (c *contentServiceClient) AddCollectionItem(ctx context.Context, in *AddCol
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.Empty)
 	err := c.cc.Invoke(ctx, ContentService_AddCollectionItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) AddCollectionWorkflowJob(ctx context.Context, in *AddWorkflowJobRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_AddCollectionWorkflowJob_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetCollectionWorkflowJobs(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowJobIds, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowJobIds)
+	err := c.cc.Invoke(ctx, ContentService_GetCollectionWorkflowJobs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -631,6 +659,26 @@ func (c *contentServiceClient) SetWorkflowStateComplete(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *contentServiceClient) AddMetadataWorkflowJob(ctx context.Context, in *AddWorkflowJobRequest, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_AddMetadataWorkflowJob_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetMetadataWorkflowJobs(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*WorkflowJobIds, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowJobIds)
+	err := c.cc.Invoke(ctx, ContentService_GetMetadataWorkflowJobs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) AddMetadataRelationship(ctx context.Context, in *MetadataRelationship, opts ...grpc.CallOption) (*bosca.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.Empty)
@@ -672,6 +720,8 @@ type ContentServiceServer interface {
 	AddCollectionPermission(context.Context, *Permission) (*bosca.Empty, error)
 	DeleteCollectionPermission(context.Context, *Permission) (*bosca.Empty, error)
 	AddCollectionItem(context.Context, *AddCollectionItemRequest) (*bosca.Empty, error)
+	AddCollectionWorkflowJob(context.Context, *AddWorkflowJobRequest) (*bosca.Empty, error)
+	GetCollectionWorkflowJobs(context.Context, *bosca.IdRequest) (*WorkflowJobIds, error)
 	CheckPermission(context.Context, *PermissionCheckRequest) (*PermissionCheckResponse, error)
 	FindCollection(context.Context, *FindCollectionRequest) (*Collections, error)
 	FindMetadata(context.Context, *FindMetadataRequest) (*Metadatas, error)
@@ -703,6 +753,8 @@ type ContentServiceServer interface {
 	DeleteMetadataPermission(context.Context, *Permission) (*bosca.Empty, error)
 	SetWorkflowState(context.Context, *SetWorkflowStateRequest) (*bosca.Empty, error)
 	SetWorkflowStateComplete(context.Context, *SetWorkflowStateCompleteRequest) (*bosca.Empty, error)
+	AddMetadataWorkflowJob(context.Context, *AddWorkflowJobRequest) (*bosca.Empty, error)
+	GetMetadataWorkflowJobs(context.Context, *bosca.IdRequest) (*WorkflowJobIds, error)
 	AddMetadataRelationship(context.Context, *MetadataRelationship) (*bosca.Empty, error)
 	GetMetadataRelationships(context.Context, *MetadataRelationshipIdRequest) (*MetadataRelationships, error)
 	mustEmbedUnimplementedContentServiceServer()
@@ -765,6 +817,12 @@ func (UnimplementedContentServiceServer) DeleteCollectionPermission(context.Cont
 }
 func (UnimplementedContentServiceServer) AddCollectionItem(context.Context, *AddCollectionItemRequest) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollectionItem not implemented")
+}
+func (UnimplementedContentServiceServer) AddCollectionWorkflowJob(context.Context, *AddWorkflowJobRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCollectionWorkflowJob not implemented")
+}
+func (UnimplementedContentServiceServer) GetCollectionWorkflowJobs(context.Context, *bosca.IdRequest) (*WorkflowJobIds, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCollectionWorkflowJobs not implemented")
 }
 func (UnimplementedContentServiceServer) CheckPermission(context.Context, *PermissionCheckRequest) (*PermissionCheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPermission not implemented")
@@ -858,6 +916,12 @@ func (UnimplementedContentServiceServer) SetWorkflowState(context.Context, *SetW
 }
 func (UnimplementedContentServiceServer) SetWorkflowStateComplete(context.Context, *SetWorkflowStateCompleteRequest) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetWorkflowStateComplete not implemented")
+}
+func (UnimplementedContentServiceServer) AddMetadataWorkflowJob(context.Context, *AddWorkflowJobRequest) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataWorkflowJob not implemented")
+}
+func (UnimplementedContentServiceServer) GetMetadataWorkflowJobs(context.Context, *bosca.IdRequest) (*WorkflowJobIds, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataWorkflowJobs not implemented")
 }
 func (UnimplementedContentServiceServer) AddMetadataRelationship(context.Context, *MetadataRelationship) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataRelationship not implemented")
@@ -1188,6 +1252,42 @@ func _ContentService_AddCollectionItem_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).AddCollectionItem(ctx, req.(*AddCollectionItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_AddCollectionWorkflowJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddWorkflowJobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).AddCollectionWorkflowJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_AddCollectionWorkflowJob_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).AddCollectionWorkflowJob(ctx, req.(*AddWorkflowJobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetCollectionWorkflowJobs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetCollectionWorkflowJobs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetCollectionWorkflowJobs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetCollectionWorkflowJobs(ctx, req.(*bosca.IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1750,6 +1850,42 @@ func _ContentService_SetWorkflowStateComplete_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_AddMetadataWorkflowJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddWorkflowJobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).AddMetadataWorkflowJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_AddMetadataWorkflowJob_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).AddMetadataWorkflowJob(ctx, req.(*AddWorkflowJobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetMetadataWorkflowJobs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(bosca.IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetMetadataWorkflowJobs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetMetadataWorkflowJobs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetMetadataWorkflowJobs(ctx, req.(*bosca.IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_AddMetadataRelationship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MetadataRelationship)
 	if err := dec(in); err != nil {
@@ -1860,6 +1996,14 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddCollectionItem",
 			Handler:    _ContentService_AddCollectionItem_Handler,
+		},
+		{
+			MethodName: "AddCollectionWorkflowJob",
+			Handler:    _ContentService_AddCollectionWorkflowJob_Handler,
+		},
+		{
+			MethodName: "GetCollectionWorkflowJobs",
+			Handler:    _ContentService_GetCollectionWorkflowJobs_Handler,
 		},
 		{
 			MethodName: "CheckPermission",
@@ -1984,6 +2128,14 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetWorkflowStateComplete",
 			Handler:    _ContentService_SetWorkflowStateComplete_Handler,
+		},
+		{
+			MethodName: "AddMetadataWorkflowJob",
+			Handler:    _ContentService_AddMetadataWorkflowJob_Handler,
+		},
+		{
+			MethodName: "GetMetadataWorkflowJobs",
+			Handler:    _ContentService_GetMetadataWorkflowJobs_Handler,
 		},
 		{
 			MethodName: "AddMetadataRelationship",

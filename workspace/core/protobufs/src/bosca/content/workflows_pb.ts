@@ -119,3 +119,132 @@ export class SetWorkflowStateCompleteRequest extends Message<SetWorkflowStateCom
   }
 }
 
+/**
+ * @generated from message bosca.content.AddWorkflowJobRequest
+ */
+export class AddWorkflowJobRequest extends Message<AddWorkflowJobRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string job_id = 2;
+   */
+  jobId = "";
+
+  /**
+   * @generated from field: string queue = 3;
+   */
+  queue = "";
+
+  constructor(data?: PartialMessage<AddWorkflowJobRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.AddWorkflowJobRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "job_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "queue", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddWorkflowJobRequest {
+    return new AddWorkflowJobRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AddWorkflowJobRequest {
+    return new AddWorkflowJobRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AddWorkflowJobRequest {
+    return new AddWorkflowJobRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AddWorkflowJobRequest | PlainMessage<AddWorkflowJobRequest> | undefined, b: AddWorkflowJobRequest | PlainMessage<AddWorkflowJobRequest> | undefined): boolean {
+    return proto3.util.equals(AddWorkflowJobRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message bosca.content.WorkflowJobIds
+ */
+export class WorkflowJobIds extends Message<WorkflowJobIds> {
+  /**
+   * @generated from field: repeated bosca.content.WorkflowJobId ids = 1;
+   */
+  ids: WorkflowJobId[] = [];
+
+  constructor(data?: PartialMessage<WorkflowJobIds>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.WorkflowJobIds";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "ids", kind: "message", T: WorkflowJobId, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowJobIds {
+    return new WorkflowJobIds().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowJobIds {
+    return new WorkflowJobIds().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowJobIds {
+    return new WorkflowJobIds().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkflowJobIds | PlainMessage<WorkflowJobIds> | undefined, b: WorkflowJobIds | PlainMessage<WorkflowJobIds> | undefined): boolean {
+    return proto3.util.equals(WorkflowJobIds, a, b);
+  }
+}
+
+/**
+ * @generated from message bosca.content.WorkflowJobId
+ */
+export class WorkflowJobId extends Message<WorkflowJobId> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string queue = 2;
+   */
+  queue = "";
+
+  constructor(data?: PartialMessage<WorkflowJobId>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "bosca.content.WorkflowJobId";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "queue", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowJobId {
+    return new WorkflowJobId().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowJobId {
+    return new WorkflowJobId().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowJobId {
+    return new WorkflowJobId().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WorkflowJobId | PlainMessage<WorkflowJobId> | undefined, b: WorkflowJobId | PlainMessage<WorkflowJobId> | undefined): boolean {
+    return proto3.util.equals(WorkflowJobId, a, b);
+  }
+}
+

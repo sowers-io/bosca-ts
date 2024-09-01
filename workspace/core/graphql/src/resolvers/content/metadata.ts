@@ -27,6 +27,7 @@ import {
   GraphQLRequestContext,
   toArrayBuffer,
   useClient,
+  useServiceAccountClient,
 } from '@bosca/common'
 import {
   AddMetadataRequest,
@@ -36,6 +37,7 @@ import {
   MetadataReadyRequest,
   SignedUrl,
   SupplementaryIdRequest,
+  WorkflowQueueService,
 } from '@bosca/protobufs'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { GraphQLError } from 'graphql'
@@ -74,6 +76,21 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     },
   },
   Metadata: {
+    workflowJobs: async (parent, _, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const queueService = useServiceAccountClient(WorkflowQueueService)
+        const jobIds = await service.getMetadataWorkflowJobs(new IdRequest({ id: parent.id }), {
+          headers: getGraphQLHeaders(context),
+        })
+        const jobs = []
+        for (const jobId of jobIds.ids) {
+          const job = await queueService.getJob(jobId)
+          jobs.push(job)
+        }
+        return jobs.map((j) => JSON.parse(j.json))
+      })
+    },
     uploadUrl: async (parent, _, context) => {
       return await executeGraphQL<GSignedUrl>(async () => {
         const service = useClient(ContentService)

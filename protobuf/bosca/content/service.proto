@@ -140,6 +140,19 @@ service ContentService {
     };
   }
 
+  rpc AddCollectionWorkflowJob (bosca.content.AddWorkflowJobRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/collections/{id}/workflow/job"
+      body: "*"
+    };
+  }
+
+  rpc GetCollectionWorkflowJobs (IdRequest) returns (WorkflowJobIds) {
+    option (google.api.http) = {
+      get: "/v1/content/collections/{id}/workflow/job"
+    };
+  }
+
   rpc CheckPermission(PermissionCheckRequest) returns (PermissionCheckResponse) {
     option (google.api.http) = {
       get: "/v1/content/permission/check"
@@ -334,6 +347,19 @@ service ContentService {
     option (google.api.http) = {
       put: "/v1/content/metadata/{metadata_id}/workflow/state/complete"
       body: "*"
+    };
+  }
+
+  rpc AddMetadataWorkflowJob (bosca.content.AddWorkflowJobRequest) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/metadata/{id}/workflow/job"
+      body: "*"
+    };
+  }
+  
+  rpc GetMetadataWorkflowJobs (IdRequest) returns (WorkflowJobIds) {
+    option (google.api.http) = {
+      get: "/v1/content/metadata/{id}/workflow/job"
     };
   }
 

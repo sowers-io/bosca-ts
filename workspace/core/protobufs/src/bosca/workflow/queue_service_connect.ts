@@ -18,8 +18,10 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { WorkflowEnqueueRequest, WorkflowEnqueueResponse } from "./execution_context_pb";
+import { WorkflowJobId } from "../content/workflows_pb";
+import { WorkflowJobInstance } from "./workflows_pb";
 import { MethodKind } from "@bufbuild/protobuf";
+import { WorkflowEnqueueRequest, WorkflowEnqueueResponse } from "./execution_context_pb";
 
 /**
  * @generated from service bosca.workflow.WorkflowQueueService
@@ -27,6 +29,15 @@ import { MethodKind } from "@bufbuild/protobuf";
 export const WorkflowQueueService = {
   typeName: "bosca.workflow.WorkflowQueueService",
   methods: {
+    /**
+     * @generated from rpc bosca.workflow.WorkflowQueueService.GetJob
+     */
+    getJob: {
+      name: "GetJob",
+      I: WorkflowJobId,
+      O: WorkflowJobInstance,
+      kind: MethodKind.Unary,
+    },
     /**
      * @generated from rpc bosca.workflow.WorkflowQueueService.Enqueue
      */

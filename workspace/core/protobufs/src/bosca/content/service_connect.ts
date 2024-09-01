@@ -25,9 +25,9 @@ import { IdAndVersionRequest, IdRequest, IdResponse, IdResponses, IdsRequest, Su
 import { Trait, Traits } from "./traits_pb";
 import { AddCollectionItemRequest, AddCollectionRequest, AddCollectionsRequest, Collection, CollectionItems, Collections, FindCollectionRequest } from "./collections_pb";
 import { Permission, PermissionCheckRequest, PermissionCheckResponse, Permissions } from "./permissions_pb";
+import { AddWorkflowJobRequest, SetWorkflowStateCompleteRequest, SetWorkflowStateRequest, WorkflowJobIds } from "./workflows_pb";
 import { AddMetadataAttributesRequest, AddMetadataRequest, AddMetadatasRequest, AddMetadataTraitRequest, AddSupplementaryRequest, FindMetadataRequest, Metadata, MetadataReadyRequest, MetadataRelationship, MetadataRelationshipIdRequest, MetadataRelationships, Metadatas, MetadataSupplementaries, MetadataSupplementary, SetMetadataTraitsRequest } from "./metadata_pb";
 import { SignedUrl } from "./url_pb";
-import { SetWorkflowStateCompleteRequest, SetWorkflowStateRequest } from "./workflows_pb";
 
 /**
  * @generated from service bosca.content.ContentService
@@ -186,6 +186,24 @@ export const ContentService = {
       name: "AddCollectionItem",
       I: AddCollectionItemRequest,
       O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.AddCollectionWorkflowJob
+     */
+    addCollectionWorkflowJob: {
+      name: "AddCollectionWorkflowJob",
+      I: AddWorkflowJobRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.GetCollectionWorkflowJobs
+     */
+    getCollectionWorkflowJobs: {
+      name: "GetCollectionWorkflowJobs",
+      I: IdRequest,
+      O: WorkflowJobIds,
       kind: MethodKind.Unary,
     },
     /**
@@ -465,6 +483,24 @@ export const ContentService = {
       name: "SetWorkflowStateComplete",
       I: SetWorkflowStateCompleteRequest,
       O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.AddMetadataWorkflowJob
+     */
+    addMetadataWorkflowJob: {
+      name: "AddMetadataWorkflowJob",
+      I: AddWorkflowJobRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.GetMetadataWorkflowJobs
+     */
+    getMetadataWorkflowJobs: {
+      name: "GetMetadataWorkflowJobs",
+      I: IdRequest,
+      O: WorkflowJobIds,
       kind: MethodKind.Unary,
     },
     /**

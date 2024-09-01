@@ -54,6 +54,12 @@ type MetadataContent {
     json: JSONObject
 }
 
+type MetadataWorkflowJob {
+    id: ID!
+    queue: String!
+    json: JSONObject!
+}
+
 type Metadata {
     parentId: ID
 
@@ -85,6 +91,8 @@ type Metadata {
     supplementaries(key: [String!]): [Supplementary!]!
 
     permissions: [Permission!]!
+
+    workflowJobs: [MetadataWorkflowJob!]!
 }
 
 type Supplementary {

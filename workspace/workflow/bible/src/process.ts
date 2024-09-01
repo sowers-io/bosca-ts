@@ -154,7 +154,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
     // fetch created collections
     const collections: Collection[] = []
     for (const addResponse of addCollectionResponses.id) {
-      if (addResponse.error) {
+      if (addResponse.error && addResponse.error != 'name must be unique') {
         throw new Error(addResponse.error)
       }
       // TODO: Add bulk getCollections

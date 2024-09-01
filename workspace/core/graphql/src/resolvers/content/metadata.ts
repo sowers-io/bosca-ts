@@ -20,6 +20,10 @@ import {
   SignedUrl as GSignedUrl,
   Supplementary,
   MetadataWorkflowJob,
+  SupplementaryContent,
+  SupplementaryUrls,
+  MetadataUrls,
+  MetadataContent,
 } from '../../generated/resolvers'
 import {
   executeGraphQL,
@@ -96,24 +100,6 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         return jobs
       })
     },
-    uploadUrl: async (parent, _, context) => {
-      return await executeGraphQL<GSignedUrl>(async () => {
-        const service = useClient(ContentService)
-        const url = await service.getMetadataUploadUrl(new IdRequest({ id: parent.id }), {
-          headers: getGraphQLHeaders(context),
-        })
-        return url.toJson() as unknown as GSignedUrl
-      })
-    },
-    downloadUrl: async (parent, _, context) => {
-      return (await executeGraphQL(async () => {
-        const service = useClient(ContentService)
-        const url = await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
-          headers: getGraphQLHeaders(context),
-        })
-        return url.toJson() as unknown as GSignedUrl
-      }))!
-    },
     supplementary: async (parent, args, context) => {
       return (await executeGraphQL(async () => {
         const service = useClient(ContentService)
@@ -149,52 +135,82 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     },
     content: async (parent, _, context) => {
       const type = parent.contentType.split(';')[0].trim()
+      const urls: MetadataUrls = {
+        id: parent.id!,
+      }
+      const result: MetadataContent = {
+        urls: urls,
+        json: null,
+        text: null,
+      }
       if (type === 'text/plain' || type === 'text/json') {
-        const url = await executeGraphQL(async () => {
+        const url: SignedUrl = await executeGraphQL(async () => {
           const service = useClient(ContentService)
-          return await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
+          const request = new IdRequest({ id: parent.id })
+          return await service.getMetadataDownloadUrl(request, {
             headers: getGraphQLHeaders(context),
           })
         })
-        if (!url) return null
-        const content = await executeHttpRequest(url)
+        if (!url) return result
+        urls.download = url.toJson() as unknown as GSignedUrl
         if (type === 'text/json') {
-          return {
-            json: JSON.parse(content.toString()),
-          }
+          const content = await executeHttpRequest(url)
+          result.json = JSON.parse(content.toString())
+        } else if (type === 'text/plain') {
+          const content = await executeHttpRequest(url)
+          result.text = content.toString()
         }
-        return {
-          text: content.toString(),
-        }
+        return result
       }
-      return null
+      return result
     },
   },
-  Supplementary: {
-    uploadUrl: async (parent, _, context) => {
+  MetadataUrls: {
+    upload: async (parent, _, context) => {
       return await executeGraphQL<GSignedUrl>(async () => {
         const service = useClient(ContentService)
-        const url = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({
-          id: parent.metadataId,
-          key: parent.key,
-        }), {
+        const url = await service.getMetadataUploadUrl(new IdRequest({ id: parent.id }), {
           headers: getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
       })
     },
-    downloadUrl: async (parent, _, context) => {
+    download: async (parent, _, context) => {
+      if (parent.download) return parent.download
+      return (await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const url = await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return url.toJson() as unknown as GSignedUrl
+      }))!
+    },
+  },
+  SupplementaryUrls: {
+    download: async (parent, _, context) => {
+      if (parent.download) return parent.download
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
-        const request = new SupplementaryIdRequest({ id: parent.metadataId, key: parent.key })
+        const request = new SupplementaryIdRequest({ id: parent.id, key: parent.key })
         const url = await service.getMetadataSupplementaryDownloadUrl(request, {
           headers: getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
       })
     },
+  },
+  Supplementary: {
     content: async (parent, _, context) => {
       const type = parent.contentType.split(';')[0].trim()
+      const urls: SupplementaryUrls = {
+        id: parent.metadataId!,
+        key: parent.key!,
+      }
+      const result: SupplementaryContent = {
+        urls: urls,
+        json: null,
+        text: null,
+      }
       if (type === 'text/plain' || type === 'text/json') {
         const url: SignedUrl = await executeGraphQL(async () => {
           const service = useClient(ContentService)
@@ -203,18 +219,18 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
             headers: getGraphQLHeaders(context),
           })
         })
-        if (!url) return null
-        const content = await executeHttpRequest(url)
+        if (!url) return result
+        urls.download = url.toJson() as unknown as GSignedUrl
         if (type === 'text/json') {
-          return {
-            json: JSON.parse(content.toString()),
-          }
+          const content = await executeHttpRequest(url)
+          result.json = JSON.parse(content.toString())
+        } else if (type === 'text/plain') {
+          const content = await executeHttpRequest(url)
+          result.text = content.toString()
         }
-        return {
-          text: content.toString(),
-        }
+        return result
       }
-      return null
+      return result
     },
   },
   Mutation: {

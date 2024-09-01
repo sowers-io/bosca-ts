@@ -23,10 +23,10 @@
       "maxConcurrency": 20
     },
     "bible-verse": {
-      "maxConcurrency": 20
+      "maxConcurrency": 100
     },
     "search-index": {
-      "maxConcurrency": 20
+      "maxConcurrency": 100
     }
   }
 }

@@ -99,7 +99,6 @@ export interface Metadata {
   contentLength?: Maybe<Scalars['Int']['output']>;
   contentType: Scalars['String']['output'];
   created: Scalars['Date']['output'];
-  downloadUrl: SignedUrl;
   id: Scalars['ID']['output'];
   labels: Array<Scalars['String']['output']>;
   languageTag: Scalars['String']['output'];
@@ -112,7 +111,6 @@ export interface Metadata {
   supplementaries: Array<Supplementary>;
   supplementary?: Maybe<Supplementary>;
   traitIds: Array<Scalars['String']['output']>;
-  uploadUrl: SignedUrl;
   workflowJobs: Array<MetadataWorkflowJob>;
   workflowState: MetadataWorkflowState;
 }
@@ -131,6 +129,7 @@ export interface MetadataContent {
   __typename?: 'MetadataContent';
   json?: Maybe<Scalars['JSONObject']['output']>;
   text?: Maybe<Scalars['String']['output']>;
+  urls?: Maybe<MetadataUrls>;
 }
 
 export interface MetadataInput {
@@ -139,6 +138,13 @@ export interface MetadataInput {
   languageTag: Scalars['String']['input'];
   name: Scalars['String']['input'];
   traitIds?: InputMaybe<Array<Scalars['String']['input']>>;
+}
+
+export interface MetadataUrls {
+  __typename?: 'MetadataUrls';
+  download?: Maybe<SignedUrl>;
+  id: Scalars['ID']['output'];
+  upload?: Maybe<SignedUrl>;
 }
 
 export interface MetadataWorkflowJob {
@@ -553,11 +559,10 @@ export enum StorageSystemType {
 
 export interface Supplementary {
   __typename?: 'Supplementary';
-  content?: Maybe<MetadataContent>;
+  content?: Maybe<SupplementaryContent>;
   contentLength?: Maybe<Scalars['Int']['output']>;
   contentType: Scalars['String']['output'];
   created: Scalars['Date']['output'];
-  downloadUrl: SignedUrl;
   key: Scalars['ID']['output'];
   metadataId: Scalars['ID']['output'];
   modified: Scalars['Date']['output'];
@@ -565,7 +570,20 @@ export interface Supplementary {
   sourceId?: Maybe<Scalars['String']['output']>;
   sourceIdentifier?: Maybe<Scalars['String']['output']>;
   traitIds: Array<Scalars['String']['output']>;
-  uploadUrl: SignedUrl;
+}
+
+export interface SupplementaryContent {
+  __typename?: 'SupplementaryContent';
+  json?: Maybe<Scalars['JSONObject']['output']>;
+  text?: Maybe<Scalars['String']['output']>;
+  urls?: Maybe<SupplementaryUrls>;
+}
+
+export interface SupplementaryUrls {
+  __typename?: 'SupplementaryUrls';
+  download?: Maybe<SignedUrl>;
+  id: Scalars['ID']['output'];
+  key: Scalars['String']['output'];
 }
 
 export interface Trait {
@@ -819,6 +837,7 @@ export type ResolversTypes = ResolversObject<{
   Metadata: ResolverTypeWrapper<Metadata>;
   MetadataContent: ResolverTypeWrapper<MetadataContent>;
   MetadataInput: MetadataInput;
+  MetadataUrls: ResolverTypeWrapper<MetadataUrls>;
   MetadataWorkflowJob: ResolverTypeWrapper<MetadataWorkflowJob>;
   MetadataWorkflowState: ResolverTypeWrapper<MetadataWorkflowState>;
   Model: ResolverTypeWrapper<Model>;
@@ -842,6 +861,8 @@ export type ResolversTypes = ResolversObject<{
   StorageSystemType: StorageSystemType;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Supplementary: ResolverTypeWrapper<Supplementary>;
+  SupplementaryContent: ResolverTypeWrapper<SupplementaryContent>;
+  SupplementaryUrls: ResolverTypeWrapper<SupplementaryUrls>;
   Trait: ResolverTypeWrapper<Trait>;
   Workflow: ResolverTypeWrapper<Workflow>;
   WorkflowActivity: ResolverTypeWrapper<WorkflowActivity>;
@@ -882,6 +903,7 @@ export type ResolversParentTypes = ResolversObject<{
   Metadata: Metadata;
   MetadataContent: MetadataContent;
   MetadataInput: MetadataInput;
+  MetadataUrls: MetadataUrls;
   MetadataWorkflowJob: MetadataWorkflowJob;
   MetadataWorkflowState: MetadataWorkflowState;
   Model: Model;
@@ -902,6 +924,8 @@ export type ResolversParentTypes = ResolversObject<{
   StorageSystemModelInput: StorageSystemModelInput;
   String: Scalars['String']['output'];
   Supplementary: Supplementary;
+  SupplementaryContent: SupplementaryContent;
+  SupplementaryUrls: SupplementaryUrls;
   Trait: Trait;
   Workflow: Workflow;
   WorkflowActivity: WorkflowActivity;
@@ -970,7 +994,6 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
   contentLength?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   contentType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
-  downloadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   labels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   languageTag?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -983,7 +1006,6 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
   supplementaries?: Resolver<Array<ResolversTypes['Supplementary']>, ParentType, ContextType, Partial<MetadataSupplementariesArgs>>;
   supplementary?: Resolver<Maybe<ResolversTypes['Supplementary']>, ParentType, ContextType, RequireFields<MetadataSupplementaryArgs, 'key'>>;
   traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  uploadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
   workflowJobs?: Resolver<Array<ResolversTypes['MetadataWorkflowJob']>, ParentType, ContextType>;
   workflowState?: Resolver<ResolversTypes['MetadataWorkflowState'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -992,6 +1014,14 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
 export type MetadataContentResolvers<ContextType = any, ParentType extends ResolversParentTypes['MetadataContent'] = ResolversParentTypes['MetadataContent']> = ResolversObject<{
   json?: Resolver<Maybe<ResolversTypes['JSONObject']>, ParentType, ContextType>;
   text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  urls?: Resolver<Maybe<ResolversTypes['MetadataUrls']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type MetadataUrlsResolvers<ContextType = any, ParentType extends ResolversParentTypes['MetadataUrls'] = ResolversParentTypes['MetadataUrls']> = ResolversObject<{
+  download?: Resolver<Maybe<ResolversTypes['SignedUrl']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  upload?: Resolver<Maybe<ResolversTypes['SignedUrl']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1125,11 +1155,10 @@ export type StorageSystemModelResolvers<ContextType = any, ParentType extends Re
 }>;
 
 export type SupplementaryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Supplementary'] = ResolversParentTypes['Supplementary']> = ResolversObject<{
-  content?: Resolver<Maybe<ResolversTypes['MetadataContent']>, ParentType, ContextType>;
+  content?: Resolver<Maybe<ResolversTypes['SupplementaryContent']>, ParentType, ContextType>;
   contentLength?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   contentType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
-  downloadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
   key?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   metadataId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   modified?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
@@ -1137,7 +1166,20 @@ export type SupplementaryResolvers<ContextType = any, ParentType extends Resolve
   sourceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   sourceIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  uploadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type SupplementaryContentResolvers<ContextType = any, ParentType extends ResolversParentTypes['SupplementaryContent'] = ResolversParentTypes['SupplementaryContent']> = ResolversObject<{
+  json?: Resolver<Maybe<ResolversTypes['JSONObject']>, ParentType, ContextType>;
+  text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  urls?: Resolver<Maybe<ResolversTypes['SupplementaryUrls']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type SupplementaryUrlsResolvers<ContextType = any, ParentType extends ResolversParentTypes['SupplementaryUrls'] = ResolversParentTypes['SupplementaryUrls']> = ResolversObject<{
+  download?: Resolver<Maybe<ResolversTypes['SignedUrl']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  key?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1231,6 +1273,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   KV?: KvResolvers<ContextType>;
   Metadata?: MetadataResolvers<ContextType>;
   MetadataContent?: MetadataContentResolvers<ContextType>;
+  MetadataUrls?: MetadataUrlsResolvers<ContextType>;
   MetadataWorkflowJob?: MetadataWorkflowJobResolvers<ContextType>;
   MetadataWorkflowState?: MetadataWorkflowStateResolvers<ContextType>;
   Model?: ModelResolvers<ContextType>;
@@ -1244,6 +1287,8 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   StorageSystem?: StorageSystemResolvers<ContextType>;
   StorageSystemModel?: StorageSystemModelResolvers<ContextType>;
   Supplementary?: SupplementaryResolvers<ContextType>;
+  SupplementaryContent?: SupplementaryContentResolvers<ContextType>;
+  SupplementaryUrls?: SupplementaryUrlsResolvers<ContextType>;
   Trait?: TraitResolvers<ContextType>;
   Workflow?: WorkflowResolvers<ContextType>;
   WorkflowActivity?: WorkflowActivityResolvers<ContextType>;

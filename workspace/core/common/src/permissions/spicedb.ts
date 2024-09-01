@@ -196,6 +196,23 @@ export class SpiceDBPermissionManager implements PermissionManager {
     await this.client.writeRelationships(v1.WriteRelationshipsRequest.create({ updates: updates }))
   }
 
+  async deleteRelationships(objectType: PermissionObjectType, permissions: Permission[]): Promise<void> {
+    const updates: v1.RelationshipUpdate[] = []
+    for (const permission of permissions) {
+      await this.client.deleteRelationships(v1.DeleteRelationshipsRequest.create({ 
+        relationshipFilter: {
+          optionalResourceId: permission.id,
+          resourceType: this.getObjectType(objectType),
+          optionalRelation: this.getRelation(permission.relation),
+          optionalSubjectFilter: {
+            subjectType: this.getSubjectType(permission.subjectType),
+            optionalSubjectId: permission.subject,
+          },
+        }
+      }))
+    }
+  }
+
   async createRelationship(objectType: PermissionObjectType, permission: Permission): Promise<void> {
     await this.createRelationships(objectType, [permission])
   }

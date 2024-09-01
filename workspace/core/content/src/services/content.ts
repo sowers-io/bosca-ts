@@ -160,6 +160,27 @@ export function content(
       )
       return await permissions.getPermissions(PermissionObjectType.collection_type, request.id)
     },
+    async addCollectionPermissions(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.collection_type,
+        request.id,
+        PermissionAction.manage,
+      )
+      for (const permission of request.permissions) {
+        await permissions.createRelationship(
+          PermissionObjectType.collection_type,
+          new Permission({
+            id: request.id,
+            subject: permission.subject,
+            relation: permission.relation,
+            subjectType: permission.subjectType,
+          }),
+        )
+      }
+      return new Empty()
+    },
     async addCollectionPermission(request, context) {
       const subject = context.values.get(SubjectKey)
       await permissions.checkWithError(
@@ -176,6 +197,46 @@ export function content(
           relation: request.relation,
           subjectType: request.subjectType,
         }),
+      )
+      return new Empty()
+    },
+    async deleteCollectionPermissions(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.collection_type,
+        request.id,
+        PermissionAction.manage,
+      )
+      await permissions.deleteRelationships(
+        PermissionObjectType.collection_type,
+        request.permissions.map((p) => new Permission({
+          id: request.id,
+          subject: p.subject,
+          relation: p.relation,
+          subjectType: p.subjectType,
+        })),
+      )
+      return new Empty()
+    },
+    async deleteCollectionPermission(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.collection_type,
+        request.id,
+        PermissionAction.manage,
+      )
+      await permissions.deleteRelationships(
+        PermissionObjectType.collection_type,
+        [
+          new Permission({
+            id: request.id,
+            subject: request.subject,
+            relation: request.relation,
+            subjectType: request.subjectType,
+          })
+        ],
       )
       return new Empty()
     },
@@ -578,6 +639,46 @@ export function content(
           relation: request.relation,
           subjectType: request.subjectType,
         }),
+      )
+      return new Empty()
+    },
+    async deleteMetadataPermissions(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        request.id,
+        PermissionAction.manage,
+      )
+      await permissions.deleteRelationships(
+        PermissionObjectType.metadata_type,
+        request.permissions.map((p) => new Permission({
+          id: request.id,
+          subject: p.subject,
+          relation: p.relation,
+          subjectType: p.subjectType,
+        })),
+      )
+      return new Empty()
+    },
+    async deleteMetadataPermission(request, context) {
+      const subject = context.values.get(SubjectKey)
+      await permissions.checkWithError(
+        subject,
+        PermissionObjectType.metadata_type,
+        request.id,
+        PermissionAction.manage,
+      )
+      await permissions.deleteRelationships(
+        PermissionObjectType.metadata_type,
+        [
+          new Permission({
+            id: request.id,
+            subject: request.subject,
+            relation: request.relation,
+            subjectType: request.subjectType,
+          })
+        ],
       )
       return new Empty()
     },

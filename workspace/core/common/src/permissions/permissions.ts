@@ -61,6 +61,8 @@ export interface PermissionManager {
 
   createRelationships(objectType: PermissionObjectType, permissions: Permission[]): Promise<void>
 
+  deleteRelationships(objectType: PermissionObjectType, permissions: Permission[]): Promise<void>
+
   createRelationship(objectType: PermissionObjectType, permission: Permission): Promise<void>
 
   waitForPermissions(objectType: PermissionObjectType, permissions: Permission[]): Promise<void>

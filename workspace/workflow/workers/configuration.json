@@ -2,13 +2,13 @@
   "maxUploadConcurrency": 20,
   "queues": {
     "metadata": {
-      "maxConcurrency": 5
+      "maxConcurrency": 20
     },
     "traits": {
-      "maxConcurrency": 5
+      "maxConcurrency": 20
     },
     "transition": {
-      "maxConcurrency": 5
+      "maxConcurrency": 20
     },
     "media-transcription": {
       "maxConcurrency": 1
@@ -17,16 +17,16 @@
       "maxConcurrency": 1
     },
     "bible": {
-      "maxConcurrency": 5
+      "maxConcurrency": 20
     },
     "bible-book": {
-      "maxConcurrency": 5
+      "maxConcurrency": 20
     },
     "bible-verse": {
-      "maxConcurrency": 5
+      "maxConcurrency": 20
     },
     "search-index": {
-      "maxConcurrency": 5
+      "maxConcurrency": 20
     }
   }
 }

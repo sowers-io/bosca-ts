@@ -269,14 +269,22 @@ export function content(
         request.collectionId,
         PermissionAction.manage,
       )
-      switch (request.itemId.case) {
-        case 'childCollectionId':
-          await dataSource.addCollectionItemId(request.collectionId, request.itemId.value, null)
-          break
-        case 'childMetadataId':
-          await dataSource.addCollectionItemId(request.collectionId, null, request.itemId.value)
-          break
+      try {
+        switch (request.itemId.case) {
+          case 'childCollectionId':
+            await dataSource.addCollectionItemId(request.collectionId, request.itemId.value, null)
+            break
+          case 'childMetadataId':
+            await dataSource.addCollectionItemId(request.collectionId, null, request.itemId.value)
+            break
+        }
+      } catch (e: any) {
+        logger.error({ request, error: e }, 'failed to add collection item')
+        if (!e.message.toString().includes('duplicate key value violates unique constraint')) {
+          throw e
+        }
       }
+      return new Empty()
     },
     async setCollectionReady(request, context) {
       const subject = context.values.get(SubjectKey)

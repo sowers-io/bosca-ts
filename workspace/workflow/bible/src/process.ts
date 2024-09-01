@@ -146,7 +146,7 @@ class Executor extends ActivityJobExecutor<ProcessBibleActivity> {
     // create metadata
     const responses = await addMetadatas(addMetadatasRequests, buffers)
     for (const id of responses.id) {
-      if (id.error) {
+      if (id.error && id.error != 'name must be unique') {
         throw new Error(id.error)
       }
     }

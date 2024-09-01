@@ -20,6 +20,7 @@ import { Configuration } from './configuration'
 import { ConnectionOptions, QueueEvents, WaitingChildrenError, Worker } from 'bullmq'
 import { WorkflowJob } from '@bosca/protobufs'
 import { jobStartedCount, jobErrorCount, jobFinishedCount, jobAddedCount, jobFailedCount, workerCount } from './metrics'
+import { ConnectError } from '@connectrpc/connect'
 
 export { Configuration, QueueConfiguration, newConfiguration } from './configuration'
 
@@ -45,6 +46,7 @@ async function runJob(job: Job, definition: WorkflowJob, activities: { [id: stri
 }
 
 export async function start(connection: ConnectionOptions, configuration: Configuration, activities: { [id: string]: Activity }) {
+  const workers: Worker[] = []
   for (const queueConfigurationId in configuration.queues) {
     const queueConfiguration = configuration.queues[queueConfigurationId]
     const worker = new Worker(
@@ -69,6 +71,7 @@ export async function start(connection: ConnectionOptions, configuration: Config
         maxStalledCount: 50,
       },
     )
+    workers.push(worker)
     worker.on('completed', (job) => {
       if (job.data.type === 'job') {
         jobFinishedCount.add(1)
@@ -96,7 +99,22 @@ export async function start(connection: ConnectionOptions, configuration: Config
     logger.info({ queue: queueConfigurationId, concurrency: queueConfiguration.maxConcurrency }, 'worker started')
   }
   logger.info('running...')
-  process.on('SIGTERM', () => {
-    workerCount.add(-1)
-  })
+  const shutdown = async () => {
+    workerCount.add(-workers.length)
+    await Promise.all(workers.map((worker) => worker.close()))
+    process.exit(0)
+  }
+  process
+    .on('SIGTERM', shutdown)
+    .on('SIGINT', shutdown)
+    .on('unhandledRejection', (reason, p) => {
+      logger.error({ reason, p }, 'unhandled rejection')
+    })
+    .on('uncaughtException', err => {
+      logger.error({ error: err }, 'uncaught exception')
+      if (err instanceof ConnectError) {
+        return
+      }
+      process.exit(1)
+    })
 }

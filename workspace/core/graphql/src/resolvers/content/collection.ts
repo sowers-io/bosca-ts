@@ -51,6 +51,9 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     collection: async (_, { id }, context) => {
       return await executeGraphQL<GCollection | null>(async () => {
         const service = useClient(ContentService)
+        if (!id) {
+          id = '00000000-0000-0000-0000-000000000000'
+        }
         const collection = await service.getCollection(new IdRequest({ id: id }), {
           headers: getGraphQLHeaders(context),
         })

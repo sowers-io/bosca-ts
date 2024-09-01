@@ -6,7 +6,8 @@
     "clean": "rm -Rf node_modules && pnpm -r exec rm -Rf node_modules && pnpm -r exec rm -Rf dist",
     "lint": "pnpm -r run lint",
     "lint:fix": "pnpm -r run lint:fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate": "buf generate"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.37.0",

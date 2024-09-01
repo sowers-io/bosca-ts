@@ -30,7 +30,7 @@ enum CollectionType {
 
 extend type Query {
 
-    collection(id: ID!): Collection
+    collection(id: ID): Collection
 }
 
 extend type Mutation {

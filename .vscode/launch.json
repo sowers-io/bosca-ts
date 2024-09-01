@@ -158,7 +158,6 @@ d{
       "name": "Debug All",
       "configurations": [
         "Debug Content",
-        "Debug Uploader",
         "Debug Workflow Dashboard",
         "Debug Workflow Queue",
         "Debug Workflow Workers",

@@ -15,6 +15,8 @@
  */
 
 import { SignedUrl } from '@bosca/protobufs'
+import http from 'node:http'
+import https from 'node:https'
 import { logger } from './logger'
 
 let executing = 0
@@ -30,25 +32,55 @@ export async function executeHttpRequest(signedUrl: SignedUrl, body?: ArrayBuffe
     headers[header.name] = header.value
   }
   const url = signedUrl.url
+  if (!executing) {
+    executing = 0
+  }
   executing++
   try {
     logger.trace({ url, executing }, 'executing request')
-    const response = await fetch(url, {
-      method: signedUrl.method,
-      headers: headers,
-      body: body ? Buffer.from(body) : undefined,
+    const buffer = await new Promise<Buffer>((resolve, reject) => {
+      const options = {
+        method: signedUrl.method,
+        headers: headers,
+      }
+      const request = (signedUrl.url.startsWith('https') ? https : http)
+        .request(signedUrl.url, options, function (res) {
+          if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
+            return reject(new Error('Request Failed: ' + res.statusCode))
+          }
+          const body: any = []
+          res.on('data', function (chunk) {
+            body.push(chunk)
+          })
+          res.on('end', function () {
+            request.destroy()
+            try {
+              resolve(Buffer.concat(body))
+            } catch (e) {
+              reject(e)
+            }
+          })
+        })
+      request.on('error', function (err) {
+        reject(err)
+      })
+      if (body) {
+        request.write(Buffer.from(body))
+      }
+      request.end()
+      setTimeout(() => {
+        if (!request.destroyed) {
+          logger.error({ url, executing }, 'request timeout')
+          request.destroy(new Error('timeout'))
+        }
+      }, 30000)
     })
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}: ${await response.text()}`)
-    }
-    const responseBody = await response.arrayBuffer()
     executing--
     logger.trace({ url, executing }, 'request complete')
-    return Buffer.from(responseBody)
+    return buffer
   } catch (e) {
     executing--
     logger.error({ url, executing, error: e }, 'request failed')
     throw e
   }
 }
-

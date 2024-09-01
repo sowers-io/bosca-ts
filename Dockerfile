@@ -18,7 +18,6 @@ RUN pnpm run --filter=common build
 RUN pnpm run -r build
 RUN pnpm deploy --filter=@bosca/content --prod /prod/content
 RUN pnpm deploy --filter=@bosca/graphql --prod /prod/graphql
-RUN pnpm deploy --filter=@bosca/uploads --prod /prod/uploads
 RUN pnpm deploy --filter=@bosca/imageproxy --prod /prod/imageproxy
 RUN pnpm deploy --filter=@bosca/workflow --prod /prod/workflow
 RUN pnpm deploy --filter=@bosca/workflow-queue --prod /prod/workflow-queue
@@ -43,12 +42,6 @@ FROM base AS bible-graphql
 COPY --from=build /prod/bible-graphql /prod/bible-graphql
 WORKDIR /prod/bible-graphql
 EXPOSE 2000
-CMD [ "pnpm", "start" ]
-
-FROM base AS uploads
-COPY --from=build /prod/uploads /prod/uploads
-WORKDIR /prod/uploads
-EXPOSE 7001
 CMD [ "pnpm", "start" ]
 
 FROM base AS imageproxy

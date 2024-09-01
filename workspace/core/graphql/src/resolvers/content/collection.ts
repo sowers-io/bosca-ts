@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-import { Resolvers, Collection as GCollection, CollectionItem as GCollectionItem } from '../../generated/resolvers'
+import {
+  Resolvers,
+  Collection as GCollection,
+  CollectionItem as GCollectionItem,
+} from '../../generated/resolvers'
 import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders } from '@bosca/common'
 import { useClient } from '@bosca/common'
-import { ContentService, IdRequest, Collection } from '@bosca/protobufs'
+import {
+  ContentService,
+  IdRequest,
+  Collection,
+  AddCollectionRequest,
+} from '@bosca/protobufs'
 import { transformMetadata } from './metadata'
+import { GraphQLError } from 'graphql'
+import { toGraphPermissions, toGrpcPermissions } from '../../util'
 
 export function transformCollection(collection: Collection): GCollection {
   const c = collection.toJson() as unknown as GCollection
@@ -44,6 +55,72 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
           headers: getGraphQLHeaders(context),
         })
         if (!collection) return null
+        return transformCollection(collection)
+      })
+    },
+  },
+  Mutation: {
+    addCollection: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const response = await service.addCollection(
+          new AddCollectionRequest({
+            parent: args.parent || '00000000-0000-0000-0000-000000000000',
+            collection: {
+              name: args.collection.name,
+            },
+          }), {
+            headers: getGraphQLHeaders(context),
+          },
+        )
+        let lastError: any | null = null
+        for (let tries = 0; tries < 100; tries++) {
+          try {
+            const collection = await service.getCollection(new IdRequest({ id: response.id }), {
+              headers: getGraphQLHeaders(context),
+            })
+            return transformCollection(collection)
+          } catch (e) {
+            lastError = e
+            await new Promise((resolve) => setTimeout(resolve, 100))
+          }
+        }
+        if (lastError) {
+          throw lastError
+        }
+        throw new GraphQLError('failed to get metadata after it was created')
+      })
+    },
+    deleteCollection: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        await service.deleteCollection(new IdRequest({ id: args.id! }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return true
+      })
+    },
+    addCollectionPermissions: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        await service.addCollectionPermissions(toGrpcPermissions(args.id, args.permissions), {
+          headers: getGraphQLHeaders(context),
+        })
+        const metadata = await service.getCollection(new IdRequest({ id: args.id }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return transformCollection(metadata)
+      })
+    },
+    deleteCollectionPermissions: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        await service.deleteCollectionPermissions(toGrpcPermissions(args.id, args.permissions), {
+          headers: getGraphQLHeaders(context),
+        })
+        const collection = await service.getCollection(new IdRequest({ id: args.id }), {
+          headers: getGraphQLHeaders(context),
+        })
         return transformCollection(collection)
       })
     },
@@ -81,6 +158,16 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
           }
         }) as GCollectionItem[]
       })
+    },
+    permissions: async (parent, _, context) => {
+      return (await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const request = new IdRequest({ id: parent.id })
+        const response = await service.getCollectionPermissions(request, {
+          headers: getGraphQLHeaders(context),
+        })
+        return toGraphPermissions(parent.id, response)
+      }))!
     },
   },
 }

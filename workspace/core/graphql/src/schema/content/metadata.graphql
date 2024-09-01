@@ -38,8 +38,13 @@ extend type Query {
 
 extend type Mutation {
 
-    addMetadata(metadata: MetadataInput!): Metadata
+    addMetadata(parent: String, metadata: MetadataInput!): Metadata
     setMetadataReady(id: String!): Metadata
+    deleteMetadata(id: String!): Boolean
+
+    addMetadataPermissions(id: String!, permissions: [PermissionInput!]!): Metadata
+    deleteMetadataPermissions(id: String!, permissions: [PermissionInput!]!): Metadata
+
     setMetadataTextContent(id: String!, text: String): Metadata
     setMetadataJSONContent(id: String!, json: JSONObject): Metadata
 }
@@ -78,6 +83,8 @@ type Metadata {
 
     supplementary(key: String!): Supplementary
     supplementaries: [Supplementary!]!
+
+    permissions: [Permission!]!
 }
 
 type Supplementary {

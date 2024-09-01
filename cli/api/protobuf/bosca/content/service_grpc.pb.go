@@ -47,7 +47,10 @@ const (
 	ContentService_GetCollection_FullMethodName                       = "/bosca.content.ContentService/GetCollection"
 	ContentService_DeleteCollection_FullMethodName                    = "/bosca.content.ContentService/DeleteCollection"
 	ContentService_GetCollectionPermissions_FullMethodName            = "/bosca.content.ContentService/GetCollectionPermissions"
+	ContentService_AddCollectionPermissions_FullMethodName            = "/bosca.content.ContentService/AddCollectionPermissions"
+	ContentService_DeleteCollectionPermissions_FullMethodName         = "/bosca.content.ContentService/DeleteCollectionPermissions"
 	ContentService_AddCollectionPermission_FullMethodName             = "/bosca.content.ContentService/AddCollectionPermission"
+	ContentService_DeleteCollectionPermission_FullMethodName          = "/bosca.content.ContentService/DeleteCollectionPermission"
 	ContentService_AddCollectionItem_FullMethodName                   = "/bosca.content.ContentService/AddCollectionItem"
 	ContentService_CheckPermission_FullMethodName                     = "/bosca.content.ContentService/CheckPermission"
 	ContentService_FindCollection_FullMethodName                      = "/bosca.content.ContentService/FindCollection"
@@ -75,7 +78,9 @@ const (
 	ContentService_SetMetadataReady_FullMethodName                    = "/bosca.content.ContentService/SetMetadataReady"
 	ContentService_GetMetadataPermissions_FullMethodName              = "/bosca.content.ContentService/GetMetadataPermissions"
 	ContentService_AddMetadataPermissions_FullMethodName              = "/bosca.content.ContentService/AddMetadataPermissions"
+	ContentService_DeleteMetadataPermissions_FullMethodName           = "/bosca.content.ContentService/DeleteMetadataPermissions"
 	ContentService_AddMetadataPermission_FullMethodName               = "/bosca.content.ContentService/AddMetadataPermission"
+	ContentService_DeleteMetadataPermission_FullMethodName            = "/bosca.content.ContentService/DeleteMetadataPermission"
 	ContentService_SetWorkflowState_FullMethodName                    = "/bosca.content.ContentService/SetWorkflowState"
 	ContentService_SetWorkflowStateComplete_FullMethodName            = "/bosca.content.ContentService/SetWorkflowStateComplete"
 	ContentService_AddMetadataRelationship_FullMethodName             = "/bosca.content.ContentService/AddMetadataRelationship"
@@ -98,7 +103,10 @@ type ContentServiceClient interface {
 	GetCollection(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Collection, error)
 	DeleteCollection(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetCollectionPermissions(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
+	AddCollectionPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*bosca.Empty, error)
+	DeleteCollectionPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
+	DeleteCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddCollectionItem(ctx context.Context, in *AddCollectionItemRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	CheckPermission(ctx context.Context, in *PermissionCheckRequest, opts ...grpc.CallOption) (*PermissionCheckResponse, error)
 	FindCollection(ctx context.Context, in *FindCollectionRequest, opts ...grpc.CallOption) (*Collections, error)
@@ -126,7 +134,9 @@ type ContentServiceClient interface {
 	SetMetadataReady(ctx context.Context, in *MetadataReadyRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	GetMetadataPermissions(ctx context.Context, in *bosca.IdRequest, opts ...grpc.CallOption) (*Permissions, error)
 	AddMetadataPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*bosca.Empty, error)
+	DeleteMetadataPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
+	DeleteMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error)
 	SetWorkflowState(ctx context.Context, in *SetWorkflowStateRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	SetWorkflowStateComplete(ctx context.Context, in *SetWorkflowStateCompleteRequest, opts ...grpc.CallOption) (*bosca.Empty, error)
 	AddMetadataRelationship(ctx context.Context, in *MetadataRelationship, opts ...grpc.CallOption) (*bosca.Empty, error)
@@ -261,10 +271,40 @@ func (c *contentServiceClient) GetCollectionPermissions(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *contentServiceClient) AddCollectionPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_AddCollectionPermissions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) DeleteCollectionPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_DeleteCollectionPermissions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) AddCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.Empty)
 	err := c.cc.Invoke(ctx, ContentService_AddCollectionPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) DeleteCollectionPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_DeleteCollectionPermission_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -541,10 +581,30 @@ func (c *contentServiceClient) AddMetadataPermissions(ctx context.Context, in *P
 	return out, nil
 }
 
+func (c *contentServiceClient) DeleteMetadataPermissions(ctx context.Context, in *Permissions, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_DeleteMetadataPermissions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *contentServiceClient) AddMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(bosca.Empty)
 	err := c.cc.Invoke(ctx, ContentService_AddMetadataPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) DeleteMetadataPermission(ctx context.Context, in *Permission, opts ...grpc.CallOption) (*bosca.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(bosca.Empty)
+	err := c.cc.Invoke(ctx, ContentService_DeleteMetadataPermission_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -607,7 +667,10 @@ type ContentServiceServer interface {
 	GetCollection(context.Context, *bosca.IdRequest) (*Collection, error)
 	DeleteCollection(context.Context, *bosca.IdRequest) (*bosca.Empty, error)
 	GetCollectionPermissions(context.Context, *bosca.IdRequest) (*Permissions, error)
+	AddCollectionPermissions(context.Context, *Permissions) (*bosca.Empty, error)
+	DeleteCollectionPermissions(context.Context, *Permissions) (*bosca.Empty, error)
 	AddCollectionPermission(context.Context, *Permission) (*bosca.Empty, error)
+	DeleteCollectionPermission(context.Context, *Permission) (*bosca.Empty, error)
 	AddCollectionItem(context.Context, *AddCollectionItemRequest) (*bosca.Empty, error)
 	CheckPermission(context.Context, *PermissionCheckRequest) (*PermissionCheckResponse, error)
 	FindCollection(context.Context, *FindCollectionRequest) (*Collections, error)
@@ -635,7 +698,9 @@ type ContentServiceServer interface {
 	SetMetadataReady(context.Context, *MetadataReadyRequest) (*bosca.Empty, error)
 	GetMetadataPermissions(context.Context, *bosca.IdRequest) (*Permissions, error)
 	AddMetadataPermissions(context.Context, *Permissions) (*bosca.Empty, error)
+	DeleteMetadataPermissions(context.Context, *Permissions) (*bosca.Empty, error)
 	AddMetadataPermission(context.Context, *Permission) (*bosca.Empty, error)
+	DeleteMetadataPermission(context.Context, *Permission) (*bosca.Empty, error)
 	SetWorkflowState(context.Context, *SetWorkflowStateRequest) (*bosca.Empty, error)
 	SetWorkflowStateComplete(context.Context, *SetWorkflowStateCompleteRequest) (*bosca.Empty, error)
 	AddMetadataRelationship(context.Context, *MetadataRelationship) (*bosca.Empty, error)
@@ -686,8 +751,17 @@ func (UnimplementedContentServiceServer) DeleteCollection(context.Context, *bosc
 func (UnimplementedContentServiceServer) GetCollectionPermissions(context.Context, *bosca.IdRequest) (*Permissions, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollectionPermissions not implemented")
 }
+func (UnimplementedContentServiceServer) AddCollectionPermissions(context.Context, *Permissions) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCollectionPermissions not implemented")
+}
+func (UnimplementedContentServiceServer) DeleteCollectionPermissions(context.Context, *Permissions) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollectionPermissions not implemented")
+}
 func (UnimplementedContentServiceServer) AddCollectionPermission(context.Context, *Permission) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollectionPermission not implemented")
+}
+func (UnimplementedContentServiceServer) DeleteCollectionPermission(context.Context, *Permission) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollectionPermission not implemented")
 }
 func (UnimplementedContentServiceServer) AddCollectionItem(context.Context, *AddCollectionItemRequest) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCollectionItem not implemented")
@@ -770,8 +844,14 @@ func (UnimplementedContentServiceServer) GetMetadataPermissions(context.Context,
 func (UnimplementedContentServiceServer) AddMetadataPermissions(context.Context, *Permissions) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataPermissions not implemented")
 }
+func (UnimplementedContentServiceServer) DeleteMetadataPermissions(context.Context, *Permissions) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteMetadataPermissions not implemented")
+}
 func (UnimplementedContentServiceServer) AddMetadataPermission(context.Context, *Permission) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMetadataPermission not implemented")
+}
+func (UnimplementedContentServiceServer) DeleteMetadataPermission(context.Context, *Permission) (*bosca.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteMetadataPermission not implemented")
 }
 func (UnimplementedContentServiceServer) SetWorkflowState(context.Context, *SetWorkflowStateRequest) (*bosca.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetWorkflowState not implemented")
@@ -1022,6 +1102,42 @@ func _ContentService_GetCollectionPermissions_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_AddCollectionPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Permissions)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).AddCollectionPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_AddCollectionPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).AddCollectionPermissions(ctx, req.(*Permissions))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_DeleteCollectionPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Permissions)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).DeleteCollectionPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_DeleteCollectionPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).DeleteCollectionPermissions(ctx, req.(*Permissions))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_AddCollectionPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Permission)
 	if err := dec(in); err != nil {
@@ -1036,6 +1152,24 @@ func _ContentService_AddCollectionPermission_Handler(srv interface{}, ctx contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).AddCollectionPermission(ctx, req.(*Permission))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_DeleteCollectionPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Permission)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).DeleteCollectionPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_DeleteCollectionPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).DeleteCollectionPermission(ctx, req.(*Permission))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1526,6 +1660,24 @@ func _ContentService_AddMetadataPermissions_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_DeleteMetadataPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Permissions)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).DeleteMetadataPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_DeleteMetadataPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).DeleteMetadataPermissions(ctx, req.(*Permissions))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContentService_AddMetadataPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Permission)
 	if err := dec(in); err != nil {
@@ -1540,6 +1692,24 @@ func _ContentService_AddMetadataPermission_Handler(srv interface{}, ctx context.
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).AddMetadataPermission(ctx, req.(*Permission))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_DeleteMetadataPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Permission)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).DeleteMetadataPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_DeleteMetadataPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).DeleteMetadataPermission(ctx, req.(*Permission))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1672,8 +1842,20 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_GetCollectionPermissions_Handler,
 		},
 		{
+			MethodName: "AddCollectionPermissions",
+			Handler:    _ContentService_AddCollectionPermissions_Handler,
+		},
+		{
+			MethodName: "DeleteCollectionPermissions",
+			Handler:    _ContentService_DeleteCollectionPermissions_Handler,
+		},
+		{
 			MethodName: "AddCollectionPermission",
 			Handler:    _ContentService_AddCollectionPermission_Handler,
+		},
+		{
+			MethodName: "DeleteCollectionPermission",
+			Handler:    _ContentService_DeleteCollectionPermission_Handler,
 		},
 		{
 			MethodName: "AddCollectionItem",
@@ -1784,8 +1966,16 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContentService_AddMetadataPermissions_Handler,
 		},
 		{
+			MethodName: "DeleteMetadataPermissions",
+			Handler:    _ContentService_DeleteMetadataPermissions_Handler,
+		},
+		{
 			MethodName: "AddMetadataPermission",
 			Handler:    _ContentService_AddMetadataPermission_Handler,
+		},
+		{
+			MethodName: "DeleteMetadataPermission",
+			Handler:    _ContentService_DeleteMetadataPermission_Handler,
 		},
 		{
 			MethodName: "SetWorkflowState",

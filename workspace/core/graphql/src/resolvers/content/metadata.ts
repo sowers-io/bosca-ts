@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-import { Resolvers, Metadata as GMetadata, SignedUrl as GSignedUrl, Supplementary } from '../../generated/resolvers'
-import { GraphQLRequestContext, executeGraphQL, getGraphQLHeaders, toArrayBuffer } from '@bosca/common'
-import { useClient, executeHttpRequest } from '@bosca/common'
+import {
+  Metadata as GMetadata,
+  Resolvers,
+  SignedUrl as GSignedUrl,
+  Supplementary,
+} from '../../generated/resolvers'
+import {
+  executeGraphQL,
+  executeHttpRequest,
+  getGraphQLHeaders,
+  GraphQLRequestContext,
+  toArrayBuffer,
+  useClient,
+} from '@bosca/common'
 import {
   AddMetadataRequest,
   ContentService,
@@ -28,6 +39,7 @@ import {
 } from '@bosca/protobufs'
 import { protoInt64 } from '@bufbuild/protobuf'
 import { GraphQLError } from 'graphql'
+import { toGraphPermissions, toGrpcPermissions } from '../../util'
 
 export function transformMetadata(metadata: Metadata): GMetadata {
   const m = metadata.toJson() as unknown as GMetadata
@@ -51,7 +63,7 @@ export function transformMetadata(metadata: Metadata): GMetadata {
 
 export const resolvers: Resolvers<GraphQLRequestContext> = {
   Query: {
-    metadata: async (parent, args, context) => {
+    metadata: async (_, args, context) => {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
@@ -62,7 +74,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     },
   },
   Metadata: {
-    uploadUrl: async (parent, args, context) => {
+    uploadUrl: async (parent, _, context) => {
       return await executeGraphQL<GSignedUrl>(async () => {
         const service = useClient(ContentService)
         const url = await service.getMetadataUploadUrl(new IdRequest({ id: parent.id }), {
@@ -71,7 +83,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         return url.toJson() as unknown as GSignedUrl
       })
     },
-    downloadUrl: async (parent, args, context) => {
+    downloadUrl: async (parent, _, context) => {
       return (await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const url = await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
@@ -90,7 +102,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         return response?.toJson() as unknown as Supplementary
       }))
     },
-    supplementaries: async (parent, args, context) => {
+    supplementaries: async (parent, _, context) => {
       return (await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const request = new IdRequest({ id: parent.id })
@@ -100,7 +112,17 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         return response.supplementaries.map((s) => s.toJson()) as unknown as Supplementary[]
       }))!
     },
-    content: async (parent, args, context) => {
+    permissions: async (parent, _, context) => {
+      return (await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        const request = new IdRequest({ id: parent.id })
+        const response = await service.getMetadataPermissions(request, {
+          headers: getGraphQLHeaders(context),
+        })
+        return toGraphPermissions(parent.id, response)
+      }))!
+    },
+    content: async (parent, _, context) => {
       const type = parent.contentType.split(';')[0].trim()
       if (type === 'text/plain' || type === 'text/json') {
         const url = await executeGraphQL(async () => {
@@ -124,16 +146,19 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     },
   },
   Supplementary: {
-    uploadUrl: async (parent, args, context) => {
+    uploadUrl: async (parent, _, context) => {
       return await executeGraphQL<GSignedUrl>(async () => {
         const service = useClient(ContentService)
-        const url = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({ id: parent.metadataId, key: parent.key }), {
+        const url = await service.getMetadataSupplementaryUploadUrl(new SupplementaryIdRequest({
+          id: parent.metadataId,
+          key: parent.key,
+        }), {
           headers: getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
       })
     },
-    downloadUrl: async (parent, args, context) => {
+    downloadUrl: async (parent, _, context) => {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const request = new SupplementaryIdRequest({ id: parent.metadataId, key: parent.key })
@@ -143,7 +168,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         return url.toJson() as unknown as GSignedUrl
       })
     },
-    content: async (parent, args, context) => {
+    content: async (parent, _, context) => {
       const type = parent.contentType.split(';')[0].trim()
       if (type === 'text/plain' || type === 'text/json') {
         const url: SignedUrl = await executeGraphQL(async () => {
@@ -168,12 +193,12 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     },
   },
   Mutation: {
-    addMetadata: async (parent, args, context) => {
+    addMetadata: async (_, args, context) => {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const response = await service.addMetadata(
           new AddMetadataRequest({
-            collection: '00000000-0000-0000-0000-000000000000',
+            collection: args.parent || '00000000-0000-0000-0000-000000000000',
             metadata: {
               name: args.metadata.name,
               contentType: args.metadata.contentType,
@@ -206,17 +231,46 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
     setMetadataReady: async (_, args, context) => {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
-        await service.setMetadataReady(
-          new MetadataReadyRequest({
-            id: args.id,
-          }), {
-            headers: getGraphQLHeaders(context),
-          },
-        )
+        await service.setMetadataReady(new MetadataReadyRequest({ id: args.id }), {
+          headers: getGraphQLHeaders(context),
+        })
         const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
           headers: getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)
+      })
+    },
+    addMetadataPermissions: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        await service.addMetadataPermissions(toGrpcPermissions(args.id, args.permissions), {
+          headers: getGraphQLHeaders(context),
+        })
+        const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return transformMetadata(metadata)
+      })
+    },
+    deleteMetadataPermissions: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        await service.deleteMetadataPermissions(toGrpcPermissions(args.id, args.permissions), {
+          headers: getGraphQLHeaders(context),
+        })
+        const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return transformMetadata(metadata)
+      })
+    },
+    deleteMetadata: async (_, args, context) => {
+      return await executeGraphQL(async () => {
+        const service = useClient(ContentService)
+        await service.deleteMetadata(new IdRequest({ id: args.id! }), {
+          headers: getGraphQLHeaders(context),
+        })
+        return true
       })
     },
     setMetadataJSONContent: async (_, args, context) => {

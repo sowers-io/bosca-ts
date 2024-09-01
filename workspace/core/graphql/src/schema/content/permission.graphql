@@ -1,0 +1,26 @@
+enum PermissionSubjectType {
+    user
+    group
+    serviceaccount
+}
+
+enum PermissionRelation {
+    viewers
+    discoverers
+    editors
+    managers
+    serviceaccounts
+    owners
+}
+
+input PermissionInput {
+    subject: String!
+    subjectType: PermissionSubjectType!
+    relation: PermissionRelation!
+}
+
+type Permission {
+    subject: String!
+    subjectType: PermissionSubjectType!
+    relation: PermissionRelation!
+}

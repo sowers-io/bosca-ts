@@ -144,10 +144,37 @@ export const ContentService = {
       kind: MethodKind.Unary,
     },
     /**
+     * @generated from rpc bosca.content.ContentService.AddCollectionPermissions
+     */
+    addCollectionPermissions: {
+      name: "AddCollectionPermissions",
+      I: Permissions,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.DeleteCollectionPermissions
+     */
+    deleteCollectionPermissions: {
+      name: "DeleteCollectionPermissions",
+      I: Permissions,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc bosca.content.ContentService.AddCollectionPermission
      */
     addCollectionPermission: {
       name: "AddCollectionPermission",
+      I: Permission,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.DeleteCollectionPermission
+     */
+    deleteCollectionPermission: {
+      name: "DeleteCollectionPermission",
       I: Permission,
       O: Empty,
       kind: MethodKind.Unary,
@@ -396,10 +423,28 @@ export const ContentService = {
       kind: MethodKind.Unary,
     },
     /**
+     * @generated from rpc bosca.content.ContentService.DeleteMetadataPermissions
+     */
+    deleteMetadataPermissions: {
+      name: "DeleteMetadataPermissions",
+      I: Permissions,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc bosca.content.ContentService.AddMetadataPermission
      */
     addMetadataPermission: {
       name: "AddMetadataPermission",
+      I: Permission,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc bosca.content.ContentService.DeleteMetadataPermission
+     */
+    deleteMetadataPermission: {
+      name: "DeleteMetadataPermission",
       I: Permission,
       O: Empty,
       kind: MethodKind.Unary,

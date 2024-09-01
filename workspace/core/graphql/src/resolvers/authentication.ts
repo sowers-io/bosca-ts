@@ -42,6 +42,31 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         throw e
       }
     },
+    signup: async (_, args) => {
+      try {
+        const configuration = new Configuration({
+          basePath: process.env.KRATOS_BASE_PATH,
+        })
+        const client = new FrontendApi(configuration)
+        const loginFlow = await client.createNativeRegistrationFlow({})
+        const updatedFlow = await client.updateRegistrationFlow({
+          flow: loginFlow.id,
+          updateRegistrationFlowBody: {
+            method: 'password',
+            traits: {
+              email: args.email,
+              firstName: args.firstName,
+              lastName: args.lastName,
+            },
+            password: args.password,
+          },
+        })
+        return updatedFlow.session_token || null
+      } catch (e) {
+        logger.error({ error: e }, 'failed to signup')
+        throw e
+      }
+    },
     setPassword: async (_, args, context) => {
       try {
         const token = getAuthenticationToken(context)
@@ -66,6 +91,6 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         logger.error({ error: e }, 'failed to set password')
         throw e
       }
-    }
+    },
   },
 }

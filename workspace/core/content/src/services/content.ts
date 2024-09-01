@@ -385,6 +385,10 @@ export function content(
       if (metadata.sourceIdentifier) {
         await objectStore.delete(metadata.sourceIdentifier.split('+')[0])
       }
+      const supplementaries = await dataSource.getMetadataSupplementaries(metadata.id)
+      for (const supplementary of supplementaries) {
+        await objectStore.delete(supplementary)
+      }
       await dataSource.deleteMetadata(request.id)
       return new Empty()
     },
@@ -558,6 +562,7 @@ export function content(
       const subject = context.values.get(SubjectKey)
       await permissions.checkWithError(subject, PermissionObjectType.metadata_type, request.id, PermissionAction.manage)
       for (const permission of request.permissions) {
+        permission.id = request.id
         await permissions.createRelationship(PermissionObjectType.collection_type, permission)
       }
       return new Empty()

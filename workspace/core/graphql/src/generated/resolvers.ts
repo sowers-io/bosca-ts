@@ -30,6 +30,7 @@ export interface Collection {
   labels: Array<Scalars['String']['output']>;
   modified: Scalars['Date']['output'];
   name: Scalars['String']['output'];
+  permissions: Array<Permission>;
   traitIds: Array<Scalars['String']['output']>;
   type: CollectionType;
 }
@@ -40,9 +41,6 @@ export interface CollectionItemsArgs {
 }
 
 export interface CollectionInput {
-  contentLength?: InputMaybe<Scalars['Int']['input']>;
-  contentType: Scalars['String']['input'];
-  languageTag: Scalars['String']['input'];
   name: Scalars['String']['input'];
 }
 
@@ -108,6 +106,7 @@ export interface Metadata {
   modified: Scalars['Date']['output'];
   name: Scalars['String']['output'];
   parentId?: Maybe<Scalars['ID']['output']>;
+  permissions: Array<Permission>;
   sourceId?: Maybe<Scalars['String']['output']>;
   sourceIdentifier?: Maybe<Scalars['String']['output']>;
   supplementaries: Array<Supplementary>;
@@ -161,7 +160,10 @@ export interface ModelInput {
 
 export interface Mutation {
   __typename?: 'Mutation';
+  addCollection?: Maybe<Collection>;
+  addCollectionPermissions?: Maybe<Collection>;
   addMetadata?: Maybe<Metadata>;
+  addMetadataPermissions?: Maybe<Metadata>;
   addModel: Model;
   addPrompt: Prompt;
   addSource: Source;
@@ -170,6 +172,10 @@ export interface Mutation {
   addWorkflowActivity: WorkflowActivity;
   addWorkflowState: WorkflowState;
   addWorkflowStateTransition: WorkflowStateTransition;
+  deleteCollection?: Maybe<Scalars['Boolean']['output']>;
+  deleteCollectionPermissions?: Maybe<Collection>;
+  deleteMetadata?: Maybe<Scalars['Boolean']['output']>;
+  deleteMetadataPermissions?: Maybe<Metadata>;
   deleteModel?: Maybe<Scalars['Boolean']['output']>;
   deletePrompt: Scalars['Boolean']['output'];
   deleteSource: Scalars['Boolean']['output'];
@@ -188,11 +194,31 @@ export interface Mutation {
   setMetadataReady?: Maybe<Metadata>;
   setMetadataTextContent?: Maybe<Metadata>;
   setPassword?: Maybe<Scalars['Boolean']['output']>;
+  signup?: Maybe<Scalars['String']['output']>;
+}
+
+
+export interface MutationAddCollectionArgs {
+  collection: CollectionInput;
+  parent?: InputMaybe<Scalars['String']['input']>;
+}
+
+
+export interface MutationAddCollectionPermissionsArgs {
+  id: Scalars['String']['input'];
+  permissions: Array<PermissionInput>;
 }
 
 
 export interface MutationAddMetadataArgs {
   metadata: MetadataInput;
+  parent?: InputMaybe<Scalars['String']['input']>;
+}
+
+
+export interface MutationAddMetadataPermissionsArgs {
+  id: Scalars['String']['input'];
+  permissions: Array<PermissionInput>;
 }
 
 
@@ -233,6 +259,28 @@ export interface MutationAddWorkflowStateArgs {
 
 export interface MutationAddWorkflowStateTransitionArgs {
   workflow: WorkflowStateTransitionInput;
+}
+
+
+export interface MutationDeleteCollectionArgs {
+  id: Scalars['String']['input'];
+}
+
+
+export interface MutationDeleteCollectionPermissionsArgs {
+  id: Scalars['String']['input'];
+  permissions: Array<PermissionInput>;
+}
+
+
+export interface MutationDeleteMetadataArgs {
+  id: Scalars['String']['input'];
+}
+
+
+export interface MutationDeleteMetadataPermissionsArgs {
+  id: Scalars['String']['input'];
+  permissions: Array<PermissionInput>;
 }
 
 
@@ -332,6 +380,43 @@ export interface MutationSetMetadataTextContentArgs {
 
 export interface MutationSetPasswordArgs {
   password: Scalars['String']['input'];
+}
+
+
+export interface MutationSignupArgs {
+  email: Scalars['String']['input'];
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+}
+
+export interface Permission {
+  __typename?: 'Permission';
+  relation: PermissionRelation;
+  subject: Scalars['String']['output'];
+  subjectType: PermissionSubjectType;
+}
+
+export interface PermissionInput {
+  relation: PermissionRelation;
+  subject: Scalars['String']['input'];
+  subjectType: PermissionSubjectType;
+}
+
+export enum PermissionRelation {
+  Discoverers = 'discoverers',
+  Editors = 'editors',
+  Managers = 'managers',
+  Owners = 'owners',
+  Serviceaccounts = 'serviceaccounts',
+  Viewers = 'viewers'
+}
+
+export enum PermissionSubjectType {
+  Group = 'group',
+  Serviceaccount = 'serviceaccount',
+  User = 'user'
 }
 
 export interface Prompt {
@@ -713,6 +798,10 @@ export type ResolversTypes = ResolversObject<{
   Model: ResolverTypeWrapper<Model>;
   ModelInput: ModelInput;
   Mutation: ResolverTypeWrapper<{}>;
+  Permission: ResolverTypeWrapper<Permission>;
+  PermissionInput: PermissionInput;
+  PermissionRelation: PermissionRelation;
+  PermissionSubjectType: PermissionSubjectType;
   Prompt: ResolverTypeWrapper<Prompt>;
   PromptInput: PromptInput;
   Query: ResolverTypeWrapper<{}>;
@@ -770,6 +859,8 @@ export type ResolversParentTypes = ResolversObject<{
   Model: Model;
   ModelInput: ModelInput;
   Mutation: {};
+  Permission: Permission;
+  PermissionInput: PermissionInput;
   Prompt: Prompt;
   PromptInput: PromptInput;
   Query: {};
@@ -810,6 +901,7 @@ export type CollectionResolvers<ContextType = any, ParentType extends ResolversP
   labels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   modified?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  permissions?: Resolver<Array<ResolversTypes['Permission']>, ParentType, ContextType>;
   traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['CollectionType'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -856,6 +948,7 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
   modified?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   parentId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  permissions?: Resolver<Array<ResolversTypes['Permission']>, ParentType, ContextType>;
   sourceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   sourceIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   supplementaries?: Resolver<Array<ResolversTypes['Supplementary']>, ParentType, ContextType>;
@@ -889,7 +982,10 @@ export type ModelResolvers<ContextType = any, ParentType extends ResolversParent
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  addCollection?: Resolver<Maybe<ResolversTypes['Collection']>, ParentType, ContextType, RequireFields<MutationAddCollectionArgs, 'collection'>>;
+  addCollectionPermissions?: Resolver<Maybe<ResolversTypes['Collection']>, ParentType, ContextType, RequireFields<MutationAddCollectionPermissionsArgs, 'id' | 'permissions'>>;
   addMetadata?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationAddMetadataArgs, 'metadata'>>;
+  addMetadataPermissions?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationAddMetadataPermissionsArgs, 'id' | 'permissions'>>;
   addModel?: Resolver<ResolversTypes['Model'], ParentType, ContextType, RequireFields<MutationAddModelArgs, 'model'>>;
   addPrompt?: Resolver<ResolversTypes['Prompt'], ParentType, ContextType, RequireFields<MutationAddPromptArgs, 'prompt'>>;
   addSource?: Resolver<ResolversTypes['Source'], ParentType, ContextType, RequireFields<MutationAddSourceArgs, 'source'>>;
@@ -898,6 +994,10 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addWorkflowActivity?: Resolver<ResolversTypes['WorkflowActivity'], ParentType, ContextType, Partial<MutationAddWorkflowActivityArgs>>;
   addWorkflowState?: Resolver<ResolversTypes['WorkflowState'], ParentType, ContextType, Partial<MutationAddWorkflowStateArgs>>;
   addWorkflowStateTransition?: Resolver<ResolversTypes['WorkflowStateTransition'], ParentType, ContextType, RequireFields<MutationAddWorkflowStateTransitionArgs, 'workflow'>>;
+  deleteCollection?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteCollectionArgs, 'id'>>;
+  deleteCollectionPermissions?: Resolver<Maybe<ResolversTypes['Collection']>, ParentType, ContextType, RequireFields<MutationDeleteCollectionPermissionsArgs, 'id' | 'permissions'>>;
+  deleteMetadata?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteMetadataArgs, 'id'>>;
+  deleteMetadataPermissions?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationDeleteMetadataPermissionsArgs, 'id' | 'permissions'>>;
   deleteModel?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteModelArgs, 'id'>>;
   deletePrompt?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePromptArgs, 'id'>>;
   deleteSource?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteSourceArgs, 'id'>>;
@@ -916,6 +1016,14 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   setMetadataReady?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataReadyArgs, 'id'>>;
   setMetadataTextContent?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataTextContentArgs, 'id'>>;
   setPassword?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationSetPasswordArgs, 'password'>>;
+  signup?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'firstName' | 'lastName' | 'password' | 'username'>>;
+}>;
+
+export type PermissionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Permission'] = ResolversParentTypes['Permission']> = ResolversObject<{
+  relation?: Resolver<ResolversTypes['PermissionRelation'], ParentType, ContextType>;
+  subject?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  subjectType?: Resolver<ResolversTypes['PermissionSubjectType'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type PromptResolvers<ContextType = any, ParentType extends ResolversParentTypes['Prompt'] = ResolversParentTypes['Prompt']> = ResolversObject<{
@@ -1088,6 +1196,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   MetadataWorkflowState?: MetadataWorkflowStateResolvers<ContextType>;
   Model?: ModelResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  Permission?: PermissionResolvers<ContextType>;
   Prompt?: PromptResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SignedUrl?: SignedUrlResolvers<ContextType>;

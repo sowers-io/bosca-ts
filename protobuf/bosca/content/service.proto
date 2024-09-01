@@ -105,9 +105,30 @@ service ContentService {
     };
   }
 
-  rpc AddCollectionPermission(Permission) returns (bosca.Empty) {
+  rpc AddCollectionPermissions(Permissions) returns (bosca.Empty) {
     option (google.api.http) = {
       post: "/v1/content/collections/{id}/permissions"
+      body: "*"
+    };
+  }
+
+  rpc DeleteCollectionPermissions(Permissions) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/collections/{id}/permissions"
+      body: "*"
+    };
+  }
+
+  rpc AddCollectionPermission(Permission) returns (bosca.Empty) {
+    option (google.api.http) = {
+      post: "/v1/content/collections/{id}/permission"
+      body: "*"
+    };
+  }
+
+  rpc DeleteCollectionPermission(Permission) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/collections/{id}/permission"
       body: "*"
     };
   }
@@ -281,9 +302,23 @@ service ContentService {
     };
   }
 
+  rpc DeleteMetadataPermissions(Permissions) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/metadata/{id}/permission"
+      body: "*"
+    };
+  }
+
   rpc AddMetadataPermission(Permission) returns (bosca.Empty) {
     option (google.api.http) = {
       post: "/v1/content/metadata/{id}/permission"
+      body: "*"
+    };
+  }
+
+  rpc DeleteMetadataPermission(Permission) returns (bosca.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/content/metadata/{id}/permission"
       body: "*"
     };
   }

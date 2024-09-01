@@ -28,7 +28,7 @@ import {
 } from '@bosca/protobufs'
 import { AdministratorGroup } from './permissions'
 import { ContentDataSource } from '../../datasources/content'
-import { PermissionManager, StateProcessing, Subject, useServiceAccountClient } from '@bosca/common'
+import { logger, PermissionManager, StateProcessing, Subject, useServiceAccountClient } from '@bosca/common'
 import { Code, ConnectError } from '@connectrpc/connect'
 import { findNonUniqueId } from './collections'
 
@@ -54,7 +54,14 @@ export async function addMetadata(
     const newPermissions = newMetadataPermissions(serviceAccountId, subject.id, metadataId)
     await permissions.createRelationships(PermissionObjectType.metadata_type, newPermissions)
     if (parentId && parentId.length > 0) {
-      await dataSource.addCollectionItemId(parentId, null, metadataId)
+      try {
+        await dataSource.addCollectionItemId(parentId, null, metadataId)
+      } catch (e: any) {
+        logger.error({ parentId, metadataId }, 'failed to add collection item id')
+        if (!e.message.toString().includes('duplicate key value violates unique constraint')) {
+          throw e
+        }
+      }
     }
     await permissions.waitForPermissions(PermissionObjectType.metadata_type, newPermissions)
   }

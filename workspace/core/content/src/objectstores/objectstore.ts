@@ -17,9 +17,9 @@
 import { Metadata, MetadataSupplementary, SignedUrl } from '@bosca/protobufs'
 
 export interface ObjectStore {
-  createUploadUrl(metadata: Metadata | MetadataSupplementary): Promise<SignedUrl>
+  createUploadUrl(metadata: Metadata, supplementary: MetadataSupplementary | null): Promise<SignedUrl>
 
-  createDownloadUrl(metadata: Metadata | MetadataSupplementary): Promise<SignedUrl>
+  createDownloadUrl(metadata: Metadata, supplementary: MetadataSupplementary | null): Promise<SignedUrl>
 
-  delete(metadata: Metadata | MetadataSupplementary | string): Promise<void>
+  delete(metadata: Metadata, supplementary: MetadataSupplementary | null): Promise<void>
 }

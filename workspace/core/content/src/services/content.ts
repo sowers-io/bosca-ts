@@ -442,13 +442,10 @@ export function content(
       if (!metadata) {
         throw new ConnectError('missing metadata', Code.NotFound)
       }
-      await objectStore.delete(metadata)
-      if (metadata.sourceIdentifier) {
-        await objectStore.delete(metadata.sourceIdentifier.split('+')[0])
-      }
+      await objectStore.delete(metadata, null)
       const supplementaries = await dataSource.getMetadataSupplementaries(metadata.id)
       for (const supplementary of supplementaries) {
-        await objectStore.delete(supplementary)
+        await objectStore.delete(metadata, supplementary)
       }
       await dataSource.deleteMetadata(request.id)
       return new Empty()
@@ -494,7 +491,7 @@ export function content(
       if (!metadata) {
         throw new ConnectError('missing metadata', Code.NotFound)
       }
-      return await objectStore.createUploadUrl(metadata)
+      return await objectStore.createUploadUrl(metadata, null)
     },
     async getMetadataDownloadUrl(request, context) {
       const subject = context.values.get(SubjectKey)
@@ -511,7 +508,7 @@ export function content(
           })
         }
       }
-      return await objectStore.createDownloadUrl(metadata)
+      return await objectStore.createDownloadUrl(metadata, null)
     },
     async addMetadataSupplementary(request, context) {
       const subject = context.values.get(SubjectKey)
@@ -555,20 +552,28 @@ export function content(
         request.id,
         PermissionAction.service,
       )
+      const metadata = await dataSource.getMetadata(request.id)
+      if (!metadata) {
+        throw new ConnectError('missing metadata', Code.NotFound)
+      }
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
         throw new ConnectError('missing supplementary', Code.NotFound)
       }
-      return objectStore.createUploadUrl(supplementary)
+      return objectStore.createUploadUrl(metadata, supplementary)
     },
     async getMetadataSupplementaryDownloadUrl(request, context) {
       const subject = context.values.get(SubjectKey)
       await permissions.checkWithError(subject, PermissionObjectType.metadata_type, request.id, PermissionAction.view)
+      const metadata = await dataSource.getMetadata(request.id)
+      if (!metadata) {
+        throw new ConnectError('missing metadata', Code.NotFound)
+      }
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
         throw new ConnectError('missing supplementary', Code.NotFound)
       }
-      return objectStore.createDownloadUrl(supplementary)
+      return objectStore.createDownloadUrl(metadata, supplementary)
     },
     async deleteMetadataSupplementary(request, context) {
       const subject = context.values.get(SubjectKey)
@@ -578,11 +583,15 @@ export function content(
         request.id,
         PermissionAction.service,
       )
+      const metadata = await dataSource.getMetadata(request.id)
+      if (!metadata) {
+        throw new ConnectError('missing metadata', Code.NotFound)
+      }
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
         throw new ConnectError('missing supplementary', Code.NotFound)
       }
-      await objectStore.delete(supplementary)
+      await objectStore.delete(metadata, supplementary)
       await dataSource.deleteMetadataSupplementary(request.id, request.key)
     },
     async getMetadataSupplementaries(request, context) {

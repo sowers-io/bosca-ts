@@ -43,24 +43,18 @@ export class S3ObjectStore implements ObjectStore {
     })
   }
 
-  private getId(metadata: Metadata | MetadataSupplementary | string): string {
-    if (metadata instanceof Metadata) {
-      if (metadata.sourceIdentifier) {
-        return metadata.sourceIdentifier.split('+')[0]
-      }
-      return metadata.id
-    } else if (metadata instanceof MetadataSupplementary) {
-      return metadata.metadataId + '.' + metadata.key
-    } else {
-      return metadata
+  private getId(metadata: Metadata, supplementary: MetadataSupplementary | null): string {
+    if (supplementary) {
+      return metadata.id + '.' + metadata.version + '.' + supplementary.key
     }
+    return metadata.id + '.' + metadata.version
   }
 
-  async createUploadUrl(metadata: Metadata | MetadataSupplementary): Promise<SignedUrl> {
+  async createUploadUrl(metadata: Metadata, supplementary: MetadataSupplementary | null): Promise<SignedUrl> {
     if (!metadata.contentLength) {
       throw new ConnectError('metadata does not have a content length', Code.FailedPrecondition)
     }
-    const id = this.getId(metadata)
+    const id = this.getId(metadata, supplementary)
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: id,
@@ -82,8 +76,8 @@ export class S3ObjectStore implements ObjectStore {
     })
   }
 
-  async createDownloadUrl(metadata: Metadata | MetadataSupplementary): Promise<SignedUrl> {
-    const id = this.getId(metadata)
+  async createDownloadUrl(metadata: Metadata, supplementary: MetadataSupplementary | null): Promise<SignedUrl> {
+    const id = this.getId(metadata, supplementary)
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: id,
@@ -95,8 +89,8 @@ export class S3ObjectStore implements ObjectStore {
     return new SignedUrl({ id: id, method: 'GET', url: url })
   }
 
-  async delete(metadata: Metadata | MetadataSupplementary | string): Promise<void> {
-    const id = this.getId(metadata)
+  async delete(metadata: Metadata, supplementary: MetadataSupplementary | null): Promise<void> {
+    const id = this.getId(metadata, supplementary)
     // await this.client.removeObject(this.bucket, id)
     await this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: id }))
   }

@@ -117,6 +117,11 @@ export interface Metadata {
 }
 
 
+export interface MetadataSupplementariesArgs {
+  key?: InputMaybe<Array<Scalars['String']['input']>>;
+}
+
+
 export interface MetadataSupplementaryArgs {
   key: Scalars['String']['input'];
 }
@@ -388,7 +393,6 @@ export interface MutationSignupArgs {
   firstName: Scalars['String']['input'];
   lastName: Scalars['String']['input'];
   password: Scalars['String']['input'];
-  username: Scalars['String']['input'];
 }
 
 export interface Permission {
@@ -951,7 +955,7 @@ export type MetadataResolvers<ContextType = any, ParentType extends ResolversPar
   permissions?: Resolver<Array<ResolversTypes['Permission']>, ParentType, ContextType>;
   sourceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   sourceIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  supplementaries?: Resolver<Array<ResolversTypes['Supplementary']>, ParentType, ContextType>;
+  supplementaries?: Resolver<Array<ResolversTypes['Supplementary']>, ParentType, ContextType, Partial<MetadataSupplementariesArgs>>;
   supplementary?: Resolver<Maybe<ResolversTypes['Supplementary']>, ParentType, ContextType, RequireFields<MetadataSupplementaryArgs, 'key'>>;
   traitIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   uploadUrl?: Resolver<ResolversTypes['SignedUrl'], ParentType, ContextType>;
@@ -1016,7 +1020,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   setMetadataReady?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataReadyArgs, 'id'>>;
   setMetadataTextContent?: Resolver<Maybe<ResolversTypes['Metadata']>, ParentType, ContextType, RequireFields<MutationSetMetadataTextContentArgs, 'id'>>;
   setPassword?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationSetPasswordArgs, 'password'>>;
-  signup?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'firstName' | 'lastName' | 'password' | 'username'>>;
+  signup?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'firstName' | 'lastName' | 'password'>>;
 }>;
 
 export type PermissionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Permission'] = ResolversParentTypes['Permission']> = ResolversObject<{

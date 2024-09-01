@@ -82,7 +82,7 @@ type Metadata {
     content: MetadataContent
 
     supplementary(key: String!): Supplementary
-    supplementaries: [Supplementary!]!
+    supplementaries(key: [String!]): [Supplementary!]!
 
     permissions: [Permission!]!
 }

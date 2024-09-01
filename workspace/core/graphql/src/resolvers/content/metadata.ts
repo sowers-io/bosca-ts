@@ -102,14 +102,17 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         return response?.toJson() as unknown as Supplementary
       }))
     },
-    supplementaries: async (parent, _, context) => {
+    supplementaries: async (parent, args, context) => {
       return (await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const request = new IdRequest({ id: parent.id })
         const response = await service.getMetadataSupplementaries(request, {
           headers: getGraphQLHeaders(context),
         })
-        return response.supplementaries.map((s) => s.toJson()) as unknown as Supplementary[]
+        return response
+          .supplementaries
+          .filter((s) => !args.key || args.key?.includes(s.key))
+          .map((s) => s.toJson()) as unknown as Supplementary[]
       }))!
     },
     permissions: async (parent, _, context) => {

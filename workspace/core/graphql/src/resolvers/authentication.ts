@@ -61,7 +61,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
             password: args.password,
           },
         })
-        return updatedFlow.session_token || null
+        return updatedFlow.identity.id
       } catch (e) {
         logger.error({ error: e }, 'failed to signup')
         throw e

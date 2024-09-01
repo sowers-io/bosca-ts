@@ -24,7 +24,7 @@ import routes from './routes'
 import fs from 'node:fs'
 
 async function main() {
-  const configuration = newConfiguration(fs.readFileSync('configuration.json', 'utf8'))
+  const configuration = newConfiguration(fs.readFileSync(process.env.CONFIGURATION_FILE || 'configuration.json', 'utf8'))
   const connection: ConnectionOptions = {
     host: (process.env.BOSCA_REDIS_HOST || 'localhost'),
     port: parseInt(process.env.BOSCA_REDIS_PORT || '6379'),

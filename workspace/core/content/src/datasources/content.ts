@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DataSource, Subject } from '@bosca/common'
+import { DataSource, logger, Subject } from '@bosca/common'
 import {
   Collection,
   CollectionType,
@@ -190,11 +190,18 @@ export class ContentDataSource extends DataSource {
   }
 
   async addCollectionItemId(collectionId: string, childCollectionId: string | null, childMetadataId: string | null): Promise<void> {
-    await this.query('insert into collection_items (collection_id, child_collection_id, child_metadata_id) values ($1::uuid, $2::uuid, $3::uuid)', [
-      collectionId,
-      childCollectionId,
-      childMetadataId,
-    ])
+    try {
+      await this.query('insert into collection_items (collection_id, child_collection_id, child_metadata_id) values ($1::uuid, $2::uuid, $3::uuid)', [
+        collectionId,
+        childCollectionId,
+        childMetadataId,
+      ])
+    } catch (e: any) {
+      logger.debug({ collectionId, childCollectionId, childMetadataId }, 'failed to add collection item, it already exists')
+      if (!e.message.toString().includes('duplicate key value violates unique constraint')) {
+        throw e
+      }
+    }
   }
 
   async deleteCollection(id: string): Promise<void> {

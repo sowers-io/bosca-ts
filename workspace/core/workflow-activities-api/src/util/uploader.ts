@@ -22,7 +22,6 @@ import {
   ContentService,
   IdRequest,
   IdResponses,
-  MetadataSupplementary,
   SupplementaryIdRequest,
 } from '@bosca/protobufs'
 import { logger, useServiceAccountClient } from '@bosca/common'

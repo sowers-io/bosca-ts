@@ -113,14 +113,7 @@ export async function addCollection(
   const newPermissions = newCollectionPermissions(serviceAccountId, subject.id, id)
   await permissions.createRelationships(PermissionObjectType.collection_type, newPermissions)
   if (parentId && parentId.length) {
-    try {
-      await dataSource.addCollectionItemId(parentId, id, null)
-    } catch (e: any) {
-      logger.error({ parentId, id }, 'failed to add collection item id')
-      if (!e.message.toString().includes('duplicate key value violates unique constraint')) {
-        throw e
-      }
-    }
+    await dataSource.addCollectionItemId(parentId, id, null)
   }
   await permissions.waitForPermissions(PermissionObjectType.collection_type, newPermissions)
   return new IdResponsesId({ id: id })

@@ -53,6 +53,7 @@ import { ObjectStore } from '../objectstores/objectstore'
 import { addCollection, getCollectionItems, setCollectionReady } from './util/collections'
 import { addMetadata, setMetadataReady, setMetadataSupplementaryReady, setWorkflowStateComplete } from './util/metadata'
 import { toValidIds } from './util/permissions'
+import { error } from 'console'
 
 export function content(
   router: ConnectRouter,
@@ -269,20 +270,13 @@ export function content(
         request.collectionId,
         PermissionAction.manage,
       )
-      try {
-        switch (request.itemId.case) {
-          case 'childCollectionId':
-            await dataSource.addCollectionItemId(request.collectionId, request.itemId.value, null)
-            break
-          case 'childMetadataId':
-            await dataSource.addCollectionItemId(request.collectionId, null, request.itemId.value)
-            break
-        }
-      } catch (e: any) {
-        logger.error({ request, error: e }, 'failed to add collection item')
-        if (!e.message.toString().includes('duplicate key value violates unique constraint')) {
-          throw e
-        }
+      switch (request.itemId.case) {
+        case 'childCollectionId':
+          await dataSource.addCollectionItemId(request.collectionId, request.itemId.value, null)
+          break
+        case 'childMetadataId':
+          await dataSource.addCollectionItemId(request.collectionId, null, request.itemId.value)
+          break
       }
       return new Empty()
     },
@@ -568,6 +562,16 @@ export function content(
         request.metadataId,
         PermissionAction.service,
       )
+      const newMetadataSupplementary = new MetadataSupplementary({
+        metadataId: request.metadataId,
+        key: request.key,
+        name: request.name,
+        contentType: request.contentType,
+        contentLength: request.contentLength,
+        traitIds: request.traitIds,
+        sourceId: request.sourceId,
+        sourceIdentifier: request.sourceIdentifier,
+      })
       try {
         await dataSource.addMetadataSupplementary(
           request.metadataId,
@@ -580,20 +584,15 @@ export function content(
           request.sourceIdentifier || null,
         )
       } catch (e: any) {
+        logger.error({ error: e, metadataId: request.metadataId, key: request.key }, 'failed to add metadata supplementary')
         if (e.message.toString().includes('duplicate key value violates unique constraint')) {
-          throw new ConnectError('duplicate key', Code.AlreadyExists)
+          const old = await dataSource.getMetadataSupplementary(request.metadataId, request.key)
+          if (!old || !old.equals(newMetadataSupplementary)) {
+            throw new ConnectError('duplicate key', Code.AlreadyExists)
+          }
         }
       }
-      return new MetadataSupplementary({
-        metadataId: request.metadataId,
-        key: request.key,
-        name: request.name,
-        contentType: request.contentType,
-        contentLength: request.contentLength,
-        traitIds: request.traitIds,
-        sourceId: request.sourceId,
-        sourceIdentifier: request.sourceIdentifier,
-      })
+      return newMetadataSupplementary
     },
     async setMetadataSupplementaryReady(request, context) {
       const subject = context.values.get(SubjectKey)

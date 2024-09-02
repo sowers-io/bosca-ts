@@ -74,7 +74,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)
       })
@@ -86,7 +86,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const service = useClient(ContentService)
         const queueService = useServiceAccountClient(WorkflowQueueService)
         const jobIds = await service.getMetadataWorkflowJobs(new IdRequest({ id: parent.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         const jobs: MetadataWorkflowJob[] = []
         for (const jobId of jobIds.ids) {
@@ -105,7 +105,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const service = useClient(ContentService)
         const request = new SupplementaryIdRequest({ id: parent.id, key: args.key })
         const response = await service.getMetadataSupplementary(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return response?.toJson() as unknown as Supplementary
       }))
@@ -115,7 +115,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const service = useClient(ContentService)
         const request = new IdRequest({ id: parent.id })
         const response = await service.getMetadataSupplementaries(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return response
           .supplementaries
@@ -128,7 +128,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const service = useClient(ContentService)
         const request = new IdRequest({ id: parent.id })
         const response = await service.getMetadataPermissions(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return toGraphPermissions(parent.id, response)
       }))!
@@ -148,7 +148,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
           const service = useClient(ContentService)
           const request = new IdRequest({ id: parent.id })
           return await service.getMetadataDownloadUrl(request, {
-            headers: getGraphQLHeaders(context),
+            headers: await getGraphQLHeaders(context),
           })
         })
         if (!url) return result
@@ -170,7 +170,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL<GSignedUrl>(async () => {
         const service = useClient(ContentService)
         const url = await service.getMetadataUploadUrl(new IdRequest({ id: parent.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
       })
@@ -180,7 +180,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return (await executeGraphQL(async () => {
         const service = useClient(ContentService)
         const url = await service.getMetadataDownloadUrl(new IdRequest({ id: parent.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
       }))!
@@ -193,7 +193,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const service = useClient(ContentService)
         const request = new SupplementaryIdRequest({ id: parent.id, key: parent.key })
         const url = await service.getMetadataSupplementaryDownloadUrl(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return url.toJson() as unknown as GSignedUrl
       })
@@ -216,7 +216,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
           const service = useClient(ContentService)
           const request = new SupplementaryIdRequest({ id: parent.metadataId, key: parent.key })
           return await service.getMetadataSupplementaryDownloadUrl(request, {
-            headers: getGraphQLHeaders(context),
+            headers: await getGraphQLHeaders(context),
           })
         })
         if (!url) return result
@@ -248,14 +248,14 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
               languageTag: args.metadata.languageTag,
             },
           }), {
-            headers: getGraphQLHeaders(context),
+            headers: await getGraphQLHeaders(context),
           },
         )
         let lastError: any | null = null
         for (let tries = 0; tries < 100; tries++) {
           try {
             const metadata = await service.getMetadata(new IdRequest({ id: response.id }), {
-              headers: getGraphQLHeaders(context),
+              headers: await getGraphQLHeaders(context),
             })
             return transformMetadata(metadata)
           } catch (e) {
@@ -273,10 +273,10 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         await service.setMetadataReady(new MetadataReadyRequest({ id: args.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)
       })
@@ -285,10 +285,10 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         await service.addMetadataPermissions(toGrpcPermissions(args.id, args.permissions), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)
       })
@@ -297,10 +297,10 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         await service.deleteMetadataPermissions(toGrpcPermissions(args.id, args.permissions), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         const metadata = await service.getMetadata(new IdRequest({ id: args.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)
       })
@@ -309,7 +309,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         await service.deleteMetadata(new IdRequest({ id: args.id! }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return true
       })
@@ -320,12 +320,12 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const service = useClient(ContentService)
         const idRequest = new IdRequest({ id: args.id })
         const url = await service.getMetadataUploadUrl(idRequest, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         const content = typeof args.json === 'string' ? args.json : JSON.stringify(args.json)
         await executeHttpRequest(url, toArrayBuffer(content))
         const metadata = await service.getMetadata(idRequest, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)
       })
@@ -336,11 +336,11 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const service = useClient(ContentService)
         const idRequest = new IdRequest({ id: args.id })
         const url = await service.getMetadataUploadUrl(idRequest, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         await executeHttpRequest(url, toArrayBuffer(args.text!))
         const metadata = await service.getMetadata(idRequest, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return transformMetadata(metadata)
       })

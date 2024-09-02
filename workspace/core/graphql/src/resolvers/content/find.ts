@@ -44,7 +44,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         }
         const service = useClient(ContentService)
         const collections = await service.findCollection(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return collections.collections.map((c) => {
           return transformCollection(c)
@@ -61,7 +61,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         }
         const service = useClient(ContentService)
         const metadata = await service.findMetadata(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return metadata.metadata.map((m) => {
           return transformMetadata(m)

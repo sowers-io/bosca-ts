@@ -25,7 +25,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL<GTrait[]>(async () => {
         const service = useClient(ContentService)
         const traits = await service.getTraits(new Empty(), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return traits.traits.map((s) => s.toJson()) as unknown as GTrait[]
       })
@@ -34,7 +34,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL<GTrait | null>(async () => {
         const service = useClient(ContentService)
         const trait = await service.getTrait(new IdRequest({ id: id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return trait.toJson() as unknown as GTrait
       })

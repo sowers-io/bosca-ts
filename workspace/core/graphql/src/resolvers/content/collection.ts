@@ -55,7 +55,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
           id = '00000000-0000-0000-0000-000000000000'
         }
         const collection = await service.getCollection(new IdRequest({ id: id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         if (!collection) return null
         return transformCollection(collection)
@@ -73,14 +73,14 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
               name: args.collection.name,
             },
           }), {
-            headers: getGraphQLHeaders(context),
+            headers: await getGraphQLHeaders(context),
           },
         )
         let lastError: any | null = null
         for (let tries = 0; tries < 100; tries++) {
           try {
             const collection = await service.getCollection(new IdRequest({ id: response.id }), {
-              headers: getGraphQLHeaders(context),
+              headers: await getGraphQLHeaders(context),
             })
             return transformCollection(collection)
           } catch (e) {
@@ -98,7 +98,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         await service.deleteCollection(new IdRequest({ id: args.id! }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return true
       })
@@ -107,10 +107,10 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         await service.addCollectionPermissions(toGrpcPermissions(args.id, args.permissions), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         const metadata = await service.getCollection(new IdRequest({ id: args.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return transformCollection(metadata)
       })
@@ -119,10 +119,10 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL(async () => {
         const service = useClient(ContentService)
         await service.deleteCollectionPermissions(toGrpcPermissions(args.id, args.permissions), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         const collection = await service.getCollection(new IdRequest({ id: args.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return transformCollection(collection)
       })
@@ -133,7 +133,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL<GCollectionItem[]>(async () => {
         const service = useClient(ContentService)
         const items = await service.getCollectionItems(new IdRequest({ id: parent.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return items.items.filter((item) => {
           if (args.filter) {
@@ -167,7 +167,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         const service = useClient(ContentService)
         const request = new IdRequest({ id: parent.id })
         const response = await service.getCollectionPermissions(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return toGraphPermissions(parent.id, response)
       }))!

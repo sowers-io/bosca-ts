@@ -43,7 +43,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
           context: ctx,
         })
         const response = await service.executeWorkflow(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         if (response.error) {
           throw new GraphQLError(response.error)
@@ -85,7 +85,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL<Workflow>(async () => {
         const service = useClient(WorkflowService)
         const workflow = await service.getWorkflow(new IdRequest({ id: args.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         const j = workflow.toJson() as unknown as Workflow
         if (!j.name) j.name = workflow.id
@@ -96,7 +96,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL<Workflow[]>(async () => {
         const service = useClient(WorkflowService)
         const response = await service.getWorkflows(new Empty(), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return response.workflows.map((w) => {
           const j = w.toJson() as unknown as Workflow
@@ -111,7 +111,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
       return await executeGraphQL<WorkflowActivity[]>(async () => {
         const service = useClient(WorkflowService)
         const response = await service.getWorkflowActivities(new IdRequest({ id: parent.id }), {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return response.activities.map((a) => {
           const j = a.toJson() as unknown as WorkflowActivity
@@ -156,7 +156,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         // @ts-ignore
         const request = new WorkflowActivityIdIntRequest({ workflowId: parent.workflowId, workflowActivityId: protoInt64.parse(parent.id) })
         const response = await service.getWorkflowActivityPrompts(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return response.prompts.map((w) => {
           const j = w.toJson() as unknown as WorkflowActivityPrompt
@@ -179,7 +179,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         // @ts-ignore
         const request = new WorkflowActivityIdIntRequest({ workflowId: parent.workflowId, workflowActivityId: protoInt64.parse(parent.id) })
         const response = await service.getWorkflowActivityModels(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return response.models.map((w) => {
           const j = w.toJson() as unknown as WorkflowActivityModel
@@ -202,7 +202,7 @@ export const resolvers: Resolvers<GraphQLRequestContext> = {
         // @ts-ignore
         const request = new WorkflowActivityIdIntRequest({ workflowId: parent.workflowId, workflowActivityId: protoInt64.parse(parent.id) })
         const response = await service.getWorkflowActivityStorageSystems(request, {
-          headers: getGraphQLHeaders(context),
+          headers: await getGraphQLHeaders(context),
         })
         return response.systems.map((w) => {
           const j = w.toJson() as unknown as WorkflowActivityStorageSystem

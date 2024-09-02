@@ -18,6 +18,7 @@ import { GraphQLError } from 'graphql/error'
 import { ConnectError, Code } from '@connectrpc/connect'
 import { GraphQLRequestContext } from './graphql'
 import { logger } from '../logger'
+import { Configuration, FrontendApi } from '@ory/kratos-client-fetch'
 
 export function getAuthenticationToken(context: GraphQLRequestContext): string | null {
   // @ts-ignore
@@ -30,12 +31,32 @@ export function getAuthenticationToken(context: GraphQLRequestContext): string |
   return null
 }
 
-export function getGraphQLHeaders(context: GraphQLRequestContext): Record<string, string> {
+export async function getGraphQLHeaders(context: GraphQLRequestContext): Promise<Record<string, string>> {
   const headers: Record<string, string> = {}
   // @ts-ignore
   const authorization = context.request.headers.headersInit!['authorization']
   if (authorization && authorization.length > 0) {
-    headers['Authorization'] = authorization
+    if (authorization.startsWith('Basic ')) {
+      const encoded = authorization.substring('Basic '.length)
+      const parts = Buffer.from(encoded, 'base64').toString('utf8').split(':')
+      const configuration = new Configuration({
+        basePath: process.env.KRATOS_BASE_PATH,
+      })
+      const client = new FrontendApi(configuration)
+      const loginFlow = await client.createNativeLoginFlow({})
+      const updatedFlow = await client.updateLoginFlow({
+        flow: loginFlow.id,
+        updateLoginFlowBody: {
+          method: 'password',
+          identifier: parts[0],
+          password: parts[1].replace('\n', ''),
+          password_identifier: parts[0],
+        },
+      })
+      headers['Authorization'] = 'Bearer ' + (updatedFlow.session_token || null)
+    } else {
+      headers['Authorization'] = authorization
+    }
   }
   return headers
 }

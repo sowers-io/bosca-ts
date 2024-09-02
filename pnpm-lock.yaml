@@ -237,6 +237,9 @@ importers:
       '@opentelemetry/semantic-conventions':
         specifier: ^1.25.1
         version: 1.25.1
+      '@ory/kratos-client-fetch':
+        specifier: ^1.2.1
+        version: 1.2.1
       fastify:
         specifier: ^4.28.1
         version: 4.28.1

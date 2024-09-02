@@ -114,7 +114,7 @@ export async function setMetadataSupplementaryReady(
   supplementaryId: string,
 ) {
   const supplementary = await dataSource.getMetadataSupplementary(metadataId, supplementaryId)
-  if (!supplementary) throw new ConnectError('missing metadata supplementary', Code.NotFound)
+  if (!supplementary) throw new ConnectError('missing metadata supplementary: ' + metadataId + ' / ' + supplementaryId, Code.NotFound)
   await permissions.checkWithError(subject, PermissionObjectType.metadata_type, supplementary.metadataId, PermissionAction.manage)
   await dataSource.setMetadataSupplementaryReady(metadataId, supplementaryId)
   if (!supplementary.traitIds || supplementary.traitIds.length === 0) return

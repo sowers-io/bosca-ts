@@ -118,6 +118,9 @@ export async function uploadSupplementary(
     }
     await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
     const uploadUrl = await getMetadataSupplementaryUploadUrl(idRequest)
+    if (!uploadUrl) {
+      throw new Error('metadata supplementary upload url not found')
+    }
     await execute(uploadUrl, buffer)
     await useServiceAccountClient(ContentService).setMetadataSupplementaryReady(idRequest)
   })

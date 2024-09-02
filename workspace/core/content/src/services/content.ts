@@ -612,7 +612,7 @@ export function content(
       }
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
-        throw new ConnectError('missing supplementary', Code.NotFound)
+        throw new ConnectError('missing supplementary: ' + request.id + '/' + request.key, Code.NotFound)
       }
       return objectStore.createUploadUrl(metadata, supplementary)
     },
@@ -625,11 +625,12 @@ export function content(
       }
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
-        throw new ConnectError('missing supplementary', Code.NotFound)
+        throw new ConnectError('missing supplementary: ' + request.id + '/' + request.key, Code.NotFound)
       }
       return objectStore.createDownloadUrl(metadata, supplementary)
     },
     async deleteMetadataSupplementary(request, context) {
+      logger.info({ request }, 'deleteMetadataSupplementary')
       const subject = context.values.get(SubjectKey)
       await permissions.checkWithError(
         subject,
@@ -639,7 +640,7 @@ export function content(
       )
       const metadata = await dataSource.getMetadata(request.id)
       if (!metadata) {
-        throw new ConnectError('missing metadata', Code.NotFound)
+        return new Empty()
       }
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
@@ -660,6 +661,7 @@ export function content(
       return new MetadataSupplementaries({ supplementaries: await dataSource.getMetadataSupplementaries(request.id) })
     },
     async getMetadataSupplementary(request, context) {
+      logger.info({ request }, 'getMetadataSupplementary')
       const subject = context.values.get(SubjectKey)
       await permissions.checkWithError(
         subject,
@@ -669,7 +671,7 @@ export function content(
       )
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
-        throw new ConnectError('missing metadata supplementary', Code.NotFound)
+        throw new ConnectError('missing metadata supplementary: ' + request.id + '/' + request.key, Code.NotFound)
       }
       return supplementary
     },

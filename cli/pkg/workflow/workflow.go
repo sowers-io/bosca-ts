@@ -18,21 +18,4 @@ package workflow
 
 import (
 	_ "embed"
-	"gopkg.in/yaml.v3"
 )
-
-//go:embed workflows.yaml
-var b []byte
-
-func GetEmbeddedConfiguration() *Configuration {
-	configuration := &Configuration{}
-	err := yaml.Unmarshal(b, &configuration)
-	if err != nil {
-		panic(err)
-	}
-	err = configuration.Validate()
-	if err != nil {
-		panic(err)
-	}
-	return configuration
-}

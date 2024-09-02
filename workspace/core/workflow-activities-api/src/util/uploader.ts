@@ -105,15 +105,7 @@ export async function uploadSupplementary(
   await Retry.execute(10, async () => {
     const service = useServiceAccountClient(ContentService)
     const idRequest = new SupplementaryIdRequest({ id: metadataId, key: key })
-    try {
-      await service.deleteMetadataSupplementary(idRequest)
-    } catch (e) {
-      if (e instanceof ConnectError && e.code == Code.NotFound) {
-        logger.debug({ error: e }, 'metadata supplementary not found, cannot delete it')
-      } else {
-        logger.error({ error: e }, 'failed to delete metadata supplementary')
-      }
-    }
+    await service.deleteMetadataSupplementary(idRequest)
     const request = {
       metadataId: metadataId,
       key: key,

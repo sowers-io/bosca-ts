@@ -53,7 +53,6 @@ import { ObjectStore } from '../objectstores/objectstore'
 import { addCollection, getCollectionItems, setCollectionReady } from './util/collections'
 import { addMetadata, setMetadataReady, setMetadataSupplementaryReady, setWorkflowStateComplete } from './util/metadata'
 import { toValidIds } from './util/permissions'
-import { error } from 'console'
 
 export function content(
   router: ConnectRouter,
@@ -644,10 +643,11 @@ export function content(
       }
       const supplementary = await dataSource.getMetadataSupplementary(request.id, request.key)
       if (!supplementary) {
-        throw new ConnectError('missing supplementary', Code.NotFound)
+        return new Empty()
       }
       await objectStore.delete(metadata, supplementary)
       await dataSource.deleteMetadataSupplementary(request.id, request.key)
+      return new Empty()
     },
     async getMetadataSupplementaries(request, context) {
       const subject = context.values.get(SubjectKey)

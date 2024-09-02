@@ -585,10 +585,7 @@ export function content(
       } catch (e: any) {
         logger.error({ error: e, metadataId: request.metadataId, key: request.key }, 'failed to add metadata supplementary')
         if (e.message.toString().includes('duplicate key value violates unique constraint')) {
-          const old = await dataSource.getMetadataSupplementary(request.metadataId, request.key)
-          if (!old || !old.equals(newMetadataSupplementary)) {
-            throw new ConnectError('duplicate key', Code.AlreadyExists)
-          }
+          throw new ConnectError('duplicate key', Code.AlreadyExists)
         }
       }
       return newMetadataSupplementary
@@ -630,7 +627,6 @@ export function content(
       return objectStore.createDownloadUrl(metadata, supplementary)
     },
     async deleteMetadataSupplementary(request, context) {
-      logger.info({ request }, 'deleteMetadataSupplementary')
       const subject = context.values.get(SubjectKey)
       await permissions.checkWithError(
         subject,
@@ -661,7 +657,6 @@ export function content(
       return new MetadataSupplementaries({ supplementaries: await dataSource.getMetadataSupplementaries(request.id) })
     },
     async getMetadataSupplementary(request, context) {
-      logger.info({ request }, 'getMetadataSupplementary')
       const subject = context.values.get(SubjectKey)
       await permissions.checkWithError(
         subject,

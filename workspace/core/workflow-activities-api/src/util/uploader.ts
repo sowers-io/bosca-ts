@@ -105,7 +105,6 @@ export async function uploadSupplementary(
   await Retry.execute(10, async () => {
     const service = useServiceAccountClient(ContentService)
     const idRequest = new SupplementaryIdRequest({ id: metadataId, key: key })
-    await service.deleteMetadataSupplementary(idRequest)
     const request = {
       metadataId: metadataId,
       key: key,
@@ -116,7 +115,14 @@ export async function uploadSupplementary(
       sourceIdentifier: sourceIdentifier,
       traitIds: traitIds,
     }
-    await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
+    try {
+      await service.addMetadataSupplementary(new AddSupplementaryRequest(request))
+    } catch (e) {
+      if (e instanceof ConnectError && e.code == Code.AlreadyExists) {
+        await service.deleteMetadataSupplementary(idRequest)
+      }
+      throw e
+    }
     const uploadUrl = await getMetadataSupplementaryUploadUrl(idRequest)
     if (!uploadUrl) {
       throw new Error('metadata supplementary upload url not found')

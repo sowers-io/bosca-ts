@@ -17,9 +17,10 @@
 package qdrant
 
 import (
-	"bosca.io/pkg/search"
 	"context"
-	"github.com/qdrant/go-client/qdrant"
+
+	"bosca.io/pkg/search"
+	go_client "github.com/qdrant/go-client/qdrant"
 	"github.com/tmc/langchaingo/embeddings"
 	"github.com/tmc/langchaingo/llms"
 )

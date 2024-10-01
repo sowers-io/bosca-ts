@@ -24,17 +24,19 @@ export class DefaultContentElement extends ContentElement {
 
   readonly id: string
   readonly type: string
-  readonly percent: number
+  readonly index: number | undefined
+  readonly percent: number | undefined
 
   constructor(element: IContentElement) {
     super()
     this.id = element.id
     this.type = element.type
+    this.index = element.index
     this.percent = element.percent
   }
 
   clone(): ContentElement {
-    return new DefaultContentElement({ id: this.id, type: this.type, percent: this.percent })
+    return new DefaultContentElement({ id: this.id, type: this.type, index: this.index, percent: this.percent })
   }
 }
 
@@ -82,7 +84,7 @@ export class DefaultAnalyticEvent extends AnalyticEvent {
   }
 
   toParameters(): any {
-    const parameters: { [key: string ]: string } = {
+    const parameters: { [key: string ]: any } = {
       type: this.type.toString(),
       element_id: this.element.id,
       created: this.created.toISOString(),
@@ -90,11 +92,16 @@ export class DefaultAnalyticEvent extends AnalyticEvent {
     if (this.element.content) {
       let ix = 0
       for (const content of this.element.content) {
-        parameters['content_id_' + (ix++)] = content.id
-        parameters['content_id_type_' + (ix++)] = content.type
-        if (content.percent) {
-          parameters['content_id_percent_' + (ix++)] = content.percent.toFixed(1)
+        parameters['content_id_' + ix] = content.id
+        parameters['content_id_type_' + ix] = content.type
+        if (content.index !== undefined) {
+          parameters['content_id_index_' + ix] = content.index
+
         }
+        if (content.percent) {
+          parameters['content_id_percent_' + ix] = content.percent
+        }
+        ix++
       }
     }
     return parameters

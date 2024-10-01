@@ -7,7 +7,8 @@ export enum AnalyticEventType {
 export interface IContentElement {
   id: string
   type: string
-  percent: number
+  index: number | undefined
+  percent: number | undefined
 }
 
 export interface IAnalyticElement {
@@ -25,7 +26,8 @@ export interface IAnalyticEvent {
 export abstract class ContentElement {
   abstract get id(): string
   abstract get type(): string
-  abstract get percent(): number
+  abstract get index(): number | undefined
+  abstract get percent(): number | undefined
 
   abstract clone(): ContentElement
 }

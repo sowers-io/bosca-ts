@@ -8,7 +8,7 @@ export interface AnalyticEventFactory {
 
 let factory: AnalyticEventFactory = {
   async createEvent(event) {
-    return new DefaultAnalyticEvent(event, new DefaultAnalyticElement(event.element, event.element && event.element.content ? event.element.content.map((c) => new DefaultContentElement(c)) : []))
+    return new DefaultAnalyticEvent(event, new DefaultAnalyticElement(event.element, event.element ? event.element.extras : {}, event.element && event.element.content ? event.element.content.map((c) => new DefaultContentElement(c)) : []))
   },
 }
 
@@ -42,11 +42,13 @@ export class DefaultContentElement extends ContentElement {
 
 export class DefaultAnalyticElement extends AnalyticElement {
   private readonly element: IAnalyticElement
+  readonly extras: { [key: string]: string }
   readonly content: ContentElement[]
 
-  constructor(element: IAnalyticElement, content: ContentElement[]) {
+  constructor(element: IAnalyticElement, extras: { [key: string]: string }, content: ContentElement[]) {
     super()
     this.element = element
+    this.extras = extras
     this.content = content
   }
 
@@ -59,7 +61,7 @@ export class DefaultAnalyticElement extends AnalyticElement {
   }
 
   clone(): AnalyticElement {
-    return new DefaultAnalyticElement(this.element, this.content.map((c) => c.clone()))
+    return new DefaultAnalyticElement(this.element, this.extras, this.content.map((c) => c.clone()))
   }
 }
 
@@ -88,6 +90,11 @@ export class DefaultAnalyticEvent extends AnalyticEvent {
       type: this.type.toString(),
       element_id: this.element.id,
       created: this.created.toISOString(),
+    }
+    if (this.element.extras) {
+      for (const key in this.element.extras) {
+        parameters['extra_' + key] = this.element.extras[key]
+      }
     }
     if (this.element.content) {
       let ix = 0

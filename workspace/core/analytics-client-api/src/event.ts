@@ -36,6 +36,7 @@ export abstract class AnalyticElement {
   abstract get id(): string
   abstract get type(): string
   abstract get content(): ContentElement[]
+  abstract get extras(): { [key: string]: string }
   
   abstract clone(): AnalyticElement
 }

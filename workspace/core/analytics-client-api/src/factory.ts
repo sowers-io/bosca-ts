@@ -78,7 +78,7 @@ export class DefaultAnalyticEvent extends AnalyticEvent {
   }
 
   get name(): string {
-    return this.event.name
+    return this.event.type.toString()
   }
 
   toParameters(): any {

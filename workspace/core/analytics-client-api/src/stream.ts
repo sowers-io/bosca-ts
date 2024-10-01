@@ -1,4 +1,4 @@
-import { AnalyticEvent, IAnalyticEvent } from './event'
+import { AnalyticEvent, AnalyticEventType, IAnalyticElement, IAnalyticEvent } from './event'
 import { getAnalyticEventFactory } from './factory'
 
 let sinks: AnalyticEventSink[] = []
@@ -38,4 +38,25 @@ export async function logEvent(event: IAnalyticEvent): Promise<void> {
     promises.push(sink.add(ev))
   }
   await Promise.all(promises)
+}
+
+export async function logImpression(element: IAnalyticElement): Promise<void> {
+  await logEvent({
+    type: AnalyticEventType.impression,
+    element: element,
+  })
+}
+
+export async function logInteraction(element: IAnalyticElement): Promise<void> {
+  await logEvent({
+    type: AnalyticEventType.interaction,
+    element: element,
+  })
+}
+
+export async function logCompletion(element: IAnalyticElement): Promise<void> {
+  await logEvent({
+    type: AnalyticEventType.completion,
+    element: element,
+  })
 }

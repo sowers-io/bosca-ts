@@ -19,7 +19,6 @@ export interface IAnalyticElement {
 
 export interface IAnalyticEvent {
   type: AnalyticEventType
-  name: string
   element: IAnalyticElement
 }
 

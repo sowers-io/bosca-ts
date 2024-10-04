@@ -89,6 +89,7 @@ export class DefaultAnalyticEvent extends AnalyticEvent {
     const parameters: { [key: string ]: any } = {
       type: this.type.toString(),
       element_id: this.element.id,
+      element_type: this.element.type,
       created: this.created.toISOString(),
     }
     if (this.element.extras) {

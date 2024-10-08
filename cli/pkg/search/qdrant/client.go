@@ -22,8 +22,9 @@ import (
 
 	"context"
 	"errors"
+
 	"github.com/google/uuid"
-	"github.com/qdrant/go-client/qdrant"
+	go_client "github.com/qdrant/go-client/qdrant"
 	"github.com/tmc/langchaingo/embeddings"
 	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/vectorstores"
